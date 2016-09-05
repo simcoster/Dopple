@@ -13,7 +13,7 @@ namespace DoppleTry2.BackTrackers
         {
         }
 
-        protected override int[] GetBackRelatedIndices(int instructionIndex, Node currentNode)
+        protected override int[] GetDataflowBackRelatedIndices(int instructionIndex, Node currentNode)
         {
             var instructionWrapper = InstructionsWrappers[instructionIndex];
             int ldArgLoc;
@@ -36,7 +36,7 @@ namespace DoppleTry2.BackTrackers
                     break;
             }
             Code[] relevantCodes = {Code.Starg, Code.Starg_S};
-            var stArgIndex = SafeSearchBackwardsForInst(
+            var stArgIndex = SafeSearchBackwardsForDataflowInst(
                 x => relevantCodes.Contains(x.Instruction.OpCode.Code) && Convert.ToInt32(x.Instruction.Operand) == ldArgLoc ,
                 instructionIndex);
             if (stArgIndex == null)

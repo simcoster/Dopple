@@ -14,7 +14,7 @@ namespace DoppleTry2.BackTrackers
         {
         }
 
-        protected override int[] GetBackRelatedIndices(int instructionIndex, Node currentNode)
+        protected override int[] GetDataflowBackRelatedIndices(int instructionIndex, Node currentNode)
         {
             throw new NotImplementedException();
         }

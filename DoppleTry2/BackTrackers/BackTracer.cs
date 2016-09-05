@@ -20,62 +20,67 @@ namespace DoppleTry2.BackTrackers
             InstructionsWrappers = instructionsWrappers;
         }
 
-        public IEnumerable<Node> AddBackNodes(Node currentNode)
+        public IEnumerable<Node> AddBackDataflowNodes(Node currentNode)
         {
             InstructionsWrappers[currentNode.InstructionWrapperIndex].WasTreated = true;
-            if (!HasBackNodes)
+            if (!HasBackDataflowNodes)
             {
                 currentNode.HasBackNodes = false;
                 return new Node[0];
             }
-            var indexes = GetBackRelatedIndices(currentNode.InstructionWrapperIndex, currentNode);
+            var indexes = GetDataflowBackRelatedIndices(currentNode.InstructionWrapperIndex, currentNode);
             foreach (var backRelatedIndex in indexes)
             {
-                currentNode.BackNodes.Add(new Node(InstructionsWrappers[backRelatedIndex],backRelatedIndex));
+                currentNode.BackNodes.Add(new Node(InstructionsWrappers[backRelatedIndex], backRelatedIndex));
             }
             return currentNode.BackNodes;
         }
 
-        protected virtual bool HasBackNodes { get; } = true;
+        protected virtual bool HasBackDataflowNodes { get; } = true;
 
-        protected abstract int[] GetBackRelatedIndices(int instructionIndex, Node currentNode);
+        protected abstract int[] GetDataflowBackRelatedIndices(int instructionIndex, Node currentNode);
 
         public abstract Code[] HandlesCodes { get; }
 
-        protected int SearchBackwardsForInstrcution(Func<InstructionWrapper, bool> predicate, int startIndex)
+        protected IEnumerable<int> SearchBackwardsForInstrcution(Func<InstructionWrapper, bool> predicate,
+            int startIndex)
         {
-            return SearchBackwardsForInstrcutions(predicate,startIndex,1).First();
+            return SearchBackwardsForDataflowInstrcutions(predicate, startIndex);
         }
 
-        protected IEnumerable<int> SearchBackwardsForInstrcutions(Func<InstructionWrapper, bool> predicate, int startIndex, int howMany)
+        protected IEnumerable<int> SearchBackwardsForDataflowInstrcutions(Func<InstructionWrapper, bool> predicate,
+            int startIndex)
         {
-            List<int> foundIndecies = new List<int>();
-
+            List<int> foundIndexes = new List<int>();
             int index = startIndex;
-            for (int i = 0; i < howMany; i++)
+            bool found = false;
+            while (found == false)
             {
-                int? foundIndex = SafeSearchBackwardsForInst(predicate, index);
-                if (foundIndecies == null)
+                var currInstruction = InstructionsWrappers[index];
+                if (predicate.Invoke(currInstruction))
                 {
-                    throw new Exception("Searched instruction was not found");
+                    foundIndexes.Add(index);
+                    found = true;
                 }
-                index = foundIndex.Value;
-                foundIndecies.Add(foundIndex.Value);
-            }
-            return foundIndecies;
-        }
-
-
-        protected int? SafeSearchBackwardsForInst(Func<InstructionWrapper, bool> predicate, int startItem)
-        {
-            for (var i = startItem - 1; i >= 0; i--)
-            {
-                if (predicate.Invoke(InstructionsWrappers[i]))
+                else if (currInstruction.Back.Count == 1)
                 {
-                    return i;
+                    if (InstructionsWrappers.IndexOf(currInstruction.Back[0]) == 1)
+                    {
+                        throw new Exception("Reached first instruction without correct one found");
+                    }
+                    index--;
+                }
+                else
+                {
+                    foreach (var instructionWrapper in currInstruction.Back)
+                    {
+                        var branchindexes = SearchBackwardsForDataflowInstrcutions(predicate,
+                            InstructionsWrappers.IndexOf(instructionWrapper));
+                        foundIndexes.AddRange(branchindexes);
+                    }
                 }
             }
-            return null;
+            return foundIndexes;
         }
     }
 }

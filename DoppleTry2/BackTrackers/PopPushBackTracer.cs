@@ -8,7 +8,7 @@ namespace DoppleTry2.BackTrackers
 {
     public class SimplePopPush : BackTracer
     {
-        protected override int[] GetBackRelatedIndices(int instructionIndex, Node currentNode)
+        protected override int[] GetDataflowBackRelatedIndices(int instructionIndex, Node currentNode)
         {
             var stackPushingOpCode = new Func<InstructionWrapper, bool>(data => data.StackPushCount > 0);
             int firstInst = SearchBackwardsForInstrcution(stackPushingOpCode, instructionIndex);

@@ -18,7 +18,7 @@ namespace DoppleTry2.BackTrackers
         };
 
 
-        protected override int[] GetBackRelatedIndices(int instructionIndex, Node currentNode)
+        protected override int[] GetDataflowBackRelatedIndices(int instructionIndex, Node currentNode)
         {
             var code = InstructionsWrappers[instructionIndex].Instruction.OpCode.Code;
             var index = SearchBackwardsForInstrcution((x) => x.Instruction.OpCode.Code == _ldStLocs[code], instructionIndex);

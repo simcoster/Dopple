@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Mono.Cecil.Cil;
 
 namespace DoppleTry2
@@ -11,6 +12,8 @@ namespace DoppleTry2
         public LocationStore LocationStore { get; set; }
         public bool HasBackRelated { get; set; } = true;
         public int StackPopCount { get; set; }
+        public List<InstructionWrapper>  Next { get; set; } = new List<InstructionWrapper>();
+        public List<InstructionWrapper> Back { get; set; } = new List<InstructionWrapper>();
 
         public InstructionWrapper(Instruction instruction)
         {

@@ -40,7 +40,7 @@ namespace DoppleTry2
                 var inst = instructions.ElementAt(i);
                 if (CallOpCodes.Any(x => x == inst.OpCode.Code && inst.Operand is MethodDefinition))
                 {
-                    var tempInst = ins;
+                    var tempInst = inst;
                     instructions.Remove(inst);
                     var calledFuncInstructions = ((MethodDefinition)inst.Operand).Body.Instructions.Cast<Instruction>().ToList();
                     instructions.InsertRange( i, DeepInline(calledFuncInstructions));

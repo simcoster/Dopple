@@ -17,8 +17,6 @@ namespace DoppleTry2.BackTrackers
             _instructionsWrappers = instructionsWrappers;
 
             backTracers.Add(new LdLocBackTracer(_instructionsWrappers));
-            backTracers.Add(new TwoArgsAndStackPushBackTracer(_instructionsWrappers));
-            backTracers.Add(new OnePopOnePushBackTracer(_instructionsWrappers));
 
             var allCodes = typeof(OpCodes).GetFields().Select(x => x.GetValue(null)).Cast<OpCode>();
 
@@ -64,7 +62,7 @@ namespace DoppleTry2.BackTrackers
             {
                 return;
             }
-            var newNodes =  BacktracersCodes[node.InstructionWrapper.Instruction.OpCode.Code].AddBackNodes(node);
+            var newNodes =  BacktracersCodes[node.InstructionWrapper.Instruction.OpCode.Code].AddBackDataflowNodes(node);
             foreach (var newNode in newNodes)
             {
                 BackTraceNode(newNode);

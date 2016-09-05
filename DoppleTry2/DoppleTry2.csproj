@@ -67,14 +67,18 @@
     <Compile Include="BackTrackers\PopPushBackTracer.cs" />
     <Compile Include="BackTrackers\LdLocBackTracer.cs" />
     <Compile Include="FunctionGraph.cs" />
+    <Compile Include="ProgramFlowHanlder\ForwardPathHanlder.cs" />
     <Compile Include="InstructionModifiers\IModifier.cs" />
     <Compile Include="InstructionModifiers\InitilizeStackPushAndPull.cs" />
     <Compile Include="InstructionModifiers\InitilizeStlocModifier.cs" />
-    <Compile Include="InstructionModifiers\InlineCalledMethods.cs" />
+    <Compile Include="InstructionModifiers\InlineCall.cs" />
     <Compile Include="InstructionModifiers\RemoveUselessModifier.cs" />
-    <Compile Include="BackTrackers\TrivialBacktracer.cs" />
     <Compile Include="InstructionWrapper.cs" />
+    <Compile Include="NodeModifier.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="ProgramFlowHanlder\MultiplePathsHandler.cs" />
+    <Compile Include="ProgramFlowHanlder\SimpleForwardPathHanlder.cs" />
+    <Compile Include="ProgramFlowHanlder\SwitchHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
