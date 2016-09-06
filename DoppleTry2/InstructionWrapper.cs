@@ -9,9 +9,10 @@ namespace DoppleTry2
         public Instruction Instruction { get; set; }
         public int StackPushCount { get; set; }
         public bool WasTreated { get; set; } = false;
-        public LocationStore LocationStore { get; set; }
         public bool HasBackRelated { get; set; } = true;
         public int StackPopCount { get; set; }
+        public int MemoryStoreCount { get; set; }
+        public int MemoryReadCount { get; set; }
         public List<InstructionWrapper>  Next { get; set; } = new List<InstructionWrapper>();
         public List<InstructionWrapper> Back { get; set; } = new List<InstructionWrapper>();
 
@@ -32,6 +33,9 @@ namespace DoppleTry2
             }
 
             StackPopCount = GetStackPopCount(instruction);
+            MemoryReadCount = InstructionPropertiesHandler.GetMemReadCount(instruction);
+            MemoryReadCount = InstructionPropertiesHandler.GetMemStoreCount(instruction);
+
         }
 
         private int GetStackPopCount(Instruction instruction)
@@ -68,9 +72,4 @@ namespace DoppleTry2
         }
     }
 
-    public class LocationStore
-    {
-        public bool StoresInLocation { get; set; }
-        public int LocationIndex { get; set; }
-    }
 }

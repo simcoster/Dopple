@@ -38,15 +38,9 @@ namespace DoppleTry2.BackTrackers
 
         protected virtual bool HasBackDataflowNodes { get; } = true;
 
-        protected abstract int[] GetDataflowBackRelatedIndices(int instructionIndex, Node currentNode);
+        protected abstract IEnumerable<int> GetDataflowBackRelatedIndices(int instructionIndex, Node currentNode);
 
         public abstract Code[] HandlesCodes { get; }
-
-        protected IEnumerable<int> SearchBackwardsForInstrcution(Func<InstructionWrapper, bool> predicate,
-            int startIndex)
-        {
-            return SearchBackwardsForDataflowInstrcutions(predicate, startIndex);
-        }
 
         protected IEnumerable<int> SearchBackwardsForDataflowInstrcutions(Func<InstructionWrapper, bool> predicate,
             int startIndex)

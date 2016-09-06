@@ -63,10 +63,14 @@
     <Compile Include="BackTrackers\BackTraceManager.cs" />
     <Compile Include="BackTrackers\ImmediateValueBackTracer.cs" />
     <Compile Include="BackTrackers\LdArgBacktracer.cs" />
+    <Compile Include="BackTrackers\MemoryLoadBackTracer.cs" />
     <Compile Include="BackTrackers\OperandDependantPush.cs" />
     <Compile Include="BackTrackers\PopPushBackTracer.cs" />
     <Compile Include="BackTrackers\LdLocBackTracer.cs" />
+    <Compile Include="BackTrackers\ThrowBackTracer.cs" />
+    <Compile Include="CodeMemoryRefCount.cs" />
     <Compile Include="FunctionGraph.cs" />
+    <Compile Include="InstructionPropertiesHandler.cs" />
     <Compile Include="ProgramFlowHanlder\ForwardPathHanlder.cs" />
     <Compile Include="InstructionModifiers\IModifier.cs" />
     <Compile Include="InstructionModifiers\InitilizeStackPushAndPull.cs" />
