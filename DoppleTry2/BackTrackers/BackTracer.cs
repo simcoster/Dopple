@@ -20,30 +20,43 @@ namespace DoppleTry2.BackTrackers
             InstructionsWrappers = instructionsWrappers;
         }
 
-        public IEnumerable<Node> AddBackDataflowNodes(Node currentNode)
+        public void AddBackDataflowConnections(InstructionWrapper currentInst)
         {
-            InstructionsWrappers[currentNode.InstructionWrapperIndex].WasTreated = true;
+            currentInst.WasTreated = true;
             if (!HasBackDataflowNodes)
             {
-                currentNode.HasBackNodes = false;
-                return new Node[0];
+                currentInst.HasBackRelated = false;
+                return;
             }
-            var indexes = GetDataflowBackRelatedIndices(currentNode.InstructionWrapperIndex, currentNode);
+            var indexes = GetDataflowBackRelatedIndices(InstructionsWrappers.IndexOf(currentInst));
             foreach (var backRelatedIndex in indexes)
             {
-                currentNode.BackNodes.Add(new Node(InstructionsWrappers[backRelatedIndex], backRelatedIndex));
+                currentInst.BackDataFlowRelated.Add(InstructionsWrappers[backRelatedIndex]);
             }
-            return currentNode.BackNodes;
         }
 
         protected virtual bool HasBackDataflowNodes { get; } = true;
 
-        protected abstract IEnumerable<int> GetDataflowBackRelatedIndices(int instructionIndex, Node currentNode);
+        protected abstract IEnumerable<int> GetDataflowBackRelatedIndices(int instructionIndex);
 
         public abstract Code[] HandlesCodes { get; }
 
         protected IEnumerable<int> SearchBackwardsForDataflowInstrcutions(Func<InstructionWrapper, bool> predicate,
             int startIndex)
+        {
+            IEnumerable<int> indexes;
+            if (TrySearchBackwardsForDataflowInstrcutions(predicate, startIndex, out indexes) == false)
+            {
+                throw new Exception("Reached first instruction without correct one found");
+            }
+            else
+            {
+                return indexes;
+            }
+        }
+
+        protected bool TrySearchBackwardsForDataflowInstrcutions(Func<InstructionWrapper, bool> predicate,
+           int startIndex, out IEnumerable<int> indexes)
         {
             List<int> foundIndexes = new List<int>();
             int index = startIndex;
@@ -56,25 +69,28 @@ namespace DoppleTry2.BackTrackers
                     foundIndexes.Add(index);
                     found = true;
                 }
-                else if (currInstruction.Back.Count == 1)
+                else if (currInstruction.BackProgramFlow.Count == 1)
                 {
-                    if (InstructionsWrappers.IndexOf(currInstruction.Back[0]) == 1)
+                    if (InstructionsWrappers.IndexOf(currInstruction.BackProgramFlow[0]) == 1)
                     {
-                        throw new Exception("Reached first instruction without correct one found");
+                        indexes = null;
+                        return false;
                     }
                     index--;
                 }
                 else
                 {
-                    foreach (var instructionWrapper in currInstruction.Back)
+                    foreach (var instructionWrapper in currInstruction.BackProgramFlow)
                     {
-                        var branchindexes = SearchBackwardsForDataflowInstrcutions(predicate,
-                            InstructionsWrappers.IndexOf(instructionWrapper));
+                        IEnumerable<int> branchindexes;
+                        TrySearchBackwardsForDataflowInstrcutions(predicate,
+                            InstructionsWrappers.IndexOf(instructionWrapper), out branchindexes);
                         foundIndexes.AddRange(branchindexes);
                     }
                 }
             }
-            return foundIndexes;
+            indexes = foundIndexes;
+            return true;
         }
     }
 }

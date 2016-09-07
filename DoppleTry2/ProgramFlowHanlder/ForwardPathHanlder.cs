@@ -18,8 +18,8 @@ namespace DoppleTry2.InstructionModifiers
 
         protected void TwoWayLinkExecutionPath(InstructionWrapper backInstruction, InstructionWrapper forwardInstruction)
         {
-            backInstruction.Next.Add(forwardInstruction);
-            forwardInstruction.Back.Add(backInstruction);
+            backInstruction.NextPossibleProgramFlow.Add(forwardInstruction);
+            forwardInstruction.BackProgramFlow.Add(backInstruction);
         }
 
         protected abstract Code[] HandledCodes { get; }

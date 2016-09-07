@@ -7,10 +7,9 @@ using Mono.Cecil.Cil;
 
 namespace DoppleTry2.BackTrackers
 {
-    class OperandDependantPush : BackTracer
+    class StaticFieldBackTracer : BackTracer
     {
-        //Need to check if 2 contain the same operand, if they do, they will supply the same value
-        public OperandDependantPush(List<InstructionWrapper> instructionsWrappers) : base(instructionsWrappers)
+        public StaticFieldBackTracer(List<InstructionWrapper> instructionsWrappers) : base(instructionsWrappers)
         {
         }
 
@@ -19,6 +18,6 @@ namespace DoppleTry2.BackTrackers
             throw new NotImplementedException();
         }
 
-        public override Code[] HandlesCodes => new[] {Code.Ldfld, Code.Ldflda, Code.Ldtoken, Code.Sizeof };
+        public override Code[] HandlesCodes { get; }
     }
 }

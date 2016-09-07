@@ -46,9 +46,7 @@ namespace DoppleTry2.BackTrackers
                     var currInstruction = _instructionsWrappers[i];
                     if (currInstruction.WasTreated == false && currInstruction.HasBackRelated)
                     {
-                        Node newEndNode = new Node(currInstruction, i);
-                        BackTraceNode(newEndNode);
-                        _endNodes.Add(newEndNode);
+                        BackTraceInst(currInstruction);
                         break;
                     }
                    
@@ -56,16 +54,16 @@ namespace DoppleTry2.BackTrackers
             }
         }
 
-        private void BackTraceNode(Node node)
+        private void BackTraceInst(InstructionWrapper instruction)
         {
-            if (node.InstructionWrapper.HasBackRelated == false)
+            if (instruction.HasBackRelated == false)
             {
                 return;
             }
             var newNodes =  BacktracersCodes[node.InstructionWrapper.Instruction.OpCode.Code].AddBackDataflowNodes(node);
             foreach (var newNode in newNodes)
             {
-                BackTraceNode(newNode);
+                BackTraceInst(newNode);
             }
         }
     }
