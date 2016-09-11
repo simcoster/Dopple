@@ -19,7 +19,7 @@ namespace DoppleTry2.BackTrackers
         protected override IEnumerable<InstructionWrapper> GetDataflowBackRelatedIndices(InstructionWrapper instWrapper)
         {
             return SearchBackwardsForDataflowInstrcutions(x => _stArrayCodes.Contains(x.Instruction.OpCode.Code)
-                                                       && Hav)
+                                                               && HaveCommonStackPushAncestor(x, instWrapper),instWrapper);
         }
 
         public override Code[] HandlesCodes => new[] {Code.Ldlen,};

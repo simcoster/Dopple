@@ -10,17 +10,16 @@ namespace DoppleTry2.InstructionModifiers
 {
     class InlineCall : IModifier
     {
-        private readonly Code[] _callOpCodes = { Code.Call, Code.Calli, Code.Callvirt };
+        public static readonly Code[] CallOpCodes = { Code.Call, Code.Calli, Code.Callvirt };
 
         public void Modify(List<InstructionWrapper> instructionWrappers)
         {
             for (int i = 0; i < instructionWrappers.Count; i++)
             {
                 var instWrapper = instructionWrappers[i];
-                if (_callOpCodes.Contains(instWrapper.Instruction.OpCode.Code) &&
+                if (CallOpCodes.Contains(instWrapper.Instruction.OpCode.Code) &&
                     instWrapper.Instruction.Operand is MethodDefinition)
                 {
-                    instructionWrappers.RemoveAt(i);
                     var calledFuncInstructions = ((MethodDefinition)instWrapper.Instruction.Operand).Body.Instructions.ToList();
                     calledFuncInstructions.RemoveAll(x => x.OpCode.Code == Code.Ret);
                     var calledFunInstWrappers = calledFuncInstructions.Select(x => new InstructionWrapper(x)).ToList();

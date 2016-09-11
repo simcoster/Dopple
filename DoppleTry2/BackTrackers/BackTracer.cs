@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DoppleTry2.InstructionModifiers;
 using Mono.Cecil.Cil;
 
 namespace DoppleTry2.BackTrackers
@@ -65,6 +66,13 @@ namespace DoppleTry2.BackTrackers
                 {
                     foundInstructions.Add(currInstruction);
                     found = true;
+                }
+                else if (InlineCall.CallOpCodes.Contains(currInstruction.Instruction.OpCode.Code)||
+                         currInstruction.Instruction.OpCode.Code == Code.Ret ||
+                         currInstruction.HasBackRelated == false)
+                {
+                    found = false;
+                    break;
                 }
                 else if (currInstruction.BackProgramFlow.Count == 1)
                 {

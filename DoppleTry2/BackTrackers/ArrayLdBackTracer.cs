@@ -18,6 +18,6 @@ namespace DoppleTry2.BackTrackers
             throw new NotImplementedException();
         }
 
-        public override Code[] HandlesCodes => new[] {Code.Ldlen};
+        public override Code[] HandlesCodes => new[] {Code.Ldlen , };
     }
 }
