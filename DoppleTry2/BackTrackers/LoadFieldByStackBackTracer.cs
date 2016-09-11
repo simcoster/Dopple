@@ -13,24 +13,35 @@ namespace DoppleTry2.BackTrackers
         {
         }
 
-        protected override IEnumerable<int> GetDataflowBackRelatedIndices(int instructionIndex)
+
+     
+
+     
+
+        protected override IEnumerable<InstructionWrapper> GetDataflowBackRelatedIndices(InstructionWrapper instWrapper)
         {
-            var currInst = InstructionsWrappers[instructionIndex];
-            Func<InstructionWrapper, bool> storeFld = (x => x.Instruction.OpCode.Code == Code.Stfld &&
-                                                            x.Instruction.Operand == currInst.Instruction.Operand &&
-                                                            HaveCommonStackPushAncestor(currInst, x));
 
-            TrySearchBackwardsForDataflowInstrcutions()
+            Func<InstructionWrapper, bool> predicate = x => 
+                                  x.Instruction.OpCode.Code == Code.Stfld &&
+                                  HaveCommonStackPushAncestor(x, instWrapper) &&
+                                  x.Instruction.Operand == instWrapper.Instruction.Operand;
+            var storeFieldInsts = SafeSearchBackwardsForDataflowInstrcutions(predicate, instWrapper);
+            if (storeFieldInsts.Count > 0)
+            {
+                return storeFieldInsts;
+            }
+            predicate = x =>
+                x.MemoryStoreCount > 0&&
+                HaveCommonStackPushAncestor(x, instWrapper);
+            var storeObjInsts = SafeSearchBackwardsForDataflowInstrcutions(predicate, instWrapper);
+            if (storeObjInsts.Count > 0)
+            {
+                return storeObjInsts;
+            }
+            return new InstructionWrapper[0];
         }
-
-        private bool HaveCommonStackPushAncestor(InstructionWrapper currInst, InstructionWrapper instructionWrapper)
-        {
-            SearchBackwardsForDataflowInstrcutions(x => x.StackPushCount)
-        }
-
 
         public override Code[] HandlesCodes { get; }
 
-        public override Run
     }
 }

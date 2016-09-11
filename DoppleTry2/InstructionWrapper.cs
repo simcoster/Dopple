@@ -35,8 +35,8 @@ namespace DoppleTry2
             }
 
             StackPopCount = GetStackPopCount(instruction);
-            MemoryReadCount = MemoryProperties.GetMemReadCount(instruction);
-            MemoryReadCount = MemoryProperties.GetMemStoreCount(instruction);
+            MemoryReadCount = MemoryProperties.GetMemReadCount(instruction.OpCode.Code);
+            MemoryStoreCount = MemoryProperties.GetMemStoreCount(instruction.OpCode.Code);
 
         }
 

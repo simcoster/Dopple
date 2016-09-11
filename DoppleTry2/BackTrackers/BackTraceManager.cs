@@ -7,9 +7,8 @@ namespace DoppleTry2.BackTrackers
 {
     public class BackTraceManager
     {
-        private List<InstructionWrapper> _instructionsWrappers;
-        private Dictionary<Code, BackTracer> BacktracersCodes = new Dictionary<Code, BackTracer>();
-        private readonly List<Node> _endNodes = new List<Node>();
+        private readonly List<InstructionWrapper> _instructionsWrappers;
+        private readonly Dictionary<Code, BackTracer> _backtracersCodes = new Dictionary<Code, BackTracer>();
 
         public BackTraceManager(List<InstructionWrapper> instructionsWrappers)
         {
@@ -60,11 +59,7 @@ namespace DoppleTry2.BackTrackers
             {
                 return;
             }
-            var newNodes =  BacktracersCodes[node.InstructionWrapper.Instruction.OpCode.Code].AddBackDataflowNodes(node);
-            foreach (var newNode in newNodes)
-            {
-                BackTraceInst(newNode);
-            }
+            _backtracersCodes[instruction.Instruction.OpCode.Code].AddBackDataflowConnections(instruction);
         }
     }
 }

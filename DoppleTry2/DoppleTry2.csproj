@@ -59,11 +59,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BackTrackers\ArrayLdBackTracer.cs" />
     <Compile Include="BackTrackers\BackTracer.cs" />
     <Compile Include="BackTrackers\BackTraceManager.cs" />
     <Compile Include="BackTrackers\ImmediateValueBackTracer.cs" />
     <Compile Include="BackTrackers\LdArgBacktracer.cs" />
     <Compile Include="BackTrackers\LdStaticFieldBackTracer.cs" />
+    <Compile Include="BackTrackers\LoadArrayBackTracer.cs" />
     <Compile Include="BackTrackers\LoadMemoryByOperandBackTracer.cs" />
     <Compile Include="BackTrackers\LoadFieldByStackBackTracer.cs" />
     <Compile Include="BackTrackers\OperandDependantPush.cs" />

@@ -28,69 +28,104 @@ namespace DoppleTry2.BackTrackers
                 currentInst.HasBackRelated = false;
                 return;
             }
-            var indexes = GetDataflowBackRelatedIndices(InstructionsWrappers.IndexOf(currentInst));
-            foreach (var backRelatedIndex in indexes)
+            var backRelatedInsts = GetDataflowBackRelatedIndices(currentInst);
+            foreach (var backRelatedInst in backRelatedInsts)
             {
-                currentInst.BackDataFlowRelated.Add(InstructionsWrappers[backRelatedIndex]);
+                currentInst.BackDataFlowRelated.Add(backRelatedInst);
             }
         }
 
         protected virtual bool HasBackDataflowNodes { get; } = true;
 
-        protected abstract IEnumerable<int> GetDataflowBackRelatedIndices(int instructionIndex);
+        protected abstract IEnumerable<InstructionWrapper> GetDataflowBackRelatedIndices(InstructionWrapper instWrapper);
 
         public abstract Code[] HandlesCodes { get; }
 
-        protected IEnumerable<int> SearchBackwardsForDataflowInstrcutions(Func<InstructionWrapper, bool> predicate,
-            int startIndex)
+        protected List<InstructionWrapper> SearchBackwardsForDataflowInstrcutions(Func<InstructionWrapper, bool> predicate,
+            InstructionWrapper startInstruction)
         {
-            IEnumerable<int> indexes;
-            if (TrySearchBackwardsForDataflowInstrcutions(predicate, startIndex, out indexes) == false)
+            List<InstructionWrapper> indexes = SafeSearchBackwardsForDataflowInstrcutions(predicate, startInstruction);
+            if (indexes.Count == 0)
             {
-                throw new Exception("Reached first instruction without correct one found");
+                throw new Exception("Reached first instWrapper without correct one found");
             }
-            else
-            {
-                return indexes;
-            }
+            return indexes;
         }
 
-        protected bool TrySearchBackwardsForDataflowInstrcutions(Func<InstructionWrapper, bool> predicate,
-           int startIndex, out IEnumerable<int> indexes)
+        protected List<InstructionWrapper> SafeSearchBackwardsForDataflowInstrcutions(Func<InstructionWrapper, bool> predicate,
+           InstructionWrapper startInstruction)
         {
-            List<int> foundIndexes = new List<int>();
-            int index = startIndex;
+            List<InstructionWrapper> foundInstructions = new List<InstructionWrapper>();
+            int index = InstructionsWrappers.IndexOf(startInstruction);
             bool found = false;
             while (found == false)
             {
                 var currInstruction = InstructionsWrappers[index];
                 if (predicate.Invoke(currInstruction))
                 {
-                    foundIndexes.Add(index);
+                    foundInstructions.Add(currInstruction);
                     found = true;
                 }
                 else if (currInstruction.BackProgramFlow.Count == 1)
                 {
-                    if (InstructionsWrappers.IndexOf(currInstruction.BackProgramFlow[0]) == 1)
-                    {
-                        indexes = null;
-                        return false;
-                    }
                     index--;
                 }
                 else
                 {
                     foreach (var instructionWrapper in currInstruction.BackProgramFlow)
                     {
-                        IEnumerable<int> branchindexes;
-                        TrySearchBackwardsForDataflowInstrcutions(predicate,
-                            InstructionsWrappers.IndexOf(instructionWrapper), out branchindexes);
-                        foundIndexes.AddRange(branchindexes);
+                        IEnumerable<InstructionWrapper> branchindexes = 
+                        SafeSearchBackwardsForDataflowInstrcutions(predicate, instructionWrapper);
+                        foundInstructions.AddRange(branchindexes);
                     }
                 }
             }
-            indexes = foundIndexes;
-            return true;
+            return foundInstructions;
         }
+
+        protected IEnumerable<InstructionWrapper> GetStackPushAncestor(InstructionWrapper currInst)
+        {
+            var instWrapper = currInst;
+            while (true)
+            {
+                switch (currInst.BackDataFlowRelated.Count)
+                {
+                    case 0:
+                        return new [] { instWrapper } ;
+                        break;
+                    case 1:
+                        instWrapper = instWrapper.BackDataFlowRelated[0];
+                        break;
+                    default:
+                        return instWrapper.BackDataFlowRelated.SelectMany(GetStackPushAncestor);
+                }
+            }
+        }
+
+        protected bool HaveCommonStackPushAncestor(InstructionWrapper firstInstruction, InstructionWrapper secondInstructions)
+        {
+            var firstAncestors = GetStackPushAncestor(firstInstruction).ToArray();
+            var secondAncestors = GetStackPushAncestor(secondInstructions).ToArray();
+
+            foreach (var firstAncestor in firstAncestors)
+            {
+                foreach (var secondAncestor in secondAncestors)
+                {
+                    if (SameOrEquivilent(firstAncestor, secondAncestor))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        protected bool SameOrEquivilent(InstructionWrapper firstAncestor, InstructionWrapper secondAncestor)
+        {
+            return firstAncestor == secondAncestor ||
+                   (firstAncestor.Instruction.OpCode.Code == secondAncestor.Instruction.OpCode.Code &&
+                    firstAncestor.Instruction.Operand == secondAncestor.Instruction.Operand);
+        }
+
     }
 }

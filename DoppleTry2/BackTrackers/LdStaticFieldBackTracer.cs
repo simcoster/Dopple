@@ -17,7 +17,7 @@ namespace DoppleTry2.BackTrackers
         {
             var instructionsWrapper = InstructionsWrappers[instructionIndex];
             IEnumerable<int> indexes;
-            if (!TrySearchBackwardsForDataflowInstrcutions(x => x.Instruction.OpCode.Code == Code.Stsfld &&
+            if (!SafeSearchBackwardsForDataflowInstrcutions(x => x.Instruction.OpCode.Code == Code.Stsfld &&
                                                                x.Instruction.Operand == instructionsWrapper.Instruction.Operand,
                                                                instructionIndex
                                                                , out indexes))

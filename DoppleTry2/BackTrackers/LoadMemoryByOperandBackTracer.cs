@@ -13,12 +13,12 @@ namespace DoppleTry2.BackTrackers
         {
         }
 
-        protected override IEnumerable<int> GetDataflowBackRelatedIndices(int instructionIndex)
+        protected override IEnumerable<InstructionWrapper> GetDataflowBackRelatedIndices(InstructionWrapper instWrapper)
         {
             var storeIndex =
-             SearchBackwardsForDataflowInstrcutions(x => x.MemoryStoreCount > 0 &&
-                                                         InstructionsWrappers[instructionIndex].Instruction.Operand ==
-                                                         x.Instruction.Operand, instructionIndex);
+           SearchBackwardsForDataflowInstrcutions(x => x.MemoryStoreCount > 0 &&
+                                                       instWrapper.Instruction.Operand ==
+                                                       x.Instruction.Operand, instWrapper);
             return storeIndex;
         }
 

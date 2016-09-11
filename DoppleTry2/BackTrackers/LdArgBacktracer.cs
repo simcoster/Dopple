@@ -13,7 +13,7 @@ namespace DoppleTry2.BackTrackers
         {
         }
 
-        protected override IEnumerable<int>[] GetDataflowBackRelatedIndices(int instructionIndex, Node currentNode)
+        protected override IEnumerable<InstructionWrapper> GetDataflowBackRelatedIndices(int instructionIndex)
         {
             var instructionWrapper = InstructionsWrappers[instructionIndex];
             int ldArgLoc;
@@ -35,24 +35,21 @@ namespace DoppleTry2.BackTrackers
                     ldArgLoc = Convert.ToInt32(instructionWrapper.Instruction.Operand);
                     break;
             }
-            Code[] relevantCodes = {Code.Starg, Code.Starg_S};
-            var stArgIndex = SafeSearchBackwardsForDataflowInst(
-                x => relevantCodes.Contains(x.Instruction.OpCode.Code) && Convert.ToInt32(x.Instruction.Operand) == ldArgLoc ,
+            Code[] relevantCodes = { Code.Starg, Code.Starg_S };
+            var stArgIndex = SafeSearchBackwardsForDataflowInstrcutions(
+                x => relevantCodes.Contains(x.Instruction.OpCode.Code) && Convert.ToInt32(x.Instruction.Operand) == ldArgLoc,
                 instructionIndex);
-            if (stArgIndex == null)
+            if (stArgIndex.Count == 0)
             {
-                currentNode.HasBackNodes = false;
-                return new int[0];
+                instructionWrapper.HasBackRelated = false;
             }
-            else
-            {
-                return new[] {stArgIndex.Value};
-            }
+            return stArgIndex;
         }
 
-        public override Code[] HandlesCodes => new []
-        {
-            Code.Ldarg,Code.Ldarg_0, Code.Ldarg_1, Code.Ldarg_2, Code.Ldarg_3, Code.Ldarg_S, 
+        public override Code[] HandlesCodes => LdArgCodes;
+
+        public static Code[] LdArgCodes = {
+            Code.Ldarg, Code.Ldarg_0, Code.Ldarg_1, Code.Ldarg_2, Code.Ldarg_3, Code.Ldarg_S,
             Code.Ldarga, Code.Ldarga_S
         };
     }
