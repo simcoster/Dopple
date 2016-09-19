@@ -37,29 +37,41 @@ namespace DoppleGraph
             myView.Dock = DockStyle.Fill;
             this.Controls.Add(myView);
 
-            List<GoNodeWrapper> nodeWrappers = new List<GoNodeWrapper>();
+            List<GoNodeWrapper> nodeWrappers =
+                instructionWrappers.Select(x => new GoNodeWrapper(new GoBasicNode(), x)).ToList();
 
-            foreach (var instructionWrapper in instructionWrappers)
+            int offset = 0;
+            foreach (var goNodeWrapper in nodeWrappers)
             {
-                GoBasicNode node1 = new GoBasicNode();
-                nodeWrappers.Add(new GoNodeWrapper(node1, instructionWrapper));
-
-                node1.
-                // specify position, label and color
-                node1.Location = new PointF(100, 100);
-                node1.Text = "first";
-                node1.Editable = true;  // first node is editable with F2 only
-                node1.Shape.BrushColor = Color.Blue;
-                // add to the document, not to the view
-                myView.Document.Add(node1);
+                goNodeWrapper.Node.Location = new PointF(100 + offset, 100);
+                goNodeWrapper.Node.Shape.BrushColor = Color.Blue;
+                goNodeWrapper.Node.Shape= new GoRectangle();
+                goNodeWrapper.Node.Text = goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code.ToString();
+                myView.Document.Add(goNodeWrapper.Node);
+                offset += 70;
             }
-
-            GoBasicNode node2 = new GoBasicNode();
-            node2.Location = new PointF(200, 100);
-            node2.Text = "second";
-            node2.Label.Editable = true;  // second node is editable by clicking only
-            node2.Shape.BrushColor = Color.Magenta;
-            myView.Document.Add(node2);
+            Random rnd = new Random();
+            foreach (var nodeWrapper in nodeWrappers)
+            {
+                Color randomColor = Color.Blue;
+                bool firstCon = true;
+                foreach (InstructionWrapper wrapper in nodeWrapper.InstructionWrapper.BackDataFlowRelated)
+                {
+                    GoLink link = new GoLink();
+                    link.FromPort = nodeWrapper.Node.Port;
+                    link.FromArrowStyle = GoStrokeArrowheadStyle.Circle;
+                    link.BrushColor = randomColor;
+                    var backNode = nodeWrappers.First(x => x.InstructionWrapper == wrapper).Node;
+                    link.ToPort = backNode.Port;
+                    myView.Document.Add(link);
+                    if (!firstCon)
+                    {
+                        randomColor = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
+                        backNode.Location = new PointF(backNode.Location.X, backNode.Location.Y + 20);
+                    }
+                    firstCon = false;
+                }
+            }
         }
     }
 }

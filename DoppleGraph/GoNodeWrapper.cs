@@ -5,13 +5,13 @@ namespace DoppleGraph
 {
     public class GoNodeWrapper
     {
-        public GoNodeWrapper(GoNode node, InstructionWrapper instructionWrapper)
+        public GoNodeWrapper(GoBasicNode node, InstructionWrapper instructionWrapper)
         {
             Node = node;
             InstructionWrapper = instructionWrapper;
         }
 
-        public GoNode Node {  get; private set; }
+        public GoBasicNode Node {  get; private set; }
         public InstructionWrapper InstructionWrapper { get; private set; }
     }
 }
