@@ -13,18 +13,13 @@ namespace DoppleTry2.BackTrackers
         {
         }
 
-        protected override IEnumerable<int> GetDataflowBackRelatedIndices(int instructionIndex)
+
+        protected override IEnumerable<InstructionWrapper> GetDataflowBackRelatedIndices(InstructionWrapper instWrapper)
         {
-            var instructionsWrapper = InstructionsWrappers[instructionIndex];
-            IEnumerable<int> indexes;
-            if (!SafeSearchBackwardsForDataflowInstrcutions(x => x.Instruction.OpCode.Code == Code.Stsfld &&
-                                                               x.Instruction.Operand == instructionsWrapper.Instruction.Operand,
-                                                               instructionIndex
-                                                               , out indexes))
-            {
-                indexes = new List<int>();
-            }
-            return indexes;
+
+            return SafeSearchBackwardsForDataflowInstrcutions(x => x.Instruction.OpCode.Code == Code.Stsfld &&
+                                                                   x.Instruction.Operand ==
+                                                                   instWrapper.Instruction.Operand, instWrapper);
         }
 
         public override Code[] HandlesCodes => new[] {Code.Ldsfld,Code.Ldsflda};

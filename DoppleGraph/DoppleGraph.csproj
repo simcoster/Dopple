@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{77C5971E-3C37-4932-911D-9C6050E67FFA}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{B9888195-F233-4969-BBBC-3A9F7769C0C7}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DoppleTry2</RootNamespace>
-    <AssemblyName>DoppleTry2</AssemblyName>
+    <RootNamespace>DoppleGraph</RootNamespace>
+    <AssemblyName>DoppleGraph</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -56,58 +56,63 @@
       <HintPath>..\packages\Mono.Cecil.0.9.6.4\lib\net45\Mono.Cecil.Rocks.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Northwoods.Go">
+      <HintPath>..\..\..\..\GoDiagram Win 5.2.0.46\lib4.6\Northwoods.Go.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BackTrackers\ArrayLdBackTracer.cs" />
-    <Compile Include="BackTrackers\BackTracer.cs" />
-    <Compile Include="BackTraceManager.cs" />
-    <Compile Include="BackTrackers\ImmediateValueBackTracer.cs" />
-    <Compile Include="BackTrackers\LdArgBacktracer.cs" />
-    <Compile Include="BackTrackers\LdStaticFieldBackTracer.cs" />
-    <Compile Include="BackTrackers\LoadArrayElemBackTracer.cs" />
-    <Compile Include="BackTrackers\LoadArrayBackTracer.cs" />
-    <Compile Include="BackTrackers\LoadMemoryByOperandBackTracer.cs" />
-    <Compile Include="BackTrackers\LoadFieldByStackBackTracer.cs" />
-    <Compile Include="BackTrackers\StackPopBackTracer.cs" />
-    <Compile Include="BackTrackers\LdLocBackTracer.cs" />
-    <Compile Include="BackTrackers\TypedReferenceBackTracer.cs" />
-    <Compile Include="CodeMemoryRefCount.cs" />
-    <Compile Include="LdStLocProperties.cs" />
-    <Compile Include="OpcodeProperties\DataflowProperties.cs" />
-    <Compile Include="OpcodeProperties\InstructionPropertiesHandler.cs" />
-    <Compile Include="OpcodeProperties\MemoryProperties.cs" />
-    <Compile Include="ProgramFlowHanlder\BrProgramFlowHandler.cs" />
-    <Compile Include="ProgramFlowHanlder\ProgramFlowHandler.cs" />
-    <Compile Include="InstructionModifiers\IModifier.cs" />
-    <Compile Include="InstructionModifiers\InlineCall.cs" />
-    <Compile Include="InstructionModifiers\RemoveUselessModifier.cs" />
-    <Compile Include="InstructionWrapper.cs" />
-    <Compile Include="NodeModifier.cs" />
+    <Compile Include="Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GoNodeWrapper.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="ProgramFlowHanlder\MultiplePathsHandler.cs" />
-    <Compile Include="ProgramFlowHanlder\SimpleProgramFlowHandler.cs" />
-    <Compile Include="ProgramFlowHanlder\SwitchHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Utility\Utility.csproj">
-      <Project>{95e968c9-c211-483d-9619-dbf408ce9bcc}</Project>
-      <Name>Utility</Name>
+    <ProjectReference Include="..\DoppleTry2\DoppleTry2.csproj">
+      <Project>{77c5971e-3c37-4932-911d-9c6050e67ffa}</Project>
+      <Name>DoppleTry2</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

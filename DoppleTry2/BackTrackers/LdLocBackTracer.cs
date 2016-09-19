@@ -8,24 +8,13 @@ namespace DoppleTry2.BackTrackers
 {
     public class LdLocBackTracer : BackTracer
     {
-        private readonly Dictionary<Code, Code> _ldStLocs = new Dictionary<Code, Code>()
-        {
-            {Code.Ldloc_0, Code.Stloc_0},
-            {Code.Ldloc_1, Code.Stloc_1},
-            {Code.Ldloc_2, Code.Stloc_2},
-            {Code.Ldloc_3, Code.Stloc_3},
-            {Code.Ldloc, Code.Stloc},
-        };
 
-
-        protected override IEnumerable<int> GetDataflowBackRelatedIndices(int instructionIndex, Node currentNode)
+        protected override IEnumerable<InstructionWrapper> GetDataflowBackRelatedIndices(InstructionWrapper instWrapper)
         {
-            var code = InstructionsWrappers[instructionIndex].Instruction.OpCode.Code;
-            var index = SearchBackwardsForDataflowInstrcutions((x) => x.Instruction.OpCode.Code == _ldStLocs[code], instructionIndex);
-            return  index;
+            return SearchBackwardsForDataflowInstrcutions(x => x.LocIndex == instWrapper.LocIndex,instWrapper);
         }
 
-        public override Code[] HandlesCodes => new []{Code.Ldloc_0, Code.Ldloc_1, Code.Ldloc_2, Code.Ldloc, Code.Ldloc_S};
+        public override Code[] HandlesCodes => new []{Code.Ldloc_0, Code.Ldloc_1, Code.Ldloc_2, Code.Ldloc, Code.Ldloc_S, Code.Ldloca_S, Code.Ldloca, };
 
         public LdLocBackTracer(List<InstructionWrapper> instructionsWrappers) : base(instructionsWrappers)
         {

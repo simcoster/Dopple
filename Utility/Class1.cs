@@ -14,6 +14,14 @@ namespace Utility
         {
             var c = a;
             var d = b;
+            if (b == a)
+            {
+                c = 5;
+            }
+            else
+            {
+                c=7;
+            }
             c = c + 3;
             int g = 5;
             g--;

@@ -15,8 +15,9 @@ namespace DoppleTry2
         public int MemoryReadCount { get; set; }
         public List<InstructionWrapper>  NextPossibleProgramFlow { get; set; } = new List<InstructionWrapper>();
         public List<InstructionWrapper> BackProgramFlow { get; set; } = new List<InstructionWrapper>();
-        public List<InstructionWrapper> BackDataFlowRelated { get; internal set; }
-        public List<InstructionWrapper> ForwardDataFlowRelated { get; internal set; }
+        public List<InstructionWrapper> BackDataFlowRelated { get; internal set; } = new List<InstructionWrapper>();
+        public List<InstructionWrapper> ForwardDataFlowRelated { get; internal set; } = new List<InstructionWrapper>();
+        public int LocIndex { get; set; }
 
         public InstructionWrapper(Instruction instruction)
         {
@@ -37,8 +38,10 @@ namespace DoppleTry2
             StackPopCount = GetStackPopCount(instruction);
             MemoryReadCount = MemoryProperties.GetMemReadCount(instruction.OpCode.Code);
             MemoryStoreCount = MemoryProperties.GetMemStoreCount(instruction.OpCode.Code);
+            LocIndex = LdStLocProperties.GetLocIndex(instruction);
 
         }
+
 
         private int GetStackPopCount(Instruction instruction)
         {

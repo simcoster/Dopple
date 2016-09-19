@@ -12,12 +12,6 @@ namespace DoppleTry2.BackTrackers
         public LoadFieldByStackBackTracer(List<InstructionWrapper> instructionsWrappers) : base(instructionsWrappers)
         {
         }
-
-
-     
-
-     
-
         protected override IEnumerable<InstructionWrapper> GetDataflowBackRelatedIndices(InstructionWrapper instWrapper)
         {
 
@@ -41,7 +35,7 @@ namespace DoppleTry2.BackTrackers
             return new InstructionWrapper[0];
         }
 
-        public override Code[] HandlesCodes { get; }
+        public override Code[] HandlesCodes => new[] {Code.Ldfld, Code.Ldflda,};
 
     }
 }

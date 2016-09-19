@@ -19,7 +19,6 @@ namespace DoppleTry2
         public static readonly Code[] UnaffectingCodes = {Code.Nop, Code.Break};
         static void Main(string[] args)
         {
-            BackTraceManager backTraceManager = new BackTraceManager(new List<InstructionWrapper>());
             //Creates an AssemblyDefinition from the "MyLibrary.dll" assembly
             AssemblyDefinition myLibrary = AssemblyDefinition.ReadAssembly(@"C:\Users\Simco\documents\visual studio 2015\Projects\DoppleTry2\Utility\bin\Debug\Utility.dll");
 
@@ -54,17 +53,5 @@ namespace DoppleTry2
             instructions.RemoveAll(x => UnaffectingCodes.Contains(x.OpCode.Code));
             return instructions;
         }
-
-
-        static FunctionGraph BackTraceFunc(List<Instruction> instructions)
-        {
-            InstructionWrapper[] instructionsWrapper = new InstructionWrapper[instructions.Count];
-            while (instructionsWrapper.Any(x => x.WasTreated == false))
-            {
-                InstructionWrapper currInst = instructionsWrapper.Last(x => x.WasTreated == false);
-            }
-            return null;
-        }
-        
     }
 }

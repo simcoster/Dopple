@@ -8,19 +8,19 @@ using Mono.Cecil.Cil;
 
 namespace DoppleTry2.ProgramFlowHanlder
 {
-    class SwitchHandler : ForwardPathHanlder
+    class SwitchHandler : ProgramFlowHandler
     {
         public SwitchHandler(List<InstructionWrapper> instructionsWrappers) : base(instructionsWrappers)
         {
         }
 
-        protected override Code[] HandledCodes => new[] {Code.Switch};
-        protected override void SetForwardExecutionFlowInsts(InstructionWrapper instructionWrapper)
+        public override Code[] HandledCodes => new[] {Code.Switch};
+        public override void SetForwardExecutionFlowInsts(InstructionWrapper instructionWrapper)
         {
             var targetInstructions  = (Instruction[]) instructionWrapper.Instruction.Operand;
             foreach (var targetInstruction in targetInstructions)
             {
-                TwoWayLinkExecutionPath(instructionWrapper,InstructionsWrappers.First(x => x.Instruction == targetInstruction));
+                TwoWayLinkExecutionPath(instructionWrapper, InstructionWrappers.First(x => x.Instruction == targetInstruction));
             }
         }
     }

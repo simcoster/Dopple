@@ -10,7 +10,7 @@ namespace DoppleTry2
                 Code.Ldind_U2, Code.Ldind_I4, Code.Ldind_U4,
                 Code.Ldind_I8, Code.Ldind_I, Code.Ldind_R4,
                 Code.Ldind_R8, Code.Ldind_Ref , Code.Cpobj, Code.Ldobj,
-                Code.Castclass, Code.Isinst, Code.Unbox, Code.Unbox_Any,  },
+                Code.Castclass, Code.Isinst, Code.Unbox, Code.Unbox_Any,Code.Initobj     },
             refCount:1);
 
         private static readonly CodeMemoryRefCount[] CodeMemoryReadCounts = {OneMemRead};
@@ -18,7 +18,7 @@ namespace DoppleTry2
         private static readonly CodeMemoryRefCount OneMemStore = new CodeMemoryRefCount(
             codes: new[] { Code.Cpobj,  Code.Stind_I, Code.Stind_I1, Code.Stind_I2
                 , Code.Stind_I4, Code.Stind_I8, Code.Stind_R4, Code.Stind_R8, Code.Newobj, Code.Box,
-                Code.Localloc   },
+                Code.Localloc, Code.Initobj, Code.Cpblk,    },
             refCount: 1);
 
         private static readonly CodeMemoryRefCount[] CodeMemoryStoreCounts = { OneMemStore };
