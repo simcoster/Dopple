@@ -57,7 +57,9 @@ namespace DoppleTry2.BackTrackers
            InstructionWrapper startInstruction)
         {
             List<InstructionWrapper> foundInstructions = new List<InstructionWrapper>();
-            int index = InstructionsWrappers.IndexOf(startInstruction);
+            int index = InstructionsWrappers.IndexOf(startInstruction)- 1;
+            if (index <0)
+                return new List<InstructionWrapper>();
             bool done = false;
             while (done == false)
             {
@@ -85,6 +87,7 @@ namespace DoppleTry2.BackTrackers
                             SafeSearchBackwardsForDataflowInstrcutions(predicate, instructionWrapper);
                         foundInstructions.AddRange(branchindexes);
                     }
+                    done = true;
                 }
             }
             return foundInstructions;

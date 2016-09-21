@@ -18,6 +18,8 @@ namespace DoppleTry2
         public List<InstructionWrapper> BackDataFlowRelated { get; internal set; } = new List<InstructionWrapper>();
         public List<InstructionWrapper> ForwardDataFlowRelated { get; internal set; } = new List<InstructionWrapper>();
         public int LocIndex { get; set; }
+        //TODO : this should be a different thing
+        public bool Inlined { get; set; } = false;
 
         public InstructionWrapper(Instruction instruction)
         {
@@ -45,7 +47,7 @@ namespace DoppleTry2
 
         private int GetStackPopCount(Instruction instruction)
         {
-            StackBehaviour[] pop1Codes = {StackBehaviour.Pop1, StackBehaviour.Popi, StackBehaviour.Popref};
+            StackBehaviour[] pop1Codes = {StackBehaviour.Pop1, StackBehaviour.Popi, StackBehaviour.Popref, StackBehaviour.Varpop, };
             StackBehaviour[] pop2Codes =
             {
                 StackBehaviour.Pop1_pop1, StackBehaviour.Popi_pop1, StackBehaviour.Popi_popi, StackBehaviour.Popi_popi8, StackBehaviour.Popi_popr4, 
