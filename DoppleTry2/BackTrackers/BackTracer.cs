@@ -54,28 +54,39 @@ namespace DoppleTry2.BackTrackers
         }
 
         protected List<InstructionWrapper> SafeSearchBackwardsForDataflowInstrcutions(Func<InstructionWrapper, bool> predicate,
-           InstructionWrapper startInstruction)
+           InstructionWrapper startInstruction, List<InstructionWrapper> visitedInstructions = null)
         {
-            List<InstructionWrapper> foundInstructions = new List<InstructionWrapper>();
+            if (visitedInstructions == null)
+            {
+                visitedInstructions = new List<InstructionWrapper>();
+            }
+            var foundInstructions = new List<InstructionWrapper>();
             int index = InstructionsWrappers.IndexOf(startInstruction)- 1;
             if (index <0)
                 return new List<InstructionWrapper>();
-            bool done = false;
-            while (done == false)
+            while (true)
             {
                 var currInstruction = InstructionsWrappers[index];
+                if (visitedInstructions.Contains(currInstruction))
+                {
+                    break;
+                }
+                else
+                {
+                    visitedInstructions.Add(currInstruction);
+                }
                 if (predicate.Invoke(currInstruction))
                 {
                     foundInstructions.Add(currInstruction);
-                    done = true;
+                    break;
                 }
-                else if (InlineCall.CallOpCodes.Contains(currInstruction.Instruction.OpCode.Code)||
-                    currInstruction.Instruction.OpCode.Code == Code.Ret ||
-                    currInstruction.BackProgramFlow.Count ==0)
+                else if (InlineCall.CallOpCodes.Contains(currInstruction.Instruction.OpCode.Code) ||
+                         currInstruction.Instruction.OpCode.Code == Code.Ret ||
+                         currInstruction.BackProgramFlow.Count == 0)
                 {
-                    done = true;
+                    break;
                 }
-                else if(currInstruction.BackProgramFlow.Count == 1)
+                else if (currInstruction.BackProgramFlow.Count == 1)
                 {
                     index = InstructionsWrappers.IndexOf(currInstruction.BackProgramFlow[0]);
                 }
@@ -83,11 +94,11 @@ namespace DoppleTry2.BackTrackers
                 {
                     foreach (var instructionWrapper in currInstruction.BackProgramFlow)
                     {
-                        IEnumerable<InstructionWrapper> branchindexes = 
+                        IEnumerable<InstructionWrapper> branchindexes =
                             SafeSearchBackwardsForDataflowInstrcutions(predicate, instructionWrapper);
                         foundInstructions.AddRange(branchindexes);
                     }
-                    done = true;
+                    break;
                 }
             }
             return foundInstructions;
