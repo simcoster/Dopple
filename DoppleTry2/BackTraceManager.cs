@@ -20,7 +20,7 @@ namespace DoppleTry2
         {
             metDef = methodDefinition;
             _instructionsWrappers =
-                methodDefinition.Body.Instructions.Select(x => new InstructionWrapper(x)).ToList();
+                methodDefinition.Body.Instructions.Select(x => new InstructionWrapper(x, methodDefinition)).ToList();
             foreach (var inst in _instructionsWrappers)
             {
                 inst.InstructionIndex = _instructionsWrappers.IndexOf(inst);
@@ -66,6 +66,10 @@ namespace DoppleTry2
             foreach (var instWrapper in _instructionsWrappers)
             {
                 var backTracers = _backTracers.Where(x => x.HandlesCodes.Contains(instWrapper.Instruction.OpCode.Code));
+                if (backTracers.Count() == 0)
+                {
+                    Console.WriteLine("Element with no backtracer!!!! " + instWrapper.Instruction.ToString());
+                }
                 foreach (var backTracer in backTracers)
                 {
                     backTracer.AddBackDataflowConnections(instWrapper);

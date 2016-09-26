@@ -21,9 +21,10 @@ namespace DoppleTry2.InstructionModifiers
                             instWrapper.Instruction.Operand is MethodDefinition &&
                             instWrapper.Inlined == false))
                     return;
-                var calledFuncInstructions = ((MethodDefinition)instWrapper.Instruction.Operand).Body.Instructions.ToList();
+                var calledFunc = (MethodDefinition)instWrapper.Instruction.Operand;
+                var calledFuncInstructions = calledFunc.Body.Instructions.ToList();
                 calledFuncInstructions.RemoveAll(x => x.OpCode.Code == Code.Ret);
-                var calledFunInstWrappers = calledFuncInstructions.Select(x => new InstructionWrapper(x)).ToList();
+                var calledFunInstWrappers = calledFuncInstructions.Select(x => new InstructionWrapper(x, calledFunc)).ToList();
                 instWrapper.Inlined = true;
                 instructionWrappers.InsertRange(i, calledFunInstWrappers);
             }

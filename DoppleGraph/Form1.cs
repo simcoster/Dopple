@@ -23,9 +23,9 @@ namespace DoppleGraph
         {
             AssemblyDefinition myLibrary = AssemblyDefinition.ReadAssembly(@"C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\Utility\bin\Release\Utility.dll");
 
-            TypeDefinition type = myLibrary.MainModule.Types[1];
+            TypeDefinition type = myLibrary.MainModule.Types[2];
 
-            foreach (var method in type.Methods.Where(x => !x.IsConstructor && x.Name.ToLower().Contains("for")))
+            foreach (var method in type.Methods.Where(x => !x.IsConstructor))
             {
                 Form newForm = new Form();
                 BackTraceManager backTraceManager = new BackTraceManager(method);
@@ -79,6 +79,7 @@ namespace DoppleGraph
                         link.PenColor = Color.FromArgb(RColorVal, GColorVal, BColorVal);
                     }
 
+                    continue;
                     foreach (InstructionWrapper wrapper in nodeWrapper.InstructionWrapper.BackProgramFlow)
                     {
                         Color randomColor;
