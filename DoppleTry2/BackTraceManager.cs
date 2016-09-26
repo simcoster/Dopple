@@ -14,9 +14,11 @@ namespace DoppleTry2
         private readonly IEnumerable<BackTracer> _backTracers;
         private readonly IEnumerable<IModifier> _modifiers;
         private readonly IEnumerable<ProgramFlowHandler> _flowHandlers;
+        private MethodDefinition metDef;
 
         public BackTraceManager(MethodDefinition methodDefinition)
         {
+            metDef = methodDefinition;
             _instructionsWrappers =
                 methodDefinition.Body.Instructions.Select(x => new InstructionWrapper(x)).ToList();
             foreach (var inst in _instructionsWrappers)

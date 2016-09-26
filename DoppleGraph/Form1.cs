@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using DoppleTry2;
-using DoppleTry2.BackTrackers;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Northwoods.Go;
@@ -25,7 +21,7 @@ namespace DoppleGraph
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            AssemblyDefinition myLibrary = AssemblyDefinition.ReadAssembly(@"C:\Users\Simco\documents\visual studio 2015\Projects\DoppleTry2\Utility\bin\Release\Utility.dll");
+            AssemblyDefinition myLibrary = AssemblyDefinition.ReadAssembly(@"C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\Utility\bin\Release\Utility.dll");
 
             TypeDefinition type = myLibrary.MainModule.Types[1];
 
@@ -53,7 +49,8 @@ namespace DoppleGraph
                     goNodeWrapper.Node.Shape = new GoRectangle();
                     goNodeWrapper.Node.Text = goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code.ToString() + " "
                                               + nodeWrappers.IndexOf(goNodeWrapper) + 
-                                              goNodeWrapper.InstructionWrapper.Instruction.Operand?.ToString();
+                                              goNodeWrapper.InstructionWrapper.Instruction.Operand?.ToString() +
+                                              " Stack: " + goNodeWrapper.InstructionWrapper.StackSum;
                     if (
                         new[] { Code.Call, Code.Calli, Code.Callvirt }.Contains(
                             goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code))
@@ -68,8 +65,7 @@ namespace DoppleGraph
                 int GColorVal = 100;
                 int BColorVal = 100;
                 foreach (var nodeWrapper in nodeWrappers)
-                {
-
+                { 
                     foreach (InstructionWrapper wrapper in nodeWrapper.InstructionWrapper.BackDataFlowRelated)
                     {
                         GoLink link = new GoLink();
@@ -84,7 +80,6 @@ namespace DoppleGraph
                         link.PenColor = Color.FromArgb(RColorVal, GColorVal, BColorVal);
                     }
 
-                    continue;
                     foreach (InstructionWrapper wrapper in nodeWrapper.InstructionWrapper.BackProgramFlow)
                     {
                         Color randomColor;
@@ -106,7 +101,7 @@ namespace DoppleGraph
                 AddColNumbers(nodeWrappers);
                 foreach (var nodeWrapper in nodeWrappers)
                 {
-                    nodeWrapper.Node.Location = new PointF(nodeWrapper.ColNum* 120 , nodeWrapper.LineNum * 60);
+                    nodeWrapper.Node.Location = new PointF(nodeWrapper.ColNum* 200 , nodeWrapper.LineNum * 200);
                 }
                 newForm.Show();
             }
@@ -132,8 +127,8 @@ namespace DoppleGraph
             foreach (InstructionWrapper instructionWrapper in nodeWrapper.InstructionWrapper.ForwardDataFlowRelated)
             {
                 var forwardNode = nodeWrappers.First(x => x.InstructionWrapper == instructionWrapper);
-                forwardNode.LineNum = nodeWrapper.LineNum + offset;
                 offset += 0.5f;
+                forwardNode.LineNum = nodeWrapper.LineNum + offset;
                 if (forwardNode.Index < nodeWrapper.Index)
                 {
                     continue;

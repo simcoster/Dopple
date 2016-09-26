@@ -20,7 +20,7 @@ namespace DoppleTry2
         static void Main(string[] args)
         {
             //Creates an AssemblyDefinition from the "MyLibrary.dll" assembly
-            AssemblyDefinition myLibrary = AssemblyDefinition.ReadAssembly(@"C:\Users\Simco\documents\visual studio 2015\Projects\DoppleTry2\Utility\bin\Debug\Utility.dll");
+            AssemblyDefinition myLibrary = AssemblyDefinition.ReadAssembly(@"C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\Utility\bin\Debug\Utility.dll");
 
             TypeDefinition type = myLibrary.MainModule.Types[2];
 

@@ -21,6 +21,7 @@ namespace DoppleTry2
         public int LocIndex { get; set; }
         //TODO : this should be a different thing
         public bool Inlined { get; set; } = false;
+        public int StackSum { get; internal set; } = 0;
 
         public InstructionWrapper(Instruction instruction)
         {
