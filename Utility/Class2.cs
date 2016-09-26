@@ -14,9 +14,11 @@ namespace Utility
         {
             string returnString = "";
             int[] meep = { 4, 5, 6, 4, 4 };
+            int a = 0;
             for (int i=0; i<5; i++)
             {
                 returnString += meep[i];
+                a++;
             }
             return returnString;
         }

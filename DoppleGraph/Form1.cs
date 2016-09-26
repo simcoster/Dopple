@@ -25,7 +25,7 @@ namespace DoppleGraph
 
             TypeDefinition type = myLibrary.MainModule.Types[1];
 
-            foreach (var method in type.Methods.Where(x => !x.IsConstructor && x.Name.ToLower().Contains("linq")))
+            foreach (var method in type.Methods.Where(x => !x.IsConstructor && x.Name.ToLower().Contains("for")))
             {
                 Form newForm = new Form();
                 BackTraceManager backTraceManager = new BackTraceManager(method);
@@ -41,7 +41,6 @@ namespace DoppleGraph
                 List<GoNodeWrapper> nodeWrappers =
                     instructionWrappers.Select(x => new GoNodeWrapper(new GoBasicNode(), x)).ToList();
 
-                int offset = 0;
                 foreach (var goNodeWrapper in nodeWrappers)
                 {
                     goNodeWrapper.Index = nodeWrappers.IndexOf(goNodeWrapper);
@@ -101,7 +100,7 @@ namespace DoppleGraph
                 AddColNumbers(nodeWrappers);
                 foreach (var nodeWrapper in nodeWrappers)
                 {
-                    nodeWrapper.Node.Location = new PointF(nodeWrapper.ColNum* 200 , nodeWrapper.LineNum * 200);
+                    nodeWrapper.Node.Location = new PointF(nodeWrapper.ColNum* 100 , nodeWrapper.LineNum * 100);
                 }
                 newForm.Show();
             }

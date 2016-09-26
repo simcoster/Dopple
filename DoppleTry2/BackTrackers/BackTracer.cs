@@ -57,8 +57,7 @@ namespace DoppleTry2.BackTrackers
         protected List<InstructionWrapper> SafeSearchBackwardsForDataflowInstrcutions(Func<InstructionWrapper, bool> predicate,
            InstructionWrapper startInstruction)
         {
-            var prevInstruction = InstructionsWrappers[InstructionsWrappers.IndexOf(startInstruction) - 1];
-            return SafeSearchBackwardsForDataflowInstrcutionsRec(predicate, prevInstruction, new List<InstructionWrapper>());
+            return startInstruction.BackProgramFlow.SelectMany(x => SafeSearchBackwardsForDataflowInstrcutionsRec(predicate, x, new List<InstructionWrapper>())).ToList();
         }
 
         protected List<InstructionWrapper> SafeSearchBackwardsForDataflowInstrcutionsRec(Func<InstructionWrapper, bool> predicate,

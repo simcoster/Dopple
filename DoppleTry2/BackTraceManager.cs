@@ -23,7 +23,7 @@ namespace DoppleTry2
                 methodDefinition.Body.Instructions.Select(x => new InstructionWrapper(x)).ToList();
             foreach (var inst in _instructionsWrappers)
             {
-                inst.LocIndex = _instructionsWrappers.IndexOf(inst);
+                inst.InstructionIndex = _instructionsWrappers.IndexOf(inst);
             }
 
             _modifiers =
