@@ -10,26 +10,30 @@ namespace Utility
 {
     public class Class2
     {
-        public static void ForLoop()
+        public static string ForLoop()
         {
-            int[] meep = new[] { 4, 5, 6, 4, 4 };
+            string returnString = "";
+            int[] meep = { 4, 5, 6, 4, 4 };
             for (int i=0; i<5; i++)
             {
-                Console.WriteLine(meep[0]);
+                returnString += meep[i];
             }
+            return returnString;
         }
 
-        public static void ForeachLoop()
+        public static string ForeachLoop()
         {
-            foreach(var blah in new []{ 4,5,6,4,4})
+            string returnString = "";
+            foreach (var blah in new []{ 4,5,6,4,4})
             {
-                Console.WriteLine(blah);
+                returnString += blah;
             }
+            return returnString;
         }
 
-        public static void LinqStatement()
+        public static string LinqStatement()
         {
-            (new[] { 2, 4, 5, 6, 4 }).Select(x => x +2);
+            return (new[] { 2, 4, 5, 6, 4 }).Select(x => x.ToString()).Aggregate((x,y) => x + y);
         }
     }
 }

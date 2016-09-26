@@ -33,6 +33,7 @@ namespace DoppleTry2.BackTrackers
             foreach (var backRelatedInst in backRelatedInsts)
             {
                 currentInst.BackDataFlowRelated.Add(backRelatedInst);
+                backRelatedInst.ForwardDataFlowRelated.Add(currentInst);
             }
         }
 
@@ -54,15 +55,22 @@ namespace DoppleTry2.BackTrackers
         }
 
         protected List<InstructionWrapper> SafeSearchBackwardsForDataflowInstrcutions(Func<InstructionWrapper, bool> predicate,
-           InstructionWrapper startInstruction, List<InstructionWrapper> visitedInstructions = null)
+           InstructionWrapper startInstruction)
+        {
+            var prevInstruction = InstructionsWrappers[InstructionsWrappers.IndexOf(startInstruction) - 1];
+            return SafeSearchBackwardsForDataflowInstrcutionsRec(predicate, prevInstruction, new List<InstructionWrapper>());
+        }
+
+        protected List<InstructionWrapper> SafeSearchBackwardsForDataflowInstrcutionsRec(Func<InstructionWrapper, bool> predicate,
+        InstructionWrapper startInstruction, List<InstructionWrapper> visitedInstructions)
         {
             if (visitedInstructions == null)
             {
                 visitedInstructions = new List<InstructionWrapper>();
             }
             var foundInstructions = new List<InstructionWrapper>();
-            int index = InstructionsWrappers.IndexOf(startInstruction)- 1;
-            if (index <0)
+            int index = InstructionsWrappers.IndexOf(startInstruction);
+            if (index < 0)
                 return new List<InstructionWrapper>();
             while (true)
             {
@@ -75,14 +83,13 @@ namespace DoppleTry2.BackTrackers
                 {
                     visitedInstructions.Add(currInstruction);
                 }
+
                 if (predicate.Invoke(currInstruction))
                 {
                     foundInstructions.Add(currInstruction);
                     break;
                 }
-                else if (InlineCall.CallOpCodes.Contains(currInstruction.Instruction.OpCode.Code) ||
-                         currInstruction.Instruction.OpCode.Code == Code.Ret ||
-                         currInstruction.BackProgramFlow.Count == 0)
+                else if (currInstruction.BackProgramFlow.Count == 0)
                 {
                     break;
                 }
@@ -95,7 +102,7 @@ namespace DoppleTry2.BackTrackers
                     foreach (var instructionWrapper in currInstruction.BackProgramFlow)
                     {
                         IEnumerable<InstructionWrapper> branchindexes =
-                            SafeSearchBackwardsForDataflowInstrcutions(predicate, instructionWrapper);
+                            SafeSearchBackwardsForDataflowInstrcutionsRec(predicate, instructionWrapper, visitedInstructions);
                         foundInstructions.AddRange(branchindexes);
                     }
                     break;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ using System.Windows.Forms;
 using DoppleTry2;
 using DoppleTry2.BackTrackers;
 using Mono.Cecil;
+using Mono.Cecil.Cil;
 using Northwoods.Go;
 
 namespace DoppleGraph
@@ -27,76 +29,142 @@ namespace DoppleGraph
 
             TypeDefinition type = myLibrary.MainModule.Types[1];
 
-            BackTraceManager backTraceManager = new BackTraceManager(type.Methods[0]);
-            var instructionWrappers = backTraceManager.Run();
-          
-
-            this.Text = "Minimal GoDiagram App";
-            // create a Go view (a Control) and add to the form
-            GoView myView = new GoView();
-            myView.Dock = DockStyle.Fill;
-            this.Controls.Add(myView);
-
-            List<GoNodeWrapper> nodeWrappers =
-                instructionWrappers.Select(x => new GoNodeWrapper(new GoBasicNode(), x)).ToList();
-
-            int offset = 0;
-            foreach (var goNodeWrapper in nodeWrappers)
+            foreach (var method in type.Methods.Where(x => !x.IsConstructor && x.Name.ToLower().Contains("linq")))
             {
-                goNodeWrapper.Index = nodeWrappers.IndexOf(goNodeWrapper);
-                goNodeWrapper.Node.Shape.BrushColor = Color.Blue;
-                goNodeWrapper.Node.Shape= new GoRectangle();
-                goNodeWrapper.Node.Text = goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code.ToString() + " " + nodeWrappers.IndexOf(goNodeWrapper);
-                myView.Document.Add(goNodeWrapper.Node);
-            }
-            Random rnd = new Random();
-            foreach (var nodeWrapper in nodeWrappers)
-            {
-                Color randomColor = Color.Blue;
-                bool firstCon = true;
+                Form newForm = new Form();
+                BackTraceManager backTraceManager = new BackTraceManager(method);
+                var instructionWrappers = backTraceManager.Run();
 
-                AddLineNumber(nodeWrapper, nodeWrappers);
-                nodeWrapper.Node.Location = new PointF(100 + offset, nodeWrapper.LineNum.Value *40);
-                offset += 70;
+                newForm.Text = method.Name;
+                // create a Go view (a Control) and add to the form
+                GoView myView = new GoView();
+                myView.AllowDelete = false;
+                myView.Dock = DockStyle.Fill;
+                newForm.Controls.Add(myView);
 
-                foreach (InstructionWrapper wrapper in nodeWrapper.InstructionWrapper.BackDataFlowRelated)
+                List<GoNodeWrapper> nodeWrappers =
+                    instructionWrappers.Select(x => new GoNodeWrapper(new GoBasicNode(), x)).ToList();
+
+                int offset = 0;
+                foreach (var goNodeWrapper in nodeWrappers)
                 {
-                    GoLink link = new GoLink();
-                    link.FromPort = nodeWrapper.Node.Port;
-                    link.PenWidth = 3;
-                    var backNode = nodeWrappers.First(x => x.InstructionWrapper == wrapper).Node;
-                    link.ToPort = backNode.Port;
-                    myView.Document.Add(link);
-                    if (!firstCon)
+                    goNodeWrapper.Index = nodeWrappers.IndexOf(goNodeWrapper);
+                    goNodeWrapper.Node.Shape.BrushColor = Color.Blue;
+                    goNodeWrapper.Node.Shape = new GoRectangle();
+                    goNodeWrapper.Node.Text = goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code.ToString() + " "
+                                              + nodeWrappers.IndexOf(goNodeWrapper) + 
+                                              goNodeWrapper.InstructionWrapper.Instruction.Operand?.ToString();
+                    if (
+                        new[] { Code.Call, Code.Calli, Code.Callvirt }.Contains(
+                            goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code))
                     {
-                        randomColor = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
+                        goNodeWrapper.Node.Text += ((MethodReference)goNodeWrapper.InstructionWrapper.Instruction.Operand).Name ?? " ";
                     }
-                    link.PenColor = randomColor;
-                    firstCon = false;
+                    myView.Document.Add(goNodeWrapper.Node);
                 }
+                Random rnd = new Random();
+
+                int RColorVal = 100;
+                int GColorVal = 100;
+                int BColorVal = 100;
+                foreach (var nodeWrapper in nodeWrappers)
+                {
+
+                    foreach (InstructionWrapper wrapper in nodeWrapper.InstructionWrapper.BackDataFlowRelated)
+                    {
+                        GoLink link = new GoLink();
+                        link.Relinkable = false;
+                        link.FromPort = nodeWrapper.Node.Port;
+                        link.PenWidth = 3;
+                        link.FromArrow = true;
+                        var backNode = nodeWrappers.First(x => x.InstructionWrapper == wrapper).Node;
+                        link.ToPort = backNode.Port;
+                        myView.Document.Add(link);
+                        GetColor(ref RColorVal, ref GColorVal, ref BColorVal);
+                        link.PenColor = Color.FromArgb(RColorVal, GColorVal, BColorVal);
+                    }
+
+                    continue;
+                    foreach (InstructionWrapper wrapper in nodeWrapper.InstructionWrapper.BackProgramFlow)
+                    {
+                        Color randomColor;
+                        GoLink link = new GoLink();
+                        link.FromArrow = true;
+                        link.FromPort = nodeWrapper.Node.Port;
+                        link.Pen = new Pen(link.Pen.Brush) {DashStyle = DashStyle.Dash};
+                        link.PenWidth = 1;
+                        link.Style = GoStrokeStyle.RoundedLineWithJumpGaps;
+                        link.BrushStyle = GoBrushStyle.EllipseGradient;
+                        var backNode = nodeWrappers.First(x => x.InstructionWrapper == wrapper).Node;
+                        link.ToPort = backNode.Port;
+                        myView.Document.Add(link);
+                        randomColor = Color.Black;
+                        link.PenColor = randomColor;
+                    }
+                    
+                }
+                AddColNumbers(nodeWrappers);
+                foreach (var nodeWrapper in nodeWrappers)
+                {
+                    nodeWrapper.Node.Location = new PointF(nodeWrapper.ColNum* 120 , nodeWrapper.LineNum * 60);
+                }
+                newForm.Show();
+            }
+            
+        }
+
+        private void AddColNumbers(List<GoNodeWrapper> nodeWrappers)
+        {
+            var firstNodes = nodeWrappers.Where(x => x.InstructionWrapper.BackDataFlowRelated.Count == 0).ToArray();
+            int lineNum = 0;
+            foreach (var firstOrderNode in firstNodes)
+            {
+                firstOrderNode.LineNum = lineNum;
+                firstOrderNode.ColNum = 0;
+                lineNum++;
+                SetColNumRec(firstOrderNode, nodeWrappers);
             }
         }
 
-        private void AddLineNumber(GoNodeWrapper nodeWrapper, List<GoNodeWrapper> nodeWrappers)
+        private void SetColNumRec(GoNodeWrapper nodeWrapper, List<GoNodeWrapper> nodeWrappers)
         {
-            if (nodeWrappers.Count(x => x.LineNum != null) == 0 )
+            float offset = 0;
+            foreach (InstructionWrapper instructionWrapper in nodeWrapper.InstructionWrapper.ForwardDataFlowRelated)
             {
-                nodeWrapper.LineNum = 0;
-                return;
+                var forwardNode = nodeWrappers.First(x => x.InstructionWrapper == instructionWrapper);
+                forwardNode.LineNum = nodeWrapper.LineNum + offset;
+                offset += 0.5f;
+                if (forwardNode.Index < nodeWrapper.Index)
+                {
+                    continue;
+                }
+                if (forwardNode.ColNum <= nodeWrapper.ColNum)
+                {
+                    forwardNode.ColNum = nodeWrapper.ColNum + 1;
+                }
+                else
+                {
+                    forwardNode.ColNum++;
+                }
+                SetColNumRec(forwardNode, nodeWrappers);
             }
-            var newLineNum = nodeWrappers.Where(x => x.LineNum != null).Select(x => x.LineNum.Value).Max() + 1;
+        }
 
-            switch (nodeWrapper.InstructionWrapper.BackDataFlowRelated.Count)
+        private void GetColor(ref int RValue, ref int GValue, ref int BValue)
+        {
+            int increment = 20;
+            int maxValue = 256;
+
+            RValue += increment;
+            if (RValue > maxValue)
             {
-                case 0:
-                    nodeWrapper.LineNum = newLineNum;
-                    return;
-                default:
-                    nodeWrapper.LineNum =
-                        nodeWrappers.Where(x => nodeWrapper.InstructionWrapper.BackDataFlowRelated.Contains(x.InstructionWrapper) && x.LineNum != null)
-                        .Select(x => x.LineNum)
-                        .Average();
-                    return;
+                RValue -= maxValue;
+                GValue += increment;
+                if (GValue > maxValue)
+                {
+                    GValue -= maxValue;
+                    BValue += increment;
+                }
             }
         }
     }

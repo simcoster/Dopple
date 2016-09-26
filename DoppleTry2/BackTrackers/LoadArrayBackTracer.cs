@@ -22,6 +22,7 @@ namespace DoppleTry2.BackTrackers
                                                                && HaveCommonStackPushAncestor(x, instWrapper),instWrapper);
         }
 
-        public override Code[] HandlesCodes => new[] {Code.Ldlen,};
+        //public override Code[] HandlesCodes => new[] {Code.Ldlen,};
+        public override Code[] HandlesCodes => new Code[0];
     }
 }

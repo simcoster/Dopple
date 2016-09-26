@@ -19,6 +19,10 @@ namespace DoppleTry2
         {
             _instructionsWrappers =
                 methodDefinition.Body.Instructions.Select(x => new InstructionWrapper(x)).ToList();
+            foreach (var inst in _instructionsWrappers)
+            {
+                inst.LocIndex = _instructionsWrappers.IndexOf(inst);
+            }
 
             _modifiers =
                 GetType()

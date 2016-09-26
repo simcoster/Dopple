@@ -11,7 +11,7 @@ namespace DoppleTry2.BackTrackers
     {
         private readonly Code[] _stArrayCodes = new[]
             {
-                Code.Newarr, Code.Stelem_Any, Code.Stelem_I, Code.Stelem_I2, 
+                Code.Stelem_Any, Code.Stelem_I, Code.Stelem_I2, 
                 Code.Stelem_I1, Code.Stelem_I4, Code.Stelem_I8, Code.Stelem_R4, Code.Stelem_R8, Code.Stelem_Ref,
             }
         .Concat(LdArgBacktracer.LdArgCodes).ToArray();
@@ -23,7 +23,7 @@ namespace DoppleTry2.BackTrackers
 
         protected override IEnumerable<InstructionWrapper> GetDataflowBackRelatedIndices(InstructionWrapper instWrapper)
         {
-            return SearchBackwardsForDataflowInstrcutions(x => _stArrayCodes.Contains(x.Instruction.OpCode.Code)
+            return SafeSearchBackwardsForDataflowInstrcutions(x => _stArrayCodes.Contains(x.Instruction.OpCode.Code)
                                                                && HaveCommonStackPushAncestor(x, instWrapper),instWrapper);
         }
 

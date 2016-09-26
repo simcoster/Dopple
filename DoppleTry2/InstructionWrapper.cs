@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using DoppleTry2.InstructionModifiers;
 using Mono.Cecil.Cil;
 
 namespace DoppleTry2
@@ -24,24 +25,29 @@ namespace DoppleTry2
         public InstructionWrapper(Instruction instruction)
         {
             Instruction = instruction;
-            switch (instruction.OpCode.StackBehaviourPush)
-            {
-                case StackBehaviour.Push0:
-                    StackPushCount = 0;
-                    break;
-                case StackBehaviour.Push1_push1:
-                    StackPushCount = 2;
-                    break;
-                default:
-                    StackPushCount = 1;
-                break;
-            }
-
+            StackPushCount = GetStackPushCount(instruction);
             StackPopCount = GetStackPopCount(instruction);
             MemoryReadCount = MemoryProperties.GetMemReadCount(instruction.OpCode.Code);
             MemoryStoreCount = MemoryProperties.GetMemStoreCount(instruction.OpCode.Code);
             LocIndex = LdStLocProperties.GetLocIndex(instruction);
 
+        }
+
+        private int GetStackPushCount(Instruction instruction)
+        {
+            if (instruction.OpCode.Code == Code.Ret)
+            {
+                return 1;
+            }
+            switch (instruction.OpCode.StackBehaviourPush)
+            {
+                case StackBehaviour.Push0:
+                    return 0;
+                case StackBehaviour.Push1_push1:
+                    return 2;
+                default:
+                    return 1;
+            }
         }
 
 
@@ -59,7 +65,11 @@ namespace DoppleTry2
                 StackBehaviour.Popref_popi_popr4, StackBehaviour.Popref_popi_popr8, StackBehaviour.Popref_popi_popref
             };
 
-            if (Instruction.OpCode.StackBehaviourPop == StackBehaviour.Pop0)
+            if (InlineCall.CallOpCodes.Contains(instruction.OpCode.Code))
+            {
+                return ((Mono.Cecil.MethodReference) instruction.Operand).Parameters.Count;
+            }
+            else if (Instruction.OpCode.StackBehaviourPop == StackBehaviour.Pop0)
             {
                 return 0;
             }

@@ -25,7 +25,7 @@ namespace DoppleTry2.BackTrackers
         public override Code[] HandlesCodes => typeof(OpCodes).GetFields()
                     .Select(x => x.GetValue(null))
                     .Cast<OpCode>()
-                    .Where(x => x.StackBehaviourPop != StackBehaviour.Pop0 && x.Code != Code.Newarr)
+                    .Where(x => x.StackBehaviourPop != StackBehaviour.Pop0)
                     .Select(x => x.Code).ToArray();
 
         public StackPopBackTracer(List<InstructionWrapper> instructionsWrappers) : base(instructionsWrappers)
