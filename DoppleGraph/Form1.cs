@@ -14,6 +14,7 @@ namespace DoppleGraph
 {
     public partial class Form1 : Form
     {
+        private List<GoNodeWrapper> nodeWrappers;
         public Form1()
         {
             InitializeComponent();
@@ -23,7 +24,7 @@ namespace DoppleGraph
         {
             AssemblyDefinition myLibrary = AssemblyDefinition.ReadAssembly(@"C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\Utility\bin\Release\Utility.dll");
 
-            TypeDefinition type = myLibrary.MainModule.Types[2];
+            TypeDefinition type = myLibrary.MainModule.Types[1];
 
             foreach (var method in type.Methods.Where(x => !x.IsConstructor))
             {
@@ -38,7 +39,7 @@ namespace DoppleGraph
                 myView.Dock = DockStyle.Fill;
                 newForm.Controls.Add(myView);
 
-                List<GoNodeWrapper> nodeWrappers =
+                nodeWrappers =
                     instructionWrappers.Select(x => new GoNodeWrapper(new GoBasicNode(), x)).ToList();
 
                 foreach (var goNodeWrapper in nodeWrappers)
@@ -99,49 +100,62 @@ namespace DoppleGraph
                     
                 }
                 AddColNumbers(nodeWrappers);
-                foreach (var nodeWrapper in nodeWrappers)
-                {
-                    nodeWrapper.Node.Location = new PointF(nodeWrapper.ColNum* 100 , nodeWrapper.LineNum * 100);
-                }
                 newForm.Show();
             }
-            
         }
 
         private void AddColNumbers(List<GoNodeWrapper> nodeWrappers)
         {
-            var firstNodes = nodeWrappers.Where(x => x.InstructionWrapper.BackDataFlowRelated.Count == 0).ToArray();
-            int lineNum = 0;
-            foreach (var firstOrderNode in firstNodes)
+            Dictionary<int, List<GoNodeWrapper>> nodeWrapperCols = new Dictionary<int, List<GoNodeWrapper>>();
+            var colNodes = nodeWrappers.Where(x => x.InstructionWrapper.BackDataFlowRelated.Count == 0).ToList();
+            SetFirstColRows(colNodes);
+            int iterations = 0;
+            while (colNodes.Count > 0 && iterations < 20)
             {
-                firstOrderNode.LineNum = lineNum;
-                firstOrderNode.ColNum = 0;
-                lineNum++;
-                SetColNumRec(firstOrderNode, nodeWrappers);
+                iterations++;
+                colNodes = colNodes
+                    .SelectMany(x => x.InstructionWrapper.ForwardDataFlowRelated)
+                    .Select(x => nodeWrappers.First(y => y.InstructionWrapper == x))
+                    .ToList();
+                foreach (var colNode in colNodes)
+                {
+                    colNode.DisplayCol = colNode.InstructionWrapper.BackDataFlowRelated.Select(x => GetNodeWrapper(x).DisplayCol).Max() +1;
+                    colNode.DisplayRow = colNode.InstructionWrapper.BackDataFlowRelated.Select(x => GetNodeWrapper(x)).Average(x => x.DisplayRow);
+                }
+            }
+
+            int totalHeight = 1000;
+            int totalWidth = 1500;
+            float heightOffset = totalHeight / nodeWrappers.Select(x => x.DisplayRow).Max();
+            float widthOffset = totalWidth / nodeWrappers.Select(x => x.DisplayCol).Max();
+            foreach (var nodeWrapper in nodeWrappers)
+            {
+                nodeWrapper.Node.Location = new PointF(nodeWrapper.DisplayCol * widthOffset, nodeWrapper.DisplayRow * heightOffset);
             }
         }
 
-        private void SetColNumRec(GoNodeWrapper nodeWrapper, List<GoNodeWrapper> nodeWrappers)
+        private GoNodeWrapper GetNodeWrapper (InstructionWrapper instWrapper)
         {
-            float offset = 0;
-            foreach (InstructionWrapper instructionWrapper in nodeWrapper.InstructionWrapper.ForwardDataFlowRelated)
+            return nodeWrappers.First(x => x.InstructionWrapper == instWrapper);
+        }
+        private void SetFirstColRows(List<GoNodeWrapper> colNodes)
+        {
+            int i = 0;
+            var visited = new List<GoNodeWrapper>();
+            foreach (var node in colNodes)
             {
-                var forwardNode = nodeWrappers.First(x => x.InstructionWrapper == instructionWrapper);
-                offset += 0.5f;
-                forwardNode.LineNum = nodeWrapper.LineNum + offset;
-                if (forwardNode.Index < nodeWrapper.Index)
-                {
+                node.DisplayCol = 0;
+                if (visited.Contains(node))
                     continue;
-                }
-                if (forwardNode.ColNum <= nodeWrapper.ColNum)
+                var neighbours = colNodes
+                    .Where(x => x.InstructionWrapper.ForwardDataFlowRelated.Intersect(node.InstructionWrapper.ForwardDataFlowRelated)
+                    .Count() > 0);
+                foreach (var neighbour in neighbours)
                 {
-                    forwardNode.ColNum = nodeWrapper.ColNum + 1;
+                    neighbour.DisplayRow = i;
+                    i++;
                 }
-                else
-                {
-                    forwardNode.ColNum++;
-                }
-                SetColNumRec(forwardNode, nodeWrappers);
+                visited.AddRange(neighbours);
             }
         }
 

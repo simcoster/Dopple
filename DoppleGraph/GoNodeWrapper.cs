@@ -14,8 +14,7 @@ namespace DoppleGraph
         public GoBasicNode Node {  get; private set; }
         public InstructionWrapper InstructionWrapper { get; private set; }
         public int Index { get; set; }
-        public float LineNum { get; set; } = 0;
-        public float ColNum { get; set; } = 0;
-
+        public float DisplayRow { get; set; }
+        public int DisplayCol { get; set; } = 0;
     }
 }
