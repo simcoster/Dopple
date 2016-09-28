@@ -1,4 +1,7 @@
-﻿using System;
+﻿using DoppleGraph;
+using DoppleTry2;
+using Mono.Cecil;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -13,7 +16,7 @@ namespace ForceBasedDiagram
 {
     public partial class Form1 : Form
     {
-        private Diagram mDiagram;
+        public Diagram mDiagram = new Diagram();
         private Random mRandom;
 
         public Form1()
@@ -23,7 +26,6 @@ namespace ForceBasedDiagram
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            mDiagram = new Diagram();
             mRandom = new Random();
 
 
@@ -48,39 +50,70 @@ namespace ForceBasedDiagram
 
         private void btnGenerate_Click(object sender, EventArgs e)
         {
-            mDiagram.Clear();
+            AssemblyDefinition myLibrary = AssemblyDefinition.ReadAssembly(@"C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\Utility\bin\Release\Utility.dll");
 
-            // create a basic, random diagram that is between 2 and 4 levels deep 
-            // and has between 1 and 10 leaf nodes per branch
-            Node node = new SpotNode(Color.Black);
-            mDiagram.AddNode(node);
+            CodeColorHanlder colorCode = new CodeColorHanlder();
+            TypeDefinition type = myLibrary.MainModule.Types[1];
 
-            for (int i = 0; i < mRandom.Next(1, 10); i++)
+            foreach (var method in type.Methods.Where(x => !x.IsConstructor))
             {
-                Node child = new SpotNode(Color.Navy);
-                node.AddChild(child);
+                Form1 newForm = new Form1();
+                newForm.btnGenerate.Hide();
+                BackTraceManager backTraceManager = new BackTraceManager(method);
+                var instructionWrappers = backTraceManager.Run();
 
-                for (int j = 0; j < mRandom.Next(0, 10); j++)
+                List<GoNodeWrapper> nodeWrappers = new List<GoNodeWrapper>();
+
+                newForm.Text = method.Name;
+                foreach (var instWrapper in instructionWrappers.Where(x => x.ForwardDataFlowRelated.Count > 0 || x.BackDataFlowRelated.Count > 0))
                 {
-                    Node grandchild = new SpotNode(Color.Blue);
-                    child.AddChild(grandchild);
+                    nodeWrappers.Add(new GoNodeWrapper(
+                        new SpotNode(colorCode.GetColor(instWrapper.Instruction.OpCode.Code)),
+                        instWrapper));
+                }
 
-                    for (int k = 0; k < mRandom.Next(0, 10); k++)
+                foreach (var nodeWrapper in nodeWrappers)
+                {
+                    newForm.mDiagram.AddNode(nodeWrapper.SpotNode);
+                    foreach (InstructionWrapper wrapper in nodeWrapper.InstWrapper.BackDataFlowRelated)
                     {
-                        Node descendant = new SpotNode(Color.CornflowerBlue);
-                        grandchild.AddChild(descendant);
+                        nodeWrapper.SpotNode.AddChild(nodeWrappers.First(x => x.InstWrapper == wrapper).SpotNode);
                     }
                 }
-            }
 
-            // run the force-directed algorithm (async)
-            Cursor = Cursors.WaitCursor;
-            btnGenerate.Enabled = false;
-            Thread bg = new Thread(mDiagram.Arrange);
-            bg.IsBackground = true;
-            bg.Start();
+                // mDiagram.Clear();
 
-            Graphics g = CreateGraphics();
+                // create a basic, random diagram that is between 2 and 4 levels deep 
+                // and has between 1 and 10 leaf nodes per branch
+                //Node node = new SpotNode(Color.Black);
+                //mDiagram.AddNode(node);
+
+                //for (int i = 0; i < mRandom.Next(1, 10); i++)
+                //{
+                //    Node child = new SpotNode(Color.Navy);
+                //    node.AddChild(child);
+
+                //    for (int j = 0; j < mRandom.Next(0, 10); j++)
+                //    {
+                //        Node grandchild = new SpotNode(Color.Blue);
+                //        child.AddChild(grandchild);
+
+                //        for (int k = 0; k < mRandom.Next(0, 10); k++)
+                //        {
+                //            Node descendant = new SpotNode(Color.CornflowerBlue);
+                //            grandchild.AddChild(descendant);
+                //        }
+                //    }
+                //}
+
+                // run the force-directed algorithm (async)
+                Cursor = Cursors.WaitCursor;
+                btnGenerate.Enabled = false;
+                Thread bg = new Thread(newForm.mDiagram.Arrange);
+                bg.IsBackground = true;
+                bg.Start();
+
+                Graphics g = CreateGraphics();
 
 #if ANIMATE
 			while (bg.IsAlive) {
@@ -89,13 +122,15 @@ namespace ForceBasedDiagram
 				Thread.Sleep(20);
 			}
 #else
-            bg.Join();
+                bg.Join();
 #endif
 
-            btnGenerate.Enabled = true;
-            Cursor = Cursors.Default;
+                btnGenerate.Enabled = true;
+                Cursor = Cursors.Default;
 
-            Invalidate();
+                Invalidate();
+                newForm.Show();
+            }
         }
     }
 }

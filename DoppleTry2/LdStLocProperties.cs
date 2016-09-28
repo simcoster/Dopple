@@ -41,7 +41,15 @@ namespace DoppleTry2
             }
             if (LcCodesOperandIndex.Contains(instruction.OpCode.Code))
             {
-                return (int)instruction.Operand;
+                if (instruction.Operand is int)
+                {
+                    return (int)instruction.Operand;
+                }
+                else if (instruction.Operand is VariableDefinition)
+                {
+                    return ((VariableDefinition)instruction.Operand).Index;
+                }
+                return 0;
             }
             else
             {

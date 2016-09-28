@@ -24,11 +24,6 @@ namespace DoppleTry2.BackTrackers
         public void AddBackDataflowConnections(InstructionWrapper currentInst)
         {
             currentInst.WasTreated = true;
-            if (!HasBackDataflowNodes)
-            {
-                currentInst.HasBackRelated = false;
-                return;
-            }
             var backRelatedInsts = GetDataflowBackRelatedIndices(currentInst);
             foreach (var backRelatedInst in backRelatedInsts)
             {
@@ -110,12 +105,21 @@ namespace DoppleTry2.BackTrackers
             return foundInstructions;
         }
 
-        protected IEnumerable<InstructionWrapper> GetStackPushAncestor(InstructionWrapper currInst)
+        protected IEnumerable<InstructionWrapper> GetStackPushAncestor(InstructionWrapper startInst, List<InstructionWrapper> visited = null)
         {
-            var instWrapper = currInst;
+            if (visited == null)
+            {
+                visited = new List<InstructionWrapper>();
+            }
+            var instWrapper = startInst;
             while (true)
             {
-                switch (currInst.BackDataFlowRelated.Count)
+                visited.Add(instWrapper);
+                if (visited.Contains(instWrapper))
+                {
+                    return new InstructionWrapper[0];
+                }
+                switch (instWrapper.BackDataFlowRelated.Count)
                 {
                     case 0:
                         return new [] { instWrapper } ;
@@ -124,7 +128,7 @@ namespace DoppleTry2.BackTrackers
                         instWrapper = instWrapper.BackDataFlowRelated[0];
                         break;
                     default:
-                        return instWrapper.BackDataFlowRelated.SelectMany(GetStackPushAncestor);
+                        return instWrapper.BackDataFlowRelated.SelectMany(x => GetStackPushAncestor(x, visited));
                 }
             }
         }

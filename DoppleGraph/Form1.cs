@@ -31,7 +31,6 @@ namespace DoppleGraph
         /// 
         /// 
         /// </summary>
-        private Dictionary<Code, Color> CodeColors = new Dictionary<Code, Color>();
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -67,16 +66,14 @@ namespace DoppleGraph
                     shape.Size = new SizeF(400, 400);
 
                     //goNodeWrapper.Node.Shape.BrushColor = colorCode.GetColor(goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code);
-                    //goNodeWrapper.Node.Text = goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code.ToString() + " "
-                    //                          + goNodeWrapper.Index + " " +
-                    //                          goNodeWrapper.InstructionWrapper.Instruction.Operand?.ToString();
-                    if (
-                        new[] { Code.Call, Code.Calli, Code.Callvirt }.Contains(
+                    goNodeWrapper.Node.Text = goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code.ToString() + " ";
+
+                    if ( new[] { Code.Call, Code.Calli, Code.Callvirt }.Contains(
                             goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code))
                     {
-                        //goNodeWrapper.Node.Text += ((MethodReference)goNodeWrapper.InstructionWrapper.Instruction.Operand).Name ?? " ";
+                        goNodeWrapper.Node.Text += ((MethodReference)goNodeWrapper.InstructionWrapper.Instruction.Operand).Name ?? " ";
                     }
-                    goNodeWrapper.Node.Text = "                 \n\n\n\n";
+                    //goNodeWrapper.Node.Text = "            \n\n";
                     myView.Document.Add(goNodeWrapper.Node);
                 }
 
@@ -92,7 +89,7 @@ namespace DoppleGraph
                         var backNode = nodeWrappers.First(x => x.InstructionWrapper == wrapper).Node;
                         link.ToPort = backNode.RightPort;
                         myView.Document.Add(link);
-                        link.PenColor = Color.FromArgb(245,228,176);
+                        link.PenColor = Color.FromArgb(0,245,228,176);
                     }
 
                     continue;

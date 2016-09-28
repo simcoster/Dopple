@@ -3,6 +3,7 @@ using System.Linq;
 using DoppleTry2.InstructionModifiers;
 using Mono.Cecil.Cil;
 using Mono.Cecil;
+using System;
 
 namespace DoppleTry2
 {
@@ -12,7 +13,6 @@ namespace DoppleTry2
         public MethodDefinition Method { get; set; }
         public int StackPushCount { get; set; }
         public bool WasTreated { get; set; } = false;
-        public bool HasBackRelated { get; set; } = true;
         public int StackPopCount { get; set; }
         public int MemoryStoreCount { get; set; }
         public int MemoryReadCount { get; set; }
@@ -21,6 +21,7 @@ namespace DoppleTry2
         public List<InstructionWrapper> BackDataFlowRelated { get; internal set; } = new List<InstructionWrapper>();
         public List<InstructionWrapper> ForwardDataFlowRelated { get; internal set; } = new List<InstructionWrapper>();
         public int LocIndex { get; set; }
+        public int ArgIndex { get; set; }
         //TODO : this should be a different thing
         public bool Inlined { get; set; } = false;
         public int StackSum { get; internal set; } = 0;
@@ -36,6 +37,47 @@ namespace DoppleTry2
             MemoryReadCount = MemoryProperties.GetMemReadCount(instruction.OpCode.Code);
             MemoryStoreCount = MemoryProperties.GetMemStoreCount(instruction.OpCode.Code);
             LocIndex = LdStLocProperties.GetLocIndex(instruction);
+            ArgIndex = GetArgIndex(instruction);
+        }
+
+        private int GetArgIndex(Instruction instruction)
+        {
+            Code[] argCodes = { Code.Ldarg, Code.Ldarg_0, Code.Ldarg_1, Code.Ldarg_2, Code.Ldarg_3, Code.Ldarg_S,
+                                Code.Ldarga, Code.Ldarga_S,
+                                Code.Starg, Code.Starg_S};
+
+            if (!argCodes.Contains(instruction.OpCode.Code))
+            {
+                return -1;
+            }
+            switch (instruction.OpCode.Code)
+            {
+                case Code.Ldarg_0:
+                    return 0;
+                case Code.Ldarg_1:
+                    return 1;
+                case Code.Ldarg_2:
+                    return 2;
+                case Code.Ldarg_3:
+                    return 3;
+            }
+
+            if (instruction.Operand is ValueType)
+            {
+                return Convert.ToInt32(instruction.Operand);
+            }
+            else
+            {
+                if (instruction.Operand is VariableDefinition)
+                {
+                    return ((VariableDefinition)instruction.Operand).Index;
+                }
+                else if (instruction.Operand is ParameterDefinition)
+                {
+                    return ((ParameterDefinition)instruction.Operand).Index;
+                }
+            }
+            throw new Exception("shouldn't get here");
         }
 
         private int GetStackPushCount(Instruction instruction)

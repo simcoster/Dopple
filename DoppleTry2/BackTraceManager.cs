@@ -33,11 +33,18 @@ namespace DoppleTry2
                     .Select(Activator.CreateInstance)
                     .Cast<IModifier>();
             _backTracers =
-                GetType()
-                    .Assembly.GetTypes()
-                    .Where(x => typeof(BackTracer).IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
-                    .Select(x => Activator.CreateInstance(x, _instructionsWrappers))
-                    .Cast<BackTracer>();
+                new BackTracer[]
+                {
+                    new ImmediateValueBackTracer(_instructionsWrappers),
+                    new StackPopBackTracer(_instructionsWrappers),
+                    new LdArgBacktracer(_instructionsWrappers),
+                    new LdLocBackTracer(_instructionsWrappers),
+                    new LdStaticFieldBackTracer(_instructionsWrappers),
+                    new LoadArrayElemBackTracer(_instructionsWrappers),
+                    new LoadFieldByStackBackTracer(_instructionsWrappers),
+                    new LoadMemoryByOperandBackTracer(_instructionsWrappers),
+                    new TypedReferenceBackTracer(_instructionsWrappers)
+                };
 
             _flowHandlers =
                GetType()
