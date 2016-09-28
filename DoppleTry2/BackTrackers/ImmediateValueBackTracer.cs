@@ -12,7 +12,7 @@ namespace DoppleTry2.BackTrackers
         {
             Code.Ldc_I4_0, Code.Ldc_I4_1, Code.Ldc_I4_2, Code.Ldc_I4_3, Code.Ldc_I4_4, Code.Ldc_I4_5,
             Code.Ldc_I4_6, Code.Ldc_I4_7, Code.Ldc_I4_8, Code.Ldc_I4_S, Code.Ldc_I4, Code.Ldc_R4, Code.Ldc_R8,
-            Code.Ldc_I8, Code.Ldc_I4_8
+            Code.Ldc_I8, Code.Ldc_I4_8, Code.Ldc_I4_M1
         };
 
         private readonly Code[] _moreCodes =

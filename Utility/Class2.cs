@@ -10,17 +10,17 @@ namespace Utility
 {
     public class Class2
     {
-        public static string ForLoop()
+        public static int ForLoop()
         {
             int returnInt = 0;
             int[] meep = { 4, 5, 6, 4, 4 };
             int a = 0;
             for (int i=0; i<5; i++)
             {
-                returnString += meep[i];
+                returnInt += meep[i];
                 a++;
             }
-            return returnString;
+            return returnInt;
         }
 
         public static int ForeachLoop()

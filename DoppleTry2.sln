@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utility", "Utility\Utility.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DoppleGraph", "DoppleGraph\DoppleGraph.csproj", "{B9888195-F233-4969-BBBC-3A9F7769C0C7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForceBasedDiagram", "ForceBasedDiagram\ForceBasedDiagram.csproj", "{7682F3AD-13A8-4297-9E47-FE3EAAB53394}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,6 +36,12 @@ Global
 		{B9888195-F233-4969-BBBC-3A9F7769C0C7}.Mixed|Any CPU.Build.0 = Mixed|Any CPU
 		{B9888195-F233-4969-BBBC-3A9F7769C0C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B9888195-F233-4969-BBBC-3A9F7769C0C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7682F3AD-13A8-4297-9E47-FE3EAAB53394}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7682F3AD-13A8-4297-9E47-FE3EAAB53394}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7682F3AD-13A8-4297-9E47-FE3EAAB53394}.Mixed|Any CPU.ActiveCfg = Release|Any CPU
+		{7682F3AD-13A8-4297-9E47-FE3EAAB53394}.Mixed|Any CPU.Build.0 = Release|Any CPU
+		{7682F3AD-13A8-4297-9E47-FE3EAAB53394}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7682F3AD-13A8-4297-9E47-FE3EAAB53394}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

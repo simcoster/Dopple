@@ -27,9 +27,8 @@ namespace DoppleGraph
         {
             AssemblyDefinition myLibrary = AssemblyDefinition.ReadAssembly(@"C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\Utility\bin\Release\Utility.dll");
 
+            CodeColorHanlder colorCode = new CodeColorHanlder();
             TypeDefinition type = myLibrary.MainModule.Types[1];
-
-            SetCodeColors();
 
             foreach (var method in type.Methods.Where(x => !x.IsConstructor))
             {

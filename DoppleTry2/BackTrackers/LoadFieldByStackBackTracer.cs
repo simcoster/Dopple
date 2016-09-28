@@ -35,7 +35,7 @@ namespace DoppleTry2.BackTrackers
             return new InstructionWrapper[0];
         }
 
-        public override Code[] HandlesCodes => new[] {Code.Ldfld, Code.Ldflda,};
+        public override Code[] HandlesCodes => new[] {Code.Ldfld, Code.Ldflda};
 
     }
 }
