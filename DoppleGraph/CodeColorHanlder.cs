@@ -12,7 +12,7 @@ namespace DoppleGraph
     { 
         static Code[] LdcCodes = { Code.Ldc_I4_0, Code.Ldc_I4_1, Code.Ldc_I4_2, Code.Ldc_I4_3, Code.Ldc_I4_4, Code.Ldc_I4_5,
                             Code.Ldc_I4_6, Code.Ldc_I4_7, Code.Ldc_I4_8, Code.Ldc_I4_S, Code.Ldc_I4, Code.Ldc_R4,
-                            Code.Ldc_R8, Code.Ldc_I8, Code.Ldc_I4_8, Code.Ldc_I4_M1 };
+                            Code.Ldc_R8, Code.Ldc_I8, Code.Ldc_I4_M1 };
 
         static Code[] LdargCodes = {Code.Ldarg, Code.Ldarg_0, Code.Ldarg_1, Code.Ldarg_2, Code.Ldarg_3, Code.Ldarg_S,
                              Code.Ldarga, Code.Ldarga_S };
@@ -40,7 +40,7 @@ namespace DoppleGraph
                         Code.Conv_Ovf_U4, Code.Conv_Ovf_U4_Un, Code.Conv_Ovf_U8, Code.Conv_Ovf_U8_Un, Code.Conv_R_Un,
                         Code.Conv_R4, Code.Conv_R8, Code.Conv_U, Code.Conv_U1, Code.Conv_U2, Code.Conv_U4, Code.Conv_U8 };
 
-        static Code[] Beq = { Code.Beq, Code.Beq };
+        static Code[] Beq = { Code.Beq, Code.Beq_S };
 
         static Code[] Bge = { Code.Bge, Code.Bge_S, Code.Bge_Un, Code.Bge_Un_S };
 
@@ -50,20 +50,63 @@ namespace DoppleGraph
 
         static Code[] Blt = { Code.Blt, Code.Blt_S, Code.Blt_Un, Code.Blt_Un_S };
 
+        Dictionary<Code, Color> CodeColors = new Dictionary<Code, Color>();
+
         public CodeColorHanlder()
         {
+            int Rvalue = 50;
+            int Gvalue = 50;
+            int Bvalue = 50;
+
+            int BigIncrement = 30;
+            int SmallIncrement = 2;
+
             var deltCodes = GetType()
                 .GetFields(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)
                 .Select(x => x.GetValue(null))
-                .Cast<Code[]>()
-                .SelectMany(x => x);
+                .Cast<Code[]>();
+
+            foreach (var codeGroup in deltCodes)
+            {
+                GetColor(ref Rvalue, ref Gvalue, ref Bvalue, BigIncrement);
+                foreach(var code in codeGroup)
+                {
+                    CodeColors.Add(code, Color.FromArgb(Rvalue, Gvalue, Bvalue));
+                    GetColor(ref Rvalue, ref Gvalue, ref Bvalue, SmallIncrement);
+                }
+            }
 
             var undeltCodes =
-               typeof(OpCodes).GetFields()
-                   .Select(x => x.GetValue(null))
-                   .Cast<OpCode>()
-                   .Select(x => x.Code)
-                   .Except(deltCodes);
+            typeof(OpCodes).GetFields().Select(x => x.GetValue(null)).Cast<OpCode>()
+                           .Select(x => x.Code).Except(deltCodes.SelectMany(x => x));
+
+            foreach (var loneCode in undeltCodes)
+            {
+                GetColor(ref Rvalue, ref Gvalue, ref Bvalue, BigIncrement);
+                CodeColors.Add(loneCode, Color.FromArgb(Rvalue, Gvalue, Bvalue));
+            }
+        }
+
+        public Color GetColor(Code code)
+        {
+            return CodeColors[code];
+        }
+
+        private void GetColor(ref int RValue, ref int GValue, ref int BValue, int increment)
+        {
+            int maxValue = 255;
+
+            RValue += increment;
+            if (RValue > maxValue)
+            {
+                RValue -= maxValue;
+                GValue += increment;
+                if (GValue > maxValue)
+                {
+                    GValue -= maxValue;
+                    BValue += increment;
+                }
+            }
         }
     }
 }

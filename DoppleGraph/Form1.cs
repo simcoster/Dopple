@@ -21,6 +21,16 @@ namespace DoppleGraph
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Maybe swtich to graphVIZZZZ
+        /// 
+        /// 
+        /// 
+        /// 
+        /// 
+        /// 
+        /// 
+        /// </summary>
         private Dictionary<Code, Color> CodeColors = new Dictionary<Code, Color>();
 
         private void Form1_Load(object sender, EventArgs e)
@@ -46,14 +56,17 @@ namespace DoppleGraph
                 nodeWrappers =
                     instructionWrappers
                     .Where(x => x.ForwardDataFlowRelated.Count >0 || x.BackDataFlowRelated.Count >0)
-                    .Select(x => new GoNodeWrapper(new GoBasicNode(), x))
+                    .Select(x => new GoNodeWrapper(new GoTextNode(), x))
                     .ToList();
 
                 foreach (var goNodeWrapper in nodeWrappers)
                 {
                     goNodeWrapper.Index = nodeWrappers.IndexOf(goNodeWrapper);
-                    goNodeWrapper.Node.Shape.BrushColor = Color.Blue;
-                    goNodeWrapper.Node.Shape = new GoRectangle();
+                    ((GoShape)goNodeWrapper.Node.Background).BrushColor = colorCode.GetColor(goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code);
+                    var shape = ((GoShape)goNodeWrapper.Node.Background);
+                    shape.Size = new SizeF(400, 400);
+
+                    //goNodeWrapper.Node.Shape.BrushColor = colorCode.GetColor(goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code);
                     goNodeWrapper.Node.Text = goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code.ToString() + " "
                                               + goNodeWrapper.Index + " " +
                                               goNodeWrapper.InstructionWrapper.Instruction.Operand?.ToString();
@@ -63,27 +76,23 @@ namespace DoppleGraph
                     {
                         goNodeWrapper.Node.Text += ((MethodReference)goNodeWrapper.InstructionWrapper.Instruction.Operand).Name ?? " ";
                     }
+                    goNodeWrapper.Node.Text = "     \n     \n     \n     \n";
                     myView.Document.Add(goNodeWrapper.Node);
                 }
-                Random rnd = new Random();
 
-                int RColorVal = 100;
-                int GColorVal = 100;
-                int BColorVal = 100;
                 foreach (var nodeWrapper in nodeWrappers)
                 { 
                     foreach (InstructionWrapper wrapper in nodeWrapper.InstructionWrapper.BackDataFlowRelated)
                     {
                         GoLink link = new GoLink();
                         link.Relinkable = false;
-                        link.FromPort = nodeWrapper.Node.Port;
+                        link.FromPort = nodeWrapper.Node.LeftPort;
                         link.PenWidth = 3;
                         link.FromArrow = true;
                         var backNode = nodeWrappers.First(x => x.InstructionWrapper == wrapper).Node;
-                        link.ToPort = backNode.Port;
+                        link.ToPort = backNode.RightPort;
                         myView.Document.Add(link);
-                        GetColor(ref RColorVal, ref GColorVal, ref BColorVal);
-                        link.PenColor = Color.FromArgb(RColorVal, GColorVal, BColorVal);
+                        link.PenColor = Color.FromArgb(245,228,176);
                     }
 
                     continue;
@@ -92,13 +101,13 @@ namespace DoppleGraph
                         Color randomColor;
                         GoLink link = new GoLink();
                         link.FromArrow = true;
-                        link.FromPort = nodeWrapper.Node.Port;
+                        link.FromPort = nodeWrapper.Node.LeftPort;
                         link.Pen = new Pen(link.Pen.Brush) {DashStyle = DashStyle.Dash};
                         link.PenWidth = 1;
                         link.Style = GoStrokeStyle.RoundedLineWithJumpGaps;
                         link.BrushStyle = GoBrushStyle.EllipseGradient;
                         var backNode = nodeWrappers.First(x => x.InstructionWrapper == wrapper).Node;
-                        link.ToPort = backNode.Port;
+                        link.ToPort = backNode.RightPort;
                         myView.Document.Add(link);
                         randomColor = Color.Black;
                         link.PenColor = randomColor;
@@ -118,7 +127,7 @@ namespace DoppleGraph
             SetRowIndexes(nodeWrappers);
             FixDuplicateCoordinates(nodeWrappers);
             int totalHeight = 1000;
-            int totalWidth = 1500;
+            int totalWidth = 1000;
             float heightOffset = totalHeight / nodeWrappers.Select(x => x.DisplayRow).Max();
             float widthOffset = totalWidth / nodeWrappers.Select(x => x.DisplayCol).Max();
             foreach (var nodeWrapper in nodeWrappers)
@@ -135,7 +144,7 @@ namespace DoppleGraph
             {
                 foreach (var node in group.Select(y => y).Skip(1))
                 {
-                    node.DisplayRow += 0.1f;
+                    node.DisplayRow += 0.5f;
                 }
             }
         }
@@ -190,22 +199,6 @@ namespace DoppleGraph
             }
         }
 
-        private void GetColor(ref int RValue, ref int GValue, ref int BValue)
-        {
-            int increment = 20;
-            int maxValue = 256;
-
-            RValue += increment;
-            if (RValue > maxValue)
-            {
-                RValue -= maxValue;
-                GValue += increment;
-                if (GValue > maxValue)
-                {
-                    GValue -= maxValue;
-                    BValue += increment;
-                }
-            }
-        }
+      
     }
 }
