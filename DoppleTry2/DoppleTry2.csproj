@@ -72,7 +72,6 @@
     <Compile Include="BackTrackers\LdArgBacktracer.cs" />
     <Compile Include="BackTrackers\LdStaticFieldBackTracer.cs" />
     <Compile Include="BackTrackers\LoadArrayElemBackTracer.cs" />
-    <Compile Include="BackTrackers\LoadArrayBackTracer.cs" />
     <Compile Include="BackTrackers\LoadMemoryByOperandBackTracer.cs" />
     <Compile Include="BackTrackers\LoadFieldByStackBackTracer.cs" />
     <Compile Include="BackTrackers\StackPopBackTracer.cs" />

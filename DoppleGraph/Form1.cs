@@ -9,6 +9,7 @@ using DoppleTry2;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Northwoods.Go;
+using DoppleTry2.BackTrackers;
 
 namespace DoppleGraph
 {
@@ -20,11 +21,15 @@ namespace DoppleGraph
             InitializeComponent();
         }
 
+        private Dictionary<Code, Color> CodeColors = new Dictionary<Code, Color>();
+
         private void Form1_Load(object sender, EventArgs e)
         {
             AssemblyDefinition myLibrary = AssemblyDefinition.ReadAssembly(@"C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\Utility\bin\Release\Utility.dll");
 
             TypeDefinition type = myLibrary.MainModule.Types[1];
+
+            SetCodeColors();
 
             foreach (var method in type.Methods.Where(x => !x.IsConstructor))
             {
@@ -40,7 +45,10 @@ namespace DoppleGraph
                 newForm.Controls.Add(myView);
 
                 nodeWrappers =
-                    instructionWrappers.Select(x => new GoNodeWrapper(new GoBasicNode(), x)).ToList();
+                    instructionWrappers
+                    .Where(x => x.ForwardDataFlowRelated.Count >0 || x.BackDataFlowRelated.Count >0)
+                    .Select(x => new GoNodeWrapper(new GoBasicNode(), x))
+                    .ToList();
 
                 foreach (var goNodeWrapper in nodeWrappers)
                 {
@@ -48,9 +56,8 @@ namespace DoppleGraph
                     goNodeWrapper.Node.Shape.BrushColor = Color.Blue;
                     goNodeWrapper.Node.Shape = new GoRectangle();
                     goNodeWrapper.Node.Text = goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code.ToString() + " "
-                                              + nodeWrappers.IndexOf(goNodeWrapper) + 
-                                              goNodeWrapper.InstructionWrapper.Instruction.Operand?.ToString() +
-                                              " Stack: " + goNodeWrapper.InstructionWrapper.StackSum;
+                                              + goNodeWrapper.Index + " " +
+                                              goNodeWrapper.InstructionWrapper.Instruction.Operand?.ToString();
                     if (
                         new[] { Code.Call, Code.Calli, Code.Callvirt }.Contains(
                             goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code))
@@ -99,31 +106,18 @@ namespace DoppleGraph
                     }
                     
                 }
-                AddColNumbers(nodeWrappers);
+                SetCoordinates(nodeWrappers);
                 newForm.Show();
             }
         }
 
-        private void AddColNumbers(List<GoNodeWrapper> nodeWrappers)
+        private void SetCoordinates(List<GoNodeWrapper> nodeWrappers)
         {
             Dictionary<int, List<GoNodeWrapper>> nodeWrapperCols = new Dictionary<int, List<GoNodeWrapper>>();
-            var colNodes = nodeWrappers.Where(x => x.InstructionWrapper.BackDataFlowRelated.Count == 0).ToList();
-            SetFirstColRows(colNodes);
-            int iterations = 0;
-            while (colNodes.Count > 0 && iterations < 20)
-            {
-                iterations++;
-                colNodes = colNodes
-                    .SelectMany(x => x.InstructionWrapper.ForwardDataFlowRelated)
-                    .Select(x => nodeWrappers.First(y => y.InstructionWrapper == x))
-                    .ToList();
-                foreach (var colNode in colNodes)
-                {
-                    colNode.DisplayCol = colNode.InstructionWrapper.BackDataFlowRelated.Select(x => GetNodeWrapper(x).DisplayCol).Max() +1;
-                    colNode.DisplayRow = colNode.InstructionWrapper.BackDataFlowRelated.Select(x => GetNodeWrapper(x)).Average(x => x.DisplayRow);
-                }
-            }
-
+            var firstColNodes = nodeWrappers.Where(x => x.InstructionWrapper.BackDataFlowRelated.Count == 0).ToList();
+            SetLongestPathRec(firstColNodes);
+            SetRowIndexes(nodeWrappers);
+            FixDuplicateCoordinates(nodeWrappers);
             int totalHeight = 1000;
             int totalWidth = 1500;
             float heightOffset = totalHeight / nodeWrappers.Select(x => x.DisplayRow).Max();
@@ -132,30 +126,68 @@ namespace DoppleGraph
             {
                 nodeWrapper.Node.Location = new PointF(nodeWrapper.DisplayCol * widthOffset, nodeWrapper.DisplayRow * heightOffset);
             }
+
+        }
+
+        private void FixDuplicateCoordinates(List<GoNodeWrapper> nodeWrappers)
+        {
+            var sameCoordiantesGroups = nodeWrappers.GroupBy(x => new { x.DisplayCol, x.DisplayRow }).Where(y => y.Count() >1);
+            foreach (var group in sameCoordiantesGroups)
+            {
+                foreach (var node in group.Select(y => y).Skip(1))
+                {
+                    node.DisplayRow += 0.1f;
+                }
+            }
         }
 
         private GoNodeWrapper GetNodeWrapper (InstructionWrapper instWrapper)
         {
             return nodeWrappers.First(x => x.InstructionWrapper == instWrapper);
         }
-        private void SetFirstColRows(List<GoNodeWrapper> colNodes)
+        private void SetLongestPathRec(List<GoNodeWrapper> colNodes)
         {
-            int i = 0;
-            var visited = new List<GoNodeWrapper>();
             foreach (var node in colNodes)
             {
-                node.DisplayCol = 0;
-                if (visited.Contains(node))
-                    continue;
-                var neighbours = colNodes
-                    .Where(x => x.InstructionWrapper.ForwardDataFlowRelated.Intersect(node.InstructionWrapper.ForwardDataFlowRelated)
-                    .Count() > 0);
-                foreach (var neighbour in neighbours)
+                var nodesToUpdate = node.InstructionWrapper.ForwardDataFlowRelated
+                    .Select(x => GetNodeWrapper(x))
+                    .Where(x => x.LongestPath.Count == 0 || !x.LongestPath.Intersect(node.LongestPath).SequenceEqual(x.LongestPath) )
+                    .Where(x => x.LongestPath.Count < node.LongestPath.Count + 1)
+                    .ToList();
+                foreach (var nodeToUpdate in nodesToUpdate)
                 {
-                    neighbour.DisplayRow = i;
-                    i++;
+                    nodeToUpdate.LongestPath = node.LongestPath.Concat(new[] { node }).ToList();
+                    nodeToUpdate.DisplayCol = nodeToUpdate.LongestPath.Count;
                 }
-                visited.AddRange(neighbours);
+                SetLongestPathRec(nodesToUpdate);
+            }
+        }
+
+        private void SetRowIndexes(List<GoNodeWrapper> allNodes)
+        {
+            var firstColNodes = allNodes.Where(x => x.InstructionWrapper.BackDataFlowRelated.Count == 0);
+            var handledFirstNodes = new List<GoNodeWrapper>();
+            handledFirstNodes.AddRange(firstColNodes);
+            int rowNum = 0;
+            while (handledFirstNodes.Count > 0)
+            {
+                var neighbours = handledFirstNodes
+                                         .Where(x => x.InstructionWrapper.ForwardDataFlowRelated
+                                         .Intersect(handledFirstNodes[0].InstructionWrapper.ForwardDataFlowRelated)
+                                         .Count() > 0)
+                                         .Concat(new[] { handledFirstNodes[0] })
+                                         .Distinct()
+                                         .ToList();
+                foreach(var neighbour in neighbours)
+                {
+                    neighbour.DisplayRow = rowNum;
+                    rowNum++;
+                    handledFirstNodes.Remove(neighbour);
+                }
+            }
+            foreach(var node in allNodes.Except(firstColNodes))
+            {
+                node.DisplayRow = node.InstructionWrapper.BackDataFlowRelated.Select(x => GetNodeWrapper(x)).Average(x => x.DisplayRow);
             }
         }
 

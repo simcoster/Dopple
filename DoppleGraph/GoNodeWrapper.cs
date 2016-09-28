@@ -1,5 +1,6 @@
 ﻿using DoppleTry2;
 using Northwoods.Go;
+using System.Collections.Generic;
 
 namespace DoppleGraph
 {
@@ -15,6 +16,7 @@ namespace DoppleGraph
         public InstructionWrapper InstructionWrapper { get; private set; }
         public int Index { get; set; }
         public float DisplayRow { get; set; }
-        public int DisplayCol { get; set; } = 0;
+        public float DisplayCol { get; set; }
+        public List<GoNodeWrapper> LongestPath { get; set; } = new List<GoNodeWrapper>();
     }
 }

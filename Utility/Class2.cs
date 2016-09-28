@@ -12,7 +12,7 @@ namespace Utility
     {
         public static string ForLoop()
         {
-            string returnString = "";
+            int returnInt = 0;
             int[] meep = { 4, 5, 6, 4, 4 };
             int a = 0;
             for (int i=0; i<5; i++)
@@ -23,19 +23,30 @@ namespace Utility
             return returnString;
         }
 
-        public static string ForeachLoop()
+        public static int ForeachLoop()
         {
-            string returnString = "";
+            int returnInt = 0;
             foreach (var blah in new []{ 4,5,6,4,4})
             {
-                returnString += blah;
+                returnInt += blah;
             }
-            return returnString;
+            return returnInt;
         }
 
-        public static string LinqStatement()
+
+        public static int ForeachLoopDifferent()
         {
-            return (new[] { 2, 4, 5, 6, 4 }).Select(x => x.ToString()).Aggregate((x,y) => x + y);
+            int returnInt = 0;
+            foreach (var blah in new[] { 4, 5, 6, 4, 4 })
+            {
+                returnInt -= blah;
+            }
+            return returnInt;
+        }
+
+        public static int LinqStatement()
+        {
+            return (new[] { 2, 4, 5, 6, 4 }).Aggregate((x,y) => x + y);
         }
     }
 }
