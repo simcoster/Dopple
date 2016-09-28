@@ -67,16 +67,16 @@ namespace DoppleGraph
                     shape.Size = new SizeF(400, 400);
 
                     //goNodeWrapper.Node.Shape.BrushColor = colorCode.GetColor(goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code);
-                    goNodeWrapper.Node.Text = goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code.ToString() + " "
-                                              + goNodeWrapper.Index + " " +
-                                              goNodeWrapper.InstructionWrapper.Instruction.Operand?.ToString();
+                    //goNodeWrapper.Node.Text = goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code.ToString() + " "
+                    //                          + goNodeWrapper.Index + " " +
+                    //                          goNodeWrapper.InstructionWrapper.Instruction.Operand?.ToString();
                     if (
                         new[] { Code.Call, Code.Calli, Code.Callvirt }.Contains(
                             goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code))
                     {
-                        goNodeWrapper.Node.Text += ((MethodReference)goNodeWrapper.InstructionWrapper.Instruction.Operand).Name ?? " ";
+                        //goNodeWrapper.Node.Text += ((MethodReference)goNodeWrapper.InstructionWrapper.Instruction.Operand).Name ?? " ";
                     }
-                    goNodeWrapper.Node.Text = "     \n     \n     \n     \n";
+                    goNodeWrapper.Node.Text = "                 \n\n\n\n";
                     myView.Document.Add(goNodeWrapper.Node);
                 }
 
@@ -132,7 +132,7 @@ namespace DoppleGraph
             float widthOffset = totalWidth / nodeWrappers.Select(x => x.DisplayCol).Max();
             foreach (var nodeWrapper in nodeWrappers)
             {
-                nodeWrapper.Node.Location = new PointF(nodeWrapper.DisplayCol * widthOffset, nodeWrapper.DisplayRow * heightOffset);
+                nodeWrapper.Node.Location = new PointF(nodeWrapper.DisplayCol * widthOffset, (nodeWrapper.DisplayRow-0.7f) * heightOffset);
             }
 
         }
@@ -176,7 +176,7 @@ namespace DoppleGraph
             var firstColNodes = allNodes.Where(x => x.InstructionWrapper.BackDataFlowRelated.Count == 0);
             var handledFirstNodes = new List<GoNodeWrapper>();
             handledFirstNodes.AddRange(firstColNodes);
-            int rowNum = 0;
+            int rowNum = 1;
             while (handledFirstNodes.Count > 0)
             {
                 var neighbours = handledFirstNodes
