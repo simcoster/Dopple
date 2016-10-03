@@ -178,10 +178,10 @@ namespace Utility
 
         //}
 
-        public static void QuicksortMiddle(IComparable[] elements, int left, int right)
+        public static void QuicksortMiddle(int[] elements, int left, int right)
         {
             int i = left, j = right;
-            IComparable pivot = elements[(left + right) / 2];
+            int pivot = elements[(left + right) / 2];
 
             while (i <= j)
             {
@@ -198,7 +198,7 @@ namespace Utility
                 if (i <= j)
                 {
                     // Swap
-                    IComparable tmp = elements[i];
+                    int tmp = elements[i];
                     elements[i] = elements[j];
                     elements[j] = tmp;
 

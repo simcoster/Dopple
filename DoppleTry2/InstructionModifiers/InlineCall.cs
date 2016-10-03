@@ -20,8 +20,10 @@ namespace DoppleTry2.InstructionModifiers
                 if (!(CallOpCodes.Contains(instWrapper.Instruction.OpCode.Code) &&
                             instWrapper.Instruction.Operand is MethodDefinition &&
                             instWrapper.Inlined == false))
-                    return;
+                    continue;
                 var calledFunc = (MethodDefinition)instWrapper.Instruction.Operand;
+                if (calledFunc.FullName == instWrapper.Method.FullName)
+                    continue;
                 var calledFuncInstructions = calledFunc.Body.Instructions.ToList();
                 calledFuncInstructions.RemoveAll(x => x.OpCode.Code == Code.Ret);
                 var calledFunInstWrappers = calledFuncInstructions.Select(x => new InstructionWrapper(x, calledFunc)).ToList();

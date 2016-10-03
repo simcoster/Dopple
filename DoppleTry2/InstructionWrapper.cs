@@ -26,6 +26,7 @@ namespace DoppleTry2
         public bool Inlined { get; set; } = false;
         public int StackSum { get; internal set; } = 0;
         public int InstructionIndex { get; internal set; }
+        public int ImmediateIntValue { get; private set; }
 
 
         public InstructionWrapper(Instruction instruction , MethodDefinition method)
@@ -38,6 +39,32 @@ namespace DoppleTry2
             MemoryStoreCount = MemoryProperties.GetMemStoreCount(instruction.OpCode.Code);
             LocIndex = LdStLocProperties.GetLocIndex(instruction);
             ArgIndex = GetArgIndex(instruction);
+            ImmediateIntValue = GetImmediateInt(instruction).Value;
+        }
+
+        private int? GetImmediateInt(Instruction instruction)
+        {
+            var imeddiateFixedValue = new[]
+            {
+                Code.Ldc_I4_0, Code.Ldc_I4_1, Code.Ldc_I4_2, Code.Ldc_I4_3, Code.Ldc_I4_4, Code.Ldc_I4_5,
+                Code.Ldc_I4_6, Code.Ldc_I4_7, Code.Ldc_I4_8
+            };
+
+            var imeddiateOperandValue = new[]
+            {
+                Code.Ldc_I4_S, Code.Ldc_I4, Code.Ldc_R4, Code.Ldc_R8, Code.Ldc_I8,Code.Ldc_I4_M1
+            };
+
+            var code = instruction.OpCode.Code;
+            if (imeddiateFixedValue.Contains(code))
+            {
+                return Int32.Parse(code.ToString().Last().ToString());
+            }
+            else if (imeddiateOperandValue.Contains(code))
+            {
+                return ((int)instruction.Operand);
+            }
+            return null;
         }
 
         private int GetArgIndex(Instruction instruction)

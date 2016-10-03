@@ -12,35 +12,56 @@ namespace Utility
     {
         public static int TwoVarsPath(int a, int b)
         {
-            var c = a;
-            var d = b;
-            if (b == a)
+            int counter = 0;
+            int sum = 0;
+            for (int i = 0; i < 5; i++)
             {
-                c = 5;
+                counter++;
+                for (int j = 0; j < 5; j++)
+                {
+                    sum += counter;
+                }
             }
-            else
-            {
-                c=7;
-            }
-            c = c + 3;
-            int g = 5;
-            g--;
-            g++;
-            c = -c;
-            d = d + 4;
-            var e = c + d;
-            return e;
+            return sum;
         }
 
-        public string TwoStrings(string a, string b)
+        public static int TwoVarsPathTwo(int a, int b)
         {
-            var c = a;
-            var d = b;
-            c = c.ToUpper();
-            Bleep = c;
-            return a;
+            int counter = 0;
+            int sum = 0;
+            for (int j = 0; j < 5; j++)
+            {
+                sum += counter;
+                for (int i = 0; i < 5; i++)
+                {
+                    counter++;
+                }
+            }
+            return sum;
         }
-
-        public string Bleep { get; set; }
+        public static int ThreeVarsPath(int a, int b)
+        {
+            int sum = 1;
+            for (int i = 1; i < 5; i++)
+            {
+                for (int j = 1; j < 6; j++)
+                {
+                    sum *= i - j;
+                }
+            }
+            return sum;
+        }
+        public static int ThreeVarsPathTwo(int a, int b)
+        {
+            int sum = 1;
+            for (int j = 1; j < 6; j++)
+            {
+                for (int i = 1; i < 5; i++)
+                {
+                    sum *= i - j;
+                }
+            }
+            return sum;
+        }
     }
 }

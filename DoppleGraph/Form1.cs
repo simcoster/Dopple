@@ -37,7 +37,7 @@ namespace DoppleGraph
             AssemblyDefinition myLibrary = AssemblyDefinition.ReadAssembly(@"C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\Utility\bin\Release\Utility.dll");
 
             CodeColorHanlder colorCode = new CodeColorHanlder();
-            TypeDefinition type = myLibrary.MainModule.Types[1];
+            TypeDefinition type = myLibrary.MainModule.Types[2];
 
             foreach (var method in type.Methods.Where(x => !x.IsConstructor))
             {
@@ -54,7 +54,7 @@ namespace DoppleGraph
 
                 nodeWrappers =
                     instructionWrappers
-                    .Where(x => x.ForwardDataFlowRelated.Count >0 || x.BackDataFlowRelated.Count >0)
+                    //.Where(x => x.ForwardDataFlowRelated.Count >0 || x.BackDataFlowRelated.Count >0)
                     .Select(x => new GoNodeWrapper(new GoTextNode(), x))
                     .ToList();
 
@@ -73,23 +73,34 @@ namespace DoppleGraph
                     {
                         goNodeWrapper.Node.Text += ((MethodReference)goNodeWrapper.InstructionWrapper.Instruction.Operand).Name ?? " ";
                     }
-                    //goNodeWrapper.Node.Text = "            \n\n";
                     myView.Document.Add(goNodeWrapper.Node);
                 }
+                SetCoordinates(nodeWrappers);
+
 
                 foreach (var nodeWrapper in nodeWrappers)
-                { 
+                {
+                    var baseColor = Color.FromArgb(245, 228, 176);
                     foreach (InstructionWrapper wrapper in nodeWrapper.InstructionWrapper.BackDataFlowRelated)
                     {
                         GoLink link = new GoLink();
                         link.Relinkable = false;
-                        link.FromPort = nodeWrapper.Node.LeftPort;
                         link.PenWidth = 3;
-                        link.FromArrow = true;
-                        var backNode = nodeWrappers.First(x => x.InstructionWrapper == wrapper).Node;
-                        link.ToPort = backNode.RightPort;
+                        //link.FromArrow = true;
+                        var backNode = GetNodeWrapper(wrapper);
+                        if (nodeWrapper.DisplayCol >= backNode.DisplayCol)
+                        {
+                            link.ToPort = backNode.Node.RightPort;
+                            link.FromPort = nodeWrapper.Node.LeftPort;
+                        }
+                        else
+                        {
+                            link.ToPort = backNode.Node.LeftPort;
+                            link.FromPort = nodeWrapper.Node.RightPort;
+                        }
                         myView.Document.Add(link);
-                        link.PenColor = Color.FromArgb(0,245,228,176);
+                        link.PenColor = baseColor;
+                        baseColor = Color.FromArgb(baseColor.R, baseColor.G, (baseColor.B + 70) % 255);
                     }
 
                     continue;
@@ -103,15 +114,14 @@ namespace DoppleGraph
                         link.PenWidth = 1;
                         link.Style = GoStrokeStyle.RoundedLineWithJumpGaps;
                         link.BrushStyle = GoBrushStyle.EllipseGradient;
-                        var backNode = nodeWrappers.First(x => x.InstructionWrapper == wrapper).Node;
-                        link.ToPort = backNode.RightPort;
+                        var backNode = GetNodeWrapper(wrapper);
+                        link.ToPort = backNode.Node.RightPort;
                         myView.Document.Add(link);
                         randomColor = Color.Black;
                         link.PenColor = randomColor;
                     }
                     
                 }
-                SetCoordinates(nodeWrappers);
                 newForm.Show();
             }
         }
@@ -125,8 +135,8 @@ namespace DoppleGraph
             FixDuplicateCoordinates(nodeWrappers);
             int totalHeight = 1000;
             int totalWidth = 1000;
-            float heightOffset = totalHeight / nodeWrappers.Select(x => x.DisplayRow).Max();
-            float widthOffset = totalWidth / nodeWrappers.Select(x => x.DisplayCol).Max();
+            float heightOffset = Convert.ToSingle(totalHeight / nodeWrappers.Select(x => x.DisplayRow).Max());
+            float widthOffset = Convert.ToSingle(totalWidth / nodeWrappers.Select(x => x.DisplayCol).Max());
             foreach (var nodeWrapper in nodeWrappers)
             {
                 nodeWrapper.Node.Location = new PointF(nodeWrapper.DisplayCol * widthOffset, (nodeWrapper.DisplayRow-0.7f) * heightOffset);
@@ -136,12 +146,15 @@ namespace DoppleGraph
 
         private void FixDuplicateCoordinates(List<GoNodeWrapper> nodeWrappers)
         {
-            var sameCoordiantesGroups = nodeWrappers.GroupBy(x => new { x.DisplayCol, x.DisplayRow }).Where(y => y.Count() >1);
-            foreach (var group in sameCoordiantesGroups)
+            for (int i = 0; i <= nodeWrappers.Select(x => x.DisplayCol).Max(); i++)
             {
-                foreach (var node in group.Select(y => y).Skip(1))
+                var colNodes = nodeWrappers.Where(x => x.DisplayCol == i).OrderBy(x => x.DisplayRow).ToList();
+                colNodes[0].DisplayRow = (float)Math.Ceiling(colNodes[0].DisplayRow);
+                int rowNum = (int)colNodes[0].DisplayRow +1;
+                foreach (var node in colNodes.Skip(1))
                 {
-                    node.DisplayRow += 0.5f;
+                    node.DisplayRow = rowNum;
+                    rowNum++;
                 }
             }
         }
@@ -196,6 +209,9 @@ namespace DoppleGraph
             }
         }
 
-      
+        private void Node_Hover(object sender, EventArgs e)
+        {
+
+        }
     }
 }

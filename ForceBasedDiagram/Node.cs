@@ -152,7 +152,7 @@ public class SpotNode : Node {
 	/// </summary>
 	public override Size Size {
 		get {
-			return new Size(8, 8);
+			return new Size(17, 17);
 		}
 	}
 	/// <summary>

@@ -5,12 +5,13 @@ using DoppleTry2.BackTrackers;
 using DoppleTry2.InstructionModifiers;
 using DoppleTry2.ProgramFlowHanlder;
 using Mono.Cecil;
+using Mono.Cecil.Cil;
 
 namespace DoppleTry2
 {
     public class BackTraceManager
     {
-        private readonly List<InstructionWrapper> _instructionsWrappers;
+        private List<InstructionWrapper> _instructionsWrappers;
         private readonly IEnumerable<BackTracer> _backTracers;
         private readonly IEnumerable<IModifier> _modifiers;
         private readonly IEnumerable<ProgramFlowHandler> _flowHandlers;
@@ -82,7 +83,74 @@ namespace DoppleTry2
                     backTracer.AddBackDataflowConnections(instWrapper);
                 }
             }
+
             return _instructionsWrappers;
+
+            var ldloc = new LdLocBackTracer(null);
+            RemoveInstWrappers(_instructionsWrappers.Where(x => ldloc.HandlesCodes.Contains(x.Instruction.OpCode.Code)));
+            RemoveInstWrappers(_instructionsWrappers.Where(x => ldloc._storingCodes.Contains(x.Instruction.OpCode.Code)));
+
+            var ldarg = new LdArgBacktracer(null);
+            foreach(int argIndex in _instructionsWrappers.Select(x => x.ArgIndex).Distinct().ToList())
+            {
+                var instsToMerge = _instructionsWrappers
+                    .Where(x => ldarg.HandlesCodes.Contains(x.Instruction.OpCode.Code))
+                    .Where(x => x.ArgIndex == argIndex).ToArray();
+                if (instsToMerge.Length > 0)
+                {
+                    MergeInsts(instsToMerge);
+                }
+            }
+            var ldImeddiate = new LdArgBacktracer(null);
+            foreach (int argIndex in _instructionsWrappers.Select(x => x).Distinct().ToList())
+            {
+                var instsToMerge = _instructionsWrappers
+                    .Where(x => ldarg.HandlesCodes.Contains(x.Instruction.OpCode.Code))
+                    .Where(x => x.ArgIndex == argIndex).ToArray();
+                if (instsToMerge.Length > 0)
+                {
+                    MergeInsts(instsToMerge);
+                }
+            }
+            RemoveInstWrappers(_instructionsWrappers.Where(x => x.Inlined == true));
+            return _instructionsWrappers;
+        }
+
+        public void MergeInsts(InstructionWrapper[] Wrappers)
+        {
+            var instWrapperToKeep = Wrappers[0];
+            foreach (var wrapper in Wrappers.Except(new[] { instWrapperToKeep}))
+            {
+                instWrapperToKeep.BackDataFlowRelated.AddRange(wrapper.BackDataFlowRelated);
+                instWrapperToKeep.ForwardDataFlowRelated.AddRange(wrapper.ForwardDataFlowRelated);
+                foreach(var removeMeFrom in instWrapperToKeep.BackDataFlowRelated.Concat(instWrapperToKeep.ForwardDataFlowRelated))
+                {
+                    removeMeFrom.ForwardDataFlowRelated.Remove(wrapper);
+                    removeMeFrom.BackDataFlowRelated.Remove(wrapper);
+                }
+                _instructionsWrappers.Remove(wrapper);
+            }
+        }
+
+        public void RemoveInstWrappers(IEnumerable<InstructionWrapper> instsToRemove)
+        {
+            var instWrappersToRemove = new List<InstructionWrapper>();
+            foreach (var instWrapper in instsToRemove)
+            {
+                foreach (var forInst in instWrapper.ForwardDataFlowRelated)
+                {
+                    forInst.BackDataFlowRelated.AddRange(instWrapper.BackDataFlowRelated);
+                    forInst.BackDataFlowRelated.Remove(instWrapper);
+                    instWrappersToRemove.Add(instWrapper);
+                }
+                foreach (var backInst in instWrapper.BackDataFlowRelated)
+                {
+                    backInst.ForwardDataFlowRelated.AddRange(instWrapper.ForwardDataFlowRelated);
+                    backInst.ForwardDataFlowRelated.Remove(instWrapper);
+                    instWrappersToRemove.Add(instWrapper);
+                }
+            }
+            _instructionsWrappers = _instructionsWrappers.Except(instWrappersToRemove).ToList();
         }
     }
 }

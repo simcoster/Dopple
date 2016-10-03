@@ -55,7 +55,7 @@ namespace ForceBasedDiagram
             CodeColorHanlder colorCode = new CodeColorHanlder();
             TypeDefinition type = myLibrary.MainModule.Types[1];
 
-            foreach (var method in type.Methods.Where(x => !x.IsConstructor))
+            foreach (var method in type.Methods.Where(x => !x.IsConstructor && x.Name.Contains("nsert")))
             {
                 Form1 newForm = new Form1();
                 newForm.btnGenerate.Hide();
@@ -75,7 +75,11 @@ namespace ForceBasedDiagram
                 foreach (var nodeWrapper in nodeWrappers)
                 {
                     newForm.mDiagram.AddNode(nodeWrapper.SpotNode);
-                    foreach (InstructionWrapper wrapper in nodeWrapper.InstWrapper.BackDataFlowRelated)
+                }
+
+                foreach (var nodeWrapper in nodeWrappers)
+                {
+                    foreach (InstructionWrapper wrapper in nodeWrapper.InstWrapper.ForwardDataFlowRelated)
                     {
                         nodeWrapper.SpotNode.AddChild(nodeWrappers.First(x => x.InstWrapper == wrapper).SpotNode);
                     }
