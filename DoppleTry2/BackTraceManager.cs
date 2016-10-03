@@ -84,8 +84,6 @@ namespace DoppleTry2
                 }
             }
 
-            return _instructionsWrappers;
-
             var ldloc = new LdLocBackTracer(null);
             RemoveInstWrappers(_instructionsWrappers.Where(x => ldloc.HandlesCodes.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(_instructionsWrappers.Where(x => ldloc._storingCodes.Contains(x.Instruction.OpCode.Code)));
@@ -101,17 +99,17 @@ namespace DoppleTry2
                     MergeInsts(instsToMerge);
                 }
             }
-            var ldImeddiate = new LdArgBacktracer(null);
-            foreach (int argIndex in _instructionsWrappers.Select(x => x).Distinct().ToList())
+
+            foreach (var imeddiateValueNode in _instructionsWrappers.Where(x => x.ImmediateIntValue != null).ToList())
             {
                 var instsToMerge = _instructionsWrappers
-                    .Where(x => ldarg.HandlesCodes.Contains(x.Instruction.OpCode.Code))
-                    .Where(x => x.ArgIndex == argIndex).ToArray();
+                    .Where(x => x.ImmediateIntValue != null && x.ImmediateIntValue.Value == x.ImmediateIntValue.Value).ToArray();
                 if (instsToMerge.Length > 0)
                 {
                     MergeInsts(instsToMerge);
                 }
             }
+
             RemoveInstWrappers(_instructionsWrappers.Where(x => x.Inlined == true));
             return _instructionsWrappers;
         }

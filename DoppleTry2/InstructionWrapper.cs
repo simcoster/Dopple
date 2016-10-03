@@ -26,7 +26,7 @@ namespace DoppleTry2
         public bool Inlined { get; set; } = false;
         public int StackSum { get; internal set; } = 0;
         public int InstructionIndex { get; internal set; }
-        public int ImmediateIntValue { get; private set; }
+        public int? ImmediateIntValue { get; private set; }
 
 
         public InstructionWrapper(Instruction instruction , MethodDefinition method)
@@ -39,7 +39,7 @@ namespace DoppleTry2
             MemoryStoreCount = MemoryProperties.GetMemStoreCount(instruction.OpCode.Code);
             LocIndex = LdStLocProperties.GetLocIndex(instruction);
             ArgIndex = GetArgIndex(instruction);
-            ImmediateIntValue = GetImmediateInt(instruction).Value;
+            ImmediateIntValue = GetImmediateInt(instruction);
         }
 
         private int? GetImmediateInt(Instruction instruction)
