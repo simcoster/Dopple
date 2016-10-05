@@ -39,7 +39,7 @@ namespace DoppleGraph
             CodeColorHanlder colorCode = new CodeColorHanlder();
             TypeDefinition type = myLibrary.MainModule.Types[1];
 
-            foreach (var method in type.Methods.Where(x => !x.IsConstructor && x.Name.Contains("eft")))
+            foreach (var method in type.Methods.Where(x => !x.IsConstructor))
             {
                 Form newForm = new Form();
                 BackTraceManager backTraceManager = new BackTraceManager(method);
@@ -57,7 +57,7 @@ namespace DoppleGraph
                 nodeWrappers =
                     instructionWrappers
                     //.Where(x => x.ForwardDataFlowRelated.Count >0 || x.BackDataFlowRelated.Count >0)
-                    .Select(x => new GoNodeWrapper(new GoTextNode(), x))
+                    .Select(x => new GoNodeWrapper(new GoTextNodeHoverable(), x))
                     .ToList();
 
                 foreach (var goNodeWrapper in nodeWrappers)
@@ -86,16 +86,14 @@ namespace DoppleGraph
                     foreach (InstructionWrapper wrapper in nodeWrapper.InstructionWrapper.BackDataFlowRelated)
                     {
                         GoLink link = new GoLink();
-                        link.Relinkable = false;
-                        link.PenWidth = 3;
                         //link.FromArrow = true;
                         var backNode = GetNodeWrapper(wrapper);
                         link.ToPort = nodeWrapper.Node.LeftPort;
                         link.FromPort = backNode.Node.RightPort;
                         myView.Document.Add(link);
-                        link.PenColor = baseColor;
-                        baseColor = Color.FromArgb(baseColor.R, baseColor.G, (baseColor.B + 70) % 255);
                     }
+                    PaintNodeLinks(nodeWrapper.Node);
+                   
 
                     continue;
                     foreach (InstructionWrapper wrapper in nodeWrapper.InstructionWrapper.BackProgramFlow)
@@ -117,6 +115,17 @@ namespace DoppleGraph
                     
                 }
                 newForm.Show();
+            }
+        }
+
+        public static void PaintNodeLinks(GoNode node)
+        {
+            var baseColor = Color.FromArgb(245, 228, 176);
+            foreach (GoLink link in node.Links)
+            {
+                link.PenWidth = 3;
+                link.PenColor = baseColor;
+                baseColor = Color.FromArgb(baseColor.R, baseColor.G, (baseColor.B + 70) % 255);
             }
         }
 
@@ -203,9 +212,5 @@ namespace DoppleGraph
             }
         }
 
-        private void Node_Hover(object sender, EventArgs e)
-        {
-
-        }
     }
 }
