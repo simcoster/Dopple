@@ -78,6 +78,7 @@
     <Compile Include="BackTrackers\LdLocBackTracer.cs" />
     <Compile Include="BackTrackers\TypedReferenceBackTracer.cs" />
     <Compile Include="CodeMemoryRefCount.cs" />
+    <Compile Include="FuncArgument.cs" />
     <Compile Include="LdStLocProperties.cs" />
     <Compile Include="OpcodeProperties\DataflowProperties.cs" />
     <Compile Include="OpcodeProperties\InstructionPropertiesHandler.cs" />

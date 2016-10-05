@@ -37,9 +37,9 @@ namespace DoppleGraph
             AssemblyDefinition myLibrary = AssemblyDefinition.ReadAssembly(@"C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\Utility\bin\Release\Utility.dll");
 
             CodeColorHanlder colorCode = new CodeColorHanlder();
-            TypeDefinition type = myLibrary.MainModule.Types[2];
+            TypeDefinition type = myLibrary.MainModule.Types[1];
 
-            foreach (var method in type.Methods.Where(x => !x.IsConstructor))
+            foreach (var method in type.Methods.Where(x => !x.IsConstructor && x.Name.Contains("eft")))
             {
                 Form newForm = new Form();
                 BackTraceManager backTraceManager = new BackTraceManager(method);
@@ -49,6 +49,8 @@ namespace DoppleGraph
                 // create a Go view (a Control) and add to the form
                 GoView myView = new GoView();
                 myView.AllowDelete = false;
+                myView.AllowInsert = false;
+                myView.AllowLink = false;
                 myView.Dock = DockStyle.Fill;
                 newForm.Controls.Add(myView);
 
@@ -66,7 +68,7 @@ namespace DoppleGraph
                     shape.Size = new SizeF(400, 400);
 
                     //goNodeWrapper.Node.Shape.BrushColor = colorCode.GetColor(goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code);
-                    goNodeWrapper.Node.Text = goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code.ToString() + " ";
+                    goNodeWrapper.Node.Text = goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code.ToString() + " " +nodeWrappers.IndexOf(goNodeWrapper);
 
                     if ( new[] { Code.Call, Code.Calli, Code.Callvirt }.Contains(
                             goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code))
@@ -88,16 +90,8 @@ namespace DoppleGraph
                         link.PenWidth = 3;
                         //link.FromArrow = true;
                         var backNode = GetNodeWrapper(wrapper);
-                        if (nodeWrapper.DisplayCol >= backNode.DisplayCol)
-                        {
-                            link.ToPort = backNode.Node.RightPort;
-                            link.FromPort = nodeWrapper.Node.LeftPort;
-                        }
-                        else
-                        {
-                            link.ToPort = backNode.Node.LeftPort;
-                            link.FromPort = nodeWrapper.Node.RightPort;
-                        }
+                        link.ToPort = nodeWrapper.Node.LeftPort;
+                        link.FromPort = backNode.Node.RightPort;
                         myView.Document.Add(link);
                         link.PenColor = baseColor;
                         baseColor = Color.FromArgb(baseColor.R, baseColor.G, (baseColor.B + 70) % 255);

@@ -42,6 +42,12 @@ namespace DoppleTry2
             ImmediateIntValue = GetImmediateInt(instruction);
         }
 
+        public void AddBackInst (InstructionWrapper backInst)
+        {
+            BackDataFlowRelated.Add(backInst);
+            backInst.ForwardDataFlowRelated.Add(this);
+        }
+
         private int? GetImmediateInt(Instruction instruction)
         {
             var imeddiateFixedValue = new[]
@@ -52,7 +58,7 @@ namespace DoppleTry2
 
             var imeddiateOperandValue = new[]
             {
-                Code.Ldc_I4_S, Code.Ldc_I4, Code.Ldc_R4, Code.Ldc_R8, Code.Ldc_I8,Code.Ldc_I4_M1
+                Code.Ldc_I4_S, Code.Ldc_I4, Code.Ldc_R4, Code.Ldc_R8, Code.Ldc_I8
             };
 
             var code = instruction.OpCode.Code;
@@ -63,6 +69,10 @@ namespace DoppleTry2
             else if (imeddiateOperandValue.Contains(code))
             {
                 return ((int)instruction.Operand);
+            }
+            else if (code == Code.Ldc_I4_M1)
+            {
+                return -1;
             }
             return null;
         }
