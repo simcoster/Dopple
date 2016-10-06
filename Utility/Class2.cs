@@ -96,12 +96,12 @@ namespace Utility
 
             while (i <= j)
             {
-                while (elements[i].CompareTo(pivot) < 0)
+                while (elements[i] <pivot )
                 {
                     i++;
                 }
 
-                while (elements[j].CompareTo(pivot) > 0)
+                while (elements[j] > pivot)
                 {
                     j--;
                 }
@@ -161,6 +161,18 @@ namespace Utility
             a[i] = num;
             QuickSortLeftPivot(a, start, i - 1);
             QuickSortLeftPivot(a, i + 1, end);
+        }
+
+        static void GetGreatest(int[] a, int start, int end)
+        {
+            int biggest = a[start];
+            for (int i=biggest+1; i<=end; i++)
+            {
+                if (biggest < a[i])
+                {
+                    biggest = a[i];
+                }
+            }
         }
 
     }

@@ -24,17 +24,20 @@ namespace DoppleTry2.BackTrackers
         public void AddBackDataflowConnections(InstructionWrapper currentInst)
         {
             currentInst.WasTreated = true;
-            var backRelatedInsts = GetDataflowBackRelatedIndices(currentInst);
-            foreach (var backRelatedInst in backRelatedInsts)
+            var backRelatedInsts = GetDataflowBackRelated(currentInst);
+            foreach (var backRelatedGroup in backRelatedInsts)
             {
-                currentInst.BackDataFlowRelated.Add(backRelatedInst);
-                backRelatedInst.ForwardDataFlowRelated.Add(currentInst);
+                currentInst.BackDataFlowRelated.AddSingleIndex(backRelatedGroup);
+                foreach(var backInst in backRelatedGroup)
+                {
+                    backInst.ForwardDataFlowRelated.AddSingleIndex(currentInst);
+                }
             }
         }
 
         protected virtual bool HasBackDataflowNodes { get; } = true;
 
-        protected abstract IEnumerable<InstructionWrapper> GetDataflowBackRelatedIndices(InstructionWrapper instWrapper);
+        protected abstract IEnumerable<IEnumerable<InstructionWrapper>> GetDataflowBackRelated(InstructionWrapper instWrapper);
 
         public abstract Code[] HandlesCodes { get; }
 
@@ -119,16 +122,16 @@ namespace DoppleTry2.BackTrackers
                 {
                     return new InstructionWrapper[0];
                 }
-                switch (instWrapper.BackDataFlowRelated.Count)
+                switch (instWrapper.BackDataFlowRelated.ArgumentList.Count)
                 {
                     case 0:
                         return new [] { instWrapper } ;
                         break;
                     case 1:
-                        instWrapper = instWrapper.BackDataFlowRelated[0];
+                        instWrapper = instWrapper.BackDataFlowRelated.ArgumentList[0].Argument;
                         break;
                     default:
-                        return instWrapper.BackDataFlowRelated.SelectMany(x => GetStackPushAncestor(x, visited));
+                        return instWrapper.BackDataFlowRelated.ArgumentList.SelectMany(x => GetStackPushAncestor(x.Argument, visited));
                 }
             }
         }
@@ -159,4 +162,6 @@ namespace DoppleTry2.BackTrackers
         }
 
     }
+
+   
 }

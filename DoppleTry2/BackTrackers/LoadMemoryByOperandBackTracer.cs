@@ -7,18 +7,18 @@ using Mono.Cecil.Cil;
 
 namespace DoppleTry2.BackTrackers
 {
-    class LoadMemoryByOperandBackTracer : BackTracer
+    class LoadMemoryByOperandBackTracer : SingeIndexBackTracer
     {
         public LoadMemoryByOperandBackTracer(List<InstructionWrapper> instructionsWrappers) : base(instructionsWrappers)
         {
         }
 
-        protected override IEnumerable<InstructionWrapper> GetDataflowBackRelatedIndices(InstructionWrapper instWrapper)
+        protected override IEnumerable<InstructionWrapper> GetDataflowBackRelatedArgGroup(InstructionWrapper instWrapper)
         {
             var storeIndex =
-           SearchBackwardsForDataflowInstrcutions(x => x.MemoryStoreCount > 0 &&
-                                                       instWrapper.Instruction.Operand ==
-                                                       x.Instruction.Operand, instWrapper);
+            SearchBackwardsForDataflowInstrcutions(x => x.MemoryStoreCount > 0 &&
+                                                        instWrapper.Instruction.Operand ==
+                                                        x.Instruction.Operand, instWrapper);
             return storeIndex;
         }
 

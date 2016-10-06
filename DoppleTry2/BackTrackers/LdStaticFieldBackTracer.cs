@@ -7,19 +7,17 @@ using Mono.Cecil.Cil;
 
 namespace DoppleTry2.BackTrackers
 {
-    class LdStaticFieldBackTracer : BackTracer
+    class LdStaticFieldBackTracer : SingeIndexBackTracer
     {
         public LdStaticFieldBackTracer(List<InstructionWrapper> instructionsWrappers) : base(instructionsWrappers)
         {
         }
 
-
-        protected override IEnumerable<InstructionWrapper> GetDataflowBackRelatedIndices(InstructionWrapper instWrapper)
+        protected override IEnumerable<InstructionWrapper> GetDataflowBackRelatedArgGroup(InstructionWrapper instWrapper)
         {
-
             return SafeSearchBackwardsForDataflowInstrcutions(x => x.Instruction.OpCode.Code == Code.Stsfld &&
-                                                                   x.Instruction.Operand ==
-                                                                   instWrapper.Instruction.Operand, instWrapper);
+                                                                  x.Instruction.Operand ==
+                                                                  instWrapper.Instruction.Operand, instWrapper);
         }
 
         public override Code[] HandlesCodes => new[] {Code.Ldsfld,Code.Ldsflda};

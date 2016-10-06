@@ -82,19 +82,7 @@ namespace DoppleGraph
 
                 foreach (var nodeWrapper in nodeWrappers)
                 {
-                    var baseColor = Color.FromArgb(245, 228, 176);
-                    foreach (InstructionWrapper wrapper in nodeWrapper.InstructionWrapper.BackDataFlowRelated)
-                    {
-                        GoLink link = new GoLink();
-                        //link.FromArrow = true;
-                        var backNode = GetNodeWrapper(wrapper);
-                        link.ToPort = nodeWrapper.Node.LeftPort;
-                        link.FromPort = backNode.Node.RightPort;
-                        myView.Document.Add(link);
-                    }
-                    PaintNodeLinks(nodeWrapper.Node);
-                   
-
+                    AddNodeLinks(nodeWrapper, myView);
                     continue;
                     foreach (InstructionWrapper wrapper in nodeWrapper.InstructionWrapper.BackProgramFlow)
                     {
@@ -118,22 +106,36 @@ namespace DoppleGraph
             }
         }
 
-        public static void PaintNodeLinks(GoNode node)
+        public void AddNodeLinks(GoNodeWrapper nodeWrapper, GoView myView)
         {
-            var baseColor = Color.FromArgb(245, 228, 176);
-            foreach (GoLink link in node.Links)
+            var linkGroupColor = Color.FromArgb(245, 228, 176);
+            foreach (var argumentGroup in nodeWrapper.InstructionWrapper.BackDataFlowRelated.ArgumentList.GroupBy(x => x.ArgIndex))
             {
-                link.PenWidth = 3;
-                link.PenColor = baseColor;
-                baseColor = Color.FromArgb(baseColor.R, baseColor.G, (baseColor.B + 70) % 255);
+                linkGroupColor = GetNextColor(linkGroupColor);
+                foreach (var indexedArg in argumentGroup)
+                {
+                    GoLink link = new GoLink();
+                    var backNode = GetNodeWrapper(indexedArg.Argument);
+                    link.PenColor = linkGroupColor;
+                    link.ToPort = nodeWrapper.Node.LeftPort;
+                    link.FromPort = backNode.Node.RightPort;
+                    myView.Document.Add(link);
+                    link.PenWidth = 3;
+
+                }
             }
+        }
+
+        private Color GetNextColor(Color color)
+        {
+            return Color.FromArgb((color.R + 30) % 255, (color.G + 40) % 255, (color.B + 70) % 255);
         }
 
         private void SetCoordinates(List<GoNodeWrapper> nodeWrappers)
         {
             Dictionary<int, List<GoNodeWrapper>> nodeWrapperCols = new Dictionary<int, List<GoNodeWrapper>>();
-            var firstColNodes = nodeWrappers.Where(x => x.InstructionWrapper.BackDataFlowRelated.Count == 0).ToList();
-            SetLongestPathRec(firstColNodes);
+            var firstNode = nodeWrappers.Where(x => x.InstructionWrapper.BackDataFlowRelated.ArgumentList.Count == 0).ToList();
+            SetLongestPathRec(firstNode);
             SetRowIndexes(nodeWrappers);
             FixDuplicateCoordinates(nodeWrappers);
             int totalHeight = 1000;
@@ -166,12 +168,13 @@ namespace DoppleGraph
         {
             return nodeWrappers.First(x => x.InstructionWrapper == instWrapper);
         }
+
         private void SetLongestPathRec(List<GoNodeWrapper> colNodes)
         {
             foreach (var node in colNodes)
             {
-                var nodesToUpdate = node.InstructionWrapper.ForwardDataFlowRelated
-                    .Select(x => GetNodeWrapper(x))
+                var nodesToUpdate = node.InstructionWrapper.ForwardDataFlowRelated.ArgumentList
+                    .Select(x => GetNodeWrapper(x.Argument))
                     .Where(x => x.LongestPath.Count == 0 || !x.LongestPath.Intersect(node.LongestPath).SequenceEqual(x.LongestPath) )
                     .Where(x => x.LongestPath.Count < node.LongestPath.Count + 1)
                     .ToList();
@@ -186,29 +189,14 @@ namespace DoppleGraph
 
         private void SetRowIndexes(List<GoNodeWrapper> allNodes)
         {
-            var firstColNodes = allNodes.Where(x => x.InstructionWrapper.BackDataFlowRelated.Count == 0);
-            var handledFirstNodes = new List<GoNodeWrapper>();
-            handledFirstNodes.AddRange(firstColNodes);
-            int rowNum = 1;
-            while (handledFirstNodes.Count > 0)
+            foreach (int col in allNodes.Select(x => x.DisplayCol).Distinct())
             {
-                var neighbours = handledFirstNodes
-                                         .Where(x => x.InstructionWrapper.ForwardDataFlowRelated
-                                         .Intersect(handledFirstNodes[0].InstructionWrapper.ForwardDataFlowRelated)
-                                         .Count() > 0)
-                                         .Concat(new[] { handledFirstNodes[0] })
-                                         .Distinct()
-                                         .ToList();
-                foreach(var neighbour in neighbours)
+                var orderedNodes = allNodes.Where(x => x.DisplayCol == col)
+                    .OrderBy(x => x.InstructionWrapper.Instruction.OpCode.Code.ToString()).ToList();
+                foreach (var node in orderedNodes)
                 {
-                    neighbour.DisplayRow = rowNum;
-                    rowNum++;
-                    handledFirstNodes.Remove(neighbour);
+                    node.DisplayRow = orderedNodes.IndexOf(node);
                 }
-            }
-            foreach(var node in allNodes.Except(firstColNodes))
-            {
-                node.DisplayRow = node.InstructionWrapper.BackDataFlowRelated.Select(x => GetNodeWrapper(x)).Average(x => x.DisplayRow);
             }
         }
 

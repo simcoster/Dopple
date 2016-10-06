@@ -1,6 +1,8 @@
 ﻿using DoppleTry2;
 using Northwoods.Go;
+using System;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace DoppleGraph
 {
@@ -24,7 +26,11 @@ namespace DoppleGraph
     {
         public override void OnLostSelection(GoSelection sel)
         {
-            Form1.PaintNodeLinks(this);
+            foreach(GoLink link in Links)
+            {
+                link.PenWidth = 3;
+                link.HighlightPenWidth = 0;
+            }
             base.OnLostSelection(sel);
         }
 
@@ -33,12 +39,14 @@ namespace DoppleGraph
             foreach (GoLink link in RightPort.Links)
             {
                 link.PenWidth = 5;
-                link.PenColor = System.Drawing.Color.Red;
+                link.HighlightPenWidth = 8;
+                link.HighlightPenColor = System.Drawing.Color.Red;
             }
             foreach (GoLink link in LeftPort.Links)
             {
+                link.HighlightPenWidth = 8;
                 link.PenWidth = 5;
-                link.PenColor = System.Drawing.Color.Blue;
+                link.HighlightPenColor = System.Drawing.Color.Blue;
             }
             base.OnGotSelection(sel);
         }

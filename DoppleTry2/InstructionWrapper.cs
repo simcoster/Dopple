@@ -18,8 +18,8 @@ namespace DoppleTry2
         public int MemoryReadCount { get; set; }
         public List<InstructionWrapper>  NextPossibleProgramFlow { get; set; } = new List<InstructionWrapper>();
         public List<InstructionWrapper> BackProgramFlow { get; set; } = new List<InstructionWrapper>();
-        public List<InstructionWrapper> BackDataFlowRelated { get; internal set; } = new List<InstructionWrapper>();
-        public List<InstructionWrapper> ForwardDataFlowRelated { get; internal set; } = new List<InstructionWrapper>();
+        public ArgList BackDataFlowRelated { get; internal set; } = new ArgList();
+        public ArgList ForwardDataFlowRelated { get; internal set; } = new ArgList();
         public int LocIndex { get; set; }
         public int ArgIndex { get; set; }
         //TODO : this should be a different thing
@@ -27,8 +27,7 @@ namespace DoppleTry2
         public int StackSum { get; internal set; } = 0;
         public int InstructionIndex { get; internal set; }
         public int? ImmediateIntValue { get; private set; }
-
-
+    
         public InstructionWrapper(Instruction instruction , MethodDefinition method)
         {
             Instruction = instruction;
@@ -42,10 +41,22 @@ namespace DoppleTry2
             ImmediateIntValue = GetImmediateInt(instruction);
         }
 
-        public void AddBackInst (InstructionWrapper backInst)
+        public void AddBackTwoWaySingleIndex(IEnumerable<InstructionWrapper> wrappersToAdd)
         {
-            BackDataFlowRelated.Add(backInst);
-            backInst.ForwardDataFlowRelated.Add(this);
+            BackDataFlowRelated.AddSingleIndex(wrappersToAdd);
+            foreach(var instWrapper in wrappersToAdd)
+            {
+                instWrapper.ForwardDataFlowRelated.AddSingleIndex(this);
+            }
+        }
+
+        public void AddForwardTwoWaySingleIndex(IEnumerable<InstructionWrapper> wrappersToAdd)
+        {
+            BackDataFlowRelated.AddSingleIndex(wrappersToAdd);
+            foreach (var instWrapper in wrappersToAdd)
+            {
+                instWrapper.BackDataFlowRelated.AddSingleIndex(this);
+            }
         }
 
         private int? GetImmediateInt(Instruction instruction)

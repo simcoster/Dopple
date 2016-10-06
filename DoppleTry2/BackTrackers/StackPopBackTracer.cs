@@ -8,15 +8,16 @@ namespace DoppleTry2.BackTrackers
 {
     public class StackPopBackTracer : BackTracer
     {
-        protected override IEnumerable<InstructionWrapper> GetDataflowBackRelatedIndices(InstructionWrapper instWrapper)
+        protected override IEnumerable<IEnumerable<InstructionWrapper>> GetDataflowBackRelated(InstructionWrapper instWrapper)
         {
-            var foundInstructions = new List<InstructionWrapper>();
+            var foundInstructions = new List<List<InstructionWrapper>>();
             for (int i = 0; i < instWrapper.StackPopCount; i++)
             {
-                foundInstructions.AddRange(SearchBackwardsForDataflowInstrcutions(x => x.StackPushCount > 0, instWrapper));
-                foreach (var foundInstruction in foundInstructions)
+                var argumentGroup = SearchBackwardsForDataflowInstrcutions(x => x.StackPushCount > 0, instWrapper);
+                foundInstructions.Add(argumentGroup);
+                foreach (var arg in argumentGroup)
                 {
-                    foundInstruction.StackPushCount--;
+                    arg.StackPushCount--;
                 }
             }
             return foundInstructions;

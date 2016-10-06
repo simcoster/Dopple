@@ -7,20 +7,20 @@ using Mono.Cecil.Cil;
 
 namespace DoppleTry2.BackTrackers
 {
-    class LdArgBacktracer : BackTracer
+    class LdArgBacktracer : SingeIndexBackTracer
     {
         public LdArgBacktracer(List<InstructionWrapper> instructionsWrappers) : base(instructionsWrappers)
         {
         }
 
-        protected override IEnumerable<InstructionWrapper> GetDataflowBackRelatedIndices(InstructionWrapper instWrapper)
-        {           
+        protected override IEnumerable<InstructionWrapper> GetDataflowBackRelatedArgGroup(InstructionWrapper instWrapper)
+        {
             Code[] relevantCodes = { Code.Starg, Code.Starg_S };
             var stArgInst = SafeSearchBackwardsForDataflowInstrcutions(
                 x => relevantCodes.Contains(x.Instruction.OpCode.Code) &&
-                x.ArgIndex == instWrapper.ArgIndex ,instWrapper);
+                x.ArgIndex == instWrapper.ArgIndex, instWrapper);
             if (stArgInst.Count == 0)
-            { 
+            {
                 return new InstructionWrapper[0];
             }
             return stArgInst;
@@ -32,7 +32,5 @@ namespace DoppleTry2.BackTrackers
             Code.Ldarg, Code.Ldarg_0, Code.Ldarg_1, Code.Ldarg_2, Code.Ldarg_3, Code.Ldarg_S,
             Code.Ldarga, Code.Ldarga_S
         };
-
-       
     }
 }

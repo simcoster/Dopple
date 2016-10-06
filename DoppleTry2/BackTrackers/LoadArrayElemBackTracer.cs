@@ -7,7 +7,7 @@ using Mono.Cecil.Cil;
 
 namespace DoppleTry2.BackTrackers
 {
-    class LoadArrayElemBackTracer : BackTracer
+    class LoadArrayElemBackTracer : SingeIndexBackTracer
     {
         private readonly Code[] _stArrayCodes = new[]
             {
@@ -20,11 +20,10 @@ namespace DoppleTry2.BackTrackers
         {
         }
 
-
-        protected override IEnumerable<InstructionWrapper> GetDataflowBackRelatedIndices(InstructionWrapper instWrapper)
+        protected override IEnumerable<InstructionWrapper> GetDataflowBackRelatedArgGroup(InstructionWrapper instWrapper)
         {
             return SafeSearchBackwardsForDataflowInstrcutions(x => _stArrayCodes.Contains(x.Instruction.OpCode.Code)
-                                                               && HaveCommonStackPushAncestor(x, instWrapper),instWrapper);
+                                                               && HaveCommonStackPushAncestor(x, instWrapper), instWrapper);
         }
 
         public override Code[] HandlesCodes => new[] {Code.Ldelema,Code.Ldelem_I1,Code.Ldelem_U1,Code.Ldelem_I2

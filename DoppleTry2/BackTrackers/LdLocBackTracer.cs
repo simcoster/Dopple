@@ -6,11 +6,11 @@ using Mono.Cecil.Cil;
 
 namespace DoppleTry2.BackTrackers
 {
-    public class LdLocBackTracer : BackTracer
+    public class LdLocBackTracer : SingeIndexBackTracer
     {
-
-        protected override IEnumerable<InstructionWrapper> GetDataflowBackRelatedIndices(InstructionWrapper instWrapper)
+        protected override IEnumerable<InstructionWrapper> GetDataflowBackRelatedArgGroup(InstructionWrapper instWrapper)
         {
+
             return SearchBackwardsForDataflowInstrcutions(x => x.LocIndex == instWrapper.LocIndex && _storingCodes.Contains(x.Instruction.OpCode.Code),
                 instWrapper);
         }

@@ -8,7 +8,12 @@ namespace DoppleTry2
 {
     public class IndexedArgument
     {
+        public IndexedArgument(int argIndex, InstructionWrapper argument)
+        {
+            ArgIndex = argIndex;
+            Argument = argument;
+        }
         public int ArgIndex { get; set; }
-        public InstructionWrapper Arguemnt { get; set; }
+        public InstructionWrapper Argument { get; set; }
     }
 }

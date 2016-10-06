@@ -66,19 +66,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArgList.cs" />
     <Compile Include="BackTrackers\BackTracer.cs" />
     <Compile Include="BackTraceManager.cs" />
-    <Compile Include="BackTrackers\ImmediateValueBackTracer.cs" />
     <Compile Include="BackTrackers\LdArgBacktracer.cs" />
     <Compile Include="BackTrackers\LdStaticFieldBackTracer.cs" />
     <Compile Include="BackTrackers\LoadArrayElemBackTracer.cs" />
     <Compile Include="BackTrackers\LoadMemoryByOperandBackTracer.cs" />
     <Compile Include="BackTrackers\LoadFieldByStackBackTracer.cs" />
+    <Compile Include="BackTrackers\SingleIndexBackTracer.cs" />
     <Compile Include="BackTrackers\StackPopBackTracer.cs" />
     <Compile Include="BackTrackers\LdLocBackTracer.cs" />
     <Compile Include="BackTrackers\TypedReferenceBackTracer.cs" />
     <Compile Include="CodeMemoryRefCount.cs" />
-    <Compile Include="FuncArgument.cs" />
+    <Compile Include="IndexedArgument.cs" />
     <Compile Include="LdStLocProperties.cs" />
     <Compile Include="OpcodeProperties\DataflowProperties.cs" />
     <Compile Include="OpcodeProperties\InstructionPropertiesHandler.cs" />

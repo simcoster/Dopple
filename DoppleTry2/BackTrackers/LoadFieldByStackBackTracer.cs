@@ -7,15 +7,16 @@ using Mono.Cecil.Cil;
 
 namespace DoppleTry2.BackTrackers
 {
-    class LoadFieldByStackBackTracer : BackTracer
+    class LoadFieldByStackBackTracer : SingeIndexBackTracer
     {
         public LoadFieldByStackBackTracer(List<InstructionWrapper> instructionsWrappers) : base(instructionsWrappers)
         {
         }
-        protected override IEnumerable<InstructionWrapper> GetDataflowBackRelatedIndices(InstructionWrapper instWrapper)
+
+        protected override IEnumerable<InstructionWrapper> GetDataflowBackRelatedArgGroup(InstructionWrapper instWrapper)
         {
 
-            Func<InstructionWrapper, bool> predicate = x => 
+            Func<InstructionWrapper, bool> predicate = x =>
                                   x.Instruction.OpCode.Code == Code.Stfld &&
                                   HaveCommonStackPushAncestor(x, instWrapper) &&
                                   x.Instruction.Operand == instWrapper.Instruction.Operand;
@@ -25,7 +26,7 @@ namespace DoppleTry2.BackTrackers
                 return storeFieldInsts;
             }
             predicate = x =>
-                x.MemoryStoreCount > 0&&
+                x.MemoryStoreCount > 0 &&
                 HaveCommonStackPushAncestor(x, instWrapper);
             var storeObjInsts = SafeSearchBackwardsForDataflowInstrcutions(predicate, instWrapper);
             if (storeObjInsts.Count > 0)
