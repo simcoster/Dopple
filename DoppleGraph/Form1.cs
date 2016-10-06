@@ -62,6 +62,8 @@ namespace DoppleGraph
 
                 foreach (var goNodeWrapper in nodeWrappers)
                 {
+                    goNodeWrapper.Node.Selected += Node_Selected;
+                    goNodeWrapper.Node.UnSelected += Node_UnSelected;
                     goNodeWrapper.Index = nodeWrappers.IndexOf(goNodeWrapper);
                     ((GoShape)goNodeWrapper.Node.Background).BrushColor = colorCode.GetColor(goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code);
                     var shape = ((GoShape)goNodeWrapper.Node.Background);
@@ -104,6 +106,53 @@ namespace DoppleGraph
                 }
                 newForm.Show();
             }
+        }
+
+        private List<GoNode> NodesToShow = new List<GoNode>();
+
+        private void Node_UnSelected(object sender, EventArgs e)
+        {
+            lock (NodesToShow)
+            {
+                var node = (GoNode)sender;
+                NodesToShow.Remove(node);
+                ReShow(node.Document);
+            }
+          
+        }
+
+        private void ReShow(GoDocument doc)
+        {
+            if (NodesToShow.Intersect(doc).Count() ==0)
+            {
+                foreach (var goObject in doc)
+                {
+                    goObject.Visible = true;
+                }
+            }
+            else
+            {
+                foreach (var goObject in doc)
+                {
+                    goObject.Visible = false;
+                }
+                foreach (GoNode node in NodesToShow)
+                {
+                    foreach(var link in node.Links)
+                    {
+                        ((GoLink)link).Visible = true;
+                        ((GoNode)link.ToNode).Visible = true;
+                        ((GoNode)link.FromNode).Visible = true;
+                    }
+                }
+            }
+        }
+
+        private void Node_Selected(object sender, EventArgs e)
+        {
+            var node = (GoNode)sender;
+            NodesToShow.Add(sender as GoNode);
+            ReShow(node.Document);
         }
 
         public void AddNodeLinks(GoNodeWrapper nodeWrapper, GoView myView)
@@ -199,6 +248,5 @@ namespace DoppleGraph
                 }
             }
         }
-
     }
 }

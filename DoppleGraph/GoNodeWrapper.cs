@@ -24,6 +24,9 @@ namespace DoppleGraph
 
     public class GoTextNodeHoverable : GoTextNode
     {
+        public event EventHandler Selected;
+        public event EventHandler UnSelected;
+
         public override void OnLostSelection(GoSelection sel)
         {
             foreach(GoLink link in Links)
@@ -31,6 +34,7 @@ namespace DoppleGraph
                 link.PenWidth = 3;
                 link.HighlightPenWidth = 0;
             }
+            UnSelected(this, null);
             base.OnLostSelection(sel);
         }
 
@@ -48,6 +52,7 @@ namespace DoppleGraph
                 link.PenWidth = 5;
                 link.HighlightPenColor = System.Drawing.Color.Blue;
             }
+            Selected(this, null);
             base.OnGotSelection(sel);
         }
     }

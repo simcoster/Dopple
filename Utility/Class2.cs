@@ -52,6 +52,16 @@ namespace Utility
             array[j] = temp;
         }
 
+        public static void swapTwoTwo(int[] array)
+        {
+            for (int i=0; i<array.Length; i++)
+            {
+                int temp = array[i];
+                array[i] = array[i+1];
+                array[i+1] = temp;
+            }
+        }
+
         public static Tuple<int, int> findMinAndIndex(int[] array, int startIndex)
         {
             int currentMin = int.MaxValue;
