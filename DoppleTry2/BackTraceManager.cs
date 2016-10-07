@@ -83,7 +83,6 @@ namespace DoppleTry2
                 }
             }
 
-            
             var ldarg = new LdArgBacktracer(null);
             foreach(int argIndex in _instructionsWrappers.Select(x => x.ArgIndex).Distinct().ToList())
             {
@@ -92,7 +91,7 @@ namespace DoppleTry2
                     .Where(x => x.ArgIndex == argIndex).ToArray();
                 if (instsToMerge.Length > 0)
                 {
-                    MergeInsts(instsToMerge);
+                   // MergeInsts(instsToMerge);
                 }
             }
 
@@ -102,7 +101,7 @@ namespace DoppleTry2
                     .Where(x => x.ImmediateIntValue != null && x.ImmediateIntValue.Value == x.ImmediateIntValue.Value).ToArray();
                 if (instsToMerge.Length > 0)
                 {
-                    MergeInsts(instsToMerge);
+                   // MergeInsts(instsToMerge);
                 }
             }
 
@@ -124,15 +123,15 @@ namespace DoppleTry2
                     var instsToMerge = sameLocInsts.Where(x => x.BackDataFlowRelated == locInst.BackDataFlowRelated).ToList();
                     if (instsToMerge.Count() > 1)
                     {
-                        MergeInsts(instsToMerge.ToArray());
+                     //   MergeInsts(instsToMerge.ToArray());
                     }
                     mergedInsts.AddRange(instsToMerge);
                 }              
             }
 
-            RemoveInstWrappers(_instructionsWrappers.Where(x => ldloc._storingCodes.Contains(x.Instruction.OpCode.Code)));
-            RemoveInstWrappers(_instructionsWrappers.Where(x => ldloc.HandlesCodes.Contains(x.Instruction.OpCode.Code)));
-            RemoveInstWrappers(_instructionsWrappers.Where(x => x.Inlined == true));
+           // RemoveInstWrappers(_instructionsWrappers.Where(x => ldloc._storingCodes.Contains(x.Instruction.OpCode.Code)));
+          //  RemoveInstWrappers(_instructionsWrappers.Where(x => ldloc.HandlesCodes.Contains(x.Instruction.OpCode.Code)));
+          //  RemoveInstWrappers(_instructionsWrappers.Where(x => x.Inlined == true));
 
             var inst = Instruction.Create(typeof(OpCodes).GetFields().Select(x => x.GetValue(null)).Cast<OpCode>().First(x => x.Code == Code.Nop));
             var nodeZero = new InstructionWrapper(inst, metDef);
@@ -142,6 +141,24 @@ namespace DoppleTry2
                 firstNode.AddBackTwoWaySingleIndex(new[] { nodeZero });
             }
             _instructionsWrappers.Add(nodeZero);
+
+            foreach(var node in _instructionsWrappers)
+            {
+                foreach(var backNode in node.BackDataFlowRelated.ArgumentList)
+                {
+                    if (!backNode.Argument.ForwardDataFlowRelated.ArgumentList.Select(x => x.Argument).Contains(node))
+                    {
+                        throw new Exception();
+                    }
+                }
+                foreach (var backNode in node.ForwardDataFlowRelated.ArgumentList)
+                {
+                    if (!backNode.Argument.BackDataFlowRelated.ArgumentList.Select(x => x.Argument).Contains(node))
+                    {
+                        throw new Exception();
+                    }
+                }
+            }
 
             return _instructionsWrappers;
         }
