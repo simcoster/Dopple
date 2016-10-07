@@ -20,6 +20,7 @@ namespace DoppleTry2.ProgramFlowHanlder
         {
             var forwardInstruction = InstructionWrappers.First(x => x.Instruction ==instructionWrapper.Instruction.Operand);
             TwoWayLinkExecutionPath(instructionWrapper, forwardInstruction);
+            TwoWayLinkExecutionPath(instructionWrapper, InstructionWrappers.First(x => x.Instruction == instructionWrapper.Instruction.Next));
         }
 
         public MultiplePathsHandler(List<InstructionWrapper> instructionWrappers) : base(instructionWrappers)

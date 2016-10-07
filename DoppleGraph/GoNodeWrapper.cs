@@ -37,6 +37,12 @@ namespace DoppleGraph
             UnSelected(this, null);
             base.OnLostSelection(sel);
         }
+        
+        public override bool OnEnterLeave(GoObject from, GoObject to, GoView view)
+        {
+
+            return base.OnEnterLeave(from, to, view);
+        }
 
         public override void OnGotSelection(GoSelection sel)
         {

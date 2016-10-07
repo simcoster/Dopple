@@ -85,24 +85,8 @@ namespace DoppleGraph
                 foreach (var nodeWrapper in nodeWrappers)
                 {
                     AddNodeLinks(nodeWrapper, myView);
-                    continue;
-                    foreach (InstructionWrapper wrapper in nodeWrapper.InstructionWrapper.BackProgramFlow)
-                    {
-                        Color randomColor;
-                        GoLink link = new GoLink();
-                        link.FromArrow = true;
-                        link.FromPort = nodeWrapper.Node.LeftPort;
-                        link.Pen = new Pen(link.Pen.Brush) {DashStyle = DashStyle.Dash};
-                        link.PenWidth = 1;
-                        link.Style = GoStrokeStyle.RoundedLineWithJumpGaps;
-                        link.BrushStyle = GoBrushStyle.EllipseGradient;
-                        var backNode = GetNodeWrapper(wrapper);
-                        link.ToPort = backNode.Node.RightPort;
-                        myView.Document.Add(link);
-                        randomColor = Color.Black;
-                        link.PenColor = randomColor;
-                    }
-                    
+                    ResolveFlowInstructions(nodeWrapper.InstructionWrapper, instructionWrappers);
+                    DrawFlowLinks(nodeWrapper, myView);
                 }
                 newForm.Show();
             }
@@ -153,6 +137,53 @@ namespace DoppleGraph
             var node = (GoNode)sender;
             NodesToShow.Add(sender as GoNode);
             ReShow(node.Document);
+        }
+
+        private void DrawFlowLinks(GoNodeWrapper nodeWrapper, GoView myView)
+        {
+            foreach (InstructionWrapper wrapper in nodeWrapper.InstructionWrapper.NextPossibleProgramFlow)
+            {
+                Color randomColor;
+                GoLink link = new GoLink();
+                link.FromArrow = true;
+                link.ToPort = nodeWrapper.Node.RightPort;
+                link.Pen = new Pen(link.Pen.Brush) { DashStyle = DashStyle.Dash };
+                link.PenWidth = 1;
+                link.Style = GoStrokeStyle.RoundedLineWithJumpGaps;
+                link.BrushStyle = GoBrushStyle.EllipseGradient;
+                var backNode = GetNodeWrapper(wrapper);
+                link.FromPort = backNode.Node.LeftPort;
+                myView.Document.Add(link);
+                randomColor = Color.Black;
+                link.PenColor = randomColor;
+            }
+        }
+
+        private void ResolveFlowInstructions (InstructionWrapper instructionWrapper, IEnumerable<InstructionWrapper> instructionWrappers)
+        {
+            Stack<InstructionWrapper> wrappersToResolve = new Stack<InstructionWrapper>();
+            foreach (var wrapper in instructionWrapper.NextPossibleProgramFlow)
+            {
+                wrappersToResolve.Push(wrapper);
+            }
+            instructionWrapper.NextPossibleProgramFlow.Clear();
+            while (wrappersToResolve.Count > 0)
+            {
+                var instToResolve = wrappersToResolve.Pop();
+                if (instructionWrappers.Contains(instToResolve))
+                {
+                    instructionWrapper.NextPossibleProgramFlow.Add(instToResolve);
+                    continue;
+                }
+                else
+                {
+                    foreach (var instToPush in instToResolve.NextPossibleProgramFlow)
+                    {
+                        wrappersToResolve.Push(instToPush);
+                    }
+                }
+            }
+           
         }
 
         public void AddNodeLinks(GoNodeWrapper nodeWrapper, GoView myView)

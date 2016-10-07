@@ -185,5 +185,24 @@ namespace Utility
             }
         }
 
+        static void InIf(int a)
+        {
+            int b =4;
+            if (a >5)
+            {
+                a = -a;
+                b = -b;
+            }
+        }
+
+        static void OutIf(int a)
+        {
+            int b =4;
+            if (a > 5)
+            {
+                b = -b;
+            }
+            a = -a;
+        }
     }
 }
