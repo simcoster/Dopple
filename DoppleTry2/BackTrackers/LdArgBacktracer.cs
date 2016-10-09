@@ -18,14 +18,14 @@ namespace DoppleTry2.BackTrackers
             List < List < InstructionWrapper >> backRelated = new List<List<InstructionWrapper>>();
             Code[] relevantCodes = { Code.Starg, Code.Starg_S };
             List<InstructionWrapper> stArgInst = new List<InstructionWrapper>();
-            //if (instWrapper.Inlined)
-            //{
-            //    backRelated.Add(BackSearcher.SearchBackwardsForDataflowInstrcutions(InstructionWrappers, 
-            //                                                        x => relevantCodes.Contains(x.Instruction.OpCode.Code) &&
-            //                                                        x.ArgIndex == instWrapper.ArgIndex, instWrapper));
-            //}
-            //else
-            //{
+            if (instWrapper.Inlined)
+            {
+                backRelated.Add(BackSearcher.SearchBackwardsForDataflowInstrcutions(InstructionWrappers,
+                                                                    x => relevantCodes.Contains(x.Instruction.OpCode.Code) &&
+                                                                    x.ArgIndex == instWrapper.ArgIndex, instWrapper));
+            }
+            else
+            {
                 BackSearcher.SafeSearchBackwardsForDataflowInstrcutions(InstructionWrappers, x =>
                                                                     relevantCodes.Contains(x.Instruction.OpCode.Code) &&
                                                                     x.ArgIndex == instWrapper.ArgIndex, instWrapper);
@@ -33,7 +33,7 @@ namespace DoppleTry2.BackTrackers
                 {
                     backRelated.Add(stArgInst);
                 }
-            //}
+            }
             return backRelated;
         }
 

@@ -92,7 +92,7 @@ namespace DoppleGraph
                 {
                     AddNodeLinks(nodeWrapper, myView);
                     ResolveFlowInstructions(nodeWrapper.InstructionWrapper, instructionWrappers);
-                    //DrawFlowLinks(nodeWrapper, myView);
+                    DrawFlowLinks(nodeWrapper, myView);
                 }
                 newForm.Show();
             }

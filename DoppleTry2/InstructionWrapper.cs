@@ -162,7 +162,8 @@ namespace DoppleTry2
 
             if (InlineCall.CallOpCodes.Contains(instruction.OpCode.Code))
             {
-                return ((Mono.Cecil.MethodReference) instruction.Operand).Parameters.Count;
+                return 0;
+                //return ((Mono.Cecil.MethodReference) instruction.Operand).Parameters.Count;
             }
             else if (instruction.OpCode.Code == Code.Ret)
             {

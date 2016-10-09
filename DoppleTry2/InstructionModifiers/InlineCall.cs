@@ -26,6 +26,7 @@ namespace DoppleTry2.InstructionModifiers
                 if (calledFunc.FullName == instWrapper.Method.FullName)
                     continue;
                 AddInlinedMethodBody(instructionWrappers, i + 1, calledFunc);
+                instWrapper.Inlined = true;
                 int addedInstrucitons = InsertHelperSTargs(instructionWrappers, instWrapper, calledFunc);
                 i += addedInstrucitons;
             }
@@ -55,9 +56,19 @@ namespace DoppleTry2.InstructionModifiers
                     var opcode = Instruction.Create(OpCodes.Starg, calledFunc.Parameters[i]);
                     InstructionWrapper stArgWrapper = new InstructionWrapper(opcode, calledFunc);
                     stArgWrapper.BackProgramFlow.Add(argProvidingWrapper);
-                    stArgWrapper.NextPossibleProgramFlow.Add(argProvidingWrapper);
+                    stArgWrapper.NextPossibleProgramFlow.AddRange(argProvidingWrapper.NextPossibleProgramFlow);
+
+                    foreach(var nextPossiblePrFlow in stArgWrapper.NextPossibleProgramFlow)
+                    {
+                        nextPossiblePrFlow.BackProgramFlow.Remove(argProvidingWrapper);
+                        nextPossiblePrFlow.BackProgramFlow.Add(stArgWrapper);
+                    }
+
+                    argProvidingWrapper.NextPossibleProgramFlow.Clear();
+                    argProvidingWrapper.NextPossibleProgramFlow.Add(stArgWrapper);
                     stArgWrapper.AddBackTwoWaySingleIndex(new[] { argProvidingWrapper });
                     stArgWrapper.StackPopCount--;
+                    stArgWrapper.ArgIndex = i;
                     argProvidingWrapper.StackPushCount--;
                     instructionWrappers.Insert(instructionWrappers.IndexOf(argProvidingWrapper) +1, stArgWrapper);
                 }
