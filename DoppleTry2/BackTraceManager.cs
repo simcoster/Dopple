@@ -56,12 +56,21 @@ namespace DoppleTry2
 
         public List<InstructionWrapper> Run()
         {
+            foreach (var instWrapper in _instructionsWrappers)
+            {
+                var flowHandlers = _flowHandlers.Where(x => x.HandledCodes.Contains(instWrapper.Instruction.OpCode.Code));
+                foreach (var flowHandler in flowHandlers)
+                {
+                    flowHandler.SetForwardExecutionFlowInsts(instWrapper);
+                }
+            }
+
             foreach (var modifier in _modifiers)
             {
                 modifier.Modify(_instructionsWrappers);
             }
 
-            foreach (var instWrapper in _instructionsWrappers)
+            foreach (var instWrapper in _instructionsWrappers.Where(x => x.Inlined))
             {
                 var flowHandlers = _flowHandlers.Where(x => x.HandledCodes.Contains(instWrapper.Instruction.OpCode.Code));
                 foreach (var flowHandler in flowHandlers)
@@ -88,10 +97,11 @@ namespace DoppleTry2
             {
                 var instsToMerge = _instructionsWrappers
                     .Where(x => ldarg.HandlesCodes.Contains(x.Instruction.OpCode.Code))
-                    .Where(x => x.ArgIndex == argIndex).ToArray();
+                    .Where(x => x.ArgIndex == argIndex)
+                    .Where(x => x.Inlined == false).ToArray();
                 if (instsToMerge.Length > 0)
                 {
-                   // MergeInsts(instsToMerge);
+                    MergeInsts(instsToMerge);
                 }
             }
 
@@ -101,7 +111,7 @@ namespace DoppleTry2
                     .Where(x => x.ImmediateIntValue != null && x.ImmediateIntValue.Value == x.ImmediateIntValue.Value).ToArray();
                 if (instsToMerge.Length > 0)
                 {
-                   // MergeInsts(instsToMerge);
+                    MergeInsts(instsToMerge);
                 }
             }
 
@@ -123,15 +133,15 @@ namespace DoppleTry2
                     var instsToMerge = sameLocInsts.Where(x => x.BackDataFlowRelated == locInst.BackDataFlowRelated).ToList();
                     if (instsToMerge.Count() > 1)
                     {
-                     //   MergeInsts(instsToMerge.ToArray());
+                        MergeInsts(instsToMerge.ToArray());
                     }
                     mergedInsts.AddRange(instsToMerge);
                 }              
             }
 
-           // RemoveInstWrappers(_instructionsWrappers.Where(x => ldloc._storingCodes.Contains(x.Instruction.OpCode.Code)));
-          //  RemoveInstWrappers(_instructionsWrappers.Where(x => ldloc.HandlesCodes.Contains(x.Instruction.OpCode.Code)));
-          //  RemoveInstWrappers(_instructionsWrappers.Where(x => x.Inlined == true));
+            RemoveInstWrappers(_instructionsWrappers.Where(x => ldloc._storingCodes.Contains(x.Instruction.OpCode.Code)));
+            RemoveInstWrappers(_instructionsWrappers.Where(x => ldloc.HandlesCodes.Contains(x.Instruction.OpCode.Code)));
+            //RemoveInstWrappers(_instructionsWrappers.Where(x => x.Inlined == true));
 
             var inst = Instruction.Create(typeof(OpCodes).GetFields().Select(x => x.GetValue(null)).Cast<OpCode>().First(x => x.Code == Code.Nop));
             var nodeZero = new InstructionWrapper(inst, metDef);
@@ -193,7 +203,7 @@ namespace DoppleTry2
             {
                 foreach (var forInst in instWrapper.ForwardDataFlowRelated.ArgumentList)
                 {
-                    forInst.Argument.BackDataFlowRelated.AddSingleIndex(instWrapper.BackDataFlowRelated);
+                    forInst.Argument.BackDataFlowRelated.AddSingleIndex(instWrapper.BackDataFlowRelated, forInst.ArgIndex);
                     forInst.Argument.BackDataFlowRelated.ArgumentList.RemoveAll(x => x.Argument == instWrapper);
                 }
                 foreach (var backInst in instWrapper.BackDataFlowRelated.ArgumentList)

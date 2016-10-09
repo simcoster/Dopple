@@ -16,6 +16,7 @@ namespace DoppleGraph
     public partial class Form1 : Form
     {
         private List<GoNodeWrapper> nodeWrappers;
+        private Dictionary<int, Color> ColumnBaseColors = new Dictionary<int, Color>();
         public Form1()
         {
             InitializeComponent();
@@ -37,9 +38,9 @@ namespace DoppleGraph
             AssemblyDefinition myLibrary = AssemblyDefinition.ReadAssembly(@"C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\Utility\bin\Release\Utility.dll");
 
             CodeColorHanlder colorCode = new CodeColorHanlder();
-            TypeDefinition type = myLibrary.MainModule.Types[1];
+            TypeDefinition type = myLibrary.MainModule.Types[2];
 
-            foreach (var method in type.Methods.Where(x => !x.IsConstructor && x.Name.ToLower().Contains("insertion")))
+            foreach (var method in type.Methods.Where(x => !x.IsConstructor && x.Name == "Caller"))
             {
                 Form newForm = new Form();
                 BackTraceManager backTraceManager = new BackTraceManager(method);
@@ -68,6 +69,11 @@ namespace DoppleGraph
                     ((GoShape)goNodeWrapper.Node.Background).BrushColor = colorCode.GetColor(goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code);
                     var shape = ((GoShape)goNodeWrapper.Node.Background);
                     shape.Size = new SizeF(400, 400);
+                    
+                    if (goNodeWrapper.InstructionWrapper.Inlined)
+                    {
+                        goNodeWrapper.Node.Shadowed = true;
+                    }
 
                     //goNodeWrapper.Node.Shape.BrushColor = colorCode.GetColor(goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code);
                     goNodeWrapper.Node.Text = goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code.ToString() + " " +nodeWrappers.IndexOf(goNodeWrapper);
@@ -93,6 +99,7 @@ namespace DoppleGraph
         }
 
         private List<GoNode> NodesToShow = new List<GoNode>();
+        private Random rnd = new Random();
 
         private void Node_UnSelected(object sender, EventArgs e)
         {
@@ -188,15 +195,21 @@ namespace DoppleGraph
 
         public void AddNodeLinks(GoNodeWrapper nodeWrapper, GoView myView)
         {
-            var linkGroupColor = Color.FromArgb(245, 228, 176);
+            if (!ColumnBaseColors.ContainsKey(nodeWrapper.DisplayCol))
+            {
+                ColumnBaseColors.Add(nodeWrapper.DisplayCol, GetRandomColor());
+            }
+            //var linkGroupColor = ColumnBaseColors[nodeWrapper.DisplayCol];
             foreach (var argumentGroup in nodeWrapper.InstructionWrapper.BackDataFlowRelated.ArgumentList.GroupBy(x => x.ArgIndex))
             {
-                linkGroupColor = GetNextColor(linkGroupColor);
+                var linkGroupColor = GetRandomColor();
                 foreach (var indexedArg in argumentGroup)
                 {
                     GoLink link = new GoLink();
                     var backNode = GetNodeWrapper(indexedArg.Argument);
+                    link.BrushColor = linkGroupColor;
                     link.PenColor = linkGroupColor;
+                    link.ToolTipText = indexedArg.ArgIndex.ToString() + " " + link.PenColor.R;
                     link.ToPort = nodeWrapper.Node.LeftPort;
                     link.FromPort = backNode.Node.RightPort;
                     myView.Document.Add(link);
@@ -204,11 +217,16 @@ namespace DoppleGraph
 
                 }
             }
+
+            var allLinks = myView.Document.Where(x => x is GoLink).Cast<GoLink>().Select(y => y.PenColor);
         }
 
-        private Color GetNextColor(Color color)
+        private Color GetRandomColor()
         {
-            return Color.FromArgb((color.R + 30) % 255, (color.G + 40) % 255, (color.B + 70) % 255);
+            Color color = new Color();
+            color = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
+            return color;
+            //return Color.FromArgb((color.R + 30) % 255, (color.G + 20) % 255, (color.B + 10) % 255);
         }
 
         private void SetCoordinates(List<GoNodeWrapper> nodeWrappers)

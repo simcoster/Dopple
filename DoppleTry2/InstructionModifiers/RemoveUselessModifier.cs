@@ -9,7 +9,6 @@ namespace DoppleTry2.InstructionModifiers
         public void Modify(List<InstructionWrapper> instructionWrappers)
         {
             var uselessCodes = new[] {Code.Nop, Code.Break};
-            instructionWrappers.RemoveAll(x => uselessCodes.Contains(x.Instruction.OpCode.Code));
-        }
+         }
     }
 }

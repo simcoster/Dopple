@@ -14,9 +14,16 @@ namespace DoppleTry2
         {
             ArgumentList.AddRange(instructionWrappers.Select(x => new IndexedArgument(GetNewIndex() + 1, x)));
         }
-        public void AddSingleIndex(ArgList argList)
+        public void AddSingleIndex(ArgList argList, int index =-1)
         {
-            ArgumentList.AddRange(argList.ArgumentList.Select(x => new IndexedArgument(GetNewIndex() + 1, x.Argument)));
+            if (index == -1)
+            {
+                ArgumentList.AddRange(argList.ArgumentList.Select(x => new IndexedArgument(GetNewIndex() + 1, x.Argument)));
+            }
+            else
+            {
+                ArgumentList.AddRange(argList.ArgumentList.Select(x => new IndexedArgument(index, x.Argument)));
+            }
         }
         public void AddSingleIndex(InstructionWrapper instructionWrapper)
         {

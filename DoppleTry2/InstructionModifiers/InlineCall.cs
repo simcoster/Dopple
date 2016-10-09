@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using DoppleTry2.BackTrackers;
 
 namespace DoppleTry2.InstructionModifiers
 {
@@ -24,12 +25,44 @@ namespace DoppleTry2.InstructionModifiers
                 var calledFunc = (MethodDefinition)instWrapper.Instruction.Operand;
                 if (calledFunc.FullName == instWrapper.Method.FullName)
                     continue;
-                var calledFuncInstructions = calledFunc.Body.Instructions.ToList();
-                calledFuncInstructions.RemoveAll(x => x.OpCode.Code == Code.Ret);
-                var calledFunInstWrappers = calledFuncInstructions.Select(x => new InstructionWrapper(x, calledFunc)).ToList();
-                instWrapper.Inlined = true;
-                instructionWrappers.InsertRange(i, calledFunInstWrappers);
+                AddInlinedMethodBody(instructionWrappers, i + 1, calledFunc);
+                int addedInstrucitons = InsertHelperSTargs(instructionWrappers, instWrapper, calledFunc);
+                i += addedInstrucitons;
             }
+        }
+
+        private static void AddInlinedMethodBody(List<InstructionWrapper> instructionWrappers, int i, MethodDefinition calledFunc)
+        {
+            var calledFuncInstructions = calledFunc.Body.Instructions.ToList();
+            var calledFunInstWrappers = calledFuncInstructions.Select(x => new InstructionWrapper(x, calledFunc)).ToList();
+            foreach (var wrapper in calledFunInstWrappers)
+            {
+                wrapper.Inlined = true;
+                wrapper.Method = calledFunc;
+            }
+            instructionWrappers.InsertRange(i, calledFunInstWrappers);
+        }
+
+        private static int InsertHelperSTargs(List<InstructionWrapper> instructionWrappers, InstructionWrapper instWrapper, MethodDefinition calledFunc)
+        {
+            int addedInstructions = 0;
+            for (int i = 0; i < calledFunc.Parameters.Count; i++)
+            {
+                var argProvidingWrappers = BackSearcher.SearchBackwardsForDataflowInstrcutions(instructionWrappers, x => x.StackPushCount > 0, instWrapper);
+                foreach (var argProvidingWrapper in argProvidingWrappers)
+                {
+                    addedInstructions++;
+                    var opcode = Instruction.Create(OpCodes.Starg, calledFunc.Parameters[i]);
+                    InstructionWrapper stArgWrapper = new InstructionWrapper(opcode, calledFunc);
+                    stArgWrapper.BackProgramFlow.Add(argProvidingWrapper);
+                    stArgWrapper.NextPossibleProgramFlow.Add(argProvidingWrapper);
+                    stArgWrapper.AddBackTwoWaySingleIndex(new[] { argProvidingWrapper });
+                    stArgWrapper.StackPopCount--;
+                    argProvidingWrapper.StackPushCount--;
+                    instructionWrappers.Insert(instructionWrappers.IndexOf(argProvidingWrapper) +1, stArgWrapper);
+                }
+            }
+            return addedInstructions;
         }
     }
 }

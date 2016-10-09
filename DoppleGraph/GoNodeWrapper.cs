@@ -18,7 +18,7 @@ namespace DoppleGraph
         public InstructionWrapper InstructionWrapper { get; private set; }
         public int Index { get; set; }
         public float DisplayRow { get; set; }
-        public float DisplayCol { get; set; }
+        public int DisplayCol { get; set; }
         public List<GoNodeWrapper> LongestPath { get; set; } = new List<GoNodeWrapper>();
     }
 

@@ -10,58 +10,23 @@ namespace Utility
 {
     public class Class1
     {
-        public static int TwoVarsPath(int a, int b)
+        public static int Caller(int a, int b)
         {
-            int counter = 0;
-            int sum = 0;
-            for (int i = 0; i < 5; i++)
-            {
-                counter++;
-                for (int j = 0; j < 5; j++)
-                {
-                    sum += counter;
-                }
-            }
-            return sum;
+            int c = a + b;
+            int d = a - b;
+            return Callee(c, d);
         }
 
-        public static int TwoVarsPathTwo(int a, int b)
+        public static int Callee(int a, int b)
         {
-            int counter = 0;
-            int sum = 0;
-            for (int j = 0; j < 5; j++)
-            {
-                sum += counter;
-                for (int i = 0; i < 5; i++)
-                {
-                    counter++;
-                }
-            }
-            return sum;
+            return a - b;
         }
-        public static int ThreeVarsPath(int a, int b)
+
+        public static int Inlined(int a, int b)
         {
-            int sum = 1;
-            for (int i = 1; i < 5; i++)
-            {
-                for (int j = 1; j < 6; j++)
-                {
-                    sum *= i - j;
-                }
-            }
-            return sum;
-        }
-        public static int ThreeVarsPathTwo(int a, int b)
-        {
-            int sum = 1;
-            for (int j = 1; j < 6; j++)
-            {
-                for (int i = 1; i < 5; i++)
-                {
-                    sum *= i - j;
-                }
-            }
-            return sum;
+            int c = a + b;
+            int d = a - b;
+            return c - d; 
         }
     }
 }
