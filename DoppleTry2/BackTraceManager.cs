@@ -141,14 +141,19 @@ namespace DoppleTry2
 
             RemoveInstWrappers(_instructionsWrappers.Where(x => ldloc._storingCodes.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(_instructionsWrappers.Where(x => ldloc.HandlesCodes.Contains(x.Instruction.OpCode.Code)));
-            //RemoveInstWrappers(_instructionsWrappers.Where(x => x.Inlined == true));
+
+            LdArgBacktracer ldArgBackTracer = new LdArgBacktracer(null);
+            RemoveInstWrappers(_instructionsWrappers.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code) && x.Inlined));
+            RemoveInstWrappers(_instructionsWrappers.Where(x => new[] { Code.Call, Code.Calli, Code.Callvirt}.Contains(x.Instruction.OpCode.Code) && x.Inlined));
+            RemoveInstWrappers(_instructionsWrappers.Where(x => ldArgBackTracer.HandlesCodes.Contains(x.Instruction.OpCode.Code) && x.Inlined));
+            RemoveInstWrappers(_instructionsWrappers.Where(x => x.Instruction.OpCode.Code == Code.Ret && x.Inlined));
 
             var inst = Instruction.Create(typeof(OpCodes).GetFields().Select(x => x.GetValue(null)).Cast<OpCode>().First(x => x.Code == Code.Nop));
             var nodeZero = new InstructionWrapper(inst, metDef);
 
             foreach (var firstNode in _instructionsWrappers.Where(x => x.BackDataFlowRelated.ArgumentList.Count == 0))
             {
-                firstNode.AddBackTwoWaySingleIndex(new[] { nodeZero });
+                firstNode.AddBackDataflowTwoWaySingleIndex(new[] { nodeZero });
             }
             _instructionsWrappers.Add(nodeZero);
 
@@ -198,12 +203,12 @@ namespace DoppleTry2
 
         public void RemoveInstWrappers(IEnumerable<InstructionWrapper> instsToRemove)
         {
-            var instWrappersToRemove = new List<InstructionWrapper>();
             foreach (var instWrapper in instsToRemove)
             {
                 foreach (var forInst in instWrapper.ForwardDataFlowRelated.ArgumentList)
                 {
-                    forInst.Argument.BackDataFlowRelated.AddSingleIndex(instWrapper.BackDataFlowRelated, forInst.ArgIndex);
+                    int backArgIndex = forInst.Argument.BackDataFlowRelated.ArgumentList.First(x => x.Argument == instWrapper).ArgIndex;
+                    forInst.Argument.BackDataFlowRelated.AddSingleIndex(instWrapper.BackDataFlowRelated, backArgIndex);
                     forInst.Argument.BackDataFlowRelated.ArgumentList.RemoveAll(x => x.Argument == instWrapper);
                 }
                 foreach (var backInst in instWrapper.BackDataFlowRelated.ArgumentList)
@@ -211,9 +216,8 @@ namespace DoppleTry2
                     backInst.Argument.ForwardDataFlowRelated.AddSingleIndex(instWrapper.ForwardDataFlowRelated);
                     backInst.Argument.ForwardDataFlowRelated.ArgumentList.RemoveAll(x => x.Argument == instWrapper);
                 }
-                instWrappersToRemove.Add(instWrapper);
             }
-            _instructionsWrappers = _instructionsWrappers.Except(instWrappersToRemove).ToList();
+            _instructionsWrappers.RemoveAll(x => instsToRemove.Contains(x));
         }
     }
 }

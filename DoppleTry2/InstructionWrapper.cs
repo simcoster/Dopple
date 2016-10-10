@@ -41,7 +41,7 @@ namespace DoppleTry2
             ImmediateIntValue = GetImmediateInt(instruction);
         }
 
-        public void AddBackTwoWaySingleIndex(IEnumerable<InstructionWrapper> wrappersToAdd)
+        public void AddBackDataflowTwoWaySingleIndex(IEnumerable<InstructionWrapper> wrappersToAdd)
         {
             BackDataFlowRelated.AddSingleIndex(wrappersToAdd);
             foreach(var instWrapper in wrappersToAdd)
@@ -130,6 +130,10 @@ namespace DoppleTry2
 
         private int GetStackPushCount(Instruction instruction)
         {
+            if (InlineCall.CallOpCodes.Contains(instruction.OpCode.Code))
+            {
+                return 0;
+            }
             if (instruction.OpCode.Code == Code.Ret)
             {
                 return 1;

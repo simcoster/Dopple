@@ -40,7 +40,7 @@ namespace DoppleGraph
             CodeColorHanlder colorCode = new CodeColorHanlder();
             TypeDefinition type = myLibrary.MainModule.Types[2];
 
-            foreach (var method in type.Methods.Where(x => !x.IsConstructor && x.Name == "Caller"))
+            foreach (var method in type.Methods.Where(x => !x.IsConstructor))
             {
                 Form newForm = new Form();
                 BackTraceManager backTraceManager = new BackTraceManager(method);
@@ -92,7 +92,7 @@ namespace DoppleGraph
                 {
                     AddNodeLinks(nodeWrapper, myView);
                     ResolveFlowInstructions(nodeWrapper.InstructionWrapper, instructionWrappers);
-                    DrawFlowLinks(nodeWrapper, myView);
+                    //DrawFlowLinks(nodeWrapper, myView);
                 }
                 newForm.Show();
             }
