@@ -22,6 +22,11 @@ namespace DoppleTry2.ProgramFlowHanlder
 
         public abstract Code[] HandledCodes { get; }
 
-        public abstract void SetForwardExecutionFlowInsts(InstructionWrapper instructionWrapper);
+        public void SetForwardExecutionFlowInsts(InstructionWrapper instructionWrapper)
+        {
+            SetForwardExecutionFlowInstsInternal(instructionWrapper);
+        }
+
+        protected abstract void SetForwardExecutionFlowInstsInternal(InstructionWrapper instructionWrapper);
     }
 }

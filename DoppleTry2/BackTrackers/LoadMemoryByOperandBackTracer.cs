@@ -27,7 +27,7 @@ namespace DoppleTry2.BackTrackers
             Code.Ldind_I1, Code.Ldind_U1, Code.Ldind_I2,
             Code.Ldind_U2, Code.Ldind_I4, Code.Ldind_U4,
             Code.Ldind_I8, Code.Ldind_I, Code.Ldind_R4,
-            Code.Ldind_R8, Code.Ldind_Ref        };
+            Code.Ldind_R8, Code.Ldind_Ref};
 
     }
 }

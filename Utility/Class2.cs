@@ -37,10 +37,12 @@ namespace Utility
         {
             for (int i = 0; i < array.Length - 1; i++)
             {
-                Tuple<int, int> nextMinAndIndex = findMinAndIndex(array, i);
-                if (nextMinAndIndex.Item1 < array[i])
+                int min;
+                int minIndex;
+                findMinAndIndex(array, i, out min, out minIndex);
+                if (min < array[i])
                 {
-                    swapTwo(array, i, nextMinAndIndex.Item2);
+                    swapTwo(array, i, minIndex);
                 }
             }
         }
@@ -52,17 +54,7 @@ namespace Utility
             array[j] = temp;
         }
 
-        public static void swapTwoTwo(int[] array)
-        {
-            for (int i=0; i<array.Length; i++)
-            {
-                int temp = array[i];
-                array[i] = array[i+1];
-                array[i+1] = temp;
-            }
-        }
-
-        public static Tuple<int, int> findMinAndIndex(int[] array, int startIndex)
+        public static void findMinAndIndex(int[] array, int startIndex, out int minValue, out int minIndex)
         {
             int currentMin = int.MaxValue;
             int currentMinIndex = -1;
@@ -74,9 +66,9 @@ namespace Utility
                     currentMinIndex = i;
                 }
             }
-            return new Tuple<int, int>(currentMin, currentMinIndex);
+            minValue = currentMin;
+            minIndex = currentMinIndex;
         }
-
 
         public int[] SelectionSort(int[] arr)
         {
@@ -172,37 +164,6 @@ namespace Utility
             QuickSortLeftPivot(a, start, i - 1);
             QuickSortLeftPivot(a, i + 1, end);
         }
-
-        static void GetGreatest(int[] a, int start, int end)
-        {
-            int biggest = a[start];
-            for (int i=biggest+1; i<=end; i++)
-            {
-                if (biggest < a[i])
-                {
-                    biggest = a[i];
-                }
-            }
-        }
-
-        static void InIf(int a)
-        {
-            int b =4;
-            if (a >5)
-            {
-                a = -a;
-                b = -b;
-            }
-        }
-
-        static void OutIf(int a)
-        {
-            int b =4;
-            if (a > 5)
-            {
-                b = -b;
-            }
-            a = -a;
-        }
+     
     }
 }

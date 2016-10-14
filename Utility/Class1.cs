@@ -10,23 +10,29 @@ namespace Utility
 {
     public class Class1
     {
-        public static int Caller(int a, int b)
+        public static int Caller(int[] a)
         {
-            int c = a + b;
-            int d = a - b;
-            return Callee(c, d);
+            int sum = 0;
+            for(int i=0; i<a.Length; i++)
+            {
+                sum = Callee(a, i, sum);
+            }
+            return sum;
         }
 
-        public static int Callee(int a, int b)
+        private static int Callee(int[] a, int i, int sum)
         {
-            return a - b;
+            return (sum + a[i]);
         }
 
-        public static int Inlined(int a, int b)
+        public static int Inlined(int[] a)
         {
-            int c = a + b;
-            int d = a - b;
-            return c - d; 
+            int sum = 0;
+            for (int i = 0; i < a.Length; i++)
+            {
+                sum = (sum + a[i]);
+            }
+            return sum;
         }
     }
 }

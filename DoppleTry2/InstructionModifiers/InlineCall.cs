@@ -23,22 +23,21 @@ namespace DoppleTry2.InstructionModifiers
                             instWrapper.Instruction.Operand is MethodDefinition &&
                             instWrapper.Inlined == false))
                     continue;
-                //instructionWrappers.Remove(instWrapper);
                 var calledFunc = (MethodDefinition)instWrapper.Instruction.Operand;
                 if (calledFunc.FullName == instWrapper.Method.FullName)
                     continue;
-                AddInlinedMethodBody(instructionWrappers, i + 1, calledFunc);
                 instWrapper.Inlined = true;
+                AddInlinedMethodBody(instructionWrappers, i + 1, calledFunc);
                 int addedInstrucitons = InsertHelperSTargs(instructionWrappers, instWrapper, calledFunc);
                 i += addedInstrucitons;
             }
         }
 
-        private static void AddInlinedMethodBody(List<InstructionWrapper> instructionWrappers, int i, MethodDefinition calledFunc)
+        private static void AddInlinedMethodBody(List<InstructionWrapper> instructionWrappers, int indexForAddingInlined, MethodDefinition calledFunc)
         {
             var calledFuncInstructions = calledFunc.Body.Instructions.ToList();
             var calledFunInstWrappers = calledFuncInstructions.Select(x => new InstructionWrapper(x, calledFunc)).ToList();
-            instructionWrappers.InsertRange(i, calledFunInstWrappers);
+            instructionWrappers.InsertRange(indexForAddingInlined, calledFunInstWrappers);
             var programFlowHelper = new SimpleProgramFlowHandler(instructionWrappers);
             var lastInlinedCallIndex = instructionWrappers.IndexOf(calledFunInstWrappers.Last());
             foreach (var wrapper in calledFunInstWrappers)
@@ -64,7 +63,7 @@ namespace DoppleTry2.InstructionModifiers
                 {
                     addedInstructions++;
                     var opcode = Instruction.Create(OpCodes.Starg, calledFunc.Parameters[i]);
-                    InstructionWrapper stArgWrapper = new InstructionWrapper(opcode, calledFunc);
+                    InstructionWrapper stArgWrapper = new InstructionWrapper(opcode, instWrapper.Method);
                     stArgWrapper.BackProgramFlow.Add(argProvidingWrapper);
                     stArgWrapper.NextPossibleProgramFlow.AddRange(argProvidingWrapper.NextPossibleProgramFlow);
                     foreach(var nextPossiblePrFlow in stArgWrapper.NextPossibleProgramFlow)

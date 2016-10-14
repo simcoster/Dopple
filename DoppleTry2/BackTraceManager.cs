@@ -79,6 +79,8 @@ namespace DoppleTry2
                 }
             }
 
+            SetInstructionIndexes(_instructionsWrappers);
+
             foreach (var instWrapper in _instructionsWrappers)
             {
                 var backTracers = _backTracers.Where(x => x.HandlesCodes.Contains(instWrapper.Instruction.OpCode.Code));
@@ -93,13 +95,13 @@ namespace DoppleTry2
             }
 
             var ldarg = new LdArgBacktracer(null);
-            foreach(int argIndex in _instructionsWrappers.Select(x => x.ArgIndex).Distinct().ToList())
+            var argGroups = _instructionsWrappers.Where(x => x.ArgIndex != -1)
+                                                 .Where(x => ldarg.HandlesCodes.Contains(x.Instruction.OpCode.Code))
+                                                 .GroupBy(x => new { x.ArgIndex, x.Method });
+            foreach (var argGroup in argGroups)
             {
-                var instsToMerge = _instructionsWrappers
-                    .Where(x => ldarg.HandlesCodes.Contains(x.Instruction.OpCode.Code))
-                    .Where(x => x.ArgIndex == argIndex)
-                    .Where(x => x.Inlined == false).ToArray();
-                if (instsToMerge.Length > 0)
+                var instsToMerge = argGroup.Select(x => x).ToArray();
+                if (instsToMerge.Length > 1)
                 {
                     MergeInsts(instsToMerge);
                 }
@@ -108,7 +110,10 @@ namespace DoppleTry2
             foreach (var imeddiateValueNode in _instructionsWrappers.Where(x => x.ImmediateIntValue != null).ToList())
             {
                 var instsToMerge = _instructionsWrappers
-                    .Where(x => x.ImmediateIntValue != null && x.ImmediateIntValue.Value == x.ImmediateIntValue.Value).ToArray();
+                    .Where(x => x.ImmediateIntValue != null)
+                    .Where(x => imeddiateValueNode.ImmediateIntValue.Value == x.ImmediateIntValue.Value)
+                    .Where(x => x.Method == imeddiateValueNode.Method)
+                    .ToArray();
                 if (instsToMerge.Length > 0)
                 {
                     MergeInsts(instsToMerge);
@@ -144,7 +149,7 @@ namespace DoppleTry2
 
             LdArgBacktracer ldArgBackTracer = new LdArgBacktracer(null);
             RemoveInstWrappers(_instructionsWrappers.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code) && x.Inlined));
-            RemoveInstWrappers(_instructionsWrappers.Where(x => new[] { Code.Call, Code.Calli, Code.Callvirt}.Contains(x.Instruction.OpCode.Code) && x.Inlined));
+            //RemoveInstWrappers(_instructionsWrappers.Where(x => new[] { Code.Call, Code.Calli, Code.Callvirt }.Contains(x.Instruction.OpCode.Code) && x.Inlined));
             RemoveInstWrappers(_instructionsWrappers.Where(x => ldArgBackTracer.HandlesCodes.Contains(x.Instruction.OpCode.Code) && x.Inlined));
             RemoveInstWrappers(_instructionsWrappers.Where(x => x.Instruction.OpCode.Code == Code.Ret && x.Inlined));
 
@@ -175,6 +180,8 @@ namespace DoppleTry2
                 }
             }
 
+            SetInstructionIndexes(_instructionsWrappers);
+
             return _instructionsWrappers;
         }
 
@@ -203,21 +210,31 @@ namespace DoppleTry2
 
         public void RemoveInstWrappers(IEnumerable<InstructionWrapper> instsToRemove)
         {
-            foreach (var instWrapper in instsToRemove)
+            foreach (var instWrapper in instsToRemove.ToArray())
             {
-                foreach (var forInst in instWrapper.ForwardDataFlowRelated.ArgumentList)
+                foreach (var forInst in instWrapper.ForwardDataFlowRelated.ArgumentList.Select(x => x.Argument).Distinct().ToArray())
                 {
-                    int backArgIndex = forInst.Argument.BackDataFlowRelated.ArgumentList.First(x => x.Argument == instWrapper).ArgIndex;
-                    forInst.Argument.BackDataFlowRelated.AddSingleIndex(instWrapper.BackDataFlowRelated, backArgIndex);
-                    forInst.Argument.BackDataFlowRelated.ArgumentList.RemoveAll(x => x.Argument == instWrapper);
+                    int backArgIndex = forInst.BackDataFlowRelated.ArgumentList.First(x => x.Argument == instWrapper).ArgIndex;
+                    forInst.BackDataFlowRelated.AddSingleIndex(instWrapper.BackDataFlowRelated, backArgIndex);
+                    //forInst.Argument.BackDataFlowRelated.ArgumentList.Remove(forInst.Argument.BackDataFlowRelated.ArgumentList.First(x => x.Argument == instWrapper));
+                    //TODO should correct this, not preserving multiple connections to the same node
+                    forInst.BackDataFlowRelated.ArgumentList.RemoveAll(x => x.Argument == instWrapper);
                 }
-                foreach (var backInst in instWrapper.BackDataFlowRelated.ArgumentList)
+                foreach (var backInst in instWrapper.BackDataFlowRelated.ArgumentList.ToArray())
                 {
                     backInst.Argument.ForwardDataFlowRelated.AddSingleIndex(instWrapper.ForwardDataFlowRelated);
                     backInst.Argument.ForwardDataFlowRelated.ArgumentList.RemoveAll(x => x.Argument == instWrapper);
                 }
+                _instructionsWrappers.Remove(instWrapper);
             }
-            _instructionsWrappers.RemoveAll(x => instsToRemove.Contains(x));
+        }
+
+        public void SetInstructionIndexes(List<InstructionWrapper> instructionWrappers)
+        {
+            foreach (var instWrapper in instructionWrappers)
+            {
+                instWrapper.InstructionIndex = instructionWrappers.IndexOf(instWrapper);
+            }
         }
     }
 }

@@ -18,16 +18,29 @@ namespace DoppleTry2
         public int MemoryReadCount { get; set; }
         public List<InstructionWrapper>  NextPossibleProgramFlow { get; set; } = new List<InstructionWrapper>();
         public List<InstructionWrapper> BackProgramFlow { get; set; } = new List<InstructionWrapper>();
-        public ArgList BackDataFlowRelated { get; internal set; } = new ArgList();
+        public ArgList BackDataFlowRelated
+        {
+            get
+            {
+                return _BackDataFlowRelated;
+            }
+            internal set
+            {
+                _BackDataFlowRelated = value;
+            }
+        }
         public ArgList ForwardDataFlowRelated { get; internal set; } = new ArgList();
         public int LocIndex { get; set; }
         public int ArgIndex { get; set; }
-        //TODO : this should be a different thing
         public bool Inlined { get; set; } = false;
         public int StackSum { get; internal set; } = 0;
         public int InstructionIndex { get; internal set; }
         public int? ImmediateIntValue { get; private set; }
-    
+        public bool MarkForDebugging { get; internal set; }
+
+        private ArgList _BackDataFlowRelated = new ArgList();
+
+
         public InstructionWrapper(Instruction instruction , MethodDefinition method)
         {
             Instruction = instruction;

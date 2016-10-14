@@ -18,11 +18,11 @@ namespace DoppleTry2
         {
             if (index == -1)
             {
-                ArgumentList.AddRange(argList.ArgumentList.Select(x => new IndexedArgument(GetNewIndex() + 1, x.Argument)));
+                ArgumentList.AddRange(argList.ArgumentList.Select(x => new IndexedArgument(GetNewIndex() + 1, x.Argument)).ToArray());
             }
             else
             {
-                ArgumentList.AddRange(argList.ArgumentList.Select(x => new IndexedArgument(index, x.Argument)));
+                ArgumentList.AddRange(argList.ArgumentList.Select(x => new IndexedArgument(index, x.Argument)).ToArray());
             }
         }
         public void AddSingleIndex(InstructionWrapper instructionWrapper)

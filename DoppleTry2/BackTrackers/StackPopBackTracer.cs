@@ -13,7 +13,12 @@ namespace DoppleTry2.BackTrackers
             var foundInstructions = new List<List<InstructionWrapper>>();
             for (int i = 0; i < instWrapper.StackPopCount; i++)
             {
-                var argumentGroup = SearchBackwardsForDataflowInstrcutions(x => x.StackPushCount > 0, instWrapper);
+                //var argumentGroup = SearchBackwardsForDataflowInstrcutions(x => x.StackPushCount > 0, instWrapper);
+                var argumentGroup = SafeSearchBackwardsForDataflowInstrcutions(x => x.StackPushCount > 0, instWrapper);
+                if (argumentGroup.Count ==0)
+                {
+                    instWrapper.MarkForDebugging = true;
+                }
                 foundInstructions.Add(argumentGroup);
                 foreach (var arg in argumentGroup)
                 {
@@ -29,7 +34,7 @@ namespace DoppleTry2.BackTrackers
                     .Where(x => x.StackBehaviourPop != StackBehaviour.Pop0)
                     .Select(x => x.Code).ToArray();
 
-        public StackPopBackTracer(List<InstructionWrapper> instructionsWrappers) : base(instructionsWrappers)
+        public StackPopBackTracer(List<InstructionWrapper> instructionWrappers) : base(instructionWrappers)
         {
         }
     }
