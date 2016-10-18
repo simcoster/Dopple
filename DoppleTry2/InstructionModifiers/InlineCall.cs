@@ -56,7 +56,7 @@ namespace DoppleTry2.InstructionModifiers
         private static int InsertHelperSTargs(List<InstructionWrapper> instructionWrappers, InstructionWrapper instWrapper, MethodDefinition calledFunc)
         {
             int addedInstructions = 0;
-            for (int i = 0; i < calledFunc.Parameters.Count; i++)
+            for (int i = calledFunc.Parameters.Count-1 ; i >= 0 ; i--)
             {
                 var argProvidingWrappers = BackSearcher.SearchBackwardsForDataflowInstrcutions(instructionWrappers, x => x.StackPushCount > 0, instWrapper);
                 foreach (var argProvidingWrapper in argProvidingWrappers)

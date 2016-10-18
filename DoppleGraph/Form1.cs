@@ -36,8 +36,9 @@ namespace DoppleGraph
         {
             AssemblyDefinition myLibrary = AssemblyDefinition.ReadAssembly(@"C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\Utility\bin\Release\Utility.dll");
 
-            TypeDefinition type = myLibrary.MainModule.Types[2];
+            TypeDefinition type = myLibrary.MainModule.Types[1];
 
+            //foreach (var method in type.Methods.Where(x => !x.IsConstructor && x.Name.Contains("Caller")))
             foreach (var method in type.Methods.Where(x => !x.IsConstructor))
             {
                 BackTraceManager backTraceManager = new BackTraceManager(method);
@@ -46,7 +47,6 @@ namespace DoppleGraph
                 Form2 newForm = new Form2(instructionWrappers);
                 newForm.Show();
             }
-
             Hide();
         }
     }

@@ -271,8 +271,12 @@ namespace DoppleGraph
                 goNodeWrapper.Node.Selected += Node_Selected;
                 goNodeWrapper.Node.UnSelected += Node_UnSelected;
                 goNodeWrapper.Index = nodeWrappers.IndexOf(goNodeWrapper);
-                ((GoShape)goNodeWrapper.Node.Background).BrushColor = colorCode.GetColor(goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code);
                 var shape = ((GoShape)goNodeWrapper.Node.Background);
+                shape.BrushColor = colorCode.GetColor(goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code);
+                if (shape.BrushColor.GetBrightness() < 0.4)
+                {
+                    goNodeWrapper.Node.Label.TextColor = Color.White;
+                }
                 shape.Size = new SizeF(400, 400);
 
                 if (goNodeWrapper.InstructionWrapper.Inlined || goNodeWrapper.InstructionWrapper.MarkForDebugging)
@@ -311,7 +315,12 @@ namespace DoppleGraph
             {
                 AddNodeLinks(nodeWrapper, myView);
                 AcomodateForRemovedFlowNodes(nodeWrapper.InstructionWrapper, instructionWrappers);
-                DrawFlowLinks(nodeWrapper, myView);
+                //DrawFlowLinks(nodeWrapper, myView);
+            }
+
+            foreach(var link in myView.Document.Where(x => x is GoLink))
+            {
+               // link.Visible = false;
             }
         }
     }
