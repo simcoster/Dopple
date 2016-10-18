@@ -306,7 +306,8 @@ namespace DoppleGraph
                 {
                     goNodeWrapper.Node.Text += ((MethodReference)goNodeWrapper.InstructionWrapper.Instruction.Operand).Name ?? " ";
                 }
-                myView.Document.Add(goNodeWrapper.Node);
+                var frontLayer = myView.Document.Layers.CreateNewLayerAfter(myView.Document.LinksLayer);
+                frontLayer.Add(goNodeWrapper.Node);
             }
             SetCoordinates(nodeWrappers);
 
