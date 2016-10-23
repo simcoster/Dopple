@@ -11,20 +11,24 @@ namespace DoppleTry2
 {
     public class BackTraceManager
     {
-        private List<InstructionWrapper> _instructionsWrappers;
+        public List<InstructionWrapper> InstructionsWrappers;
         private readonly IEnumerable<BackTracer> _backTracers;
         private readonly IEnumerable<IModifier> _modifiers;
         private readonly IEnumerable<ProgramFlowHandler> _flowHandlers;
         private MethodDefinition metDef;
 
+        public BackTraceManager (IEnumerable<InstructionWrapper> instWrappers)
+        {
+            InstructionsWrappers = instWrappers.ToList();
+        }
         public BackTraceManager(MethodDefinition methodDefinition)
         {
             metDef = methodDefinition;
-            _instructionsWrappers =
+            InstructionsWrappers =
                 methodDefinition.Body.Instructions.Select(x => new InstructionWrapper(x, methodDefinition)).ToList();
-            foreach (var inst in _instructionsWrappers)
+            foreach (var inst in InstructionsWrappers)
             {
-                inst.InstructionIndex = _instructionsWrappers.IndexOf(inst);
+                inst.InstructionIndex = InstructionsWrappers.IndexOf(inst);
             }
 
             _modifiers =
@@ -36,27 +40,27 @@ namespace DoppleTry2
             _backTracers =
                 new BackTracer[]
                 {
-                    new StackPopBackTracer(_instructionsWrappers),
-                    new LdArgBacktracer(_instructionsWrappers),
-                    new LdLocBackTracer(_instructionsWrappers),
-                    new LdStaticFieldBackTracer(_instructionsWrappers),
-                    new LoadArrayElemBackTracer(_instructionsWrappers),
-                    new LoadFieldByStackBackTracer(_instructionsWrappers),
-                    new LoadMemoryByOperandBackTracer(_instructionsWrappers),
-                    new TypedReferenceBackTracer(_instructionsWrappers)
+                    new StackPopBackTracer(InstructionsWrappers),
+                    new LdArgBacktracer(InstructionsWrappers),
+                    new LdLocBackTracer(InstructionsWrappers),
+                    new LdStaticFieldBackTracer(InstructionsWrappers),
+                    new LoadArrayElemBackTracer(InstructionsWrappers),
+                    new LoadFieldByStackBackTracer(InstructionsWrappers),
+                    new LoadMemoryByOperandBackTracer(InstructionsWrappers),
+                    new TypedReferenceBackTracer(InstructionsWrappers)
                 };
 
             _flowHandlers =
                GetType()
                    .Assembly.GetTypes()
                    .Where(x => typeof(ProgramFlowHandler).IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
-                   .Select(x => Activator.CreateInstance(x, _instructionsWrappers))
+                   .Select(x => Activator.CreateInstance(x, InstructionsWrappers))
                    .Cast<ProgramFlowHandler>();
         }
 
         public List<InstructionWrapper> Run()
         {
-            foreach (var instWrapper in _instructionsWrappers)
+            foreach (var instWrapper in InstructionsWrappers)
             {
                 var flowHandlers = _flowHandlers.Where(x => x.HandledCodes.Contains(instWrapper.Instruction.OpCode.Code));
                 foreach (var flowHandler in flowHandlers)
@@ -67,10 +71,10 @@ namespace DoppleTry2
 
             foreach (var modifier in _modifiers)
             {
-                modifier.Modify(_instructionsWrappers);
+                modifier.Modify(InstructionsWrappers);
             }
 
-            foreach (var instWrapper in _instructionsWrappers.Where(x => x.Inlined))
+            foreach (var instWrapper in InstructionsWrappers.Where(x => x.Inlined))
             {
                 var flowHandlers = _flowHandlers.Where(x => x.HandledCodes.Contains(instWrapper.Instruction.OpCode.Code));
                 foreach (var flowHandler in flowHandlers)
@@ -79,9 +83,9 @@ namespace DoppleTry2
                 }
             }
 
-            SetInstructionIndexes(_instructionsWrappers);
+            SetInstructionIndexes(InstructionsWrappers);
 
-            foreach (var instWrapper in _instructionsWrappers)
+            foreach (var instWrapper in InstructionsWrappers)
             {
                 var backTracers = _backTracers.Where(x => x.HandlesCodes.Contains(instWrapper.Instruction.OpCode.Code));
                 if (backTracers.Count() == 0)
@@ -95,7 +99,7 @@ namespace DoppleTry2
             }
 
             var ldarg = new LdArgBacktracer(null);
-            var argGroups = _instructionsWrappers.Where(x => x.ArgIndex != -1)
+            var argGroups = InstructionsWrappers.Where(x => x.ArgIndex != -1)
                                                  .Where(x => ldarg.HandlesCodes.Contains(x.Instruction.OpCode.Code))
                                                  .GroupBy(x => new { x.ArgIndex, x.Method });
             foreach (var argGroup in argGroups)
@@ -107,9 +111,9 @@ namespace DoppleTry2
                 }
             }
 
-            foreach (var imeddiateValueNode in _instructionsWrappers.Where(x => x.ImmediateIntValue != null).ToList())
+            foreach (var imeddiateValueNode in InstructionsWrappers.Where(x => x.ImmediateIntValue != null).ToList())
             {
-                var instsToMerge = _instructionsWrappers
+                var instsToMerge = InstructionsWrappers
                     .Where(x => x.ImmediateIntValue != null)
                     .Where(x => imeddiateValueNode.ImmediateIntValue.Value == x.ImmediateIntValue.Value)
                     .Where(x => x.Method == imeddiateValueNode.Method)
@@ -122,11 +126,11 @@ namespace DoppleTry2
 
             var ldloc = new LdLocBackTracer(null);
 
-            foreach (int locIndex in _instructionsWrappers
+            foreach (int locIndex in InstructionsWrappers
                 .Where(x => x.LocIndex != -1)
                 .Select(x => x.LocIndex).Distinct().ToList())
             {
-                var sameLocInsts = _instructionsWrappers.Where(x => x.LocIndex == locIndex &&
+                var sameLocInsts = InstructionsWrappers.Where(x => x.LocIndex == locIndex &&
                                         ldloc.HandlesCodes.Contains(x.Instruction.OpCode.Code)).ToList();
                 var mergedInsts = new List<InstructionWrapper>();
                 foreach (var locInst in sameLocInsts)
@@ -144,25 +148,25 @@ namespace DoppleTry2
                 }              
             }
 
-            RemoveInstWrappers(_instructionsWrappers.Where(x => ldloc._storingCodes.Contains(x.Instruction.OpCode.Code)));
-            RemoveInstWrappers(_instructionsWrappers.Where(x => ldloc.HandlesCodes.Contains(x.Instruction.OpCode.Code)));
+            RemoveInstWrappers(InstructionsWrappers.Where(x => ldloc._storingCodes.Contains(x.Instruction.OpCode.Code)));
+            RemoveInstWrappers(InstructionsWrappers.Where(x => ldloc.HandlesCodes.Contains(x.Instruction.OpCode.Code)));
 
             LdArgBacktracer ldArgBackTracer = new LdArgBacktracer(null);
-            RemoveInstWrappers(_instructionsWrappers.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code) && x.Inlined));
-            RemoveInstWrappers(_instructionsWrappers.Where(x => new[] { Code.Call, Code.Calli, Code.Callvirt }.Contains(x.Instruction.OpCode.Code) && x.Inlined));
-            RemoveInstWrappers(_instructionsWrappers.Where(x => ldArgBackTracer.HandlesCodes.Contains(x.Instruction.OpCode.Code) && x.Inlined));
-            RemoveInstWrappers(_instructionsWrappers.Where(x => x.Instruction.OpCode.Code == Code.Ret && x.Inlined));
+            RemoveInstWrappers(InstructionsWrappers.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code) && x.Inlined));
+            RemoveInstWrappers(InstructionsWrappers.Where(x => ldArgBackTracer.HandlesCodes.Contains(x.Instruction.OpCode.Code) && x.Inlined));
+            RemoveInstWrappers(InstructionsWrappers.Where(x => new[] { Code.Call, Code.Calli, Code.Callvirt }.Contains(x.Instruction.OpCode.Code) && x.Inlined));
+            RemoveInstWrappers(InstructionsWrappers.Where(x => x.Instruction.OpCode.Code == Code.Ret && x.Inlined));
 
             var inst = Instruction.Create(typeof(OpCodes).GetFields().Select(x => x.GetValue(null)).Cast<OpCode>().First(x => x.Code == Code.Nop));
             var nodeZero = new InstructionWrapper(inst, metDef);
 
-            foreach (var firstNode in _instructionsWrappers.Where(x => x.BackDataFlowRelated.ArgumentList.Count == 0))
+            foreach (var firstNode in InstructionsWrappers.Where(x => x.BackDataFlowRelated.ArgumentList.Count == 0))
             {
                 firstNode.AddBackDataflowTwoWaySingleIndex(new[] { nodeZero });
             }
-            _instructionsWrappers.Add(nodeZero);
+            InstructionsWrappers.Add(nodeZero);
 
-            foreach(var node in _instructionsWrappers)
+            foreach(var node in InstructionsWrappers)
             {
                 foreach(var backNode in node.BackDataFlowRelated.ArgumentList)
                 {
@@ -180,9 +184,9 @@ namespace DoppleTry2
                 }
             }
 
-            SetInstructionIndexes(_instructionsWrappers);
+            SetInstructionIndexes(InstructionsWrappers);
 
-            return _instructionsWrappers;
+            return InstructionsWrappers;
         }
 
         public void MergeInsts(InstructionWrapper[] Wrappers)
@@ -204,7 +208,7 @@ namespace DoppleTry2
                     forwardNode.Argument.BackDataFlowRelated.ArgumentList.RemoveAll(x => x.Argument == wrapperToRemove);
                     forwardNode.Argument.BackDataFlowRelated.AddSingleIndex(instWrapperToKeep);
                 }
-                _instructionsWrappers.Remove(wrapperToRemove);
+                InstructionsWrappers.Remove(wrapperToRemove);
             }
         }
 
@@ -225,7 +229,7 @@ namespace DoppleTry2
                     backInst.Argument.ForwardDataFlowRelated.AddSingleIndex(instWrapper.ForwardDataFlowRelated);
                     backInst.Argument.ForwardDataFlowRelated.ArgumentList.RemoveAll(x => x.Argument == instWrapper);
                 }
-                _instructionsWrappers.Remove(instWrapper);
+                InstructionsWrappers.Remove(instWrapper);
             }
         }
 

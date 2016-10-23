@@ -22,7 +22,6 @@ namespace DoppleGraph
         public GoView myView;
         CodeColorHanlder colorCode = new CodeColorHanlder();
 
-
         private Form2()
         {
             InitializeComponent();
@@ -61,6 +60,8 @@ namespace DoppleGraph
                 {
                     goObject.Visible = true;
                 }
+                ShowDataFlowLinks_CheckedChanged(null, null);
+                ShowFlowLinks_CheckedChanged(null, null);
             }
             else
             {
@@ -70,7 +71,16 @@ namespace DoppleGraph
                 }
                 foreach (GoNode node in NodesToShow)
                 {
-                    foreach (var link in node.Links)
+                    var linksToShow = node.Links.Cast<GoLink>().ToList();
+                    if (!ShowProgramFlowLinks.Checked)
+                    {
+                        linksToShow = linksToShow.Cast<GoLink>().Where(x => x.Pen.DashStyle != DashStyle.Dash).ToList();
+                    }
+                    if (!ShowDataFlowLinks.Checked)
+                    {
+                        linksToShow = linksToShow.Cast<GoLink>().Where(x => x.Pen.DashStyle != DashStyle.Solid).ToList();
+                    }
+                    foreach (var link in linksToShow)
                     {
                         ((GoLink)link).Visible = true;
                         ((GoNode)link.ToNode).Visible = true;
@@ -85,7 +95,8 @@ namespace DoppleGraph
             var node = (GoNode)sender;
             if (ModifierKeys.HasFlag(Keys.Shift))
             {
-                NodesToShow.AddRange(nodeWrappers.Where(x => x.InstructionWrapper.Method == GetNodeWrapper(node).InstructionWrapper.Method).Select(x => x.Node));
+                NodesToShow.AddRange(nodeWrappers.Where(x => x.InstructionWrapper.Method == GetNodeWrapper(node).InstructionWrapper.Method)
+                    .Select(x => x.Node));
             }
             NodesToShow.Add(sender as GoNode);
             ReShow(node.Document);
@@ -253,6 +264,7 @@ namespace DoppleGraph
             this.Text = instructionWrappers[0].Method.Name;
             // create a Go view (a Control) and add to the form
             myView = new GoView();
+            myView.KeyPress += MyView_KeyPress;
             myView.AllowDelete = false;
             myView.AllowInsert = false;
             myView.AllowLink = false;
@@ -298,13 +310,16 @@ namespace DoppleGraph
                     goNodeWrapper.Node.ToolTipText = goNodeWrapper.InstructionWrapper.Method.Name;
                 }
 
-                //goNodeWrapper.Node.Shape.BrushColor = colorCode.GetColor(goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code);
-                goNodeWrapper.Node.Text = goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code.ToString() + " " + goNodeWrapper.InstructionWrapper.InstructionIndex;
+                goNodeWrapper.Node.Text = goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code.ToString() + " " + goNodeWrapper.InstructionWrapper.Instruction.Offset;
 
                 if (new[] { Code.Call, Code.Calli, Code.Callvirt }.Contains(
                         goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code))
                 {
                     goNodeWrapper.Node.Text += ((MethodReference)goNodeWrapper.InstructionWrapper.Instruction.Operand).Name ?? " ";
+                }
+                else if (goNodeWrapper.InstructionWrapper.Instruction.Operand != null)
+                {
+                    goNodeWrapper.Node.Text += goNodeWrapper.InstructionWrapper.Instruction.Operand.ToString();
                 }
                 var frontLayer = myView.Document.Layers.CreateNewLayerAfter(myView.Document.LinksLayer);
                 frontLayer.Add(goNodeWrapper.Node);
@@ -316,12 +331,53 @@ namespace DoppleGraph
             {
                 AddNodeLinks(nodeWrapper, myView);
                 AcomodateForRemovedFlowNodes(nodeWrapper.InstructionWrapper, instructionWrappers);
-                //DrawFlowLinks(nodeWrapper, myView);
+                DrawFlowLinks(nodeWrapper, myView);
             }
+        }
 
-            foreach(var link in myView.Document.Where(x => x is GoLink))
+        private void MyView_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            var backTraceManager = new BackTraceManager(instructionWrappers);
+            if (e.KeyChar == 'd')
             {
-               // link.Visible = false;
+                var wrappersToDelete = myView.Selection
+                    .Where(x => x is GoNode)
+                    .Cast<GoNode>()
+                    .Select(x => GetNodeWrapper((GoNode)x).InstructionWrapper);
+                backTraceManager.RemoveInstWrappers(wrappersToDelete);
+            }
+        }
+
+
+        private void ShowFlowLinks_CheckedChanged(object sender, EventArgs e)
+        {
+            var flowLinks = myView.Document.Where(x => x is GoLink).Cast<GoLink>().Where(x => x.Pen.DashStyle == DashStyle.Dash);
+            foreach (var flowLink in flowLinks)
+            {
+                if (ShowProgramFlowLinks.Checked)
+                {
+                    flowLink.Visible = true;
+                }
+                else
+                {
+                    flowLink.Visible = false;
+                }
+            }
+        }
+
+        private void ShowDataFlowLinks_CheckedChanged(object sender, EventArgs e)
+        {
+            var flowLinks = myView.Document.Where(x => x is GoLink).Cast<GoLink>().Where(x => x.Pen.DashStyle != DashStyle.Dash);
+            foreach (var flowLink in flowLinks)
+            {
+                if (ShowDataFlowLinks.Checked)
+                {
+                    flowLink.Visible = true;
+                }
+                else
+                {
+                    flowLink.Visible = false;
+                }
             }
         }
     }
