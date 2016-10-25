@@ -10,6 +10,8 @@ namespace Utility
 {
     public class Class2
     {
+
+        /*
         public static void insertionSort(int[] array)
         {
             for (int i = 0; i < array.Length - 1; i++)
@@ -100,8 +102,15 @@ namespace Utility
             }
             return arr;
         }
+        
+        */
 
-        public static void QuicksortMiddle(int[] elements, int left, int right)
+        public static void QuickSortMiddle(int[] arr)
+        {
+            QuicksortMiddleRec(arr, 0, arr.Length);
+        }
+
+        public static void QuicksortMiddleRec(int[] elements, int left, int right)
         {
             int i = left, j = right;
             int pivot = elements[(left + right) / 2];
@@ -133,12 +142,12 @@ namespace Utility
             // Recursive calls
             if (left < j)
             {
-                QuicksortMiddle(elements, left, j);
+                QuicksortMiddleRec(elements, left, j);
             }
 
             if (i < right)
             {
-                QuicksortMiddle(elements, i, right);
+                QuicksortMiddleRec(elements, i, right);
             }
         }
 

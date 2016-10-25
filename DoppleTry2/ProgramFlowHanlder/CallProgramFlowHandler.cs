@@ -20,7 +20,7 @@ namespace DoppleTry2.ProgramFlowHanlder
         {
             get
             {
-                return new[] { Code.Call, Code.Calli, Code.Callvirt };
+                return CodeGroups.CallCodes;
             }
         }
 

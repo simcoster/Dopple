@@ -15,7 +15,7 @@ namespace DoppleTry2
 {
     class Program
     {
-        static readonly Code[] CallOpCodes = { Code.Call, Code.Calli, Code.Callvirt };
+        static readonly Code[] CallOpCodes = CodeGroups.CallCodes;
         public static readonly Code[] UnaffectingCodes = {Code.Nop, Code.Break};
         static void Main(string[] args)
         {

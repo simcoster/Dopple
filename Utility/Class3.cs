@@ -10,36 +10,33 @@ namespace Utility
 {
     public class Class3
     {
-        public static void insertionSort(int[] array)
+        public int SumArray(int[] array)
         {
-            int i = 0;
-            int nextMin = int.MaxValue;
-            int nextMinIndex = -1;
-            if (nextMin < array[i])
+            int sum = 0;
+            for(int i=0; i <array.Length; i++)
             {
-                int temp = array[i];
-                array[i] = nextMin;
-                array[nextMinIndex] = temp;
+                sum += array[i];
             }
+
+            return sum;
         }
 
-        public static void insertionSortWithHelpers(int[] array)
+        public static int SumArrayInStages(int[] array)
         {
-
-            int i = 0;
-            int min = int.MaxValue;
-            int minIndex = -1;
-            if (min < array[i])
+            int sumEven = 0;
+            for (int i = 0; i < array.Length; i +=2)
             {
-                swapTwo(array, i, minIndex);
+                sumEven += array[i];
             }
-        }
 
-        public static void swapTwo(int[] array, int i, int j)
-        {
-            int temp = array[i];
-            array[i] = array[j];
-            array[j] = temp;
+            int sumOdd = 0;
+            for (int i = 1; i < array.Length; i += 2)
+            {
+                sumOdd += array[i];
+            }
+
+            return sumEven + sumOdd;
+
         }
     }
 }

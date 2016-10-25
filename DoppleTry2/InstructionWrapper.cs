@@ -9,39 +9,10 @@ namespace DoppleTry2
 {
     public class InstructionWrapper
     {
-        public Instruction Instruction { get; set; }
-        public MethodDefinition Method { get; set; }
-        public int StackPushCount { get; set; }
-        public bool WasTreated { get; set; } = false;
-        public int StackPopCount { get; set; }
-        public int MemoryStoreCount { get; set; }
-        public int MemoryReadCount { get; set; }
-        public List<InstructionWrapper>  NextPossibleProgramFlow { get; set; } = new List<InstructionWrapper>();
-        public List<InstructionWrapper> BackProgramFlow { get; set; } = new List<InstructionWrapper>();
-        public ArgList BackDataFlowRelated
-        {
-            get
-            {
-                return _BackDataFlowRelated;
-            }
-            internal set
-            {
-                _BackDataFlowRelated = value;
-            }
-        }
-        public ArgList ForwardDataFlowRelated { get; internal set; } = new ArgList();
-        public int LocIndex { get; set; }
-        public int ArgIndex { get; set; }
-        public bool Inlined { get; set; } = false;
-        public int StackSum { get; internal set; } = 0;
-        public int InstructionIndex { get; internal set; }
-        public int? ImmediateIntValue { get; private set; }
-        public bool MarkForDebugging { get; internal set; }
 
         private ArgList _BackDataFlowRelated = new ArgList();
 
-
-        public InstructionWrapper(Instruction instruction , MethodDefinition method)
+        public InstructionWrapper(Instruction instruction, MethodDefinition method)
         {
             Instruction = instruction;
             Method = method;
@@ -52,53 +23,6 @@ namespace DoppleTry2
             LocIndex = LdStLocProperties.GetLocIndex(instruction);
             ArgIndex = GetArgIndex(instruction);
             ImmediateIntValue = GetImmediateInt(instruction);
-        }
-
-        public void AddBackDataflowTwoWaySingleIndex(IEnumerable<InstructionWrapper> wrappersToAdd)
-        {
-            BackDataFlowRelated.AddSingleIndex(wrappersToAdd);
-            foreach(var instWrapper in wrappersToAdd)
-            {
-                instWrapper.ForwardDataFlowRelated.AddSingleIndex(this);
-            }
-        }
-
-        public void AddForwardTwoWaySingleIndex(IEnumerable<InstructionWrapper> wrappersToAdd)
-        {
-            BackDataFlowRelated.AddSingleIndex(wrappersToAdd);
-            foreach (var instWrapper in wrappersToAdd)
-            {
-                instWrapper.BackDataFlowRelated.AddSingleIndex(this);
-            }
-        }
-
-        private int? GetImmediateInt(Instruction instruction)
-        {
-            var imeddiateFixedValue = new[]
-            {
-                Code.Ldc_I4_0, Code.Ldc_I4_1, Code.Ldc_I4_2, Code.Ldc_I4_3, Code.Ldc_I4_4, Code.Ldc_I4_5,
-                Code.Ldc_I4_6, Code.Ldc_I4_7, Code.Ldc_I4_8
-            };
-
-            var imeddiateOperandValue = new[]
-            {
-                Code.Ldc_I4_S, Code.Ldc_I4, Code.Ldc_R4, Code.Ldc_R8, Code.Ldc_I8
-            };
-
-            var code = instruction.OpCode.Code;
-            if (imeddiateFixedValue.Contains(code))
-            {
-                return Int32.Parse(code.ToString().Last().ToString());
-            }
-            else if (imeddiateOperandValue.Contains(code))
-            {
-                return ((int)instruction.Operand);
-            }
-            else if (code == Code.Ldc_I4_M1)
-            {
-                return -1;
-            }
-            return null;
         }
 
         private int GetArgIndex(Instruction instruction)
@@ -141,34 +65,41 @@ namespace DoppleTry2
             throw new Exception("shouldn't get here");
         }
 
-        private int GetStackPushCount(Instruction instruction)
+        private int? GetImmediateInt(Instruction instruction)
         {
-            if (InlineCall.CallOpCodes.Contains(instruction.OpCode.Code))
+            var imeddiateFixedValue = new[]
             {
-                return 0;
-            }
-            if (instruction.OpCode.Code == Code.Ret)
-            {
-                return 1;
-            }
-            switch (instruction.OpCode.StackBehaviourPush)
-            {
-                case StackBehaviour.Push0:
-                    return 0;
-                case StackBehaviour.Push1_push1:
-                    return 2;
-                default:
-                    return 1;
-            }
-        }
+                Code.Ldc_I4_0, Code.Ldc_I4_1, Code.Ldc_I4_2, Code.Ldc_I4_3, Code.Ldc_I4_4, Code.Ldc_I4_5,
+                Code.Ldc_I4_6, Code.Ldc_I4_7, Code.Ldc_I4_8
+            };
 
+            var imeddiateOperandValue = new[]
+            {
+                Code.Ldc_I4_S, Code.Ldc_I4, Code.Ldc_R4, Code.Ldc_R8, Code.Ldc_I8
+            };
+
+            var code = instruction.OpCode.Code;
+            if (imeddiateFixedValue.Contains(code))
+            {
+                return Int32.Parse(code.ToString().Last().ToString());
+            }
+            else if (imeddiateOperandValue.Contains(code))
+            {
+                return ((int)instruction.Operand);
+            }
+            else if (code == Code.Ldc_I4_M1)
+            {
+                return -1;
+            }
+            return null;
+        }
 
         private int GetStackPopCount(Instruction instruction)
         {
-            StackBehaviour[] pop1Codes = {StackBehaviour.Pop1, StackBehaviour.Popi, StackBehaviour.Popref, };
+            StackBehaviour[] pop1Codes = { StackBehaviour.Pop1, StackBehaviour.Popi, StackBehaviour.Popref, };
             StackBehaviour[] pop2Codes =
             {
-                StackBehaviour.Pop1_pop1, StackBehaviour.Popi_pop1, StackBehaviour.Popi_popi, StackBehaviour.Popi_popi8, StackBehaviour.Popi_popr4, 
+                StackBehaviour.Pop1_pop1, StackBehaviour.Popi_pop1, StackBehaviour.Popi_popi, StackBehaviour.Popi_popi8, StackBehaviour.Popi_popr4,
                 StackBehaviour.Popi_popr8, StackBehaviour.Popref_pop1,  StackBehaviour.Popref_popi
             };
             StackBehaviour[] pop3Codes =
@@ -177,7 +108,7 @@ namespace DoppleTry2
                 StackBehaviour.Popref_popi_popr4, StackBehaviour.Popref_popi_popr8, StackBehaviour.Popref_popi_popref
             };
 
-            if (InlineCall.CallOpCodes.Contains(instruction.OpCode.Code))
+            if (InlineCallModifier.CallOpCodes.Contains(instruction.OpCode.Code))
             {
                 return 0;
                 //return ((Mono.Cecil.MethodReference) instruction.Operand).Parameters.Count;
@@ -211,6 +142,74 @@ namespace DoppleTry2
             }
             return 0;
         }
+
+        private int GetStackPushCount(Instruction instruction)
+        {
+            if (InlineCallModifier.CallOpCodes.Contains(instruction.OpCode.Code))
+            {
+                return 0;
+            }
+            if (instruction.OpCode.Code == Code.Ret)
+            {
+                return 0;
+            }
+            switch (instruction.OpCode.StackBehaviourPush)
+            {
+                case StackBehaviour.Push0:
+                    return 0;
+                case StackBehaviour.Push1_push1:
+                    return 2;
+                default:
+                    return 1;
+            }
+        }
+
+        public void AddBackDataflowTwoWaySingleIndex(IEnumerable<InstructionWrapper> wrappersToAdd)
+        {
+            BackDataFlowRelated.AddSingleIndex(wrappersToAdd);
+            foreach (var instWrapper in wrappersToAdd)
+            {
+                instWrapper.ForwardDataFlowRelated.AddSingleIndex(this);
+            }
+        }
+
+        public void AddForwardTwoWaySingleIndex(IEnumerable<InstructionWrapper> wrappersToAdd)
+        {
+            BackDataFlowRelated.AddSingleIndex(wrappersToAdd);
+            foreach (var instWrapper in wrappersToAdd)
+            {
+                instWrapper.BackDataFlowRelated.AddSingleIndex(this);
+            }
+        }
+
+        public int ArgIndex { get; set; }
+        public ArgList BackDataFlowRelated
+        {
+            get
+            {
+                return _BackDataFlowRelated;
+            }
+            internal set
+            {
+                _BackDataFlowRelated = value;
+            }
+        }
+        public List<InstructionWrapper> BackProgramFlow { get; set; } = new List<InstructionWrapper>();
+        public ArgList ForwardDataFlowRelated { get; internal set; } = new ArgList();
+        public int? ImmediateIntValue { get; private set; }
+        public bool Inlined { get; set; } = false;
+        public Instruction Instruction { get; set; }
+        public int InstructionIndex { get; internal set; }
+        public int LocIndex { get; set; }
+        public bool MarkForDebugging { get; internal set; }
+        public int MemoryReadCount { get; set; }
+        public int MemoryStoreCount { get; set; }
+        public MethodDefinition Method { get; set; }
+        public List<InstructionWrapper> NextPossibleProgramFlow { get; set; } = new List<InstructionWrapper>();
+        public int StackPopCount { get; set; }
+        public int StackPushCount { get; set; }
+        public bool FirstLineInstruction { get; set; } = false;
+        public bool WasTreated { get; set; } = false;
     }
 
 }

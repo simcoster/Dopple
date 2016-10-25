@@ -79,8 +79,11 @@
     <Compile Include="BackTrackers\StackPopBackTracer.cs" />
     <Compile Include="BackTrackers\LdLocBackTracer.cs" />
     <Compile Include="BackTrackers\TypedReferenceBackTracer.cs" />
+    <Compile Include="CodeGroups.cs" />
     <Compile Include="CodeMemoryRefCount.cs" />
     <Compile Include="IndexedArgument.cs" />
+    <Compile Include="InstructionModifiers\RecursionStArgModifier.cs" />
+    <Compile Include="InstructionModifiers\StArgAdder.cs" />
     <Compile Include="LdStLocProperties.cs" />
     <Compile Include="OpcodeProperties\DataflowProperties.cs" />
     <Compile Include="OpcodeProperties\InstructionPropertiesHandler.cs" />
@@ -98,6 +101,9 @@
     <Compile Include="ProgramFlowHanlder\SimpleProgramFlowHandler.cs" />
     <Compile Include="ProgramFlowHanlder\SwitchHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Varifier\IVerifier1.cs" />
+    <Compile Include="Varifier\StackPopPushVerfier.cs" />
+    <Compile Include="Varifier\TwoWayVerifier.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

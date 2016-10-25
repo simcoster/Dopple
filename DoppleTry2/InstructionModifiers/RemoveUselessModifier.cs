@@ -4,7 +4,7 @@ using Mono.Cecil.Cil;
 
 namespace DoppleTry2.InstructionModifiers
 {
-    class RemoveUselessModifier : IModifier
+    class RemoveUselessModifier : IPreBacktraceModifier
     {
         public void Modify(List<InstructionWrapper> instructionWrappers)
         {

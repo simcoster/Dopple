@@ -9,4 +9,7 @@ namespace DoppleTry2.InstructionModifiers
     {
         void Modify(List<InstructionWrapper> instructionWrappers);
     }
+
+    interface IPreBacktraceModifier : IModifier {}
+    interface IPostBackTraceModifier : IModifier { }
 }

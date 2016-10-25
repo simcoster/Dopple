@@ -37,11 +37,8 @@ namespace DoppleTry2.BackTrackers
             return backRelated;
         }
 
-        public override Code[] HandlesCodes => LdArgCodes;
+        public override Code[] HandlesCodes => CodeGroups.LdArgCodes;
 
-        public static Code[] LdArgCodes = {
-            Code.Ldarg, Code.Ldarg_0, Code.Ldarg_1, Code.Ldarg_2, Code.Ldarg_3, Code.Ldarg_S,
-            Code.Ldarga, Code.Ldarga_S
-        };
+       
     }
 }

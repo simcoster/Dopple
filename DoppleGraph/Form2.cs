@@ -321,6 +321,11 @@ namespace DoppleGraph
                 {
                     goNodeWrapper.Node.Text += goNodeWrapper.InstructionWrapper.Instruction.Operand.ToString();
                 }
+                else if ( CodeGroups.LdArgCodes.Contains(goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code))
+                {
+                    var ArgName = goNodeWrapper.InstructionWrapper.Method.Parameters[goNodeWrapper.InstructionWrapper.ArgIndex].Name;
+                    goNodeWrapper.Node.Text += " " + ArgName + " ";
+                }
                 var frontLayer = myView.Document.Layers.CreateNewLayerAfter(myView.Document.LinksLayer);
                 frontLayer.Add(goNodeWrapper.Node);
             }

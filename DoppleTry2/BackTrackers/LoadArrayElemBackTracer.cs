@@ -14,7 +14,7 @@ namespace DoppleTry2.BackTrackers
                 Code.Stelem_Any, Code.Stelem_I, Code.Stelem_I2, 
                 Code.Stelem_I1, Code.Stelem_I4, Code.Stelem_I8, Code.Stelem_R4, Code.Stelem_R8, Code.Stelem_Ref,
             }
-        .Concat(LdArgBacktracer.LdArgCodes).ToArray();
+        .Concat(CodeGroups.LdArgCodes).ToArray();
 
         public LoadArrayElemBackTracer(List<InstructionWrapper> instructionsWrappers) : base(instructionsWrappers)
         {

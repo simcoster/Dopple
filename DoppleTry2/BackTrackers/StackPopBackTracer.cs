@@ -25,6 +25,7 @@ namespace DoppleTry2.BackTrackers
                     arg.StackPushCount--;
                 }
             }
+            instWrapper.StackPopCount = 0;
             return foundInstructions;
         }
 
