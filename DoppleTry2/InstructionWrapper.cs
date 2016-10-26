@@ -108,7 +108,7 @@ namespace DoppleTry2
                 StackBehaviour.Popref_popi_popr4, StackBehaviour.Popref_popi_popr8, StackBehaviour.Popref_popi_popref
             };
 
-            if (InlineCallModifier.CallOpCodes.Contains(instruction.OpCode.Code))
+            if (CodeGroups.CallCodes.Contains(instruction.OpCode.Code))
             {
                 return 0;
                 //return ((Mono.Cecil.MethodReference) instruction.Operand).Parameters.Count;
@@ -151,7 +151,14 @@ namespace DoppleTry2
             }
             if (instruction.OpCode.Code == Code.Ret)
             {
-                return 0;
+                if (Method.ReturnType.FullName == "System.Void")
+                {
+                    return 0;
+                }
+                else
+                {
+                    return 1;
+                }
             }
             switch (instruction.OpCode.StackBehaviourPush)
             {

@@ -35,7 +35,8 @@ namespace DoppleTry2
 
             _preBacktraceModifiers = new IPreBacktraceModifier[] { new InlineCallModifier(), new RemoveUselessModifier() };
 
-            _postBacktraceModifiers = new IPostBackTraceModifier[] { new RecursionStArgModifier() };
+            //_postBacktraceModifiers = new IPostBackTraceModifier[] { new RecursionStArgModifier() };
+            _postBacktraceModifiers = new IPostBackTraceModifier[] { };
 
             _backTracers =
                 new BackTracer[]
@@ -85,26 +86,7 @@ namespace DoppleTry2
                 }
             }
         }
-        void BackTracePreCalls()
-        {
-            SimpleProgramFlowHandler flowHandler = new SimpleProgramFlowHandler(InstructionsWrappers);
-            foreach (var inst in InstructionsWrappers.Where(x => CodeGroups.CallCodes.Contains(x.Instruction.OpCode.Code) && !x.Inlined ))
-            {
-
-            }
-            foreach (var instWrapper in InstructionsWrappers)
-            {
-                var backTracers = _backTracers.Where(x => x.HandlesCodes.Contains(instWrapper.Instruction.OpCode.Code));
-                if (backTracers.Count() == 0)
-                {
-                    Console.WriteLine("Element with no backtracer!!!! " + instWrapper.Instruction.ToString());
-                }
-                foreach (var backTracer in backTracers)
-                {
-                    backTracer.AddBackDataflowConnections(instWrapper);
-                }
-            }
-        }
+     
 
         private void MergeImmediateValue()
         {
@@ -158,7 +140,7 @@ namespace DoppleTry2
             }
         }
 
-        private void PreBacktraceModifiers()
+        private void InlineFunctionCalls()
         {
             foreach (var modifier in _preBacktraceModifiers)
             {
@@ -234,12 +216,13 @@ namespace DoppleTry2
         public List<InstructionWrapper> Run()
         {
             PreInliningAddFlowConnections();
-            PreBacktraceModifiers();
+            AddHelperRetInstructions();
+            BackTrace();
+            InlineFunctionCalls();
             PostInlingAddFlowConnections();
             SetInstructionIndexes(InstructionsWrappers);
-            BackTracePreCalls();
-            PostBackTraceModifiers();
             BackTrace();
+            //PostBackTraceModifiers();
             MergeLdArgs();
             MergeImmediateValue();
 
@@ -259,7 +242,13 @@ namespace DoppleTry2
             return InstructionsWrappers;
         }
 
-        public void SetInstructionIndexes(List<InstructionWrapper> instructionWrappers)
+        private void AddHelperRetInstructions()
+        {
+            AddHelperRetsModifer addRetsModifier = new AddHelperRetsModifer();
+            addRetsModifier.Modify(InstructionsWrappers);
+        }
+
+        public static void SetInstructionIndexes(List<InstructionWrapper> instructionWrappers)
         {
             foreach (var instWrapper in instructionWrappers)
             {

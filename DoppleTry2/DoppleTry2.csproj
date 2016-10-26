@@ -82,6 +82,7 @@
     <Compile Include="CodeGroups.cs" />
     <Compile Include="CodeMemoryRefCount.cs" />
     <Compile Include="IndexedArgument.cs" />
+    <Compile Include="InstructionModifiers\AddHelperRetsModifer.cs" />
     <Compile Include="InstructionModifiers\RecursionStArgModifier.cs" />
     <Compile Include="InstructionModifiers\StArgAdder.cs" />
     <Compile Include="LdStLocProperties.cs" />
