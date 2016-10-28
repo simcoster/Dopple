@@ -151,6 +151,8 @@ namespace Utility
             }
         }
 
+        /*
+
         static void QuickSortLeftPivot(int[] a, int start, int end)
         {
             if (start >= end)
@@ -183,6 +185,8 @@ namespace Utility
             QuickSortLeftPivot(a, start, i - 1);
             QuickSortLeftPivot(a, i + 1, end);
         }
+
+    */
      
     }
 }

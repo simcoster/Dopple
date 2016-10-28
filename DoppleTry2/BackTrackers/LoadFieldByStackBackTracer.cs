@@ -18,17 +18,17 @@ namespace DoppleTry2.BackTrackers
 
             Func<InstructionWrapper, bool> predicate = x =>
                                   x.Instruction.OpCode.Code == Code.Stfld &&
-                                  HaveCommonStackPushAncestor(x, instWrapper) &&
+                                  BackSearcher.HaveCommonStackPushAncestor(x, instWrapper) &&
                                   x.Instruction.Operand == instWrapper.Instruction.Operand;
-            var storeFieldInsts = SafeSearchBackwardsForDataflowInstrcutions(predicate, instWrapper);
+            var storeFieldInsts = BackSearcher.SafeSearchBackwardsForDataflowInstrcutions(InstructionWrappers,predicate, instWrapper);
             if (storeFieldInsts.Count > 0)
             {
                 return storeFieldInsts;
             }
             predicate = x =>
                 x.MemoryStoreCount > 0 &&
-                HaveCommonStackPushAncestor(x, instWrapper);
-            var storeObjInsts = SafeSearchBackwardsForDataflowInstrcutions(predicate, instWrapper);
+                BackSearcher.HaveCommonStackPushAncestor(x, instWrapper);
+            var storeObjInsts = BackSearcher.SafeSearchBackwardsForDataflowInstrcutions(InstructionWrappers, predicate, instWrapper);
             if (storeObjInsts.Count > 0)
             {
                 return storeObjInsts;

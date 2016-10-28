@@ -27,7 +27,7 @@ namespace DoppleTry2
         {
             metDef = methodDefinition;
             InstructionsWrappers =
-                methodDefinition.Body.Instructions.Select(x => new InstructionWrapper(x, methodDefinition)).ToList();
+                methodDefinition.Body.Instructions.Select(x => InstructionWrapperFactory.GetInstructionWrapper(x, methodDefinition)).ToList();
             foreach (var inst in InstructionsWrappers)
             {
                 inst.InstructionIndex = InstructionsWrappers.IndexOf(inst);
@@ -62,7 +62,7 @@ namespace DoppleTry2
         private void AddZeroNode()
         {
             var inst = Instruction.Create(typeof(OpCodes).GetFields().Select(x => x.GetValue(null)).Cast<OpCode>().First(x => x.Code == Code.Nop));
-            var nodeZero = new InstructionWrapper(inst, metDef);
+            var nodeZero = InstructionWrapperFactory.GetInstructionWrapper(inst, metDef);
 
             foreach (var firstNode in InstructionsWrappers.Where(x => x.BackDataFlowRelated.ArgumentList.Count == 0 || x.FirstLineInstruction))
             {
@@ -216,7 +216,6 @@ namespace DoppleTry2
         public List<InstructionWrapper> Run()
         {
             PreInliningAddFlowConnections();
-            AddHelperRetInstructions();
             BackTrace();
             InlineFunctionCalls();
             PostInlingAddFlowConnections();
@@ -230,10 +229,10 @@ namespace DoppleTry2
             RemoveInstWrappers(InstructionsWrappers.Where(x => CodeGroups.LocLoadCodes.Contains(x.Instruction.OpCode.Code)));
 
             LdArgBacktracer ldArgBackTracer = new LdArgBacktracer(null);
-            //RemoveInstWrappers(InstructionsWrappers.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code) && x.Inlined));
-            //RemoveInstWrappers(InstructionsWrappers.Where(x => ldArgBackTracer.HandlesCodes.Contains(x.Instruction.OpCode.Code) && x.Inlined));
+            RemoveInstWrappers(InstructionsWrappers.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code) && x.Inlined));
+            RemoveInstWrappers(InstructionsWrappers.Where(x => ldArgBackTracer.HandlesCodes.Contains(x.Instruction.OpCode.Code) && x.Inlined));
             RemoveInstWrappers(InstructionsWrappers.Where(x => new[] { Code.Call, Code.Calli, Code.Callvirt }.Contains(x.Instruction.OpCode.Code) && x.Inlined));
-            //RemoveInstWrappers(InstructionsWrappers.Where(x => x.Instruction.OpCode.Code == Code.Ret && x.Inlined));
+            RemoveInstWrappers(InstructionsWrappers.Where(x => x.Instruction.OpCode.Code == Code.Ret && x.Inlined));
 
             AddZeroNode();
             SetInstructionIndexes(InstructionsWrappers);

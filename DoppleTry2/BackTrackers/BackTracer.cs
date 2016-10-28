@@ -41,6 +41,7 @@ namespace DoppleTry2.BackTrackers
 
         public abstract Code[] HandlesCodes { get; }
 
+        /*
         protected List<InstructionWrapper> SearchBackwardsForDataflowInstrcutions(Func<InstructionWrapper, bool> predicate,
             InstructionWrapper startInstruction)
         {
@@ -74,6 +75,8 @@ namespace DoppleTry2.BackTrackers
             return BackSearcher.SameOrEquivilent(firstAncestor, secondAncestor);
 
         }
+
+    */
 
     }
 

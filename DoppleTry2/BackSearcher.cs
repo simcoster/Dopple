@@ -93,7 +93,6 @@ namespace DoppleTry2
                 {
                     case 0:
                         return new[] { instWrapper };
-                        break;
                     case 1:
                         instWrapper = instWrapper.BackDataFlowRelated.ArgumentList[0].Argument;
                         break;

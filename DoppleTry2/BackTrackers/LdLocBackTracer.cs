@@ -11,7 +11,7 @@ namespace DoppleTry2.BackTrackers
         protected override IEnumerable<InstructionWrapper> GetDataflowBackRelatedArgGroup(InstructionWrapper instWrapper)
         {
 
-            return SearchBackwardsForDataflowInstrcutions(x => x.LocIndex == instWrapper.LocIndex && CodeGroups.LocStoreCodes.Contains(x.Instruction.OpCode.Code),
+            return BackSearcher.SearchBackwardsForDataflowInstrcutions(InstructionWrappers, x => x.LocIndex == instWrapper.LocIndex && CodeGroups.LocStoreCodes.Contains(x.Instruction.OpCode.Code),
                 instWrapper);
         }
 

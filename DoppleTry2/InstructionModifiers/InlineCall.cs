@@ -13,52 +13,55 @@ namespace DoppleTry2.InstructionModifiers
     class InlineCallModifier : IPreBacktraceModifier
     {
         public static readonly Code[] CallOpCodes = CodeGroups.CallCodes;
-
         public void Modify(List<InstructionWrapper> instructionWrappers)
         {
-            for (int i = 0; i < instructionWrappers.Count; i++)
+            foreach (var nestedCallInstWrapper in instructionWrappers.Where(x => x is CallInstructionWrapper).ToArray())
             {
-                var instWrapper = instructionWrappers[i];
-                if (!(CallOpCodes.Contains(instWrapper.Instruction.OpCode.Code) &&
-                            instWrapper.Instruction.Operand is MethodDefinition &&
-                            instWrapper.Inlined == false))
+                int instWrapperIndex = instructionWrappers.IndexOf(nestedCallInstWrapper);
+                var inlinedInstWrappers = GetDeepInlineRec(nestedCallInstWrapper, new List<MethodDefinition>());
+                if (inlinedInstWrappers.Count > 0)
                 {
-                    continue;
+                    instructionWrappers.InsertRange(instWrapperIndex + 1, inlinedInstWrappers);
+                    nestedCallInstWrapper.NextPossibleProgramFlow.Clear();
+                    ProgramFlowHandler.TwoWayLinkExecutionPath(nestedCallInstWrapper, inlinedInstWrappers[0]);
                 }
-                var calledFunc = (MethodDefinition)instWrapper.Instruction.Operand;
-                if (calledFunc.FullName == instWrapper.Method.FullName)
-                {
-                    continue;
-                }
-                instWrapper.Inlined = true;
-                AddInlinedMethodBody(instructionWrappers, i + 1, calledFunc);
-                int addedInstrucitons = StArgAdder.InsertHelperSTargs(instructionWrappers, instWrapper, calledFunc).Count;
-                i += addedInstrucitons;
+            }
+            foreach (var nestedCallInstWrapper in instructionWrappers.Where(x => x is CallInstructionWrapper).Cast<CallInstructionWrapper>().ToArray())
+            {
+                StArgAdder.InsertHelperSTargs(instructionWrappers, nestedCallInstWrapper);
             }
         }
 
-       
-
-        private static void AddInlinedMethodBody(List<InstructionWrapper> instructionWrappers, int indexForAddingInlined, MethodDefinition calledFunc)
+        List<InstructionWrapper> GetDeepInlineRec(InstructionWrapper callInstWrapper, List<MethodDefinition> callSequence)
         {
-            var calledFuncInstructions = calledFunc.Body.Instructions.ToList();
-            var calledFunInstWrappers = calledFuncInstructions.Select(x => new InstructionWrapper(x, calledFunc)).ToList();
-            instructionWrappers.InsertRange(indexForAddingInlined, calledFunInstWrappers);
-            var programFlowHelper = new SimpleProgramFlowHandler(instructionWrappers);
-            var lastInlinedCallIndex = instructionWrappers.IndexOf(calledFunInstWrappers.Last());
-            foreach (var wrapper in calledFunInstWrappers)
+            if (!(callInstWrapper is CallInstructionWrapper))
             {
-                wrapper.Inlined = true;
-                wrapper.Method = calledFunc;
-                if (wrapper.Instruction.OpCode.Code == Code.Ret)
+                throw new Exception("only user functions should be inlined");
+            }
+            var calledFunc = (MethodDefinition)callInstWrapper.Instruction.Operand;
+            if (callSequence.Contains(calledFunc))
+            {
+                return new List<InstructionWrapper>();
+            }
+            else
+            {
+                var callSequenceClone = new List<MethodDefinition>(callSequence);
+                callSequenceClone.Add(calledFunc);
+                var calledFuncInstructions = calledFunc.Body.Instructions.ToList();
+                var calledFuncInstWrappers = calledFuncInstructions.Select(x => InstructionWrapperFactory.GetInstructionWrapper(x, calledFunc)).ToList();
+                foreach (var nestedCallInstWrapper in calledFuncInstWrappers.Where(x => x is CallInstructionWrapper).ToArray())
                 {
-                    wrapper.StackPushCount = 1;
-                    wrapper.NextPossibleProgramFlow.Clear();
-                    programFlowHelper.TwoWayLinkExecutionPath(wrapper, instructionWrappers[lastInlinedCallIndex + 1]);
+                    int instWrapperIndex = calledFuncInstWrappers.IndexOf(nestedCallInstWrapper);
+                    var inlinedInstWrappers = GetDeepInlineRec(nestedCallInstWrapper, callSequenceClone);
+                    if (inlinedInstWrappers.Count > 0)
+                    {
+                        calledFuncInstWrappers.InsertRange(instWrapperIndex + 1, inlinedInstWrappers);
+                        nestedCallInstWrapper.NextPossibleProgramFlow.Clear();
+                        ProgramFlowHandler.TwoWayLinkExecutionPath(nestedCallInstWrapper, inlinedInstWrappers[0]);
+                    }
                 }
+                return calledFuncInstWrappers;
             }
         }
-
-     
     }
 }

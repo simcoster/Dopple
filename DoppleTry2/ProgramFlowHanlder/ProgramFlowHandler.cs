@@ -14,7 +14,7 @@ namespace DoppleTry2.ProgramFlowHanlder
             InstructionWrappers = instructionWrappers;
         }
 
-        public void TwoWayLinkExecutionPath(InstructionWrapper backInstruction, InstructionWrapper forwardInstruction)
+        public static void TwoWayLinkExecutionPath(InstructionWrapper backInstruction, InstructionWrapper forwardInstruction)
         {
             backInstruction.NextPossibleProgramFlow.Add(forwardInstruction);
             forwardInstruction.BackProgramFlow.Add(backInstruction);

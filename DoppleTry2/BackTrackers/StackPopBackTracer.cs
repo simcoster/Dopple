@@ -14,7 +14,7 @@ namespace DoppleTry2.BackTrackers
             for (int i = 0; i < instWrapper.StackPopCount; i++)
             {
                 //var argumentGroup = SearchBackwardsForDataflowInstrcutions(x => x.StackPushCount > 0, instWrapper);
-                var argumentGroup = SafeSearchBackwardsForDataflowInstrcutions(x => x.StackPushCount > 0, instWrapper);
+                var argumentGroup = BackSearcher.SafeSearchBackwardsForDataflowInstrcutions(InstructionWrappers, x => x.StackPushCount > 0, instWrapper);
                 if (argumentGroup.Count ==0)
                 {
                     instWrapper.MarkForDebugging = true;

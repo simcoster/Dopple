@@ -15,7 +15,7 @@ namespace DoppleTry2.InstructionModifiers
             foreach (var callInst in instructionWrappers.Where(x => CodeGroups.CallCodes.Contains(x.Instruction.OpCode.Code)).ToArray())
             {
                 var opcode = Instruction.Create(OpCodes.Ret);
-                InstructionWrapper retInstWrapper = new InstructionWrapper(opcode, (MethodDefinition)callInst.Instruction.Operand);
+                InstructionWrapper retInstWrapper = InstructionWrapperFactory.GetInstructionWrapper(opcode, (MethodDefinition)callInst.Instruction.Operand);
                 retInstWrapper.BackProgramFlow.Add(callInst);
                 retInstWrapper.NextPossibleProgramFlow.AddRange(callInst.NextPossibleProgramFlow);
                 callInst.NextPossibleProgramFlow.Clear();

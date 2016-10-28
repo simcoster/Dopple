@@ -9,7 +9,6 @@ namespace DoppleTry2
 {
     public class InstructionWrapper
     {
-
         private ArgList _BackDataFlowRelated = new ArgList();
 
         public InstructionWrapper(Instruction instruction, MethodDefinition method)
@@ -218,5 +217,4 @@ namespace DoppleTry2
         public bool FirstLineInstruction { get; set; } = false;
         public bool WasTreated { get; set; } = false;
     }
-
 }
