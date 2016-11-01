@@ -34,6 +34,7 @@ namespace DoppleGraph
         }
 
         private List<GoNode> NodesToShow = new List<GoNode>();
+        private List<GoObject> ObjectsToHide = new List<GoObject>();
         private Random rnd = new Random();
         private List<InstructionWrapper> instructionWrappers;
 
@@ -56,7 +57,7 @@ namespace DoppleGraph
         {
             if (NodesToShow.Intersect(doc).Count() == 0)
             {
-                foreach (var goObject in doc)
+                foreach (var goObject in doc.Except(ObjectsToHide))
                 {
                     goObject.Visible = true;
                 }
@@ -80,7 +81,7 @@ namespace DoppleGraph
                     {
                         linksToShow = linksToShow.Cast<GoLink>().Where(x => x.Pen.DashStyle != DashStyle.Solid).ToList();
                     }
-                    foreach (var link in linksToShow)
+                    foreach (var link in linksToShow.Except(ObjectsToHide).Cast<GoLink>())
                     {
                         ((GoLink)link).Visible = true;
                         ((GoNode)link.ToNode).Visible = true;
@@ -170,10 +171,8 @@ namespace DoppleGraph
                     link.FromPort = backNode.Node.RightPort;
                     myView.Document.Add(link);
                     link.PenWidth = 3;
-
                 }
             }
-
             var allLinks = myView.Document.Where(x => x is GoLink).Cast<GoLink>().Select(y => y.PenColor);
         }
 
@@ -345,14 +344,33 @@ namespace DoppleGraph
             var backTraceManager = new BackTraceManager(instructionWrappers);
             if (e.KeyChar == 'd')
             {
-                var wrappersToDelete = myView.Selection
-                    .Where(x => x is GoNode)
-                    .Cast<GoNode>()
-                    .Select(x => GetNodeWrapper((GoNode)x).InstructionWrapper);
-                backTraceManager.RemoveInstWrappers(wrappersToDelete);
+                PermanentlyHideSelection();
+            }
+            else if (e.KeyChar == 'r')
+            {
+                foreach(var node in myView.Selection)
+                {
+                    myView.Selection.AddRange(node.)
+                }
             }
         }
 
+        private void PermanentlyHideSelection()
+        {
+            var nodesToHide = myView.Selection
+                                .Where(x => x is GoNode)
+                                .Cast<GoNode>();
+            foreach (var node in nodesToHide)
+            {
+                foreach (GoLink link in node.Links)
+                {
+                    link.Visible = false;
+                    ObjectsToHide.Add(link);
+                }
+                node.Visible = false;
+                ObjectsToHide.Add(node);
+            }
+        }
 
         private void ShowFlowLinks_CheckedChanged(object sender, EventArgs e)
         {
@@ -372,7 +390,7 @@ namespace DoppleGraph
 
         private void ShowDataFlowLinks_CheckedChanged(object sender, EventArgs e)
         {
-            var flowLinks = myView.Document.Where(x => x is GoLink).Cast<GoLink>().Where(x => x.Pen.DashStyle != DashStyle.Dash);
+            var flowLinks = myView.Document.Except(ObjectsToHide).Where(x => x is GoLink).Cast<GoLink>().Where(x => x.Pen.DashStyle != DashStyle.Dash);
             foreach (var flowLink in flowLinks)
             {
                 if (ShowDataFlowLinks.Checked)
@@ -388,7 +406,7 @@ namespace DoppleGraph
 
         private void ShowRightDataLinks_CheckedChanged(object sender, EventArgs e)
         {
-            var linksToHide = myView.Selection.Where(x => x is GoTextNode).Cast<GoTextNode>().SelectMany(x => x.LeftPort.Links).Cast<GoLink>();
+            var linksToHide = myView.Selection.Except(ObjectsToHide).Where(x => x is GoTextNode).Cast<GoTextNode>().SelectMany(x => x.LeftPort.Links).Cast<GoLink>();
             foreach (var flowLink in linksToHide)
             {
                 if (ShowRightDataLinks.Checked)

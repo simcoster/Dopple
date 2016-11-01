@@ -71,8 +71,10 @@ namespace DoppleTry2
             MergeLdArgs();
             MergeImmediateValue();
 
-            RemoveInstWrappers(InstructionsWrappers.Where(x => CodeGroups.LocStoreCodes.Contains(x.Instruction.OpCode.Code)));
-            RemoveInstWrappers(InstructionsWrappers.Where(x => CodeGroups.LocLoadCodes.Contains(x.Instruction.OpCode.Code)));
+            MergeLdLocs();
+
+            //RemoveInstWrappers(InstructionsWrappers.Where(x => CodeGroups.LocStoreCodes.Contains(x.Instruction.OpCode.Code)));
+            //RemoveInstWrappers(InstructionsWrappers.Where(x => CodeGroups.LocLoadCodes.Contains(x.Instruction.OpCode.Code)));
 
             LdArgBacktracer ldArgBackTracer = new LdArgBacktracer(null);
             //RemoveInstWrappers(InstructionsWrappers.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code) && x.Inlined));
@@ -136,6 +138,31 @@ namespace DoppleTry2
                 if (instsToMerge.Length > 0)
                 {
                     MergeInsts(instsToMerge);
+                }
+            }
+            SetInstructionIndexes();
+        }
+
+        private void MergeLdLocs()
+        {
+            var grouped = new List<InstructionWrapper>();
+            foreach (var ldLocSameIndex in InstructionsWrappers.Where(x => CodeGroups.LocLoadCodes.Contains(x.Instruction.OpCode.Code)).GroupBy(x => x.LocIndex))
+            {
+                foreach(var ldLocWrapper in ldLocSameIndex)
+                {
+                    if (grouped.Contains(ldLocWrapper))
+                    {
+                        continue;
+                    }
+                    var toMerge = ldLocSameIndex
+                                    .Where(x => x.BackDataFlowRelated.ArgumentList.Select(y => y.Argument)
+                                    .SequenceEqual(ldLocWrapper.BackDataFlowRelated.ArgumentList.Select(z => z.Argument)))
+                                    .Except(grouped).ToArray();
+                    if (toMerge.Count() > 1 )
+                    {
+                        MergeInsts(toMerge.ToArray());
+                        grouped.AddRange(toMerge);
+                    }
                 }
             }
             SetInstructionIndexes();
@@ -232,13 +259,15 @@ namespace DoppleTry2
         void PreInlineBackTrace()
         {
             StackPopBackTracer stackPopBacktracer = new StackPopBackTracer(InstructionsWrappers);
-            var stackPopWrappers = InstructionsWrappers
+            var singleStackPopWrappers = InstructionsWrappers
                                                 .Where(x => stackPopBacktracer.HandlesCodes.Contains(x.Instruction.OpCode.Code))
+                                                .Where(x => x.StackPopCount ==1)
                                                 .OrderByDescending(x => InstructionsWrappers.IndexOf(x));
-            foreach (var stackpopInst in stackPopWrappers)
+            foreach (var stackpopInst in singleStackPopWrappers)
             {
                 stackPopBacktracer.AddBackDataflowConnectionsInFuncBoundry(stackpopInst);
             }
+            //Maybe the problem is only about doing the singe pop first, let's try
         }
 
         private void AddHelperRetInstructions()

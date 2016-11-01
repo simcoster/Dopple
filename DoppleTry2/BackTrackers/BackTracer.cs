@@ -45,44 +45,9 @@ namespace DoppleTry2.BackTrackers
 
         public abstract Code[] HandlesCodes { get; }
 
-        /*
-        protected List<InstructionWrapper> SearchBackwardsForDataflowInstrcutions(Func<InstructionWrapper, bool> predicate,
-            InstructionWrapper startInstruction)
+        public static IEnumerable<InstructionWrapper> GetBackDataTree(InstructionWrapper wrapper)
         {
-            return BackSearcher.SearchBackwardsForDataflowInstrcutions(InstructionWrappers , predicate, startInstruction);
+            var backDataTree = new List<InstructionWrapper>();
         }
-
-        protected List<InstructionWrapper> SafeSearchBackwardsForDataflowInstrcutions(Func<InstructionWrapper, bool> predicate,
-           InstructionWrapper startInstruction)
-        {
-            return BackSearcher.SafeSearchBackwardsForDataflowInstrcutions(InstructionWrappers,predicate,startInstruction);
-        }
-
-        protected List<InstructionWrapper> SafeSearchBackwardsForDataflowInstrcutionsRec(Func<InstructionWrapper, bool> predicate,
-        InstructionWrapper startInstruction, List<InstructionWrapper> visitedInstructions)
-        {
-            return BackSearcher.SafeSearchBackwardsForDataflowInstrcutionsRec(InstructionWrappers, predicate,startInstruction, new List<InstructionWrapper>());
-        }
-
-        protected IEnumerable<InstructionWrapper> GetStackPushAncestor(InstructionWrapper startInst, List<InstructionWrapper> visited = null)
-        {
-            return BackSearcher.GetStackPushAncestor(startInst, visited);
-        }
-
-        protected bool HaveCommonStackPushAncestor(InstructionWrapper firstInstruction, InstructionWrapper secondInstructions)
-        {
-            return BackSearcher.HaveCommonStackPushAncestor(firstInstruction, secondInstructions);
-        }
-
-        protected bool SameOrEquivilent(InstructionWrapper firstAncestor, InstructionWrapper secondAncestor)
-        {
-            return BackSearcher.SameOrEquivilent(firstAncestor, secondAncestor);
-
-        }
-
-    */
-
     }
-
-   
 }

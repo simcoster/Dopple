@@ -201,7 +201,18 @@ namespace DoppleTry2
             }
         }
         public List<InstructionWrapper> BackProgramFlow { get; set; } = new List<InstructionWrapper>();
-        public ArgList ForwardDataFlowRelated { get; internal set; } = new ArgList();
+        ArgList forwardDataFlowRelated = new ArgList();
+        public ArgList ForwardDataFlowRelated
+        {
+            get
+            {
+                return forwardDataFlowRelated;
+            }
+            internal set
+            {
+                forwardDataFlowRelated = value;
+            }
+        }
         public int? ImmediateIntValue { get; private set; }
         public bool Inlined { get; set; } = false;
         public Instruction Instruction { get; set; }
