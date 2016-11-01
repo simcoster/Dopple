@@ -44,10 +44,5 @@ namespace DoppleTry2.BackTrackers
         protected abstract IEnumerable<IEnumerable<InstructionWrapper>> GetDataflowBackRelated(InstructionWrapper instWrapper);
 
         public abstract Code[] HandlesCodes { get; }
-
-        public static IEnumerable<InstructionWrapper> GetBackDataTree(InstructionWrapper wrapper)
-        {
-            var backDataTree = new List<InstructionWrapper>();
-        }
     }
 }

@@ -48,16 +48,16 @@ namespace DoppleGraph
                 }
                 var node = (GoNode)sender;
                 NodesToShow.Remove(node);
-                ReShow(node.Document);
+                ReShow();
             }
 
         }
 
-        private void ReShow(GoDocument doc)
+        private void ReShow()
         {
-            if (NodesToShow.Intersect(doc).Count() == 0)
+            if (NodesToShow.Intersect(myView.Document).Count() == 0)
             {
-                foreach (var goObject in doc.Except(ObjectsToHide))
+                foreach (var goObject in myView.Document.Except(ObjectsToHide))
                 {
                     goObject.Visible = true;
                 }
@@ -66,7 +66,7 @@ namespace DoppleGraph
             }
             else
             {
-                foreach (var goObject in doc)
+                foreach (var goObject in myView.Document)
                 {
                     goObject.Visible = false;
                 }
@@ -100,7 +100,7 @@ namespace DoppleGraph
                     .Select(x => x.Node));
             }
             NodesToShow.Add(sender as GoNode);
-            ReShow(node.Document);
+            ReShow();
         }
 
         private void DrawFlowLinks(GoNodeWrapper nodeWrapper, GoView myView)
@@ -346,12 +346,24 @@ namespace DoppleGraph
             {
                 PermanentlyHideSelection();
             }
-            else if (e.KeyChar == 'r')
+            else if (e.KeyChar == '.')
             {
-                foreach(var node in myView.Selection)
+                foreach(var node in myView.Selection.Where(x => x is GoNode).Cast<GoNode>().ToArray())
                 {
-                    myView.Selection.AddRange(node.)
+                    var nodeBackTree = BackSearcher.GetBackDataTree(GetNodeWrapper(node).InstructionWrapper).Select(x => GetNodeWrapper(x).Node).ToList();
+                    var nodesToHide = myView.Document.Where(x => x is GoNode).Except(nodeBackTree).ToList();
+                    foreach(var notABackNode in nodesToHide)
+                    {
+                        myView.Selection.Add(notABackNode);
+                    }
+                    myView.Selection.Remove(node);
                 }
+                PermanentlyHideSelection();
+            }
+            else if (e.KeyChar == '*')
+            {
+                ObjectsToHide.Clear();
+                ReShow();
             }
         }
 
