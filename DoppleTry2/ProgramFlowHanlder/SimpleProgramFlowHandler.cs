@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using DoppleTry2.InstructionModifiers;
@@ -7,7 +8,7 @@ namespace DoppleTry2.ProgramFlowHanlder
 {
     class SimpleProgramFlowHandler : ProgramFlowHandler
     {
-        public SimpleProgramFlowHandler(List<InstructionWrapper> instructionWrappers) : base(instructionWrappers)
+        public SimpleProgramFlowHandler()
         {
             HandledCodes = typeof(OpCodes).GetFields()
                 .Select(x => x.GetValue(null))
@@ -20,15 +21,15 @@ namespace DoppleTry2.ProgramFlowHanlder
 
         public override Code[] HandledCodes { get; }
 
-        protected override void SetForwardExecutionFlowInstsInternal(InstructionWrapper instructionWrapper)
+        protected override void SetForwardExecutionFlowInstsInternal(InstructionWrapper wrapperToModify, List<InstructionWrapper> instructionWrappers)
         {
             InstructionWrapper nextInstructionWrapper =
-                InstructionWrappers.FirstOrDefault(x => x.Instruction == instructionWrapper.Instruction.Next);
+               instructionWrappers.FirstOrDefault(x => x.Instruction == wrapperToModify.Instruction.Next);
             if (nextInstructionWrapper == null)
             {
                 return;
             }
-            TwoWayLinkExecutionPath(instructionWrapper, nextInstructionWrapper);
+            TwoWayLinkExecutionPath(wrapperToModify, nextInstructionWrapper);
         }
     }
 }

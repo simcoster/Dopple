@@ -22,8 +22,8 @@ namespace DoppleTry2.BackTrackers
 
         protected override IEnumerable<InstructionWrapper> GetDataflowBackRelatedArgGroup(InstructionWrapper instWrapper)
         {
-            return SafeSearchBackwardsForDataflowInstrcutions(x => _stArrayCodes.Contains(x.Instruction.OpCode.Code)
-                                                               && HaveCommonStackPushAncestor(x, instWrapper), instWrapper);
+            return BackSearcher.SafeSearchBackwardsForDataflowInstrcutions(InstructionWrappers, x => _stArrayCodes.Contains(x.Instruction.OpCode.Code)
+                                                               && BackSearcher.HaveCommonStackPushAncestor(x, instWrapper), instWrapper);
         }
 
         public override Code[] HandlesCodes => new[] {Code.Ldelema,Code.Ldelem_I1,Code.Ldelem_U1,Code.Ldelem_I2

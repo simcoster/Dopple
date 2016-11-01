@@ -10,8 +10,6 @@ namespace Utility
 {
     public class Class2
     {
-
-        /*
         public static void insertionSort(int[] array)
         {
             for (int i = 0; i < array.Length - 1; i++)
@@ -35,6 +33,7 @@ namespace Utility
             }
         }
 
+        /*
         public static void insertionSortWithHelpers(int[] array)
         {
             for (int i = 0; i < array.Length - 1; i++)
@@ -102,8 +101,7 @@ namespace Utility
             }
             return arr;
         }
-        
-        */
+
 
         public static void QuickSortMiddle(int[] arr)
         {
@@ -151,8 +149,6 @@ namespace Utility
             }
         }
 
-        /*
-
         static void QuickSortLeftPivot(int[] a, int start, int end)
         {
             if (start >= end)
@@ -185,8 +181,7 @@ namespace Utility
             QuickSortLeftPivot(a, start, i - 1);
             QuickSortLeftPivot(a, i + 1, end);
         }
+     */
 
-    */
-     
     }
 }

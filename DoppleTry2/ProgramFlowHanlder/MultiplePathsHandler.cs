@@ -16,15 +16,12 @@ namespace DoppleTry2.ProgramFlowHanlder
             Code.Bge_Un, Code.Bge_Un_S, Code.Bgt, Code.Bgt_S, Code.Bgt_Un, Code.Bgt_Un_S, Code.Ble, Code.Ble_S, 
             Code.Ble_Un, Code.Ble_Un_S, Code.Bne_Un, Code.Bne_Un_S, Code.Blt, Code.Blt_S, Code.Blt_Un, Code.Blt_Un_S, 
         };
-        protected override void SetForwardExecutionFlowInstsInternal(InstructionWrapper instructionWrapper)
-        {
-            var forwardInstruction = InstructionWrappers.First(x => x.Instruction ==instructionWrapper.Instruction.Operand);
-            TwoWayLinkExecutionPath(instructionWrapper, forwardInstruction);
-            TwoWayLinkExecutionPath(instructionWrapper, InstructionWrappers.First(x => x.Instruction == instructionWrapper.Instruction.Next));
-        }
 
-        public MultiplePathsHandler(List<InstructionWrapper> instructionWrappers) : base(instructionWrappers)
+        protected override void SetForwardExecutionFlowInstsInternal(InstructionWrapper wrapperToModify, List<InstructionWrapper> instructionWrappers)
         {
+            var forwardInstruction = instructionWrappers.First(x => x.Instruction == wrapperToModify.Instruction.Operand);
+            TwoWayLinkExecutionPath(wrapperToModify, forwardInstruction);
+            TwoWayLinkExecutionPath(wrapperToModify, instructionWrappers.First(x => x.Instruction == wrapperToModify.Instruction.Next));
         }
     }
 }

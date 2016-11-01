@@ -39,8 +39,8 @@ namespace DoppleGraph
 
             TypeDefinition type = myLibrary.MainModule.Types[2];
 
-            //foreach (var method in type.Methods.Where(x => !x.IsConstructor && x.Name.Contains("sertion")))
-            foreach (var method in type.Methods.Where(x => !x.IsConstructor))
+            foreach (var method in type.Methods.Where(x => !x.IsConstructor && !x.Name.Contains("Rec")))
+            //foreach (var method in type.Methods.Where(x => !x.IsConstructor))
             {
                 BackTraceManager backTraceManager = new BackTraceManager(method);
                 var instructionWrappers = backTraceManager.Run();

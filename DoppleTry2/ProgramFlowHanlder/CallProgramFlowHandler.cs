@@ -9,12 +9,7 @@ namespace DoppleTry2.ProgramFlowHanlder
 {
     class CallProgramFlowHandler : ProgramFlowHandler
     {
-
-        SimpleProgramFlowHandler SimpleProgramFlowHandler; 
-        public CallProgramFlowHandler(List<InstructionWrapper> instructionWrappers) : base(instructionWrappers)
-        {
-            SimpleProgramFlowHandler=  new SimpleProgramFlowHandler(InstructionWrappers);
-        }
+        readonly SimpleProgramFlowHandler _simpleProgramFlowHandler = new SimpleProgramFlowHandler();
 
         public override Code[] HandledCodes
         {
@@ -24,20 +19,20 @@ namespace DoppleTry2.ProgramFlowHanlder
             }
         }
 
-        protected override void SetForwardExecutionFlowInstsInternal(InstructionWrapper instructionWrapper)
+        protected override void SetForwardExecutionFlowInstsInternal(InstructionWrapper wrapperToModify, List<InstructionWrapper> instructionWrappers)
         {
-            if (instructionWrapper.Inlined)
+            if (wrapperToModify.Inlined)
             {
-                foreach (var inst in instructionWrapper.NextPossibleProgramFlow)
+                foreach (var inst in wrapperToModify.NextPossibleProgramFlow)
                 {
-                    inst.BackProgramFlow.Remove(instructionWrapper);
+                    inst.BackProgramFlow.Remove(wrapperToModify);
                 }
-                instructionWrapper.NextPossibleProgramFlow.Clear();
-                TwoWayLinkExecutionPath(instructionWrapper, InstructionWrappers[InstructionWrappers.IndexOf(instructionWrapper) + 1]); 
+                wrapperToModify.NextPossibleProgramFlow.Clear();
+                TwoWayLinkExecutionPath(wrapperToModify, instructionWrappers[instructionWrappers.IndexOf(wrapperToModify) + 1]);
             }
             else
             {
-                SimpleProgramFlowHandler.SetForwardExecutionFlowInsts(instructionWrapper);
+                _simpleProgramFlowHandler.SetForwardExecutionFlowInsts(wrapperToModify, instructionWrappers);
             }
         }
     }

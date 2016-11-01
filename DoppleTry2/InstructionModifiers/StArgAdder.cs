@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace DoppleTry2.InstructionModifiers
 {
-    public static class StArgAdder
+    public class StArgAdder : IModifier
     {
-        public static List<InstructionWrapper> InsertHelperSTargs(List<InstructionWrapper> instructionWrappers, CallInstructionWrapper callInstWrapper)
+        private static List<InstructionWrapper> InsertHelperSTargs(List<InstructionWrapper> instructionWrappers, CallInstructionWrapper callInstWrapper)
         {
             var addedInstructions = new List<InstructionWrapper>();
             var calledFunc = callInstWrapper.CalledFunction;
@@ -34,12 +34,26 @@ namespace DoppleTry2.InstructionModifiers
                     stArgWrapper.StackPopCount--;
                     stArgWrapper.ArgIndex = i;
                     stArgWrapper.Inlined = true;
+                    stArgWrapper.ProgramFlowResolveDone = true;
                     argProvidingWrapper.StackPushCount--;
                     instructionWrappers.Insert(instructionWrappers.IndexOf(argProvidingWrapper) + 1, stArgWrapper);
                     addedInstructions.Add(stArgWrapper);
                 }
             }
             return addedInstructions;
+        }
+
+        public void Modify(List<InstructionWrapper> instructionWrappers)
+        {
+            var callInstructions = instructionWrappers
+                                    .Where(x => x is CallInstructionWrapper)
+                                    .OrderByDescending(x => instructionWrappers.IndexOf(x))
+                                    .Cast<CallInstructionWrapper>()
+                                    .ToArray();
+            foreach (var callInst in callInstructions)
+            {
+                InsertHelperSTargs(instructionWrappers, callInst);
+            }
         }
     }
 }

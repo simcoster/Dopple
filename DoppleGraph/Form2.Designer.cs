@@ -30,6 +30,8 @@
         {
             this.ShowProgramFlowLinks = new System.Windows.Forms.CheckBox();
             this.ShowDataFlowLinks = new System.Windows.Forms.CheckBox();
+            this.ShowRightDataLinks = new System.Windows.Forms.CheckBox();
+            this.ShowLeftDataLinks = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // ShowProgramFlowLinks
@@ -60,11 +62,41 @@
             this.ShowDataFlowLinks.UseVisualStyleBackColor = true;
             this.ShowDataFlowLinks.CheckedChanged += new System.EventHandler(this.ShowDataFlowLinks_CheckedChanged);
             // 
+            // ShowRightDataLinks
+            // 
+            this.ShowRightDataLinks.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.ShowRightDataLinks.AutoSize = true;
+            this.ShowRightDataLinks.Checked = true;
+            this.ShowRightDataLinks.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ShowRightDataLinks.Location = new System.Drawing.Point(164, 58);
+            this.ShowRightDataLinks.Name = "ShowRightDataLinks";
+            this.ShowRightDataLinks.Size = new System.Drawing.Size(105, 17);
+            this.ShowRightDataLinks.TabIndex = 2;
+            this.ShowRightDataLinks.Text = "Right Data Links";
+            this.ShowRightDataLinks.UseVisualStyleBackColor = true;
+            this.ShowRightDataLinks.CheckedChanged += new System.EventHandler(this.ShowRightDataLinks_CheckedChanged);
+            // 
+            // ShowLeftDataLinks
+            // 
+            this.ShowLeftDataLinks.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.ShowLeftDataLinks.AutoSize = true;
+            this.ShowLeftDataLinks.Checked = true;
+            this.ShowLeftDataLinks.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.ShowLeftDataLinks.Location = new System.Drawing.Point(171, 81);
+            this.ShowLeftDataLinks.Name = "ShowLeftDataLinks";
+            this.ShowLeftDataLinks.Size = new System.Drawing.Size(98, 17);
+            this.ShowLeftDataLinks.TabIndex = 3;
+            this.ShowLeftDataLinks.Text = "Left Data Links";
+            this.ShowLeftDataLinks.UseVisualStyleBackColor = true;
+            this.ShowLeftDataLinks.CheckedChanged += new System.EventHandler(this.ShowLeftDataLinks_CheckedChanged);
+            // 
             // Form2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(276, 277);
+            this.Controls.Add(this.ShowLeftDataLinks);
+            this.Controls.Add(this.ShowRightDataLinks);
             this.Controls.Add(this.ShowDataFlowLinks);
             this.Controls.Add(this.ShowProgramFlowLinks);
             this.Name = "Form2";
@@ -79,5 +111,7 @@
 
         private System.Windows.Forms.CheckBox ShowProgramFlowLinks;
         private System.Windows.Forms.CheckBox ShowDataFlowLinks;
+        private System.Windows.Forms.CheckBox ShowRightDataLinks;
+        private System.Windows.Forms.CheckBox ShowLeftDataLinks;
     }
 }

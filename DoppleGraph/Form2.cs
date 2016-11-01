@@ -385,5 +385,37 @@ namespace DoppleGraph
                 }
             }
         }
+
+        private void ShowRightDataLinks_CheckedChanged(object sender, EventArgs e)
+        {
+            var linksToHide = myView.Selection.Where(x => x is GoTextNode).Cast<GoTextNode>().SelectMany(x => x.LeftPort.Links).Cast<GoLink>();
+            foreach (var flowLink in linksToHide)
+            {
+                if (ShowRightDataLinks.Checked)
+                {
+                    flowLink.Visible = true;
+                }
+                else
+                {
+                    flowLink.Visible = false;
+                }
+            }
+        }
+
+        private void ShowLeftDataLinks_CheckedChanged(object sender, EventArgs e)
+        {
+            var linksToHide = myView.Selection.Where(x => x is GoTextNode).Cast<GoTextNode>().SelectMany(x => x.RightPort.Links).Cast<GoLink>();
+            foreach (var flowLink in linksToHide)
+            {
+                if (ShowLeftDataLinks.Checked)
+                {
+                    flowLink.Visible = true;
+                }
+                else
+                {
+                    flowLink.Visible = false;
+                }
+            }
+        }
     }
 }

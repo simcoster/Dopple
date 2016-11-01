@@ -23,7 +23,10 @@ namespace DoppleTry2.BackTrackers
 
         public void AddBackDataflowConnections(InstructionWrapper currentInst)
         {
-            currentInst.WasTreated = true;
+            if (currentInst.DoneBackTracers.Contains(GetType()))
+            {
+                return;
+            }
             var backRelatedInsts = GetDataflowBackRelated(currentInst);
             foreach (var backRelatedGroup in backRelatedInsts)
             {
@@ -33,6 +36,7 @@ namespace DoppleTry2.BackTrackers
                     backInst.ForwardDataFlowRelated.AddSingleIndex(currentInst);
                 }
             }
+            currentInst.DoneBackTracers.Add(GetType());
         }
 
         protected virtual bool HasBackDataflowNodes { get; } = true;

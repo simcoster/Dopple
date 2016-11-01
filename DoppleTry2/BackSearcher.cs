@@ -14,7 +14,7 @@ namespace DoppleTry2
             List<InstructionWrapper> indexes = SafeSearchBackwardsForDataflowInstrcutions(InstructionWrappers, predicate, startInstruction);
             if (indexes.Count == 0)
             {
-                //throw new Exception("Reached first instWrapper without correct one found");
+                throw new Exception("Reached first instWrapper without correct one found");
             }
             return indexes;
         }

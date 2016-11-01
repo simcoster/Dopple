@@ -100,6 +100,7 @@
     <Compile Include="NodeModifier.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="ProgramFlowHanlder\MultiplePathsHandler.cs" />
+    <Compile Include="ProgramFlowHanlder\ProgramFlowManager.cs" />
     <Compile Include="ProgramFlowHanlder\SimpleProgramFlowHandler.cs" />
     <Compile Include="ProgramFlowHanlder\SwitchHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

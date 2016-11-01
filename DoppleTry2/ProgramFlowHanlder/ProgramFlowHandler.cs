@@ -7,13 +7,6 @@ namespace DoppleTry2.ProgramFlowHanlder
 {
     abstract class ProgramFlowHandler
     {
-        protected List<InstructionWrapper> InstructionWrappers;
-
-        protected ProgramFlowHandler(List<InstructionWrapper> instructionWrappers)
-        {
-            InstructionWrappers = instructionWrappers;
-        }
-
         public static void TwoWayLinkExecutionPath(InstructionWrapper backInstruction, InstructionWrapper forwardInstruction)
         {
             backInstruction.NextPossibleProgramFlow.Add(forwardInstruction);
@@ -49,11 +42,16 @@ namespace DoppleTry2.ProgramFlowHanlder
 
         public abstract Code[] HandledCodes { get; }
 
-        public void SetForwardExecutionFlowInsts(InstructionWrapper instructionWrapper)
+        public void SetForwardExecutionFlowInsts(InstructionWrapper wrapperToModify, List<InstructionWrapper> instructionWrappers)
         {
-            SetForwardExecutionFlowInstsInternal(instructionWrapper);
+            if (wrapperToModify.ProgramFlowResolveDone)
+            {
+                return;
+            }
+            SetForwardExecutionFlowInstsInternal(wrapperToModify, instructionWrappers);
+            wrapperToModify.ProgramFlowResolveDone = true;
         }
 
-        protected abstract void SetForwardExecutionFlowInstsInternal(InstructionWrapper instructionWrapper);
+        protected abstract void SetForwardExecutionFlowInstsInternal(InstructionWrapper wrapperToModify, List<InstructionWrapper> instructionWrappers);
     }
 }

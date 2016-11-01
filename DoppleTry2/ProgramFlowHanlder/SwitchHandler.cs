@@ -10,17 +10,14 @@ namespace DoppleTry2.ProgramFlowHanlder
 {
     class SwitchHandler : ProgramFlowHandler
     {
-        public SwitchHandler(List<InstructionWrapper> instructionsWrappers) : base(instructionsWrappers)
-        {
-        }
-
         public override Code[] HandledCodes => new[] {Code.Switch};
-        protected override void SetForwardExecutionFlowInstsInternal(InstructionWrapper instructionWrapper)
+
+        protected override void SetForwardExecutionFlowInstsInternal(InstructionWrapper wrapperToModify, List<InstructionWrapper> instructionWrappers)
         {
-            var targetInstructions  = (Instruction[]) instructionWrapper.Instruction.Operand;
+            var targetInstructions = (Instruction[])wrapperToModify.Instruction.Operand;
             foreach (var targetInstruction in targetInstructions)
             {
-                TwoWayLinkExecutionPath(instructionWrapper, InstructionWrappers.First(x => x.Instruction == targetInstruction));
+                TwoWayLinkExecutionPath(wrapperToModify, instructionWrappers.First(x => x.Instruction == targetInstruction));
             }
         }
     }
