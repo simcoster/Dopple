@@ -14,6 +14,7 @@ namespace DoppleTry2.InstructionModifiers
         {
             var addedInstructions = new List<InstructionWrapper>();
             var calledFunc = callInstWrapper.CalledFunction;
+
             for (int i = calledFunc.Parameters.Count - 1; i >= 0; i--)
             {
                 var argProvidingWrappers = BackSearcher.SearchBackwardsForDataflowInstrcutions(instructionWrappers, x => x.StackPushCount > 0, callInstWrapper);
@@ -33,6 +34,10 @@ namespace DoppleTry2.InstructionModifiers
                     stArgWrapper.AddBackDataflowTwoWaySingleIndex(new[] { argProvidingWrapper });
                     stArgWrapper.StackPopCount--;
                     stArgWrapper.ArgIndex = i;
+                    if (!calledFunc.IsStatic)
+                    {
+                        stArgWrapper.ArgIndex--;
+                    }
                     stArgWrapper.Inlined = true;
                     stArgWrapper.ProgramFlowResolveDone = true;
                     argProvidingWrapper.StackPushCount--;

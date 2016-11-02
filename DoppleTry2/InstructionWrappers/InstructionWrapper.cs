@@ -21,6 +21,10 @@ namespace DoppleTry2
             MemoryStoreCount = MemoryProperties.GetMemStoreCount(instruction.OpCode.Code);
             LocIndex = LdStLocProperties.GetLocIndex(instruction);
             ArgIndex = GetArgIndex(instruction);
+            if (!method.IsStatic)
+            {
+                ArgIndex--;
+            }
             ImmediateIntValue = GetImmediateInt(instruction);
         }
 

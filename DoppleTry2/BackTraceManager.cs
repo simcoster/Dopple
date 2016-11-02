@@ -70,21 +70,21 @@ namespace DoppleTry2
             BackTrace();
             MergeLdArgs();
             MergeImmediateValue();
-
             MergeLdLocs();
 
-            //RemoveInstWrappers(InstructionsWrappers.Where(x => CodeGroups.LocStoreCodes.Contains(x.Instruction.OpCode.Code)));
-            //RemoveInstWrappers(InstructionsWrappers.Where(x => CodeGroups.LocLoadCodes.Contains(x.Instruction.OpCode.Code)));
-
+            RemoveInstWrappers(InstructionsWrappers.Where(x => CodeGroups.LocStoreCodes.Contains(x.Instruction.OpCode.Code)));
+            RemoveInstWrappers(InstructionsWrappers.Where(x => CodeGroups.LocLoadCodes.Contains(x.Instruction.OpCode.Code)));
             LdArgBacktracer ldArgBackTracer = new LdArgBacktracer(null);
-            //RemoveInstWrappers(InstructionsWrappers.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code) && x.Inlined));
-            //RemoveInstWrappers(InstructionsWrappers.Where(x => ldArgBackTracer.HandlesCodes.Contains(x.Instruction.OpCode.Code) && x.Inlined));
+            RemoveInstWrappers(InstructionsWrappers.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code) && x.Inlined));
+            RemoveInstWrappers(InstructionsWrappers.Where(x => ldArgBackTracer.HandlesCodes.Contains(x.Instruction.OpCode.Code) && x.Inlined));
             RemoveInstWrappers(InstructionsWrappers.Where(x => new[] { Code.Call, Code.Calli, Code.Callvirt }.Contains(x.Instruction.OpCode.Code) && x.Inlined));
             RemoveInstWrappers(InstructionsWrappers.Where(x => x.Instruction.OpCode.Code == Code.Ret && x.Inlined));
 
+            MergeRecursionParalel();
+
             AddZeroNode();
             SetInstructionIndexes();
-            Veirify();
+            //Veirify();
 
             return InstructionsWrappers;
         }
@@ -124,7 +124,16 @@ namespace DoppleTry2
                 }
             }
         }
-     
+
+
+        void MergeRecursionParalel()
+        {
+            var recursionGroups = InstructionsWrappers.GroupBy(x => new { x.Method.FullName, x.Instruction.Offset }).Where(x => x.Count() >1);
+            foreach (var recursionGroup in recursionGroups)
+            {
+                MergeInsts(recursionGroup.ToArray());
+            }
+        }
 
         private void MergeImmediateValue()
         {

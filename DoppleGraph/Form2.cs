@@ -126,7 +126,7 @@ namespace DoppleGraph
         private void AcomodateForRemovedFlowNodes(InstructionWrapper instructionWrapper, IEnumerable<InstructionWrapper> instructionWrappers)
         {
             Stack<InstructionWrapper> wrappersToResolve = new Stack<InstructionWrapper>();
-            foreach (var wrapper in instructionWrapper.NextPossibleProgramFlow)
+            foreach (var wrapper in instructionWrapper.NextPossibleProgramFlow.Except(new[] { instructionWrapper }))
             {
                 wrappersToResolve.Push(wrapper);
             }
@@ -141,7 +141,7 @@ namespace DoppleGraph
                 }
                 else
                 {
-                    foreach (var instToPush in instToResolve.NextPossibleProgramFlow)
+                    foreach (var instToPush in instToResolve.NextPossibleProgramFlow.Except(new[] { instructionWrapper }))
                     {
                         wrappersToResolve.Push(instToPush);
                     }
@@ -334,8 +334,8 @@ namespace DoppleGraph
             foreach (var nodeWrapper in nodeWrappers)
             {
                 AddNodeLinks(nodeWrapper, myView);
-                AcomodateForRemovedFlowNodes(nodeWrapper.InstructionWrapper, instructionWrappers);
-                DrawFlowLinks(nodeWrapper, myView);
+                //AcomodateForRemovedFlowNodes(nodeWrapper.InstructionWrapper, instructionWrappers);
+                //DrawFlowLinks(nodeWrapper, myView);
             }
         }
 
