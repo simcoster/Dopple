@@ -11,7 +11,7 @@ namespace DoppleTry2.Varifier
             {
                 if ( inst.StackPushCount > 0 || inst.StackPopCount > 0)
                 {
-                    //throw new Exception(String.Format("inst {0} has stack push count {1} and stack pop count {2}", inst.Instruction, inst.StackPushCount, inst.StackPopCount));
+                    throw new Exception(String.Format("inst {0} has stack push count {1} and stack pop count {2}", inst.Instruction, inst.StackPushCount, inst.StackPopCount));
                 }
             }
         }

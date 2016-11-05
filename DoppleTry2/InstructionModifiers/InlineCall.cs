@@ -30,17 +30,30 @@ namespace DoppleTry2.InstructionModifiers
                     instructionWrappers.InsertRange(instWrapperIndex + 1, inlinedInstWrappers);
                 }
             }
+
             foreach (var nestedCallInstWrapper in instructionWrappers.Where(x => x is CallInstructionWrapper))
             {
                 int index = instructionWrappers.IndexOf(nestedCallInstWrapper);
                 ProgramFlowHandler.TwoWayLinkExecutionPath(nestedCallInstWrapper, instructionWrappers[index+1]);
                 nestedCallInstWrapper.ProgramFlowResolveDone = true;
             }
+
             foreach (var retCall in instructionWrappers.Where(x => x.Instruction.OpCode.Code == Code.Ret && x != instructionWrappers.Last()))
             {
                 int index = instructionWrappers.IndexOf(retCall);
                 ProgramFlowHandler.TwoWayLinkExecutionPath(retCall, instructionWrappers[index + 1]);
                 retCall.ProgramFlowResolveDone = true;
+                if (retCall.Instruction.OpCode.Code == Code.Ret)
+                {
+                    if (retCall.Method.ReturnType.FullName == "System.Void")
+                    {
+                        retCall.StackPushCount = 0;
+                    }
+                    else
+                    {
+                        retCall.StackPushCount = 1;
+                    }
+                }
             }
         }
 

@@ -88,7 +88,7 @@ namespace DoppleTry2
             }
             else if (imeddiateOperandValue.Contains(code))
             {
-                return ((int)instruction.Operand);
+                return (Convert.ToInt32(instruction.Operand));
             }
             else if (code == Code.Ldc_I4_M1)
             {
@@ -152,17 +152,7 @@ namespace DoppleTry2
             {
                 return 0;
             }
-            if (instruction.OpCode.Code == Code.Ret)
-            {
-                if (Method.ReturnType.FullName == "System.Void")
-                {
-                    return 0;
-                }
-                else
-                {
-                    return 1;
-                }
-            }
+
             switch (instruction.OpCode.StackBehaviourPush)
             {
                 case StackBehaviour.Push0:

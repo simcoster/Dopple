@@ -48,7 +48,6 @@ namespace DoppleGraph
                 Form2 newForm = new Form2(instructionWrappers);
                 newForm.Show();
             }
-            Hide();
         }
     }
 }

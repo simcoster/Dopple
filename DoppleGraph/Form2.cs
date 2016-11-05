@@ -231,17 +231,23 @@ namespace DoppleGraph
         {
             foreach (var node in colNodes)
             {
-                var nodesToUpdate = node.InstructionWrapper.ForwardDataFlowRelated.ArgumentList
-                    .Select(x => GetNodeWrapper(x.Argument))
-                    .Where(x => x.LongestPath.Count == 0 || !x.LongestPath.Intersect(node.LongestPath).SequenceEqual(x.LongestPath))
-                    .Where(x => x.LongestPath.Count < node.LongestPath.Count + 1)
-                    .ToList();
-                foreach (var nodeToUpdate in nodesToUpdate)
+                try
                 {
-                    nodeToUpdate.LongestPath = node.LongestPath.Concat(new[] { node }).ToList();
-                    nodeToUpdate.DisplayCol = nodeToUpdate.LongestPath.Count;
+                    var nodesToUpdate = node.InstructionWrapper.ForwardDataFlowRelated.ArgumentList
+                   .Select(x => GetNodeWrapper(x.Argument))
+                   .Where(x => x.LongestPath.Count == 0 || !x.LongestPath.Intersect(node.LongestPath).SequenceEqual(x.LongestPath))
+                   .Where(x => x.LongestPath.Count < node.LongestPath.Count + 1)
+                   .ToList();
+                    foreach (var nodeToUpdate in nodesToUpdate)
+                    {
+                        nodeToUpdate.LongestPath = node.LongestPath.Concat(new[] { node }).ToList();
+                        nodeToUpdate.DisplayCol = nodeToUpdate.LongestPath.Count;
+                    }
+                    SetLongestPathRec(nodesToUpdate);
                 }
-                SetLongestPathRec(nodesToUpdate);
+               catch
+                {
+                }
             }
         }
 
@@ -306,7 +312,7 @@ namespace DoppleGraph
                     }
                     goNodeWrapper.Node.Shape.PenWidth = 3;
                     goNodeWrapper.Node.Shadowed = true;
-                    goNodeWrapper.Node.ToolTipText = goNodeWrapper.InstructionWrapper.Method.Name;
+                    goNodeWrapper.Node.ToolTipText = goNodeWrapper.InstructionWrapper.Method.Name + "*************";
                 }
 
                 goNodeWrapper.Node.Text = goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code.ToString() + " " + goNodeWrapper.InstructionWrapper.Instruction.Offset;

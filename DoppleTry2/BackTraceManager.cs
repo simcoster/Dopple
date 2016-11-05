@@ -68,10 +68,27 @@ namespace DoppleTry2
             InlineFunctionCalls();
             AddStArgHelpers();
             BackTrace();
+
+            MergeSimilarInstructions();
+            //RemoveHelperCodes();
+
+            AddZeroNode();
+            SetInstructionIndexes();
+            Veirify();
+
+            return InstructionsWrappers;
+        }
+
+        private void MergeSimilarInstructions()
+        {
             MergeLdArgs();
             MergeImmediateValue();
             MergeLdLocs();
+            MergeRecursionParalel();
+        }
 
+        private void RemoveHelperCodes()
+        {
             RemoveInstWrappers(InstructionsWrappers.Where(x => CodeGroups.LocStoreCodes.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(InstructionsWrappers.Where(x => CodeGroups.LocLoadCodes.Contains(x.Instruction.OpCode.Code)));
             LdArgBacktracer ldArgBackTracer = new LdArgBacktracer(null);
@@ -79,14 +96,7 @@ namespace DoppleTry2
             RemoveInstWrappers(InstructionsWrappers.Where(x => ldArgBackTracer.HandlesCodes.Contains(x.Instruction.OpCode.Code) && x.Inlined));
             RemoveInstWrappers(InstructionsWrappers.Where(x => new[] { Code.Call, Code.Calli, Code.Callvirt }.Contains(x.Instruction.OpCode.Code) && x.Inlined));
             RemoveInstWrappers(InstructionsWrappers.Where(x => x.Instruction.OpCode.Code == Code.Ret && x.Inlined));
-
-            MergeRecursionParalel();
-
-            AddZeroNode();
-            SetInstructionIndexes();
-            //Veirify();
-
-            return InstructionsWrappers;
+            RemoveInstWrappers(InstructionsWrappers.Where(x => x.Instruction.OpCode.Code == Code.Dup));
         }
 
         void AddStArgHelpers()
@@ -128,7 +138,10 @@ namespace DoppleTry2
 
         void MergeRecursionParalel()
         {
-            var recursionGroups = InstructionsWrappers.GroupBy(x => new { x.Method.FullName, x.Instruction.Offset }).Where(x => x.Count() >1);
+            var recursionGroups = InstructionsWrappers
+                                    .Where(x => x.Instruction.OpCode.Code != Code.Starg && x.Instruction.OpCode.Code != Code.Starg_S)
+                                    .GroupBy(x => new { x.Method.FullName, x.Instruction.Offset, x.Instruction.OpCode })
+                                    .Where(x => x.Count() >1);
             foreach (var recursionGroup in recursionGroups)
             {
                 MergeInsts(recursionGroup.ToArray());

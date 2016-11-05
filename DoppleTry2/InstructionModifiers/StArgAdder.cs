@@ -22,6 +22,7 @@ namespace DoppleTry2.InstructionModifiers
                 {
                     var opcode = Instruction.Create(OpCodes.Starg, calledFunc.Parameters[i]);
                     InstructionWrapper stArgWrapper = InstructionWrapperFactory.GetInstructionWrapper(opcode, callInstWrapper.Method);
+                    stArgWrapper.Instruction.Offset = 99999;
                     stArgWrapper.BackProgramFlow.Add(argProvidingWrapper);
                     stArgWrapper.NextPossibleProgramFlow.AddRange(argProvidingWrapper.NextPossibleProgramFlow);
                     foreach (var nextPossiblePrFlow in stArgWrapper.NextPossibleProgramFlow)
