@@ -70,7 +70,7 @@ namespace DoppleTry2
             BackTrace();
 
             MergeSimilarInstructions();
-            //RemoveHelperCodes();
+            RemoveHelperCodes();
 
             AddZeroNode();
             SetInstructionIndexes();
@@ -92,7 +92,7 @@ namespace DoppleTry2
             RemoveInstWrappers(InstructionsWrappers.Where(x => CodeGroups.LocStoreCodes.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(InstructionsWrappers.Where(x => CodeGroups.LocLoadCodes.Contains(x.Instruction.OpCode.Code)));
             LdArgBacktracer ldArgBackTracer = new LdArgBacktracer(null);
-            RemoveInstWrappers(InstructionsWrappers.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code) && x.Inlined));
+            //RemoveInstWrappers(InstructionsWrappers.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(InstructionsWrappers.Where(x => ldArgBackTracer.HandlesCodes.Contains(x.Instruction.OpCode.Code) && x.Inlined));
             RemoveInstWrappers(InstructionsWrappers.Where(x => new[] { Code.Call, Code.Calli, Code.Callvirt }.Contains(x.Instruction.OpCode.Code) && x.Inlined));
             RemoveInstWrappers(InstructionsWrappers.Where(x => x.Instruction.OpCode.Code == Code.Ret && x.Inlined));
