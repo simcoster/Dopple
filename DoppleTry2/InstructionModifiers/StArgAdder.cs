@@ -39,7 +39,6 @@ namespace DoppleTry2.InstructionModifiers
                     {
                         stArgWrapper.ArgIndex--;
                     }
-                    stArgWrapper.Inlined = true;
                     stArgWrapper.ProgramFlowResolveDone = true;
                     argProvidingWrapper.StackPushCount--;
                     instructionWrappers.Insert(instructionWrappers.IndexOf(argProvidingWrapper) + 1, stArgWrapper);
@@ -52,7 +51,7 @@ namespace DoppleTry2.InstructionModifiers
         public void Modify(List<InstructionWrapper> instructionWrappers)
         {
             var callInstructions = instructionWrappers
-                                    .Where(x => x is CallInstructionWrapper)
+                                    .Where(x => x is CallInstructionWrapper && x.Inlined)
                                     .OrderByDescending(x => instructionWrappers.IndexOf(x))
                                     .Cast<CallInstructionWrapper>()
                                     .ToArray();

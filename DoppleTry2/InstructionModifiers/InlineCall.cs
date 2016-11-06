@@ -19,19 +19,19 @@ namespace DoppleTry2.InstructionModifiers
         {
             foreach (var nestedCallInstWrapper in instructionWrappers.Where(x => x is CallInstructionWrapper).Cast<CallInstructionWrapper>().ToArray())
             {
-                int instWrapperIndex = instructionWrappers.IndexOf(nestedCallInstWrapper);
                 var inlinedInstWrappers = GetDeepInlineRec(nestedCallInstWrapper, new List<MethodDefinition>());
-                foreach(var inlinedCall in inlinedInstWrappers)
-                {
-                    inlinedCall.Inlined = true;
-                }
                 if (inlinedInstWrappers.Count > 0)
                 {
+                    int instWrapperIndex = instructionWrappers.IndexOf(nestedCallInstWrapper);
                     instructionWrappers.InsertRange(instWrapperIndex + 1, inlinedInstWrappers);
+                }
+                foreach (var inlinedLdArg in inlinedInstWrappers.Where(x => CodeGroups.LdArgCodes.Contains(x.Instruction.OpCode.Code)))
+                {
+                    inlinedLdArg.Inlined = true;
                 }
             }
 
-            foreach (var nestedCallInstWrapper in instructionWrappers.Where(x => x is CallInstructionWrapper))
+            foreach (var nestedCallInstWrapper in instructionWrappers.Where(x => x is CallInstructionWrapper && x.Inlined))
             {
                 int index = instructionWrappers.IndexOf(nestedCallInstWrapper);
                 ProgramFlowHandler.TwoWayLinkExecutionPath(nestedCallInstWrapper, instructionWrappers[index+1]);
@@ -64,7 +64,7 @@ namespace DoppleTry2.InstructionModifiers
                 throw new Exception("only user functions should be inlined");
             }
             var calledFunc = (MethodDefinition)callInstWrapper.Instruction.Operand;
-            if (callSequence.Count(x => x == calledFunc) > 1)
+            if (callSequence.Count(x => x == calledFunc) > 0)
             {
                 return new List<InstructionWrapper>();
             }
@@ -86,6 +86,7 @@ namespace DoppleTry2.InstructionModifiers
                         ProgramFlowHandler.TwoWayLinkExecutionPath(nestedCallInstWrapper, inlinedInstWrappers[0]);
                     }
                 }
+                callInstWrapper.Inlined = true;
                 return calledFuncInstWrappers;
             }
         }

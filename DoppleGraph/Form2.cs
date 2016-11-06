@@ -340,8 +340,8 @@ namespace DoppleGraph
             foreach (var nodeWrapper in nodeWrappers)
             {
                 AddNodeLinks(nodeWrapper, myView);
-                //AcomodateForRemovedFlowNodes(nodeWrapper.InstructionWrapper, instructionWrappers);
-                //DrawFlowLinks(nodeWrapper, myView);
+                AcomodateForRemovedFlowNodes(nodeWrapper.InstructionWrapper, instructionWrappers);
+                DrawFlowLinks(nodeWrapper, myView);
             }
         }
 

@@ -151,6 +151,7 @@ namespace Utility
         }
 
 
+
         static void BubbleSort(int[] number)
         {
             bool flag = true;
@@ -173,8 +174,7 @@ namespace Utility
             }
         }
 
-                */
-
+        */
 
         static public void DoMerge(int[] numbers, int left, int mid, int right)
         {
@@ -233,8 +233,16 @@ namespace Utility
             MergeSortRec(numbers, numbers.Length, 0);
         }
 
-
         /*
+        static public void TestRec (int[] arr, int left, int right)
+        {
+            var lefttemp = left + 5;
+            var rightTemp = 4;
+            TestRec(arr, lefttemp,rightTemp);
+            TestRec(new int[4], lefttemp, rightTemp);
+        }
+                                      
+
 
         static void QuickSortLeftPivot(int[] a, int start, int end)
         {

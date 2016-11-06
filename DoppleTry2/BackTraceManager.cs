@@ -115,6 +115,10 @@ namespace DoppleTry2
             {
                 firstNode.AddBackDataflowTwoWaySingleIndex(new[] { nodeZero });
             }
+            foreach(var firstFromRecursion in InstructionsWrappers.Where(x => BackSearcher.GetBackDataTree(x).Contains(x) && CodeGroups.LdArgCodes.Contains(x.Instruction.OpCode.Code)))
+            {
+                firstFromRecursion.AddBackDataflowTwoWaySingleIndex(new[] { nodeZero });
+            }
             InstructionsWrappers.Add(nodeZero);
             SetInstructionIndexes();
         }
