@@ -20,53 +20,11 @@ namespace DoppleTry2
             MemoryReadCount = MemoryProperties.GetMemReadCount(instruction.OpCode.Code);
             MemoryStoreCount = MemoryProperties.GetMemStoreCount(instruction.OpCode.Code);
             LocIndex = LdStLocProperties.GetLocIndex(instruction);
-            ArgIndex = GetArgIndex(instruction);
-            if (!method.IsStatic)
-            {
-                ArgIndex--;
-            }
+          
             ImmediateIntValue = GetImmediateInt(instruction);
         }
 
-        private int GetArgIndex(Instruction instruction)
-        {
-            Code[] argCodes = { Code.Ldarg, Code.Ldarg_0, Code.Ldarg_1, Code.Ldarg_2, Code.Ldarg_3, Code.Ldarg_S,
-                                Code.Ldarga, Code.Ldarga_S,
-                                Code.Starg, Code.Starg_S};
-
-            if (!argCodes.Contains(instruction.OpCode.Code))
-            {
-                return -1;
-            }
-            switch (instruction.OpCode.Code)
-            {
-                case Code.Ldarg_0:
-                    return 0;
-                case Code.Ldarg_1:
-                    return 1;
-                case Code.Ldarg_2:
-                    return 2;
-                case Code.Ldarg_3:
-                    return 3;
-            }
-
-            if (instruction.Operand is ValueType)
-            {
-                return Convert.ToInt32(instruction.Operand);
-            }
-            else
-            {
-                if (instruction.Operand is VariableDefinition)
-                {
-                    return ((VariableDefinition)instruction.Operand).Index;
-                }
-                else if (instruction.Operand is ParameterDefinition)
-                {
-                    return ((ParameterDefinition)instruction.Operand).Index;
-                }
-            }
-            throw new Exception("shouldn't get here");
-        }
+     
 
         private int? GetImmediateInt(Instruction instruction)
         {
@@ -182,7 +140,6 @@ namespace DoppleTry2
             }
         }
 
-        public int ArgIndex { get; set; }
         public ArgList BackDataFlowRelated
         {
             get
@@ -208,7 +165,6 @@ namespace DoppleTry2
             }
         }
         public int? ImmediateIntValue { get; private set; }
-        public bool Inlined { get; set; } = false;
         public Instruction Instruction { get; set; }
         public int InstructionIndex { get; internal set; }
         public int LocIndex { get; set; }
@@ -222,5 +178,6 @@ namespace DoppleTry2
         public bool FirstLineInstruction { get; set; } = false;
         public List<Type> DoneBackTracers = new List<Type>();
         public bool ProgramFlowResolveDone { get; set; } = false;
+        public InliningProperties InliningProperties = new InliningProperties();
     }
 }

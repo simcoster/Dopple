@@ -16,19 +16,17 @@ namespace DoppleTry2.BackTrackers
         protected override IEnumerable<IEnumerable<InstructionWrapper>> GetDataflowBackRelated(InstructionWrapper instWrapper)
         {
             List < List < InstructionWrapper >> backRelated = new List<List<InstructionWrapper>>();
-            Code[] relevantCodes = { Code.Starg, Code.Starg_S };
             List<InstructionWrapper> stArgInst = new List<InstructionWrapper>();
-            if (instWrapper.Inlined)
+            if (instWrapper.InliningProperties.Inlined)
             {
                 backRelated.Add(BackSearcher.SearchBackwardsForDataflowInstrcutions(InstructionWrappers,
-                                                                    x => relevantCodes.Contains(x.Instruction.OpCode.Code) &&
-                                                                    x.ArgIndex == instWrapper.ArgIndex, instWrapper));
+                                                                    x => x is StArgInstructionWrapper &&
+                                                                    ((StArgInstructionWrapper)x).ArgIndex == ((LdArgInstructionWrapper)instWrapper).ArgIndex, instWrapper));
             }
             else
             {
-                BackSearcher.SafeSearchBackwardsForDataflowInstrcutions(InstructionWrappers, x =>
-                                                                    relevantCodes.Contains(x.Instruction.OpCode.Code) &&
-                                                                    x.ArgIndex == instWrapper.ArgIndex, instWrapper);
+                BackSearcher.SafeSearchBackwardsForDataflowInstrcutions(InstructionWrappers, x => x is StArgInstructionWrapper &&
+                                                                                                      ((StArgInstructionWrapper)x).ArgIndex == ((LdArgInstructionWrapper)instWrapper).ArgIndex, instWrapper);
                 if (stArgInst.Count != 0)
                 {
                     backRelated.Add(stArgInst);

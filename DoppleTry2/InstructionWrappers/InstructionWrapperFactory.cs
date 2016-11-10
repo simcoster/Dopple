@@ -14,6 +14,14 @@ namespace DoppleTry2
             {
                 return new CallInstructionWrapper(instruction, method);
             }
+            else if (CodeGroups.LdArgCodes.Contains(instruction.OpCode.Code))
+            {
+                return new LdArgInstructionWrapper(instruction, method);
+            }
+            else if (CodeGroups.StArgCodes.Contains(instruction.OpCode.Code))
+            {
+                return new StArgInstructionWrapper(instruction, method);
+            }
             else
             {
                 return new InstructionWrapper(instruction, method);

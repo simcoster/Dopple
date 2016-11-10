@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DoppleTry2.Varifier
 {
@@ -7,7 +8,7 @@ namespace DoppleTry2.Varifier
     {
         public void Verify(IEnumerable<InstructionWrapper> instructionWrappers)
         {
-            foreach (var inst in instructionWrappers)
+            foreach (var inst in instructionWrappers.OrderByDescending(x => x.InstructionIndex))
             {
                 if ( inst.StackPushCount > 0 || inst.StackPopCount > 0)
                 {

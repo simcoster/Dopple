@@ -14,10 +14,6 @@ namespace DoppleTry2.BackTrackers
             for (int i = 0; i < instWrapper.StackPopCount; i++)
             {
                 var argumentGroup = BackSearcher.SearchBackwardsForDataflowInstrcutions(InstructionWrappers, x => x.StackPushCount > 0, instWrapper);
-                if (argumentGroup.Count ==0)
-                {
-                    instWrapper.MarkForDebugging = true;
-                }
                 foundInstructions.Add(argumentGroup);
                 foreach (var arg in argumentGroup)
                 {
@@ -41,13 +37,13 @@ namespace DoppleTry2.BackTrackers
                     return;
                 }
                 currentInst.BackDataFlowRelated.AddSingleIndex(argumentGroup);
+                currentInst.StackPopCount--;
                 foreach (var backInst in argumentGroup)
                 {
                     backInst.ForwardDataFlowRelated.AddSingleIndex(currentInst);
                     backInst.StackPushCount--;
                 }
             }
-            currentInst.StackPopCount = 0;
             RestoreCallsProgramFlow(CallWrappersFlowBackup);
         }
 

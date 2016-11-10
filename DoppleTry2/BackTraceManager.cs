@@ -69,8 +69,8 @@ namespace DoppleTry2
             AddStArgHelpers();
             BackTrace();
 
-            MergeSimilarInstructions();
-            RemoveHelperCodes();
+            //MergeSimilarInstructions();
+            //RemoveHelperCodes();
 
             AddZeroNode();
             SetInstructionIndexes();
@@ -84,7 +84,7 @@ namespace DoppleTry2
             MergeLdArgs();
             MergeImmediateValue();
             MergeLdLocs();
-            MergeRecursionParalel();
+            //MergeRecursionParalel();
         }
 
         private void RemoveHelperCodes()
@@ -92,10 +92,10 @@ namespace DoppleTry2
             RemoveInstWrappers(InstructionsWrappers.Where(x => CodeGroups.LocStoreCodes.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(InstructionsWrappers.Where(x => CodeGroups.LocLoadCodes.Contains(x.Instruction.OpCode.Code)));
             LdArgBacktracer ldArgBackTracer = new LdArgBacktracer(null);
-            //RemoveInstWrappers(InstructionsWrappers.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code)));
-            RemoveInstWrappers(InstructionsWrappers.Where(x => ldArgBackTracer.HandlesCodes.Contains(x.Instruction.OpCode.Code) && x.Inlined));
-            RemoveInstWrappers(InstructionsWrappers.Where(x => new[] { Code.Call, Code.Calli, Code.Callvirt }.Contains(x.Instruction.OpCode.Code) && x.Inlined));
-            RemoveInstWrappers(InstructionsWrappers.Where(x => x.Instruction.OpCode.Code == Code.Ret && x.Inlined));
+            RemoveInstWrappers(InstructionsWrappers.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code)));
+            RemoveInstWrappers(InstructionsWrappers.Where(x => ldArgBackTracer.HandlesCodes.Contains(x.Instruction.OpCode.Code) && x.InliningProperties.Inlined));
+            RemoveInstWrappers(InstructionsWrappers.Where(x => new[] { Code.Call, Code.Calli, Code.Callvirt }.Contains(x.Instruction.OpCode.Code) && x.InliningProperties.Inlined));
+            RemoveInstWrappers(InstructionsWrappers.Where(x => x.Instruction.OpCode.Code == Code.Ret && x.InliningProperties.Inlined));
             RemoveInstWrappers(InstructionsWrappers.Where(x => x.Instruction.OpCode.Code == Code.Dup));
         }
 
@@ -143,7 +143,7 @@ namespace DoppleTry2
         void MergeRecursionParalel()
         {
             var recursionGroups = InstructionsWrappers
-                                    .Where(x => x.Instruction.OpCode.Code != Code.Starg && x.Instruction.OpCode.Code != Code.Starg_S)
+                                    .Where(x => !CodeGroups.StArgCodes.Contains(x.Instruction.OpCode.Code))
                                     .GroupBy(x => new { x.Method.FullName, x.Instruction.Offset, x.Instruction.OpCode })
                                     .Where(x => x.Count() >1);
             foreach (var recursionGroup in recursionGroups)
@@ -197,8 +197,10 @@ namespace DoppleTry2
         private void MergeLdArgs()
         {
             var ldarg = new LdArgBacktracer(null);
-            var argGroups = InstructionsWrappers.Where(x => x.ArgIndex != -1)
+            var argGroups = InstructionsWrappers.Where(x => x is FunctionArgInstWrapper)
+                                                 .Cast<FunctionArgInstWrapper>()
                                                  .Where(x => ldarg.HandlesCodes.Contains(x.Instruction.OpCode.Code))
+                                                 .Where(x => x.BackDataFlowRelated.ArgumentList.Count == 0)
                                                  .GroupBy(x => new { x.ArgIndex, x.Method });
             foreach (var argGroup in argGroups)
             {
@@ -287,13 +289,12 @@ namespace DoppleTry2
             StackPopBackTracer stackPopBacktracer = new StackPopBackTracer(InstructionsWrappers);
             var singleStackPopWrappers = InstructionsWrappers
                                                 .Where(x => stackPopBacktracer.HandlesCodes.Contains(x.Instruction.OpCode.Code))
-                                                .Where(x => x.StackPopCount ==1)
                                                 .OrderByDescending(x => InstructionsWrappers.IndexOf(x));
             foreach (var stackpopInst in singleStackPopWrappers)
             {
                 stackPopBacktracer.AddBackDataflowConnectionsInFuncBoundry(stackpopInst);
             }
-            //Maybe the problem is only about doing the singe pop first, let's try
+            //Nope, i have to resolve this in another way
         }
 
         private void AddHelperRetInstructions()

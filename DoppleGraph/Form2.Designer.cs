@@ -32,6 +32,9 @@
             this.ShowDataFlowLinks = new System.Windows.Forms.CheckBox();
             this.ShowRightDataLinks = new System.Windows.Forms.CheckBox();
             this.ShowLeftDataLinks = new System.Windows.Forms.CheckBox();
+            this.minIndex = new System.Windows.Forms.TextBox();
+            this.maxIndex = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // ShowProgramFlowLinks
@@ -90,11 +93,42 @@
             this.ShowLeftDataLinks.UseVisualStyleBackColor = true;
             this.ShowLeftDataLinks.CheckedChanged += new System.EventHandler(this.ShowLeftDataLinks_CheckedChanged);
             // 
+            // minIndex
+            // 
+            this.minIndex.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.minIndex.Location = new System.Drawing.Point(173, 104);
+            this.minIndex.Name = "minIndex";
+            this.minIndex.Size = new System.Drawing.Size(37, 20);
+            this.minIndex.TabIndex = 4;
+            this.minIndex.TextChanged += new System.EventHandler(this.minIndex_TextChanged);
+            // 
+            // maxIndex
+            // 
+            this.maxIndex.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.maxIndex.Location = new System.Drawing.Point(232, 104);
+            this.maxIndex.Name = "maxIndex";
+            this.maxIndex.Size = new System.Drawing.Size(37, 20);
+            this.maxIndex.TabIndex = 5;
+            this.maxIndex.TextChanged += new System.EventHandler(this.maxIndex_TextChanged);
+            // 
+            // label1
+            // 
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(216, 107);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(10, 13);
+            this.label1.TabIndex = 6;
+            this.label1.Text = "-";
+            // 
             // Form2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(276, 277);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.maxIndex);
+            this.Controls.Add(this.minIndex);
             this.Controls.Add(this.ShowLeftDataLinks);
             this.Controls.Add(this.ShowRightDataLinks);
             this.Controls.Add(this.ShowDataFlowLinks);
@@ -113,5 +147,8 @@
         private System.Windows.Forms.CheckBox ShowDataFlowLinks;
         private System.Windows.Forms.CheckBox ShowRightDataLinks;
         private System.Windows.Forms.CheckBox ShowLeftDataLinks;
+        private System.Windows.Forms.TextBox minIndex;
+        private System.Windows.Forms.TextBox maxIndex;
+        private System.Windows.Forms.Label label1;
     }
 }

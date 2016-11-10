@@ -17,21 +17,32 @@ namespace DoppleTry2.InstructionModifiers
 
         public void Modify(List<InstructionWrapper> instructionWrappers)
         {
+            int recursionInstanceIndex = 1;
             foreach (var nestedCallInstWrapper in instructionWrappers.Where(x => x is CallInstructionWrapper).Cast<CallInstructionWrapper>().ToArray())
             {
                 var inlinedInstWrappers = GetDeepInlineRec(nestedCallInstWrapper, new List<MethodDefinition>());
-                if (inlinedInstWrappers.Count > 0)
+                if (inlinedInstWrappers.Count == 0)
                 {
-                    int instWrapperIndex = instructionWrappers.IndexOf(nestedCallInstWrapper);
-                    instructionWrappers.InsertRange(instWrapperIndex + 1, inlinedInstWrappers);
+                    continue;
                 }
+                int instWrapperIndex = instructionWrappers.IndexOf(nestedCallInstWrapper);
+                instructionWrappers.InsertRange(instWrapperIndex + 1, inlinedInstWrappers);
                 foreach (var inlinedLdArg in inlinedInstWrappers.Where(x => CodeGroups.LdArgCodes.Contains(x.Instruction.OpCode.Code)))
                 {
-                    inlinedLdArg.Inlined = true;
+                    inlinedLdArg.InliningProperties.Inlined = true;
+                }
+                if (nestedCallInstWrapper.CalledFunction.FullName == nestedCallInstWrapper.Method.FullName)
+                {
+                    foreach(var inst in inlinedInstWrappers)
+                    {
+                        inst.InliningProperties.RecursionInstanceIndex = recursionInstanceIndex;
+                        inst.InliningProperties.Recursive = true;
+                    }
+                    recursionInstanceIndex++;
                 }
             }
 
-            foreach (var nestedCallInstWrapper in instructionWrappers.Where(x => x is CallInstructionWrapper && x.Inlined))
+            foreach (var nestedCallInstWrapper in instructionWrappers.Where(x => x is CallInstructionWrapper && x.InliningProperties.Inlined))
             {
                 int index = instructionWrappers.IndexOf(nestedCallInstWrapper);
                 ProgramFlowHandler.TwoWayLinkExecutionPath(nestedCallInstWrapper, instructionWrappers[index+1]);
@@ -86,7 +97,7 @@ namespace DoppleTry2.InstructionModifiers
                         ProgramFlowHandler.TwoWayLinkExecutionPath(nestedCallInstWrapper, inlinedInstWrappers[0]);
                     }
                 }
-                callInstWrapper.Inlined = true;
+                callInstWrapper.InliningProperties.Inlined = true;
                 return calledFuncInstWrappers;
             }
         }

@@ -21,7 +21,7 @@ namespace DoppleTry2.InstructionModifiers
                 foreach (var argProvidingWrapper in argProvidingWrappers)
                 {
                     var opcode = Instruction.Create(OpCodes.Starg, calledFunc.Parameters[i]);
-                    InstructionWrapper stArgWrapper = InstructionWrapperFactory.GetInstructionWrapper(opcode, callInstWrapper.Method);
+                    StArgInstructionWrapper stArgWrapper = (StArgInstructionWrapper)InstructionWrapperFactory.GetInstructionWrapper(opcode, calledFunc);
                     stArgWrapper.Instruction.Offset = 99999;
                     stArgWrapper.BackProgramFlow.Add(argProvidingWrapper);
                     stArgWrapper.NextPossibleProgramFlow.AddRange(argProvidingWrapper.NextPossibleProgramFlow);
@@ -51,7 +51,7 @@ namespace DoppleTry2.InstructionModifiers
         public void Modify(List<InstructionWrapper> instructionWrappers)
         {
             var callInstructions = instructionWrappers
-                                    .Where(x => x is CallInstructionWrapper && x.Inlined)
+                                    .Where(x => x is CallInstructionWrapper && x.InliningProperties.Inlined)
                                     .OrderByDescending(x => instructionWrappers.IndexOf(x))
                                     .Cast<CallInstructionWrapper>()
                                     .ToArray();

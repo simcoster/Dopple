@@ -42,6 +42,10 @@ namespace DoppleGraph
         {
             lock (NodesToShow)
             {
+                if (maxIndex.Text != "" || minIndex.Text != "")
+                {
+                    return;
+                }
                 if (myView.Selection.Count == 0)
                 {
                     NodesToShow.Clear();
@@ -123,31 +127,38 @@ namespace DoppleGraph
             }
         }
 
-        private void AcomodateForRemovedFlowNodes(InstructionWrapper instructionWrapper, IEnumerable<InstructionWrapper> instructionWrappers)
+        private void AcomodateFlowForRemovedNodes()
         {
-            Stack<InstructionWrapper> wrappersToResolve = new Stack<InstructionWrapper>();
-            foreach (var wrapper in instructionWrapper.NextPossibleProgramFlow.Except(new[] { instructionWrapper }))
+            foreach (var instWrapper in instructionWrappers)
             {
-                wrappersToResolve.Push(wrapper);
+                instWrapper.NextPossibleProgramFlow = GetStillExistingNextFlowInstructions(instWrapper).ToList();
             }
-            instructionWrapper.NextPossibleProgramFlow.Clear();
-            while (wrappersToResolve.Count > 0)
+        }
+
+        public IEnumerable<InstructionWrapper> GetStillExistingNextFlowInstructions(InstructionWrapper instruction, List<InstructionWrapper> visited =null)
+        {
+            if (visited == null)
             {
-                var instToResolve = wrappersToResolve.Pop();
-                if (instructionWrappers.Contains(instToResolve))
+                visited = new List<InstructionWrapper>();
+            }
+            visited.Add(instruction);
+            List<InstructionWrapper> wrappersToReturn = new List<InstructionWrapper>();
+            foreach(var nextInst in instruction.NextPossibleProgramFlow)
+            {
+                if (visited.Contains(nextInst))
                 {
-                    instructionWrapper.NextPossibleProgramFlow.Add(instToResolve);
                     continue;
+                }
+                else if (instructionWrappers.Contains(nextInst))
+                {
+                    wrappersToReturn.Add(nextInst);
                 }
                 else
                 {
-                    foreach (var instToPush in instToResolve.NextPossibleProgramFlow.Except(new[] { instructionWrapper }))
-                    {
-                        wrappersToResolve.Push(instToPush);
-                    }
+                    wrappersToReturn.AddRange(GetStillExistingNextFlowInstructions(nextInst,visited));
                 }
             }
-
+            return wrappersToReturn;
         }
 
         public void AddNodeLinks(GoNodeWrapper nodeWrapper, GoView myView)
@@ -192,7 +203,7 @@ namespace DoppleGraph
             SetRowIndexes(nodeWrappers);
             FixDuplicateCoordinates(nodeWrappers);
             int totalHeight = 1000;
-            int totalWidth = 1000;
+            int totalWidth = 2000;
             float heightOffset = Convert.ToSingle(totalHeight / nodeWrappers.Select(x => x.DisplayRow).Max());
             float widthOffset = Convert.ToSingle(totalWidth / nodeWrappers.Select(x => x.DisplayCol).Max());
             foreach (var nodeWrapper in nodeWrappers)
@@ -296,13 +307,9 @@ namespace DoppleGraph
                 }
                 shape.Size = new SizeF(400, 400);
 
-                if (goNodeWrapper.InstructionWrapper.Inlined || goNodeWrapper.InstructionWrapper.MarkForDebugging)
+                if (goNodeWrapper.InstructionWrapper.InliningProperties.Inlined || goNodeWrapper.InstructionWrapper.MarkForDebugging)
                 {
-                    if (goNodeWrapper.InstructionWrapper.Method.Name.Contains("swap"))
-                    {
-                        goNodeWrapper.Node.Shape.PenColor = Color.Gray;
-                    }
-                    else if (goNodeWrapper.InstructionWrapper.MarkForDebugging)
+                    if (goNodeWrapper.InstructionWrapper.MarkForDebugging)
                     {
                         goNodeWrapper.Node.Shape.PenColor = Color.Red;
                     }
@@ -315,7 +322,7 @@ namespace DoppleGraph
                     goNodeWrapper.Node.ToolTipText = goNodeWrapper.InstructionWrapper.Method.Name + "*************";
                 }
 
-                goNodeWrapper.Node.Text = goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code.ToString() + " " + goNodeWrapper.InstructionWrapper.Instruction.Offset;
+                goNodeWrapper.Node.Text = goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code.ToString() + " " + goNodeWrapper.InstructionWrapper.InstructionIndex;
 
                 if (new[] { Code.Call, Code.Calli, Code.Callvirt }.Contains(
                         goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code))
@@ -326,10 +333,15 @@ namespace DoppleGraph
                 {
                     goNodeWrapper.Node.Text += goNodeWrapper.InstructionWrapper.Instruction.Operand.ToString();
                 }
-                else if ( CodeGroups.LdArgCodes.Contains(goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code))
+                else if ( goNodeWrapper.InstructionWrapper is FunctionArgInstWrapper)
                 {
-                    var ArgName = goNodeWrapper.InstructionWrapper.Method.Parameters[goNodeWrapper.InstructionWrapper.ArgIndex].Name;
+                    var ArgName = ((FunctionArgInstWrapper)goNodeWrapper.InstructionWrapper).ArgName;
                     goNodeWrapper.Node.Text += " " + ArgName + " ";
+                }
+
+                if (goNodeWrapper.InstructionWrapper.InliningProperties.Recursive)
+                {
+                    goNodeWrapper.Node.Text += " RecIndex:" + goNodeWrapper.InstructionWrapper.InliningProperties.RecursionInstanceIndex;
                 }
                 var frontLayer = myView.Document.Layers.CreateNewLayerAfter(myView.Document.LinksLayer);
                 frontLayer.Add(goNodeWrapper.Node);
@@ -340,15 +352,15 @@ namespace DoppleGraph
             foreach (var nodeWrapper in nodeWrappers)
             {
                 AddNodeLinks(nodeWrapper, myView);
-                //AcomodateForRemovedFlowNodes(nodeWrapper.InstructionWrapper, instructionWrappers);
-                //DrawFlowLinks(nodeWrapper, myView);
+                AcomodateFlowForRemovedNodes();
+                DrawFlowLinks(nodeWrapper, myView);
             }
         }
 
         private void MyView_KeyPress(object sender, KeyPressEventArgs e)
         {
             var backTraceManager = new BackTraceManager(instructionWrappers);
-            if (e.KeyChar == 'd')
+            if (e.KeyChar == '/')
             {
                 PermanentlyHideSelection();
             }
@@ -369,6 +381,7 @@ namespace DoppleGraph
             else if (e.KeyChar == '*')
             {
                 ObjectsToHide.Clear();
+                NodesToShow.Clear();
                 ReShow();
             }
         }
@@ -452,6 +465,37 @@ namespace DoppleGraph
                     flowLink.Visible = false;
                 }
             }
+        }
+
+        private void minIndex_TextChanged(object sender, EventArgs e)
+        {
+            if (maxIndex.Text == "" || minIndex.Text == "")
+            {
+                return;
+            }
+            ShowOnlyMinMax();
+        }
+
+        private void maxIndex_TextChanged(object sender, EventArgs e)
+        {
+            if (maxIndex.Text == "" || minIndex.Text == "")
+            {
+                return;
+            }
+            ShowOnlyMinMax();
+        }
+
+        private void ShowOnlyMinMax()
+        {
+            int minIndexInt = Convert.ToInt32(minIndex.Text);
+            int maxIndexInt = Convert.ToInt32(maxIndex.Text);
+            var nodesToShow = instructionWrappers
+                                .Where(x => x.InstructionIndex >= minIndexInt && x.InstructionIndex <= maxIndexInt)
+                                .Select(x => GetNodeWrapper(x).Node)
+                                .ToList();
+            NodesToShow.Clear();
+            NodesToShow.AddRange(nodesToShow);
+            ReShow();
         }
     }
 }

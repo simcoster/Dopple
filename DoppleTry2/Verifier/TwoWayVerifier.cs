@@ -10,7 +10,7 @@ namespace DoppleTry2.Varifier
     {
         public void Verify(IEnumerable<InstructionWrapper> instructionWrappers)
         {
-            foreach (var inst in instructionWrappers)
+            foreach (var inst in instructionWrappers.OrderByDescending(x => x.InstructionIndex))
             {
                 foreach (var backInst in inst.BackDataFlowRelated.ArgumentList)
                 {

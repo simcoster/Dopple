@@ -102,7 +102,7 @@ namespace Utility
             return arr;
         }
 
-        /*
+/*
 
         public static void QuickSortMiddle(int[] arr)
         {
@@ -151,7 +151,6 @@ namespace Utility
         }
 
 
-
         static void BubbleSort(int[] number)
         {
             bool flag = true;
@@ -173,7 +172,6 @@ namespace Utility
                 }
             }
         }
-
         */
 
         static public void DoMerge(int[] numbers, int left, int mid, int right)
@@ -214,69 +212,73 @@ namespace Utility
             }
         }
 
-        static public void MergeSortRec(int[] numbers, int left, int right)
-        {
-            int mid;
 
-            if (right > left)
-            {
-                mid = (right + left) / 2;
-                MergeSortRec(numbers, left, mid);
-                MergeSortRec(numbers, (mid + 1), right);
 
-                DoMerge(numbers, left, (mid + 1), right);
-            }
-        }
 
-        static public void MergeSort(int[] numbers)
-        {
-            MergeSortRec(numbers, numbers.Length, 0);
-        }
+static public void MergeSortRec(int[] numbers, int left, int right)
+{
+    int mid;
+
+    if (right > left)
+    {
+        mid = (right + left) / 2;
+        MergeSortRec(numbers, left, mid);
+        MergeSortRec(numbers, (mid + 1), right);
+
+        DoMerge(numbers, left, (mid + 1), right);
+    }
+}
+
+static public void MergeSort(int[] numbers)
+{
+    MergeSortRec(numbers, numbers.Length, 0);
+}
 
         /*
-        static public void TestRec (int[] arr, int left, int right)
+
+static public void TestRec (int[] arr, int left, int right)
+{
+    var lefttemp = left + 5;
+    var rightTemp = 4;
+    TestRec(arr, lefttemp,rightTemp);
+    TestRec(new int[4], lefttemp, rightTemp);
+}
+
+
+
+static void QuickSortLeftPivot(int[] a, int start, int end)
+{
+    if (start >= end)
+    {
+        return;
+    }
+
+    int num = a[start];
+
+    int i = start, j = end;
+
+    while (i < j)
+    {
+        while (i < j && a[j] > num)
         {
-            var lefttemp = left + 5;
-            var rightTemp = 4;
-            TestRec(arr, lefttemp,rightTemp);
-            TestRec(new int[4], lefttemp, rightTemp);
-        }
-                                      
-
-
-        static void QuickSortLeftPivot(int[] a, int start, int end)
-        {
-            if (start >= end)
-            {
-                return;
-            }
-
-            int num = a[start];
-
-            int i = start, j = end;
-
-            while (i < j)
-            {
-                while (i < j && a[j] > num)
-                {
-                    j--;
-                }
-
-                a[i] = a[j];
-
-                while (i < j && a[i] < num)
-                {
-                    i++;
-                }
-
-                a[j] = a[i];
-            }
-
-            a[i] = num;
-            QuickSortLeftPivot(a, start, i - 1);
-            QuickSortLeftPivot(a, i + 1, end);
+            j--;
         }
 
-    */
+        a[i] = a[j];
+
+        while (i < j && a[i] < num)
+        {
+            i++;
+        }
+
+        a[j] = a[i];
+    }
+
+    a[i] = num;
+    QuickSortLeftPivot(a, start, i - 1);
+    QuickSortLeftPivot(a, i + 1, end);
+}
+
+*/
     }
 }

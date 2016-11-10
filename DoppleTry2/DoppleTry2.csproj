@@ -84,8 +84,11 @@
     <Compile Include="IndexedArgument.cs" />
     <Compile Include="InstructionModifiers\AddHelperRetsModifer.cs" />
     <Compile Include="InstructionModifiers\StArgAdder.cs" />
+    <Compile Include="InstructionWrappers\ArgType.cs" />
     <Compile Include="InstructionWrappers\CallInstructionWrapper.cs" />
+    <Compile Include="InstructionWrappers\InliningProperties.cs" />
     <Compile Include="InstructionWrappers\InstructionWrapperFactory.cs" />
+    <Compile Include="InstructionWrappers\FunctionArgInstWrapper.cs" />
     <Compile Include="LdStLocProperties.cs" />
     <Compile Include="OpcodeProperties\DataflowProperties.cs" />
     <Compile Include="OpcodeProperties\InstructionPropertiesHandler.cs" />
@@ -104,9 +107,10 @@
     <Compile Include="ProgramFlowHanlder\SimpleProgramFlowHandler.cs" />
     <Compile Include="ProgramFlowHanlder\SwitchHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Varifier\IVerifier1.cs" />
-    <Compile Include="Varifier\StackPopPushVerfier.cs" />
-    <Compile Include="Varifier\TwoWayVerifier.cs" />
+    <Compile Include="Verifier\IVerifier1.cs" />
+    <Compile Include="Verifier\LdElemVerifier.cs" />
+    <Compile Include="Verifier\StackPopPushVerfier.cs" />
+    <Compile Include="Verifier\TwoWayVerifier.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
