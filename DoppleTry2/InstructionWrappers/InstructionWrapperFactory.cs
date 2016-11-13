@@ -1,9 +1,10 @@
-﻿using Mono.Cecil;
+﻿using DoppleTry2.InstructionWrappers;
+using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System;
 using System.Linq;
 
-namespace DoppleTry2
+namespace DoppleTry2.InstructionWrappers
 {
     public class InstructionWrapperFactory
     {
@@ -21,6 +22,18 @@ namespace DoppleTry2
             else if (CodeGroups.StArgCodes.Contains(instruction.OpCode.Code))
             {
                 return new StArgInstructionWrapper(instruction, method);
+            }
+            else if (CodeGroups.LdLocCodes.Contains(instruction.OpCode.Code))
+            {
+                return new LocationLoadInstructionWrapper(instruction, method);
+            }
+            else if (CodeGroups.StLocCodes.Contains(instruction.OpCode.Code))
+            {
+                return new LocationStoreInstructionWrapper(instruction, method);
+            }
+            else if (CodeGroups.LdImmediateFromOperandCodes.Concat(CodeGroups.LdImmediateValueCodes).Contains(instruction.OpCode.Code))
+            {
+                return new LdImmediateInstWrapper(instruction, method);
             }
             else
             {

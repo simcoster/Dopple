@@ -1,10 +1,11 @@
-﻿using System;
+﻿using DoppleTry2.InstructionWrappers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DoppleTry2.Varifier
+namespace DoppleTry2.Verifier
 {
     class TwoWayVerifier : IVerifier
     {

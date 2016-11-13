@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using DoppleTry2.InstructionWrappers;
 
-namespace DoppleTry2.Varifier
+
+namespace DoppleTry2.Verifier
 {
     interface IVerifier
     {

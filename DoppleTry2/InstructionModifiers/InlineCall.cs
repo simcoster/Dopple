@@ -7,6 +7,7 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 using DoppleTry2.BackTrackers;
 using DoppleTry2.ProgramFlowHanlder;
+using DoppleTry2.InstructionWrappers;
 
 namespace DoppleTry2.InstructionModifiers
 {

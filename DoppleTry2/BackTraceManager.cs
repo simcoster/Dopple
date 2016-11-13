@@ -6,7 +6,8 @@ using DoppleTry2.InstructionModifiers;
 using DoppleTry2.ProgramFlowHanlder;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using DoppleTry2.Varifier;
+using DoppleTry2.Verifier;
+using DoppleTry2.InstructionWrappers;
 
 namespace DoppleTry2
 {
@@ -89,8 +90,8 @@ namespace DoppleTry2
 
         private void RemoveHelperCodes()
         {
-            RemoveInstWrappers(InstructionsWrappers.Where(x => CodeGroups.LocStoreCodes.Contains(x.Instruction.OpCode.Code)));
-            RemoveInstWrappers(InstructionsWrappers.Where(x => CodeGroups.LocLoadCodes.Contains(x.Instruction.OpCode.Code)));
+            RemoveInstWrappers(InstructionsWrappers.Where(x => CodeGroups.StLocCodes.Contains(x.Instruction.OpCode.Code)));
+            RemoveInstWrappers(InstructionsWrappers.Where(x => CodeGroups.LdLocCodes.Contains(x.Instruction.OpCode.Code)));
             LdArgBacktracer ldArgBackTracer = new LdArgBacktracer(null);
             RemoveInstWrappers(InstructionsWrappers.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(InstructionsWrappers.Where(x => ldArgBackTracer.HandlesCodes.Contains(x.Instruction.OpCode.Code) && x.InliningProperties.Inlined));
@@ -154,11 +155,12 @@ namespace DoppleTry2
 
         private void MergeImmediateValue()
         {
-            foreach (var imeddiateValueNode in InstructionsWrappers.Where(x => x.ImmediateIntValue != null).ToList())
+            foreach (var imeddiateValueNode in InstructionsWrappers.Where(x => x is LdImmediateInstWrapper).Cast<LdImmediateInstWrapper>().ToList())
             {
                 var instsToMerge = InstructionsWrappers
-                    .Where(x => x.ImmediateIntValue != null)
-                    .Where(x => imeddiateValueNode.ImmediateIntValue.Value == x.ImmediateIntValue.Value)
+                    .Where(x => x is LdImmediateInstWrapper)
+                    .Cast<LdImmediateInstWrapper>()
+                    .Where(x => imeddiateValueNode.ImmediateIntValue == x.ImmediateIntValue)
                     .Where(x => x.Method == imeddiateValueNode.Method)
                     .ToArray();
                 if (instsToMerge.Length > 0)
@@ -172,7 +174,7 @@ namespace DoppleTry2
         private void MergeLdLocs()
         {
             var grouped = new List<InstructionWrapper>();
-            foreach (var ldLocSameIndex in InstructionsWrappers.Where(x => CodeGroups.LocLoadCodes.Contains(x.Instruction.OpCode.Code)).GroupBy(x => x.LocIndex))
+            foreach (var ldLocSameIndex in InstructionsWrappers.Where(x => x is LocationLoadInstructionWrapper).Cast<LocationLoadInstructionWrapper>().GroupBy(x => x.LocIndex))
             {
                 foreach(var ldLocWrapper in ldLocSameIndex)
                 {
@@ -232,7 +234,7 @@ namespace DoppleTry2
 
         private void Veirify()
         {
-            var verifiers = new IVerifier[] { new StackPopPushVerfier(), new TwoWayVerifier() };
+            var verifiers = new IVerifier[] {new LdElemVerifier(), new StackPopPushVerfier(), new TwoWayVerifier(), new ArithmeticsVerifier() };
             foreach (var verifier in verifiers)
             {
                 verifier.Verify(InstructionsWrappers);

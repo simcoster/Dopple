@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DoppleTry2.InstructionWrappers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -87,7 +88,7 @@ namespace DoppleTry2
                 visited.Add(instWrapper);
                 if (visited.Contains(instWrapper))
                 {
-                    return new InstructionWrapper[0];
+                    return new InstructionWrapper[] {};
                 }
                 switch (instWrapper.BackDataFlowRelated.ArgumentList.Count)
                 {

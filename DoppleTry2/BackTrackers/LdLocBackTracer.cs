@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Mono.Cecil.Cil;
+using DoppleTry2.InstructionWrappers;
 
 namespace DoppleTry2.BackTrackers
 {
@@ -10,12 +11,12 @@ namespace DoppleTry2.BackTrackers
     {
         protected override IEnumerable<InstructionWrapper> GetDataflowBackRelatedArgGroup(InstructionWrapper instWrapper)
         {
-
-            return BackSearcher.SearchBackwardsForDataflowInstrcutions(InstructionWrappers, x => x.LocIndex == instWrapper.LocIndex && CodeGroups.LocStoreCodes.Contains(x.Instruction.OpCode.Code),
-                instWrapper);
+            LocationLoadInstructionWrapper ldInstWrapper = (LocationLoadInstructionWrapper)instWrapper;
+            return BackSearcher.SearchBackwardsForDataflowInstrcutions(InstructionWrappers, x => x is LocationStoreInstructionWrapper && 
+                                    ((LocationStoreInstructionWrapper)x).LocIndex == ldInstWrapper.LocIndex, instWrapper);
         }
 
-        public override Code[] HandlesCodes => CodeGroups.LocLoadCodes;
+        public override Code[] HandlesCodes => CodeGroups.LdLocCodes;
 
         public LdLocBackTracer(List<InstructionWrapper> instructionsWrappers) : base(instructionsWrappers)
         {

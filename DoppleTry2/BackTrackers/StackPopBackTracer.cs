@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Mono.Cecil.Cil;
+using DoppleTry2.InstructionWrappers;
 
 namespace DoppleTry2.BackTrackers
 {

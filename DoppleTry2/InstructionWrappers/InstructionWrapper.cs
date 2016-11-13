@@ -5,7 +5,7 @@ using Mono.Cecil.Cil;
 using Mono.Cecil;
 using System;
 
-namespace DoppleTry2
+namespace DoppleTry2.InstructionWrappers
 {
     public class InstructionWrapper
     {
@@ -19,40 +19,6 @@ namespace DoppleTry2
             StackPopCount = GetStackPopCount(instruction);
             MemoryReadCount = MemoryProperties.GetMemReadCount(instruction.OpCode.Code);
             MemoryStoreCount = MemoryProperties.GetMemStoreCount(instruction.OpCode.Code);
-            LocIndex = LdStLocProperties.GetLocIndex(instruction);
-          
-            ImmediateIntValue = GetImmediateInt(instruction);
-        }
-
-     
-
-        private int? GetImmediateInt(Instruction instruction)
-        {
-            var imeddiateFixedValue = new[]
-            {
-                Code.Ldc_I4_0, Code.Ldc_I4_1, Code.Ldc_I4_2, Code.Ldc_I4_3, Code.Ldc_I4_4, Code.Ldc_I4_5,
-                Code.Ldc_I4_6, Code.Ldc_I4_7, Code.Ldc_I4_8
-            };
-
-            var imeddiateOperandValue = new[]
-            {
-                Code.Ldc_I4_S, Code.Ldc_I4, Code.Ldc_R4, Code.Ldc_R8, Code.Ldc_I8
-            };
-
-            var code = instruction.OpCode.Code;
-            if (imeddiateFixedValue.Contains(code))
-            {
-                return Int32.Parse(code.ToString().Last().ToString());
-            }
-            else if (imeddiateOperandValue.Contains(code))
-            {
-                return (Convert.ToInt32(instruction.Operand));
-            }
-            else if (code == Code.Ldc_I4_M1)
-            {
-                return -1;
-            }
-            return null;
         }
 
         private int GetStackPopCount(Instruction instruction)
@@ -164,10 +130,8 @@ namespace DoppleTry2
                 forwardDataFlowRelated = value;
             }
         }
-        public int? ImmediateIntValue { get; private set; }
         public Instruction Instruction { get; set; }
         public int InstructionIndex { get; internal set; }
-        public int LocIndex { get; set; }
         public bool MarkForDebugging { get; internal set; }
         public int MemoryReadCount { get; set; }
         public int MemoryStoreCount { get; set; }

@@ -4,11 +4,28 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Mono.Cecil.Cil;
+using Mono.Cecil;
 
-namespace DoppleTry2
+namespace DoppleTry2.InstructionWrappers
 {
-    class LdStLocProperties
+    public class LocationStoreInstructionWrapper : TempLocationInstructionWrapper
     {
+        public LocationStoreInstructionWrapper(Instruction instruction, MethodDefinition method) : base(instruction, method) {}
+    }
+    
+    public class LocationLoadInstructionWrapper : TempLocationInstructionWrapper
+    {
+        public LocationLoadInstructionWrapper(Instruction instruction, MethodDefinition method) : base(instruction, method) { }
+    }
+
+    public abstract class TempLocationInstructionWrapper : InstructionWrapper
+    {
+        public TempLocationInstructionWrapper(Instruction instruction, MethodDefinition method) : base(instruction, method)
+        {
+            LocIndex = GetLocIndex(instruction);
+        }
+        public int LocIndex { get; private set; }
+
         private static readonly Dictionary<Code, int> LcCodesIndexes = new Dictionary<Code, int>
         {
             {Code.Ldloc_0, 0},
