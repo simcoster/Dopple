@@ -73,9 +73,9 @@ namespace DoppleTry2
             //MergeSimilarInstructions();
             //RemoveHelperCodes();
 
-            AddZeroNode();
             SetInstructionIndexes();
             Veirify();
+            AddZeroNode();
 
             return InstructionsWrappers;
         }

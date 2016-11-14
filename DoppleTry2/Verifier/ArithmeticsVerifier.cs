@@ -19,30 +19,34 @@ namespace DoppleTry2.Verifier
 
             foreach (var arithInst in instructionWrappers.Where(x => handledCodes.Contains(x.Instruction.OpCode.Code)).OrderByDescending(x => x.InstructionIndex))
             {
-                foreach(var arg in arithInst.BackDataFlowRelated.ArgumentList)
+                foreach (var arg in arithInst.BackDataFlowRelated.ArgumentList)
                 {
-                    var a = BackSearcher.GetStackPushAncestor(arg.Argument);
-                    //if (BackSearcher.GetStackPushAncestor(arg.Argument).All(x => x is LdImmediateInstWrapper || (x is LdArgInstructionWrapper )))
-                    //{
+                    if (BackSearcher.GetStackPushAncestor(arg.Argument).All(x => x is LdImmediateInstWrapper || (x is LdArgInstructionWrapper && ((LdArgInstructionWrapper)x).ArgType.IsPrimitive)))
+                    {
 
-                    //}
+                    }
+                    else
+                    {
+
+                    }
                 }
             }
         }
 
-        public static bool IsNumber(object value)
+        public static bool IsNumberType(Type value)
         {
-            return value is sbyte
-                    || value is byte
-                    || value is short
-                    || value is ushort
-                    || value is int
-                    || value is uint
-                    || value is long
-                    || value is ulong
-                    || value is float
-                    || value is double
-                    || value is decimal;
+            return value == typeof(sbyte)
+                    || value == typeof(byte)
+                    || value == typeof(short)
+                    || value == typeof(ushort)
+                    || value == typeof(int)
+                    || value == typeof(uint)
+                    || value == typeof(long)
+                    || value == typeof(ulong)
+                    || value == typeof(float)
+                    || value == typeof(double)
+                    || value == typeof(decimal);
         }
     }
 }
+

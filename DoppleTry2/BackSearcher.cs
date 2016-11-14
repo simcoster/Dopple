@@ -85,11 +85,11 @@ namespace DoppleTry2
             var instWrapper = startInst;
             while (true)
             {
-                visited.Add(instWrapper);
                 if (visited.Contains(instWrapper))
                 {
                     return new InstructionWrapper[] {};
                 }
+                visited.Add(instWrapper);
                 switch (instWrapper.BackDataFlowRelated.ArgumentList.Count)
                 {
                     case 0:
