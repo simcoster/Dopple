@@ -90,19 +90,19 @@ namespace DoppleTry2.InstructionWrappers
 
         public void AddBackDataflowTwoWaySingleIndex(IEnumerable<InstructionWrapper> wrappersToAdd)
         {
-            BackDataFlowRelated.AddSingleIndex(wrappersToAdd);
+            BackDataFlowRelated.AddWithNewIndex(wrappersToAdd);
             foreach (var instWrapper in wrappersToAdd)
             {
-                instWrapper.ForwardDataFlowRelated.AddSingleIndex(this);
+                instWrapper.ForwardDataFlowRelated.AddWithNewIndex(this);
             }
         }
 
         public void AddForwardTwoWaySingleIndex(IEnumerable<InstructionWrapper> wrappersToAdd)
         {
-            BackDataFlowRelated.AddSingleIndex(wrappersToAdd);
+            BackDataFlowRelated.AddWithNewIndex(wrappersToAdd);
             foreach (var instWrapper in wrappersToAdd)
             {
-                instWrapper.BackDataFlowRelated.AddSingleIndex(this);
+                instWrapper.BackDataFlowRelated.AddWithNewIndex(this);
             }
         }
 

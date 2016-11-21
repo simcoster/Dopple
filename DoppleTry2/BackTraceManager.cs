@@ -6,7 +6,7 @@ using DoppleTry2.InstructionModifiers;
 using DoppleTry2.ProgramFlowHanlder;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using DoppleTry2.Verifier;
+using DoppleTry2.VerifierNs;
 using DoppleTry2.InstructionWrappers;
 
 namespace DoppleTry2
@@ -126,7 +126,7 @@ namespace DoppleTry2
 
         private void BackTrace()
         {
-            foreach (var instWrapper in InstructionsWrappers)
+            foreach (var instWrapper in InstructionsWrappers.OrderByDescending(x => x.InstructionIndex))
             {
                 var backTracers = _backTracers.Where(x => x.HandlesCodes.Contains(instWrapper.Instruction.OpCode.Code));
                 if (backTracers.Count() == 0)
@@ -234,11 +234,11 @@ namespace DoppleTry2
 
         private void Veirify()
         {
-            var verifiers = new IVerifier[] {new LdElemVerifier(), new StackPopPushVerfier(), new TwoWayVerifier(), new ArithmeticsVerifier() };
-            foreach (var verifier in verifiers)
-            {
-                verifier.Verify(InstructionsWrappers);
-            }
+            var verifiers = new Verifier[] {new LdElemVerifier(InstructionsWrappers), new StackPopPushVerfier(InstructionsWrappers), new TwoWayVerifier(InstructionsWrappers), new ArithmeticsVerifier(InstructionsWrappers) };
+            //foreach (var verifier in verifiers)
+            //{
+            //    verifier.Verify(InstructionsWrappers);
+            //}
         }
 
         public void MergeInsts(InstructionWrapper[] Wrappers)
@@ -246,19 +246,19 @@ namespace DoppleTry2
             var instWrapperToKeep = Wrappers[0];
             foreach (var wrapperToRemove in Wrappers.Except(new[] { instWrapperToKeep }))
             {
-                instWrapperToKeep.BackDataFlowRelated.AddSingleIndex(wrapperToRemove.BackDataFlowRelated);
-                instWrapperToKeep.ForwardDataFlowRelated.AddSingleIndex(wrapperToRemove.ForwardDataFlowRelated);
+                instWrapperToKeep.BackDataFlowRelated.AddWithNewIndex(wrapperToRemove.BackDataFlowRelated);
+                instWrapperToKeep.ForwardDataFlowRelated.AddWithNewIndex(wrapperToRemove.ForwardDataFlowRelated);
 
                 foreach (var backNode in wrapperToRemove.BackDataFlowRelated.ArgumentList)
                 {
                     backNode.Argument.ForwardDataFlowRelated.ArgumentList.RemoveAll(x => x.Argument == wrapperToRemove);
-                    backNode.Argument.ForwardDataFlowRelated.AddSingleIndex(instWrapperToKeep);
+                    backNode.Argument.ForwardDataFlowRelated.AddWithNewIndex(instWrapperToKeep);
                 }
 
                 foreach (var forwardNode in wrapperToRemove.ForwardDataFlowRelated.ArgumentList)
                 {
                     forwardNode.Argument.BackDataFlowRelated.ArgumentList.RemoveAll(x => x.Argument == wrapperToRemove);
-                    forwardNode.Argument.BackDataFlowRelated.AddSingleIndex(instWrapperToKeep);
+                    forwardNode.Argument.BackDataFlowRelated.AddWithNewIndex(instWrapperToKeep);
                 }
                 InstructionsWrappers.Remove(wrapperToRemove);
             }
@@ -271,14 +271,14 @@ namespace DoppleTry2
                 foreach (var forInst in instWrapper.ForwardDataFlowRelated.ArgumentList.Select(x => x.Argument).Distinct().ToArray())
                 {
                     int backArgIndex = forInst.BackDataFlowRelated.ArgumentList.First(x => x.Argument == instWrapper).ArgIndex;
-                    forInst.BackDataFlowRelated.AddSingleIndex(instWrapper.BackDataFlowRelated, backArgIndex);
+                    forInst.BackDataFlowRelated.AddWithNewIndex(instWrapper.BackDataFlowRelated, backArgIndex);
                     //forInst.Argument.BackDataFlowRelated.ArgumentList.Remove(forInst.Argument.BackDataFlowRelated.ArgumentList.First(x => x.Argument == instWrapper));
                     //TODO should correct this, not preserving multiple connections to the same node
                     forInst.BackDataFlowRelated.ArgumentList.RemoveAll(x => x.Argument == instWrapper);
                 }
                 foreach (var backInst in instWrapper.BackDataFlowRelated.ArgumentList.ToArray())
                 {
-                    backInst.Argument.ForwardDataFlowRelated.AddSingleIndex(instWrapper.ForwardDataFlowRelated);
+                    backInst.Argument.ForwardDataFlowRelated.AddWithNewIndex(instWrapper.ForwardDataFlowRelated);
                     backInst.Argument.ForwardDataFlowRelated.ArgumentList.RemoveAll(x => x.Argument == instWrapper);
                 }
                 InstructionsWrappers.Remove(instWrapper);

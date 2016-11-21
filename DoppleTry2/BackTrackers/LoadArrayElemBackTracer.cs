@@ -10,12 +10,7 @@ namespace DoppleTry2.BackTrackers
 {
     class LoadArrayElemBackTracer : SingeIndexBackTracer
     {
-        private readonly Code[] _stArrayCodes = new[]
-            {
-                Code.Stelem_Any, Code.Stelem_I, Code.Stelem_I2, 
-                Code.Stelem_I1, Code.Stelem_I4, Code.Stelem_I8, Code.Stelem_R4, Code.Stelem_R8, Code.Stelem_Ref,
-            }
-        .Concat(CodeGroups.LdArgCodes).ToArray();
+        private readonly Code[] _stArrayCodes = CodeGroups.StElemCodes.Concat(CodeGroups.LdArgCodes).ToArray();
 
         public LoadArrayElemBackTracer(List<InstructionWrapper> instructionsWrappers) : base(instructionsWrappers)
         {

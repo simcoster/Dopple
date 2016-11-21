@@ -37,11 +37,11 @@ namespace DoppleTry2.BackTrackers
                 {
                     return;
                 }
-                currentInst.BackDataFlowRelated.AddSingleIndex(argumentGroup);
+                currentInst.BackDataFlowRelated.AddWithNewIndex(argumentGroup);
                 currentInst.StackPopCount--;
                 foreach (var backInst in argumentGroup)
                 {
-                    backInst.ForwardDataFlowRelated.AddSingleIndex(currentInst);
+                    backInst.ForwardDataFlowRelated.AddWithNewIndex(currentInst);
                     backInst.StackPushCount--;
                 }
             }

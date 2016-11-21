@@ -1,5 +1,5 @@
 ﻿using DoppleTry2.InstructionWrappers;
-using DoppleTry2.Verifier;
+using DoppleTry2.VerifierNs;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System;
@@ -9,16 +9,31 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace DoppleTry2.Verifier
+namespace DoppleTry2.VerifierNs
 {
-    class LdElemVerifier : IVerifier
+    class LdElemVerifier : Verifier
     {
-        public void Verify(IEnumerable<InstructionWrapper> instructionWrappers)
+        public LdElemVerifier(List<InstructionWrapper> instructionWrappers) : base(instructionWrappers)
         {
-            foreach (var ldElem in instructionWrappers.Where(x => CodeGroups.LdElemCodes.Contains(x.Instruction.OpCode.Code)))
+        }
+
+        public override void Verify(InstructionWrapper instructionWrapper)
+        {
+            if (CodeGroups.LdElemCodes.Concat(CodeGroups.StElemCodes).Contains(instructionWrapper.Instruction.OpCode.Code))
             {
-            //    var arrayArg = ldElem.BackDataFlowRelated.ArgumentList.First(x => BackSearcher.GetStackPushAncestor(x.Argument)
-            //                    .All(y => y.Instruction.OpCode.Code == Code.Newarr || (y is LdArgInstructionWrapper && ((LdArgInstructionWrapper)y).ArgType is ArrayType)));
+                return;
+            }
+            var argumentGroups = instructionWrapper.BackDataFlowRelated.ArgumentList.GroupBy(x => x.ArgIndex).ToList();
+            var arrayArgGroup = argumentGroups.First(x => x.SelectMany(y => BackSearcher.GetStackPushAncestor(y.Argument))
+                                .All(y => IsProvidingArray(y)));
+            argumentGroups.Remove(arrayArgGroup);
+            if (argumentGroups.SelectMany(x =>x).All(x => IsProvidingNumber(x.Argument)))
+            {
+                return;
+            }
+            else
+            {
+                throw new Exception("Not all elements are providing numbers");
             }
         }
     }

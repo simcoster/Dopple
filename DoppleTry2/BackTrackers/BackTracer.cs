@@ -29,12 +29,13 @@ namespace DoppleTry2.BackTrackers
                 return;
             }
             var backRelatedInsts = GetDataflowBackRelated(currentInst);
+
             foreach (var backRelatedGroup in backRelatedInsts)
             {
-                currentInst.BackDataFlowRelated.AddSingleIndex(backRelatedGroup);
+                currentInst.BackDataFlowRelated.AddWithNewIndex(backRelatedGroup);
                 foreach(var backInst in backRelatedGroup)
                 {
-                    backInst.ForwardDataFlowRelated.AddSingleIndex(currentInst);
+                    backInst.ForwardDataFlowRelated.AddWithNewIndex(currentInst);
                 }
             }
             currentInst.DoneBackTracers.Add(GetType());

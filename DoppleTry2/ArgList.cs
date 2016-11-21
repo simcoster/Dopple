@@ -11,11 +11,11 @@ namespace DoppleTry2
     {
         public List<IndexedArgument> ArgumentList { get; internal set; } = new List<IndexedArgument>();
 
-        public void AddSingleIndex(IEnumerable<InstructionWrapper> instructionWrappers)
+        public void AddWithNewIndex(IEnumerable<InstructionWrapper> instructionWrappers)
         {
             ArgumentList.AddRange(instructionWrappers.Select(x => new IndexedArgument(GetNewIndex() + 1, x)));
         }
-        public void AddSingleIndex(ArgList argList, int index =-1)
+        public void AddWithNewIndex(ArgList argList, int index =-1)
         {
             if (index == -1)
             {
@@ -26,9 +26,9 @@ namespace DoppleTry2
                 ArgumentList.AddRange(argList.ArgumentList.Select(x => new IndexedArgument(index, x.Argument)).ToArray());
             }
         }
-        public void AddSingleIndex(InstructionWrapper instructionWrapper)
+        public void AddWithNewIndex(InstructionWrapper instructionWrapper)
         {
-            AddSingleIndex(new[] { instructionWrapper });
+            AddWithNewIndex(new[] { instructionWrapper });
         }
 
         public override bool Equals (object otherObject)

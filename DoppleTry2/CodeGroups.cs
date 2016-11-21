@@ -15,6 +15,8 @@ namespace DoppleTry2
         public static Code[] StArgCodes   =  { Code.Starg, Code.Starg_S};
         public static Code[] LdElemCodes  =  { Code.Ldelema, Code.Ldelem_Any, Code.Ldelem_I, Code.Ldelem_I1, Code.Ldelem_I2, Code.Ldelem_I4, Code.Ldelem_I8,
                                                Code.Ldelem_R4, Code.Ldelem_R8, Code.Ldelem_Ref, Code.Ldelem_U1 , Code.Ldelem_U2, Code.Ldelem_U4};
+        public static Code[] StElemCodes =   {   Code.Stelem_Any, Code.Stelem_I, Code.Stelem_I2, Code.Stelem_I1, Code.Stelem_I4, Code.Stelem_I8, Code.Stelem_R4,
+                                                Code.Stelem_R8, Code.Stelem_Ref };
         public static Code[] LdImmediateFromOperandCodes = { Code.Ldc_I4_S, Code.Ldc_I4, Code.Ldc_R4, Code.Ldc_R8, Code.Ldc_I8 };
         public static Code[] LdImmediateValueCodes = { Code.Ldc_I4_0, Code.Ldc_I4_1, Code.Ldc_I4_2, Code.Ldc_I4_3, Code.Ldc_I4_4, Code.Ldc_I4_5,
                                                Code.Ldc_I4_6, Code.Ldc_I4_7, Code.Ldc_I4_8};

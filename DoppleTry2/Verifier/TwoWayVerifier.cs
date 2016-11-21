@@ -5,10 +5,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DoppleTry2.Verifier
+namespace DoppleTry2.VerifierNs
 {
-    class TwoWayVerifier : IVerifier
+    class TwoWayVerifier : Verifier
     {
+        public TwoWayVerifier(List<InstructionWrapper> instructionWrappers) : base(instructionWrappers)
+        {
+
+        }
+
+        public override void Verify(InstructionWrapper instructionWrapper)
+        {
+            throw new NotImplementedException();
+        }
+
         public void Verify(IEnumerable<InstructionWrapper> instructionWrappers)
         {
             foreach (var inst in instructionWrappers.OrderByDescending(x => x.InstructionIndex))
