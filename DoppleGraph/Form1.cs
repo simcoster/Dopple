@@ -39,7 +39,7 @@ namespace DoppleGraph
 
             TypeDefinition type = myLibrary.MainModule.Types[2];
 
-            foreach (var method in type.Methods.Where(x => !x.IsConstructor && x.Name == "DoMerge"))
+            foreach (var method in type.Methods.Where(x => !x.IsConstructor))
             //foreach (var method in type.Methods.Where(x => !x.IsConstructor))
             {
                 GraphBuilder backTraceManager = new GraphBuilder(method);
