@@ -12,7 +12,7 @@ namespace DoppleTry2.BackTrackers
         protected override IEnumerable<InstructionWrapper> GetDataflowBackRelatedArgGroup(InstructionWrapper instWrapper)
         {
             LocationLoadInstructionWrapper ldInstWrapper = (LocationLoadInstructionWrapper)instWrapper;
-            return BackSearcher.SearchBackwardsForDataflowInstrcutions(InstructionWrappers, x => x is LocationStoreInstructionWrapper && 
+            return _SingleIndexBackSearcher.SearchBackwardsForDataflowInstrcutions(x => x is LocationStoreInstructionWrapper && 
                                     ((LocationStoreInstructionWrapper)x).LocIndex == ldInstWrapper.LocIndex, instWrapper);
         }
 

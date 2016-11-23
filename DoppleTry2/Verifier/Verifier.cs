@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using DoppleTry2.InstructionWrappers;
 using Mono.Cecil.Cil;
+using System.Linq;
 
 namespace DoppleTry2.VerifierNs
 {
@@ -39,9 +40,13 @@ namespace DoppleTry2.VerifierNs
             {
                 return true;
             }
+            if (insturctionWrapper.Instruction.OpCode.StackBehaviourPush == StackBehaviour.Pushref)
+            {
+                return true;
+            }
             return false;
         }
-        public bool IsProvidingNumber (InstructionWrapper instructionWrapper)
+        public bool IsProvidingNumber(InstructionWrapper instructionWrapper)
         {
             if (instructionWrapper is LdImmediateInstWrapper)
             {
@@ -51,7 +56,32 @@ namespace DoppleTry2.VerifierNs
             {
                 return true;
             }
+            if (new[] { StackBehaviour.Pushi, StackBehaviour.Pushi8 }.Contains(instructionWrapper.Instruction.OpCode.StackBehaviourPush))
+            {
+                return true;
+            }
             return false;
         }
+
+        public InstructionWrapper[] BacktraceStLdLoc (InstructionWrapper instructionWrapper)
+        {
+            if (CodeGroups.LdLocCodes.Concat(CodeGroups.StLocCodes).Contains(instructionWrapper.Instruction.OpCode.Code))
+            {
+                return instructionWrapper.BackDataFlowRelated.ArgumentList.SelectMany(x => BacktraceStLdLoc(x.Argument)).ToArray();
+            }
+            else
+            {
+                return new[] { instructionWrapper };
+            }
+        }
+    }
+
+    public enum ValueType
+    {
+        Number,
+        Array,
+        Object,
+        String,
+        Null
     }
 }

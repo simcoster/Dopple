@@ -8,36 +8,27 @@ using DoppleTry2.InstructionWrappers;
 
 namespace DoppleTry2.BackTrackers
 {
-    class LdArgBacktracer :  BackTracer
+    class LdArgBacktracer : SingeIndexBackTracer
     {
         public LdArgBacktracer(List<InstructionWrapper> instructionsWrappers) : base(instructionsWrappers)
         {
         }
 
-        protected override IEnumerable<IEnumerable<InstructionWrapper>> GetDataflowBackRelated(InstructionWrapper instWrapper)
+        protected override IEnumerable<InstructionWrapper> GetDataflowBackRelatedArgGroup(InstructionWrapper instWrapper)
         {
-            List < List < InstructionWrapper >> backRelated = new List<List<InstructionWrapper>>();
+            List<List<InstructionWrapper>> backRelated = new List<List<InstructionWrapper>>();
             List<InstructionWrapper> stArgInst = new List<InstructionWrapper>();
             if (instWrapper.InliningProperties.Inlined)
             {
-                backRelated.Add(BackSearcher.SearchBackwardsForDataflowInstrcutions(InstructionWrappers,
-                                                                    x => x is StArgInstructionWrapper &&
-                                                                    ((StArgInstructionWrapper)x).ArgIndex == ((LdArgInstructionWrapper)instWrapper).ArgIndex, instWrapper));
+                return _SingleIndexBackSearcher.SearchBackwardsForDataflowInstrcutions(x => x is StArgInstructionWrapper &&
+                                                                    ((StArgInstructionWrapper)x).ArgIndex == ((LdArgInstructionWrapper)instWrapper).ArgIndex, instWrapper);
             }
             else
             {
-                BackSearcher.SafeSearchBackwardsForDataflowInstrcutions(InstructionWrappers, x => x is StArgInstructionWrapper &&
-                                                                                                      ((StArgInstructionWrapper)x).ArgIndex == ((LdArgInstructionWrapper)instWrapper).ArgIndex, instWrapper);
-                if (stArgInst.Count != 0)
-                {
-                    backRelated.Add(stArgInst);
-                }
+                return _SingleIndexBackSearcher.SafeSearchBackwardsForDataflowInstrcutions(x => x is StArgInstructionWrapper && ((StArgInstructionWrapper)x).ArgIndex == ((LdArgInstructionWrapper)instWrapper).ArgIndex, instWrapper);
             }
-            return backRelated;
         }
 
-        public override Code[] HandlesCodes => CodeGroups.LdArgCodes;
-
-       
+        public override Code[] HandlesCodes => CodeGroups.LdArgCodes; 
     }
 }

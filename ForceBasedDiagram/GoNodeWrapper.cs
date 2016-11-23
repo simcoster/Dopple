@@ -1,4 +1,5 @@
 ﻿using DoppleTry2;
+using DoppleTry2.InstructionWrappers;
 
 namespace ForceBasedDiagram
 {

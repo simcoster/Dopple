@@ -21,7 +21,7 @@ namespace DoppleTry2.BackTrackers
                                   x.Instruction.OpCode.Code == Code.Stfld &&
                                   BackSearcher.HaveCommonStackPushAncestor(x, instWrapper) &&
                                   x.Instruction.Operand == instWrapper.Instruction.Operand;
-            var storeFieldInsts = BackSearcher.SafeSearchBackwardsForDataflowInstrcutions(InstructionWrappers,predicate, instWrapper);
+            var storeFieldInsts = _SingleIndexBackSearcher.SafeSearchBackwardsForDataflowInstrcutions(predicate, instWrapper);
             if (storeFieldInsts.Count > 0)
             {
                 return storeFieldInsts;
@@ -29,7 +29,7 @@ namespace DoppleTry2.BackTrackers
             predicate = x =>
                 x.MemoryStoreCount > 0 &&
                 BackSearcher.HaveCommonStackPushAncestor(x, instWrapper);
-            var storeObjInsts = BackSearcher.SafeSearchBackwardsForDataflowInstrcutions(InstructionWrappers, predicate, instWrapper);
+            var storeObjInsts = _SingleIndexBackSearcher.SafeSearchBackwardsForDataflowInstrcutions(predicate, instWrapper);
             if (storeObjInsts.Count > 0)
             {
                 return storeObjInsts;

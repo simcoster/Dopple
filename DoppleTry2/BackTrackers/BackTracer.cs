@@ -21,29 +21,9 @@ namespace DoppleTry2.BackTrackers
         {
             InstructionWrappers = instructionsWrappers;
         }
-
-        public void AddBackDataflowConnections(InstructionWrapper currentInst)
-        {
-            if (currentInst.DoneBackTracers.Contains(GetType()))
-            {
-                return;
-            }
-            var backRelatedInsts = GetDataflowBackRelated(currentInst);
-
-            foreach (var backRelatedGroup in backRelatedInsts)
-            {
-                currentInst.BackDataFlowRelated.AddWithNewIndex(backRelatedGroup);
-                foreach(var backInst in backRelatedGroup)
-                {
-                    backInst.ForwardDataFlowRelated.AddWithNewIndex(currentInst);
-                }
-            }
-            currentInst.DoneBackTracers.Add(GetType());
-        }
-
+        public abstract void AddBackDataflowConnections(InstructionWrapper currentInst);
+       
         protected virtual bool HasBackDataflowNodes { get; } = true;
-
-        protected abstract IEnumerable<IEnumerable<InstructionWrapper>> GetDataflowBackRelated(InstructionWrapper instWrapper);
 
         public abstract Code[] HandlesCodes { get; }
     }

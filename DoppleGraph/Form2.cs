@@ -360,7 +360,7 @@ namespace DoppleGraph
 
         private void MyView_KeyPress(object sender, KeyPressEventArgs e)
         {
-            var backTraceManager = new BackTraceManager(instructionWrappers);
+            var backTraceManager = new GraphBuilder(instructionWrappers);
             if (e.KeyChar == '/')
             {
                 PermanentlyHideSelection();

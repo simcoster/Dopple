@@ -11,13 +11,35 @@ namespace DoppleTry2.BackTrackers
     {
         public SingeIndexBackTracer(List<InstructionWrapper> instructionsWrappers) : base(instructionsWrappers)
         {
+            _SingleIndexBackSearcher = new SingleIndexBackSearcher(instructionsWrappers);
         }
+        protected SingleIndexBackSearcher _SingleIndexBackSearcher;
 
-        protected override IEnumerable<IEnumerable<InstructionWrapper>> GetDataflowBackRelated(InstructionWrapper instWrapper)
+        protected IEnumerable<IEnumerable<InstructionWrapper>> GetDataflowBackRelated(InstructionWrapper instWrapper)
         {
             return new List<List<InstructionWrapper>>() { { GetDataflowBackRelatedArgGroup(instWrapper).ToList() } };
         }
+        public override void AddBackDataflowConnections(InstructionWrapper currentInst)
+        {
+            if (currentInst.DoneBackTracers.Contains(GetType()))
+            {
+                return;
+            }
+            var backRelatedInsts = GetDataflowBackRelated(currentInst);
+
+            foreach (var backRelatedGroup in backRelatedInsts)
+            {
+                currentInst.BackDataFlowRelated.AddWithNewIndex(backRelatedGroup);
+                foreach (var backInst in backRelatedGroup)
+                {
+                    backInst.ForwardDataFlowRelated.AddWithNewIndex(currentInst);
+                }
+            }
+            currentInst.DoneBackTracers.Add(GetType());
+        }
 
         protected abstract IEnumerable<InstructionWrapper> GetDataflowBackRelatedArgGroup(InstructionWrapper instWrapper);
+
+       
     }
 }

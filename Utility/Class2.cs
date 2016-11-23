@@ -215,24 +215,24 @@ namespace Utility
 
 
 
-static public void MergeSortRec(int[] numbers, int left, int right)
-{
-    int mid;
+        static public void MergeSortRec(int[] numbers, int left, int right)
+        {
+            int mid;
 
-    if (right > left)
-    {
-        mid = (right + left) / 2;
-        MergeSortRec(numbers, left, mid);
-        MergeSortRec(numbers, (mid + 1), right);
+            if (right > left)
+            {
+                mid = (right + left) / 2;
+                MergeSortRec(numbers, left, mid);
+                MergeSortRec(numbers, (mid + 1), right);
 
-        DoMerge(numbers, left, (mid + 1), right);
-    }
-}
+                DoMerge(numbers, left, (mid + 1), right);
+            }
+        }
 
-static public void MergeSort(int[] numbers)
-{
-    MergeSortRec(numbers, numbers.Length, 0);
-}
+        static public void MergeSort(int[] numbers)
+        {
+            MergeSortRec(numbers, numbers.Length, 0);
+        }
 
         /*
 

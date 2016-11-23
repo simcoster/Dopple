@@ -16,7 +16,7 @@ namespace DoppleTry2.VerifierNs
 
         public override void Verify(InstructionWrapper instructionWrapper)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         public void Verify(IEnumerable<InstructionWrapper> instructionWrappers)

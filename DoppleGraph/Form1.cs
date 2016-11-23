@@ -42,7 +42,7 @@ namespace DoppleGraph
             foreach (var method in type.Methods.Where(x => !x.IsConstructor))
             //foreach (var method in type.Methods.Where(x => !x.IsConstructor))
             {
-                BackTraceManager backTraceManager = new BackTraceManager(method);
+                GraphBuilder backTraceManager = new GraphBuilder(method);
                 var instructionWrappers = backTraceManager.Run();
 
                 Form2 newForm = new Form2(instructionWrappers);

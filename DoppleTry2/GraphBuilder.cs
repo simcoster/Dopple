@@ -11,7 +11,7 @@ using DoppleTry2.InstructionWrappers;
 
 namespace DoppleTry2
 {
-    public class BackTraceManager
+    public class GraphBuilder
     {
         private readonly IEnumerable<BackTracer> _backTracers;
         private readonly IEnumerable<ProgramFlowHandler> _flowHandlers;
@@ -21,11 +21,11 @@ namespace DoppleTry2
         private MethodDefinition metDef;
         public List<InstructionWrapper> InstructionsWrappers;
 
-        public BackTraceManager(IEnumerable<InstructionWrapper> instWrappers)
+        public GraphBuilder(IEnumerable<InstructionWrapper> instWrappers)
         {
             InstructionsWrappers = instWrappers.ToList();
         }
-        public BackTraceManager(MethodDefinition methodDefinition)
+        public GraphBuilder(MethodDefinition methodDefinition)
         {
             metDef = methodDefinition;
             InstructionsWrappers =
@@ -140,6 +140,17 @@ namespace DoppleTry2
             }
         }
 
+        private void BackTraceRec(InstructionWrapper instructionWrapper)
+        {
+            // start going backwards.
+            // if you come across someone with stack pop still left, do that first, then continue
+            // either the backtracer will signal me, and then i'll continue from where i left off, or trace back again
+            // it's performance vs readability
+            //  Backtracer shouldn't know of other backtracers
+            // we'll stop and run again....
+
+        }
+
 
         void MergeRecursionParalel()
         {
@@ -235,10 +246,13 @@ namespace DoppleTry2
         private void Veirify()
         {
             var verifiers = new Verifier[] {new LdElemVerifier(InstructionsWrappers), new StackPopPushVerfier(InstructionsWrappers), new TwoWayVerifier(InstructionsWrappers), new ArithmeticsVerifier(InstructionsWrappers) };
-            //foreach (var verifier in verifiers)
-            //{
-            //    verifier.Verify(InstructionsWrappers);
-            //}
+            foreach (var instWrapper in InstructionsWrappers.OrderByDescending(x => x.InstructionIndex))
+            {
+                foreach(var verifier in verifiers)
+                {
+                    verifier.Verify(instWrapper);
+                }
+            }
         }
 
         public void MergeInsts(InstructionWrapper[] Wrappers)
@@ -288,13 +302,17 @@ namespace DoppleTry2
 
         void PreInlineBackTrace()
         {
+            if (InstructionsWrappers.All(x => x.Method.FullName == InstructionsWrappers[0].Method.FullName))
+            {
+                //return;
+            }
             StackPopBackTracer stackPopBacktracer = new StackPopBackTracer(InstructionsWrappers);
             var singleStackPopWrappers = InstructionsWrappers
                                                 .Where(x => stackPopBacktracer.HandlesCodes.Contains(x.Instruction.OpCode.Code))
                                                 .OrderByDescending(x => InstructionsWrappers.IndexOf(x));
             foreach (var stackpopInst in singleStackPopWrappers)
             {
-                stackPopBacktracer.AddBackDataflowConnectionsInFuncBoundry(stackpopInst);
+                stackPopBacktracer.AddBackDataflowConnections(stackpopInst);
             }
             //Nope, i have to resolve this in another way
         }

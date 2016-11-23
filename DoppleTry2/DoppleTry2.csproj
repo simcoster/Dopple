@@ -69,7 +69,8 @@
     <Compile Include="ArgList.cs" />
     <Compile Include="BackSearcher.cs" />
     <Compile Include="BackTrackers\BackTracer.cs" />
-    <Compile Include="BackTraceManager.cs" />
+    <Compile Include="BackTrackers\SingleIndexBackSearcher.cs" />
+    <Compile Include="GraphBuilder.cs" />
     <Compile Include="BackTrackers\LdArgBacktracer.cs" />
     <Compile Include="BackTrackers\LdStaticFieldBackTracer.cs" />
     <Compile Include="BackTrackers\LoadArrayElemBackTracer.cs" />

@@ -1,4 +1,5 @@
-﻿using DoppleTry2.InstructionWrappers;
+﻿using DoppleTry2.BackTrackers;
+using DoppleTry2.InstructionWrappers;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System;
@@ -18,7 +19,8 @@ namespace DoppleTry2.InstructionModifiers
 
             for (int i = calledFunc.Parameters.Count - 1; i >= 0; i--)
             {
-                var argProvidingWrappers = BackSearcher.SearchBackwardsForDataflowInstrcutions(instructionWrappers, x => x.StackPushCount > 0, callInstWrapper);
+                var backSearcher = new SingleIndexBackSearcher(instructionWrappers);
+                var argProvidingWrappers = backSearcher.SearchBackwardsForDataflowInstrcutions(x => x.StackPushCount > 0, callInstWrapper);
                 foreach (var argProvidingWrapper in argProvidingWrappers)
                 {
                     var opcode = Instruction.Create(OpCodes.Starg, calledFunc.Parameters[i]);

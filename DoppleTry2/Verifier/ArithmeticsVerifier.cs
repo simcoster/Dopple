@@ -35,9 +35,6 @@ namespace DoppleTry2.VerifierNs
                 }
             }
         }
-
-       
-
     }
 }
 

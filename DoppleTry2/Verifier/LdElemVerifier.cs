@@ -19,12 +19,12 @@ namespace DoppleTry2.VerifierNs
 
         public override void Verify(InstructionWrapper instructionWrapper)
         {
-            if (CodeGroups.LdElemCodes.Concat(CodeGroups.StElemCodes).Contains(instructionWrapper.Instruction.OpCode.Code))
+            if (!CodeGroups.LdElemCodes.Concat(CodeGroups.StElemCodes).Contains(instructionWrapper.Instruction.OpCode.Code))
             {
                 return;
             }
             var argumentGroups = instructionWrapper.BackDataFlowRelated.ArgumentList.GroupBy(x => x.ArgIndex).ToList();
-            var arrayArgGroup = argumentGroups.First(x => x.SelectMany(y => BackSearcher.GetStackPushAncestor(y.Argument))
+            var arrayArgGroup = argumentGroups.First(x => x.SelectMany(y => BacktraceStLdLoc(y.Argument))
                                 .All(y => IsProvidingArray(y)));
             argumentGroups.Remove(arrayArgGroup);
             if (argumentGroups.SelectMany(x =>x).All(x => IsProvidingNumber(x.Argument)))

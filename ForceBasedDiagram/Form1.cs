@@ -59,7 +59,7 @@ namespace ForceBasedDiagram
             {
                 Form1 newForm = new Form1();
                 newForm.btnGenerate.Hide();
-                BackTraceManager backTraceManager = new BackTraceManager(method);
+                GraphBuilder backTraceManager = new GraphBuilder(method);
                 var instructionWrappers = backTraceManager.Run();
 
                 List<GoNodeWrapper> nodeWrappers = new List<GoNodeWrapper>();
