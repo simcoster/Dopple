@@ -56,16 +56,16 @@ namespace DoppleTry2.VerifierNs
             {
                 return true;
             }
-            if (new[] { StackBehaviour.Pushi, StackBehaviour.Pushi8 }.Contains(instructionWrapper.Instruction.OpCode.StackBehaviourPush))
+            if (new[] { StackBehaviour.Pushref, StackBehaviour.Push0 }.Contains(instructionWrapper.Instruction.OpCode.StackBehaviourPush))
             {
-                return true;
+                return false;
             }
-            return false;
+            return true;
         }
 
         public InstructionWrapper[] BacktraceStLdLoc (InstructionWrapper instructionWrapper)
         {
-            if (CodeGroups.LdLocCodes.Concat(CodeGroups.StLocCodes).Contains(instructionWrapper.Instruction.OpCode.Code))
+            if (CodeGroups.LdLocCodes.Concat(CodeGroups.StLocCodes).Concat(new[] { Code.Dup }).Contains(instructionWrapper.Instruction.OpCode.Code))
             {
                 return instructionWrapper.BackDataFlowRelated.ArgumentList.SelectMany(x => BacktraceStLdLoc(x.Argument)).ToArray();
             }

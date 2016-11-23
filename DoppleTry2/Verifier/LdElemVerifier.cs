@@ -27,7 +27,7 @@ namespace DoppleTry2.VerifierNs
             var arrayArgGroup = argumentGroups.First(x => x.SelectMany(y => BacktraceStLdLoc(y.Argument))
                                 .All(y => IsProvidingArray(y)));
             argumentGroups.Remove(arrayArgGroup);
-            if (argumentGroups.SelectMany(x =>x).All(x => IsProvidingNumber(x.Argument)))
+            if (argumentGroups.SelectMany(x =>x).SelectMany(x => BacktraceStLdLoc(x.Argument)).All(x => IsProvidingNumber(x)))
             {
                 return;
             }
