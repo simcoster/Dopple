@@ -22,8 +22,7 @@ namespace DoppleTry2.BackTrackers
         /// <param name="startInstruction"></param>
         /// <param name="visitedInstructions"></param>
         /// <returns></returns>
-        private IEnumerable<InstructionWrapper> SearchAndAddDataflowInstrcutions(List<InstructionWrapper> instructionWrappers, Func<InstructionWrapper, bool> predicate,
-        InstructionWrapper startInstruction, List<InstructionWrapper> visitedInstructions = null)
+        public IEnumerable<InstructionWrapper> SearchAndAddDataflowInstrcutions(InstructionWrapper startInstruction, List<InstructionWrapper> visitedInstructions = null)
         {
             var foundInstructions = new List<InstructionWrapper>();
             if (visitedInstructions == null)
@@ -45,13 +44,13 @@ namespace DoppleTry2.BackTrackers
                 {
                     AddBackDataflowConnections(backInstructionWrapper);
                 }
-                if (predicate.Invoke(backInstructionWrapper))
+                if (backInstructionWrapper.StackPushCount >0 )
                 {
                     foundInstructions.Add(backInstructionWrapper);
                 }
                 else
                 {
-                    foundInstructions.AddRange(SearchAndAddDataflowInstrcutions(instructionWrappers,predicate, backInstructionWrapper, visitedInstructions));
+                    foundInstructions.AddRange(SearchAndAddDataflowInstrcutions(backInstructionWrapper, visitedInstructions));
                 }
             }
             return foundInstructions;
@@ -61,7 +60,7 @@ namespace DoppleTry2.BackTrackers
         {
             for (int i = 0; i < currentInst.StackPopCount; i++)
             {
-                var argumentGroup = SearchAndAddDataflowInstrcutions(InstructionWrappers, x => x.StackPushCount > 0, currentInst);
+                var argumentGroup = SearchAndAddDataflowInstrcutions(currentInst);
                 if (argumentGroup.Count() ==0
                     )
                 {
