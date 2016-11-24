@@ -21,17 +21,6 @@ namespace DoppleGraph
             InitializeComponent();
         }
 
-        /// <summary>
-        /// Maybe swtich to graphVIZZZZ
-        /// 
-        /// 
-        /// 
-        /// 
-        /// 
-        /// 
-        /// 
-        /// </summary>
-
         private void Form1_Load(object sender, EventArgs e)
         {
             AssemblyDefinition myLibrary = AssemblyDefinition.ReadAssembly(@"C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\Utility\bin\Release\Utility.dll");
@@ -39,7 +28,7 @@ namespace DoppleGraph
 
             TypeDefinition type = myLibrary.MainModule.Types[2];
 
-            foreach (var method in type.Methods.Where(x => !x.IsConstructor))
+            foreach (var method in type.Methods.Where(x => !x.IsConstructor && x.Name == "MergeSortRec"))
             //foreach (var method in type.Methods.Where(x => !x.IsConstructor))
             {
                 GraphBuilder backTraceManager = new GraphBuilder(method);
