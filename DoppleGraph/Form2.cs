@@ -323,7 +323,7 @@ namespace DoppleGraph
                     goNodeWrapper.Node.ToolTipText = goNodeWrapper.InstructionWrapper.Method.Name + "*************";
                 }
 
-                goNodeWrapper.Node.Text = goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code.ToString() + " " + goNodeWrapper.InstructionWrapper.InstructionIndex;
+                goNodeWrapper.Node.Text = goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code.ToString() + " index:" + goNodeWrapper.InstructionWrapper.InstructionIndex + " offset:" + goNodeWrapper.InstructionWrapper.Instruction.Offset;
 
                 if (new[] { Code.Call, Code.Calli, Code.Callvirt }.Contains(
                         goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code))

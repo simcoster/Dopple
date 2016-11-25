@@ -150,7 +150,9 @@ namespace Utility
             }
         }
 
+                */
 
+ 
         static void BubbleSort(int[] number)
         {
             bool flag = true;
@@ -172,8 +174,8 @@ namespace Utility
                 }
             }
         }
-        */
 
+       
         static public void DoMerge(int[] numbers, int left, int mid, int right)
         {
             int[] temp = new int[25];

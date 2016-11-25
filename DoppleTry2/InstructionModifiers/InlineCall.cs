@@ -21,7 +21,7 @@ namespace DoppleTry2.InstructionModifiers
             int recursionInstanceIndex = 1;
             foreach (var nestedCallInstWrapper in instructionWrappers.Where(x => x is CallInstructionWrapper).Cast<CallInstructionWrapper>().ToArray())
             {
-                var inlinedInstWrappers = GetDeepInlineRec(nestedCallInstWrapper, new List<MethodDefinition>());
+                var inlinedInstWrappers = GetDeepInlineRec(nestedCallInstWrapper, new List<MethodDefinition>() { instructionWrappers[0].Method });
                 if (inlinedInstWrappers.Count == 0)
                 {
                     continue;
@@ -76,7 +76,7 @@ namespace DoppleTry2.InstructionModifiers
                 throw new Exception("only user functions should be inlined");
             }
             var calledFunc = (MethodDefinition)callInstWrapper.Instruction.Operand;
-            if (callSequence.Count(x => x == calledFunc) > 0)
+            if (callSequence.Count(x => x == calledFunc) > 1)
             {
                 return new List<InstructionWrapper>();
             }
