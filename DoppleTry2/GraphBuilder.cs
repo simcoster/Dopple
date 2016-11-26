@@ -71,8 +71,8 @@ namespace DoppleTry2
             AddStArgHelpers();
             BackTrace();
 
-            //RemoveHelperCodes();
-            //MergeSimilarInstructions();
+            RemoveHelperCodes();
+            MergeSimilarInstructions();
 
             SetInstructionIndexes();
             Veirify();

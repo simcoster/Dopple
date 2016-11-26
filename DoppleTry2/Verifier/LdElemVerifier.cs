@@ -24,9 +24,13 @@ namespace DoppleTry2.VerifierNs
                 return;
             }
             var argumentGroups = instructionWrapper.BackDataFlowRelated.ArgumentList.GroupBy(x => x.ArgIndex).ToList();
-            var arrayArgGroup = argumentGroups.First(x => x.SelectMany(y => BacktraceStLdLoc(y.Argument))
+            var arrayArgGroup = argumentGroups.Where(x => x.SelectMany(y => BacktraceStLdLoc(y.Argument))
                                 .All(y => IsProvidingArray(y)));
-            argumentGroups.Remove(arrayArgGroup);
+            if (arrayArgGroup.Count() < 1)
+            {
+                throw new Exception("No array reference argument");
+            }
+            argumentGroups = argumentGroups.Except(arrayArgGroup).ToList();
             if (argumentGroups.SelectMany(x =>x).SelectMany(x => BacktraceStLdLoc(x.Argument)).All(x => IsProvidingNumber(x)))
             {
                 return;

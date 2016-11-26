@@ -10,7 +10,6 @@ namespace Utility
 {
     public class Class2
     {
-        /*
         public static void insertionSort(int[] array)
         {
             for (int i = 0; i < array.Length - 1; i++)
@@ -69,7 +68,7 @@ namespace Utility
         {
             int currentMin = int.MaxValue;
             int currentMinIndex = -1;
-            for(int i=startIndex; i<array.Length; i++)
+            for (int i = startIndex; i < array.Length; i++)
             {
                 if (array[i] < currentMin)
                 {
@@ -102,57 +101,56 @@ namespace Utility
             return arr;
         }
 
-/*
-
-        public static void QuickSortMiddle(int[] arr)
-        {
-            QuicksortMiddleRec(arr, 0, arr.Length);
-        }
-
-        public static void QuicksortMiddleRec(int[] elements, int left, int right)
-        {
-            int i = left, j = right;
-            int pivot = elements[(left + right) / 2];
-
-            while (i <= j)
-            {
-                while (elements[i] <pivot )
-                {
-                    i++;
-                }
-
-                while (elements[j] > pivot)
-                {
-                    j--;
-                }
-
-                if (i <= j)
-                {
-                    // Swap
-                    int tmp = elements[i];
-                    elements[i] = elements[j];
-                    elements[j] = tmp;
-
-                    i++;
-                    j--;
-                }
-            }
-
-            // Recursive calls
-            if (left < j)
-            {
-                QuicksortMiddleRec(elements, left, j);
-            }
-
-            if (i < right)
-            {
-                QuicksortMiddleRec(elements, i, right);
-            }
-        }
-
-                */
-
         /*
+
+                public static void QuickSortMiddle(int[] arr)
+                {
+                    QuicksortMiddleRec(arr, 0, arr.Length);
+                }
+
+                public static void QuicksortMiddleRec(int[] elements, int left, int right)
+                {
+                    int i = left, j = right;
+                    int pivot = elements[(left + right) / 2];
+
+                    while (i <= j)
+                    {
+                        while (elements[i] <pivot )
+                        {
+                            i++;
+                        }
+
+                        while (elements[j] > pivot)
+                        {
+                            j--;
+                        }
+
+                        if (i <= j)
+                        {
+                            // Swap
+                            int tmp = elements[i];
+                            elements[i] = elements[j];
+                            elements[j] = tmp;
+
+                            i++;
+                            j--;
+                        }
+                    }
+
+                    // Recursive calls
+                    if (left < j)
+                    {
+                        QuicksortMiddleRec(elements, left, j);
+                    }
+
+                    if (i < right)
+                    {
+                        QuicksortMiddleRec(elements, i, right);
+                    }
+                }
+
+                        */
+
         static void BubbleSort(int[] number)
         {
             bool flag = true;
@@ -174,67 +172,66 @@ namespace Utility
                 }
             }
         }
-        */
 
-         static public void DoMerge(int[] numbers, int left, int mid, int right)
-         {
-             int[] temp = new int[25];
-             int i, left_end, num_elements, tmp_pos;
+        static public void DoMerge(int[] numbers, int left, int mid, int right)
+        {
+            int[] temp = new int[25];
+            int i, left_end, num_elements, tmp_pos;
 
-             left_end = (mid - 1);
-             tmp_pos = left;
-             num_elements = (right - left + 1);
+            left_end = (mid - 1);
+            tmp_pos = left;
+            num_elements = (right - left + 1);
 
-             while ((left <= left_end) && (mid <= right))
-             {
-                 if (numbers[left] <= numbers[mid])
-                 {
-                     temp[tmp_pos] = numbers[left];
-                     tmp_pos++;
-                     left++;
-                 }
-                 else
-                 {
-                     temp[tmp_pos] = numbers[mid];
-                     tmp_pos++;
-                     mid++;
-                 }
-             }
+            while ((left <= left_end) && (mid <= right))
+            {
+                if (numbers[left] <= numbers[mid])
+                {
+                    temp[tmp_pos] = numbers[left];
+                    tmp_pos++;
+                    left++;
+                }
+                else
+                {
+                    temp[tmp_pos] = numbers[mid];
+                    tmp_pos++;
+                    mid++;
+                }
+            }
 
-             while (left <= left_end)
-                 temp[tmp_pos++] = numbers[left++];
+            while (left <= left_end)
+                temp[tmp_pos++] = numbers[left++];
 
-             while (mid <= right)
-                 temp[tmp_pos++] = numbers[mid++];
+            while (mid <= right)
+                temp[tmp_pos++] = numbers[mid++];
 
-             for (i = 0; i < num_elements; i++)
-             {
-                 numbers[right] = temp[right];
-                 right--;
-             }
-         }
-
+            for (i = 0; i < num_elements; i++)
+            {
+                numbers[right] = temp[right];
+                right--;
+            }
+        }
 
 
 
-         static public void MergeSortRec(int[] numbers, int left, int right)
-         {
-             int mid;
 
-             if (right > left)
-             {
-                 mid = (right + left) / 2;
-                 MergeSortRec(numbers, left, mid);
-                 MergeSortRec(numbers, (mid + 1), right);
+        static public void MergeSortRec(int[] numbers, int left, int right)
+        {
+            int mid;
 
-                 DoMerge(numbers, left, (mid + 1), right);
-             }
-         }
+            if (right > left)
+            {
+                mid = (right + left) / 2;
+                MergeSortRec(numbers, left, mid);
+                MergeSortRec(numbers, (mid + 1), right);
 
-         static public void MergeSort(int[] numbers)
-         {
-             MergeSortRec(numbers, numbers.Length, 0);
-         }
+                DoMerge(numbers, left, (mid + 1), right);
+            }
+        }
+
+        static public void MergeSort(int[] numbers)
+        {
+            MergeSortRec(numbers, numbers.Length, 0);
+        }
 
         /*
  static public void TestRec (int[] arr, int left, int right)
@@ -281,5 +278,50 @@ namespace Utility
  }
 
  */
+        public bool BinarySearch(int first, int last, int[] mynumbers, int target)
+        {
+            while (first <= last)
+            {
+                var mid = (first + last) / 2;
+
+                if (target < mynumbers[mid])
+                {
+                    first = mid + 1;
+                }
+
+                if (target > mynumbers[mid])
+                {
+                    last = mid - 1;
+                }
+
+                else
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        public bool BinarySearchRec(int first, int last, int[] mynumbers, int target)
+        {
+            if (first == last)
+            {
+                return mynumbers[first] == target;
+            }
+
+            var mid = (first + last) / 2;
+
+            if (target < mynumbers[mid])
+            {
+                return BinarySearchRec(mid + 1, last, mynumbers, target);
+            }
+            if (target > mynumbers[mid])
+            {
+                return BinarySearchRec(first, mid - 1, mynumbers, target);
+            }
+            else
+            {
+                return true;
+            }
+        }
     }
 }

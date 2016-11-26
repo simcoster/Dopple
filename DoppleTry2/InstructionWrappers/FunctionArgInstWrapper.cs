@@ -20,8 +20,10 @@ namespace DoppleTry2.InstructionWrappers
         public FunctionArgInstWrapper(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
             ArgIndex = GetArgIndex(instruction);
-            if (!method.IsStatic)
+            if (!method.IsStatic && instruction.Operand==null)
+            {
                 ArgIndex--;
+            }
             ArgName = method.Parameters[ArgIndex].Name;
             ArgType = method.Parameters[ArgIndex].ParameterType;
         }
