@@ -162,7 +162,7 @@ namespace DoppleGraph
             return wrappersToReturn;
         }
 
-        public void AddNodeLinks(GoNodeWrapper nodeWrapper, GoView myView)
+        public void DrawDataLinks(GoNodeWrapper nodeWrapper, GoView myView)
         {
             if (!ColumnBaseColors.ContainsKey(nodeWrapper.DisplayCol))
             {
@@ -352,9 +352,19 @@ namespace DoppleGraph
 
             foreach (var nodeWrapper in nodeWrappers)
             {
-                AddNodeLinks(nodeWrapper, myView);
+                DrawDataLinks(nodeWrapper, myView);
                 AcomodateFlowForRemovedNodes();
                 DrawFlowLinks(nodeWrapper, myView);
+            }
+            //MarkLoops(nodeWrappers);
+
+        }
+
+        private void MarkLoops(List<GoNodeWrapper> nodeWrappers)
+        {
+            foreach(var node in nodeWrappers.Where(x => x.InstructionWrapper.BackProgramFlow.Count ==0))
+            {
+
             }
         }
 

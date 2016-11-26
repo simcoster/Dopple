@@ -14,10 +14,11 @@ namespace DoppleTry2.VerifierNs
 
         public override void Verify(InstructionWrapper instructionWrapper)
         {
-            Code[] handledCodes = new[] {Code.Add,Code.Add_Ovf,Code.Add_Ovf_Un,
-                   Code.Sub, Code.Sub_Ovf, Code.Sub_Ovf_Un,
-                    Code.Div, Code.Div_Un,
-                    Code.Mul, Code.Mul_Ovf, Code.Mul_Ovf_Un};
+            Code[] handledCodes = new[] 
+                    {Code.Add, Code.Add_Ovf, Code.Add_Ovf_Un,
+                     Code.Sub, Code.Sub_Ovf, Code.Sub_Ovf_Un,
+                     Code.Div, Code.Div_Un,
+                     Code.Mul, Code.Mul_Ovf, Code.Mul_Ovf_Un};
 
             if (!handledCodes.Contains(instructionWrapper.Instruction.OpCode.Code))
             {
@@ -25,7 +26,7 @@ namespace DoppleTry2.VerifierNs
             }
             foreach (var arg in instructionWrapper.BackDataFlowRelated.ArgumentList)
             {
-                if (BackSearcher.GetStackPushAncestor(arg.Argument).All(x => IsProvidingNumber(x)))
+                if (BacktraceStLdLoc(arg.Argument).All(x => IsProvidingNumber(x)))
                 {
 
                 }

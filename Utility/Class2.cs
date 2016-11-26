@@ -152,7 +152,7 @@ namespace Utility
 
                 */
 
- 
+        /*
         static void BubbleSort(int[] number)
         {
             bool flag = true;
@@ -174,113 +174,112 @@ namespace Utility
                 }
             }
         }
+        */
 
-       
-        static public void DoMerge(int[] numbers, int left, int mid, int right)
-        {
-            int[] temp = new int[25];
-            int i, left_end, num_elements, tmp_pos;
+         static public void DoMerge(int[] numbers, int left, int mid, int right)
+         {
+             int[] temp = new int[25];
+             int i, left_end, num_elements, tmp_pos;
 
-            left_end = (mid - 1);
-            tmp_pos = left;
-            num_elements = (right - left + 1);
+             left_end = (mid - 1);
+             tmp_pos = left;
+             num_elements = (right - left + 1);
 
-            while ((left <= left_end) && (mid <= right))
-            {
-                if (numbers[left] <= numbers[mid])
-                {
-                    temp[tmp_pos] = numbers[left];
-                    tmp_pos++;
-                    left++;
-                }
-                else
-                {
-                    temp[tmp_pos] = numbers[mid];
-                    tmp_pos++;
-                    mid++;
-                }
-            }
+             while ((left <= left_end) && (mid <= right))
+             {
+                 if (numbers[left] <= numbers[mid])
+                 {
+                     temp[tmp_pos] = numbers[left];
+                     tmp_pos++;
+                     left++;
+                 }
+                 else
+                 {
+                     temp[tmp_pos] = numbers[mid];
+                     tmp_pos++;
+                     mid++;
+                 }
+             }
 
-            while (left <= left_end)
-                temp[tmp_pos++] = numbers[left++];
+             while (left <= left_end)
+                 temp[tmp_pos++] = numbers[left++];
 
-            while (mid <= right)
-                temp[tmp_pos++] = numbers[mid++];
+             while (mid <= right)
+                 temp[tmp_pos++] = numbers[mid++];
 
-            for (i = 0; i < num_elements; i++)
-            {
-                numbers[right] = temp[right];
-                right--;
-            }
-        }
-
-
+             for (i = 0; i < num_elements; i++)
+             {
+                 numbers[right] = temp[right];
+                 right--;
+             }
+         }
 
 
-        static public void MergeSortRec(int[] numbers, int left, int right)
-        {
-            int mid;
 
-            if (right > left)
-            {
-                mid = (right + left) / 2;
-                MergeSortRec(numbers, left, mid);
-                MergeSortRec(numbers, (mid + 1), right);
 
-                DoMerge(numbers, left, (mid + 1), right);
-            }
-        }
+         static public void MergeSortRec(int[] numbers, int left, int right)
+         {
+             int mid;
 
-        static public void MergeSort(int[] numbers)
-        {
-            MergeSortRec(numbers, numbers.Length, 0);
-        }
+             if (right > left)
+             {
+                 mid = (right + left) / 2;
+                 MergeSortRec(numbers, left, mid);
+                 MergeSortRec(numbers, (mid + 1), right);
+
+                 DoMerge(numbers, left, (mid + 1), right);
+             }
+         }
+
+         static public void MergeSort(int[] numbers)
+         {
+             MergeSortRec(numbers, numbers.Length, 0);
+         }
 
         /*
-
-static public void TestRec (int[] arr, int left, int right)
-{
-    var lefttemp = left + 5;
-    var rightTemp = 4;
-    TestRec(arr, lefttemp,rightTemp);
-    TestRec(new int[4], lefttemp, rightTemp);
-}
-
+ static public void TestRec (int[] arr, int left, int right)
+ {
+     var lefttemp = left + 5;
+     var rightTemp = 4;
+     TestRec(arr, lefttemp,rightTemp);
+     TestRec(new int[4], lefttemp, rightTemp);
+ }
 
 
-static void QuickSortLeftPivot(int[] a, int start, int end)
-{
-    if (start >= end)
-    {
-        return;
-    }
 
-    int num = a[start];
+ static void QuickSortLeftPivot(int[] a, int start, int end)
+ {
+     if (start >= end)
+     {
+         return;
+     }
 
-    int i = start, j = end;
+     int num = a[start];
 
-    while (i < j)
-    {
-        while (i < j && a[j] > num)
-        {
-            j--;
-        }
+     int i = start, j = end;
 
-        a[i] = a[j];
+     while (i < j)
+     {
+         while (i < j && a[j] > num)
+         {
+             j--;
+         }
 
-        while (i < j && a[i] < num)
-        {
-            i++;
-        }
+         a[i] = a[j];
 
-        a[j] = a[i];
-    }
+         while (i < j && a[i] < num)
+         {
+             i++;
+         }
 
-    a[i] = num;
-    QuickSortLeftPivot(a, start, i - 1);
-    QuickSortLeftPivot(a, i + 1, end);
-}
+         a[j] = a[i];
+     }
 
-*/
+     a[i] = num;
+     QuickSortLeftPivot(a, start, i - 1);
+     QuickSortLeftPivot(a, i + 1, end);
+ }
+
+ */
     }
 }

@@ -45,7 +45,6 @@ namespace DoppleTry2
                 {
                     new StackPopBackTracer(InstructionWrappers),
                     new LdArgBacktracer(InstructionWrappers),
-                    new LdLocBackTracer(InstructionWrappers),
                     new LdStaticFieldBackTracer(InstructionWrappers),
                     new LoadArrayElemBackTracer(InstructionWrappers),
                     new LoadFieldByStackBackTracer(InstructionWrappers),
@@ -64,17 +63,19 @@ namespace DoppleTry2
 
         public List<InstructionWrapper> Run()
         {
+            SetInstructionIndexes();
             _programFlowManager.AddFlowConnections(InstructionWrappers);
-            //PreInlineBackTrace();
+            PreInlineBackTrace();
             InlineFunctionCalls();
+            SetInstructionIndexes();
             AddStArgHelpers();
             BackTrace();
 
-            RemoveHelperCodes();
-            MergeSimilarInstructions();
+            //RemoveHelperCodes();
+            //MergeSimilarInstructions();
 
             SetInstructionIndexes();
-            //Veirify();
+            Veirify();
             AddZeroNode();
 
             return InstructionWrappers;
@@ -85,8 +86,8 @@ namespace DoppleTry2
             MergeLdArgs();
             MergeImmediateValue();
             //MergeLdLocs();
-            MergeRecursionParalel();
-            MergeEquivilents();
+            //MergeRecursionParalel();
+            //MergeEquivilents();
         }
 
         private void MergeEquivilents()
@@ -327,19 +328,11 @@ namespace DoppleTry2
 
         void PreInlineBackTrace()
         {
-            if (InstructionWrappers.All(x => x.Method.FullName == InstructionWrappers[0].Method.FullName))
+            LdLocBackTracer ldLocBackTracer = new LdLocBackTracer(InstructionWrappers);
+            foreach(var instWrapper in InstructionWrappers.Where(x => ldLocBackTracer.HandlesCodes.Contains(x.Instruction.OpCode.Code)).OrderByDescending(x => x.InstructionIndex))
             {
-                //return;
+                ldLocBackTracer.AddBackDataflowConnections(instWrapper);
             }
-            StackPopBackTracer stackPopBacktracer = new StackPopBackTracer(InstructionWrappers);
-            var singleStackPopWrappers = InstructionWrappers
-                                                .Where(x => stackPopBacktracer.HandlesCodes.Contains(x.Instruction.OpCode.Code))
-                                                .OrderByDescending(x => InstructionWrappers.IndexOf(x));
-            foreach (var stackpopInst in singleStackPopWrappers)
-            {
-                stackPopBacktracer.AddBackDataflowConnections(stackpopInst);
-            }
-            //Nope, i have to resolve this in another way
         }
 
         private void AddHelperRetInstructions()

@@ -87,6 +87,7 @@ namespace DoppleTry2.InstructionModifiers
                 var calledFuncInstructions = calledFunc.Body.Instructions.ToList();
                 var calledFuncInstWrappers = calledFuncInstructions.Select(x => InstructionWrapperFactory.GetInstructionWrapper(x, calledFunc)).ToList();
                 programFlowHanlder.AddFlowConnections(calledFuncInstWrappers);
+                InFuncBackTrace(calledFuncInstWrappers);
                 foreach (var nestedCallInstWrapper in calledFuncInstWrappers.Where(x => x is CallInstructionWrapper).ToArray())
                 {
                     int instWrapperIndex = calledFuncInstWrappers.IndexOf(nestedCallInstWrapper);
@@ -100,6 +101,15 @@ namespace DoppleTry2.InstructionModifiers
                 }
                 callInstWrapper.InliningProperties.Inlined = true;
                 return calledFuncInstWrappers;
+            }
+        }
+
+        private void InFuncBackTrace(List<InstructionWrapper> calledFuncInstructions)
+        {
+            LdLocBackTracer LoadLocationBacktracer = new LdLocBackTracer(calledFuncInstructions);
+            foreach(var inst in calledFuncInstructions.Where(x => LoadLocationBacktracer.HandlesCodes.Contains(x.Instruction.OpCode.Code)).OrderByDescending(x => x.InstructionIndex))
+            {
+                LoadLocationBacktracer.AddBackDataflowConnections(inst);
             }
         }
     }

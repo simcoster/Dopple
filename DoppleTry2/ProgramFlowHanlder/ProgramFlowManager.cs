@@ -30,10 +30,6 @@ namespace DoppleTry2.ProgramFlowHanlder
                     flowHandler.SetForwardExecutionFlowInsts(instWrapper, instructionsWrappers);
                 }
             }
-            foreach (var instWrapper in instructionsWrappers)
-            {
-                instWrapper.InstructionIndex = instructionsWrappers.IndexOf(instWrapper);
-            }
         }
     }
 }
