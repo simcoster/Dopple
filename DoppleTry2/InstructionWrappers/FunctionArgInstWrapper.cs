@@ -15,15 +15,21 @@ namespace DoppleTry2.InstructionWrappers
         public StArgInstructionWrapper(Instruction instruction, MethodDefinition method) : base(instruction, method) { }
     }
 
+    public class StThisArgInstructionWrapper : StArgInstructionWrapper
+    {
+        public StThisArgInstructionWrapper(Instruction instruction, MethodDefinition method) : base(instruction, method)
+        {
+            ArgIndex = 0;
+            ArgName = "this";
+            ArgType = method.DeclaringType;
+        }
+    }
+
     public abstract class FunctionArgInstWrapper : InstructionWrapper
     {
         public FunctionArgInstWrapper(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
             ArgIndex = GetArgIndex(instruction);
-            if (!method.IsStatic && instruction.Operand==null)
-            {
-                ArgIndex--;
-            }
             ArgName = method.Parameters[ArgIndex].Name;
             ArgType = method.Parameters[ArgIndex].ParameterType;
         }

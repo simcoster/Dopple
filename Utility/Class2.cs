@@ -10,6 +10,7 @@ namespace Utility
 {
     public class Class2
     {
+        /*
         public static void insertionSort(int[] array)
         {
             for (int i = 0; i < array.Length - 1; i++)
@@ -150,7 +151,7 @@ namespace Utility
                 }
 
                         */
-
+/*
         static void BubbleSort(int[] number)
         {
             bool flag = true;
@@ -278,6 +279,7 @@ namespace Utility
  }
 
  */
+ /*
         public bool BinarySearch(int first, int last, int[] mynumbers, int target)
         {
             while (first <= last)
@@ -301,6 +303,8 @@ namespace Utility
             }
             return false;
         }
+
+        */
         public bool BinarySearchRec(int first, int last, int[] mynumbers, int target)
         {
             if (first == last)
