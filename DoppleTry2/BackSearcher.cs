@@ -53,6 +53,21 @@ namespace DoppleTry2
             return visited.Distinct();
         }
 
+        public static IEnumerable<InstructionWrapper> GetBackFlowTree(InstructionWrapper startInst, List<InstructionWrapper> visited = null)
+        {
+            if (visited == null)
+            {
+                visited = new List<InstructionWrapper>();
+            }
+            if (visited.Contains(startInst))
+            {
+                return new InstructionWrapper[0];
+            }
+            visited.Add(startInst);
+            visited.AddRange(startInst.BackProgramFlow.SelectMany(x => GetBackDataTree(x, visited)).ToArray());
+            return visited.Distinct();
+        }
+
         public static bool HaveCommonStackPushAncestor(InstructionWrapper firstInstruction, InstructionWrapper secondInstructions)
         {
             var firstAncestors = GetStackPushAncestor(firstInstruction).ToArray();

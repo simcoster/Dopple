@@ -87,7 +87,7 @@ namespace DoppleTry2
             MergeImmediateValue();
             //MergeLdLocs();
             MergeRecursionParalel();
-            MergeEquivilents();
+            //MergeEquivilents();
         }
 
         private void MergeEquivilents()

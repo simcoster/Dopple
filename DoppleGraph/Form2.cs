@@ -180,7 +180,21 @@ namespace DoppleGraph
                     link.PenColor = linkGroupColor;
                     link.ToolTipText = indexedArg.ArgIndex.ToString() + " " + link.PenColor.R;
                     link.ToPort = nodeWrapper.Node.LeftPort;
-                    link.FromPort = backNode.Node.RightPort;
+                    if (backNode.Node == nodeWrapper.Node)
+                    {
+                        //link.Curviness = 200;
+                        link.FromPort = backNode.Node.RightPort;
+                        link.Style = GoStrokeStyle.Bezier;
+                        link.CalculateRoute();
+                        foreach (int index in new[] { 1,2})
+                        {
+                            link.SetPoint(index, new PointF(link.GetPoint(index).X, link.GetPoint(index).Y - 40));
+                        }
+                    }
+                    else
+                    {
+                        link.FromPort = backNode.Node.RightPort;
+                    }
                     myView.Document.Add(link);
                     link.PenWidth = 3;
                 }
@@ -231,7 +245,7 @@ namespace DoppleGraph
 
         private GoNodeWrapper GetNodeWrapper(InstructionWrapper instWrapper)
         {
-            return nodeWrappers.First(x => x.InstructionWrapper == instWrapper);
+            return nodeWrappers.FirstOrDefault(x => x.InstructionWrapper == instWrapper);
         }
 
         private GoNodeWrapper GetNodeWrapper(GoNode goNode)
@@ -295,6 +309,7 @@ namespace DoppleGraph
                 .Select(x => new GoNodeWrapper(new GoTextNodeHoverable(), x))
                 .ToList();
 
+            var frontLayer = myView.Document.Layers.CreateNewLayerAfter(myView.Document.LinksLayer);
             foreach (var goNodeWrapper in nodeWrappers)
             {
                 goNodeWrapper.Node.Selected += Node_Selected;
@@ -344,7 +359,6 @@ namespace DoppleGraph
                 {
                     goNodeWrapper.Node.Text += " RecIndex:" + goNodeWrapper.InstructionWrapper.InliningProperties.RecursionInstanceIndex;
                 }
-                var frontLayer = myView.Document.Layers.CreateNewLayerAfter(myView.Document.LinksLayer);
                 frontLayer.Add(goNodeWrapper.Node);
             }
             SetCoordinates(nodeWrappers);
@@ -375,6 +389,20 @@ namespace DoppleGraph
                     var nodeBackTree = BackSearcher.GetBackDataTree(GetNodeWrapper(node).InstructionWrapper).Select(x => GetNodeWrapper(x).Node).ToList();
                     var nodesToHide = myView.Document.Where(x => x is GoNode).Except(nodeBackTree).ToList();
                     foreach(var notABackNode in nodesToHide)
+                    {
+                        myView.Selection.Add(notABackNode);
+                    }
+                    myView.Selection.Remove(node);
+                }
+                PermanentlyHideSelection();
+            }
+            else if (e.KeyChar == '+')
+            {
+                foreach (var node in myView.Selection.Where(x => x is GoNode).Cast<GoNode>().ToArray())
+                {
+                    var nodeBackTree = BackSearcher.GetBackFlowTree(GetNodeWrapper(node).InstructionWrapper).Select(x => GetNodeWrapper(x).Node).ToList();
+                    var nodesToHide = myView.Document.Where(x => x is GoNode).Except(nodeBackTree).ToList();
+                    foreach (var notABackNode in nodesToHide)
                     {
                         myView.Selection.Add(notABackNode);
                     }

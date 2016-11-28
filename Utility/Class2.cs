@@ -102,7 +102,6 @@ namespace Utility
             return arr;
         }
 
-        /*
 
                 public static void QuickSortMiddle(int[] arr)
                 {
@@ -150,8 +149,7 @@ namespace Utility
                     }
                 }
 
-            */
-
+    */
         static void BubbleSort(int[] number)
         {
             bool flag = true;
