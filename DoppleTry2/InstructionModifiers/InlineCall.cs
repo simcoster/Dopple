@@ -28,9 +28,9 @@ namespace DoppleTry2.InstructionModifiers
                 }
                 int instWrapperIndex = instructionWrappers.IndexOf(nestedCallInstWrapper);
                 instructionWrappers.InsertRange(instWrapperIndex + 1, inlinedInstWrappers);
-                foreach (var inlinedLdArg in inlinedInstWrappers.Where(x => CodeGroups.LdArgCodes.Contains(x.Instruction.OpCode.Code)))
+                foreach (var inlinedInstWrapper in inlinedInstWrappers)
                 {
-                    inlinedLdArg.InliningProperties.Inlined = true;
+                    inlinedInstWrapper.InliningProperties.Inlined = true;
                 }
                 if (nestedCallInstWrapper.CalledFunction.FullName == nestedCallInstWrapper.Method.FullName)
                 {

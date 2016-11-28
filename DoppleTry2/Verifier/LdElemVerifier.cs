@@ -37,7 +37,7 @@ namespace DoppleTry2.VerifierNs
             }
             else
             {
-                throw new Exception("Not all elements are providing numbers");
+                //throw new Exception("Not all elements are providing numbers");
             }
         }
     }

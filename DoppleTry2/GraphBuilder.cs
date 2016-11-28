@@ -87,7 +87,7 @@ namespace DoppleTry2
             MergeImmediateValue();
             //MergeLdLocs();
             MergeRecursionParalel();
-            //MergeEquivilents();
+            MergeEquivilents();
         }
 
         private void MergeEquivilents()
@@ -104,7 +104,7 @@ namespace DoppleTry2
                                     .Where(x =>  typeof(OpCodes).GetFields().Select(y => y.GetValue(null))
                                                 .Cast<OpCode>().Where(y => y.StackBehaviourPop != StackBehaviour.Pop0).Select(y=> y.Code)
                                                 .Contains(x.Instruction.OpCode.Code))
-                                    .Where(x => x.BackDataFlowRelated.ArgumentList.SequenceEqual(inst.BackDataFlowRelated.ArgumentList))
+                                    .Where(x => x.BackDataFlowRelated.ArgumentList.Select(y => y.Argument).SequenceEqual(inst.BackDataFlowRelated.ArgumentList.Select(z => z.Argument)))
                                     .Where(x => !new[]{ Code.Ret}.Concat(CodeGroups.CallCodes).Contains(x.Instruction.OpCode.Code)) ;
                 if (toMerge.Count() >1)
                 {
@@ -197,7 +197,6 @@ namespace DoppleTry2
                     .Where(x => x is LdImmediateInstWrapper)
                     .Cast<LdImmediateInstWrapper>()
                     .Where(x => imeddiateValueNode.ImmediateIntValue == x.ImmediateIntValue)
-                    .Where(x => x.Method == imeddiateValueNode.Method)
                     .ToArray();
                 if (instsToMerge.Length > 0)
                 {
@@ -285,7 +284,7 @@ namespace DoppleTry2
             var instWrapperToKeep = Wrappers.ElementAt(0);
             foreach (var wrapperToRemove in Wrappers.ToArray().Except(new[] { instWrapperToKeep }))
             {
-                instWrapperToKeep.BackDataFlowRelated.AddWithNewIndex(wrapperToRemove.BackDataFlowRelated);
+                instWrapperToKeep.BackDataFlowRelated.AddWithNewIndexes(wrapperToRemove.BackDataFlowRelated.ArgumentList.Select(x => x.Argument));
                 instWrapperToKeep.ForwardDataFlowRelated.AddWithNewIndex(wrapperToRemove.ForwardDataFlowRelated);
 
                 foreach (var backNode in wrapperToRemove.BackDataFlowRelated.ArgumentList)

@@ -150,8 +150,8 @@ namespace Utility
                     }
                 }
 
-                        */
-/*
+            */
+
         static void BubbleSort(int[] number)
         {
             bool flag = true;
@@ -233,8 +233,7 @@ namespace Utility
         {
             MergeSortRec(numbers, numbers.Length, 0);
         }
-
-        /*
+        
  static public void TestRec (int[] arr, int left, int right)
  {
      var lefttemp = left + 5;
@@ -278,9 +277,8 @@ namespace Utility
      QuickSortLeftPivot(a, i + 1, end);
  }
 
- */
  
-        public bool BinarySearch(int first, int last, int[] mynumbers, int target)
+        public static bool BinarySearch(int first, int last, int[] mynumbers, int target)
         {
             while (first <= last)
             {

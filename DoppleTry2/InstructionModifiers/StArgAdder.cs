@@ -17,34 +17,33 @@ namespace DoppleTry2.InstructionModifiers
             var addedInstructions = new List<InstructionWrapper>();
             var calledFunc = callInstWrapper.CalledFunction;
             var stackPopBacktracer = new StackPopBackTracer(instructionWrappers);
-            int maxArgIndex;
-            int minArgIndex;
             if (calledFunc.IsStatic)
             {
-                maxArgIndex = calledFunc.Parameters.Count -1;
-                minArgIndex = 0;
+                for (int i = calledFunc.Parameters.Count - 1; i >= 0; i--)
+                {
+                    var argProvidingWrappers = stackPopBacktracer.SearchAndAddDataflowInstrcutions(callInstWrapper);
+                    foreach (var argProvidingWrapper in argProvidingWrappers)
+                    {
+                        Instruction opcode = Instruction.Create(OpCodes.Starg, calledFunc.Parameters[i]);
+                        var stArgWrapper = (StArgInstructionWrapper)InstructionWrapperFactory.GetInstructionWrapper(opcode, calledFunc);
+                        AddStArgInst(instructionWrappers, addedInstructions, calledFunc, i, argProvidingWrapper, stArgWrapper);
+                    }
+                }
             }
             else
             {
-                maxArgIndex = calledFunc.Parameters.Count;
-                minArgIndex = 1;
-            }
-            for (int i = maxArgIndex; i >= minArgIndex; i--)
-            {
-                //var backSearcher = new SingleIndexBackSearcher(instructionWrappers);
-                //var argProvidingWrappers = backSearcher.SearchBackwardsForDataflowInstrcutions(x => x.StackPushCount > 0, callInstWrapper);
-                var argProvidingWrappers = stackPopBacktracer.SearchAndAddDataflowInstrcutions(callInstWrapper);
-                foreach (var argProvidingWrapper in argProvidingWrappers)
+                for (int i = calledFunc.Parameters.Count; i >= 1; i--)
                 {
-                    Instruction opcode = Instruction.Create(OpCodes.Starg, calledFunc.Parameters[i - 1]);
-                    var stArgWrapper = (StArgInstructionWrapper)InstructionWrapperFactory.GetInstructionWrapper(opcode, calledFunc);
-                    AddStArgInst(instructionWrappers, addedInstructions, calledFunc, i, argProvidingWrapper, stArgWrapper);
+                    var argProvidingWrappers = stackPopBacktracer.SearchAndAddDataflowInstrcutions(callInstWrapper);
+                    foreach (var argProvidingWrapper in argProvidingWrappers)
+                    {
+                        Instruction opcode = Instruction.Create(OpCodes.Starg, calledFunc.Parameters[i -1]);
+                        var stArgWrapper = (StArgInstructionWrapper)InstructionWrapperFactory.GetInstructionWrapper(opcode, calledFunc);
+                        AddStArgInst(instructionWrappers, addedInstructions, calledFunc, i, argProvidingWrapper, stArgWrapper);
+                    }
                 }
-            }
-            if (!calledFunc.IsStatic)
-            {
-                var argProvidingWrappers = stackPopBacktracer.SearchAndAddDataflowInstrcutions(callInstWrapper);
-                foreach (var argProvidingWrapper in argProvidingWrappers)
+                var theThisArgProvidingWrappers = stackPopBacktracer.SearchAndAddDataflowInstrcutions(callInstWrapper);
+                foreach (var argProvidingWrapper in theThisArgProvidingWrappers)
                 {
                     Instruction opcode = Instruction.Create(OpCodes.Starg, calledFunc.Parameters[0]);
                     var stArgWrapper = new StThisArgInstructionWrapper(opcode, calledFunc);
@@ -54,7 +53,7 @@ namespace DoppleTry2.InstructionModifiers
             return addedInstructions;
         }
 
-        private static void AddStArgInst(List<InstructionWrapper> instructionWrappers, List<InstructionWrapper> addedInstructions, MethodDefinition calledFunc, int i, InstructionWrapper argProvidingWrapper, StArgInstructionWrapper stArgWrapper)
+        private static void AddStArgInst(List<InstructionWrapper> instructionWrappers, List<InstructionWrapper> addedInstructions, MethodDefinition calledFunc, int argIndex, InstructionWrapper argProvidingWrapper, StArgInstructionWrapper stArgWrapper)
         {
             stArgWrapper.Instruction.Offset = 99999;
             stArgWrapper.BackProgramFlow.Add(argProvidingWrapper);
@@ -68,7 +67,7 @@ namespace DoppleTry2.InstructionModifiers
             argProvidingWrapper.NextPossibleProgramFlow.Add(stArgWrapper);
             stArgWrapper.AddBackDataflowTwoWaySingleIndex(new[] { argProvidingWrapper });
             stArgWrapper.StackPopCount--;
-            stArgWrapper.ArgIndex = i;
+            stArgWrapper.ArgIndex = argIndex;
             stArgWrapper.ProgramFlowResolveDone = true;
             argProvidingWrapper.StackPushCount--;
             instructionWrappers.Insert(instructionWrappers.IndexOf(argProvidingWrapper) + 1, stArgWrapper);

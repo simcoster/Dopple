@@ -360,13 +360,6 @@ namespace DoppleGraph
 
         }
 
-        private void MarkLoops(List<GoNodeWrapper> nodeWrappers)
-        {
-            foreach(var node in nodeWrappers.Where(x => x.InstructionWrapper.BackProgramFlow.Count ==0))
-            {
-
-            }
-        }
 
         private void MyView_KeyPress(object sender, KeyPressEventArgs e)
         {

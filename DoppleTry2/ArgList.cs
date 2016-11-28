@@ -15,6 +15,14 @@ namespace DoppleTry2
         {
             ArgumentList.AddRange(instructionWrappers.Select(x => new IndexedArgument(GetNewIndex() + 1, x)));
         }
+        public void AddWithNewIndexes(IEnumerable<InstructionWrapper> instructionWrappers)
+        {
+            foreach (var instWrapper in instructionWrappers)
+            {
+                AddWithNewIndex(instWrapper);
+            }
+        }
+
         public void AddWithNewIndex(ArgList argList, int index =-1)
         {
             if (index == -1)
