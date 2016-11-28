@@ -69,10 +69,6 @@ namespace DoppleTry2.InstructionModifiers
             stArgWrapper.AddBackDataflowTwoWaySingleIndex(new[] { argProvidingWrapper });
             stArgWrapper.StackPopCount--;
             stArgWrapper.ArgIndex = i;
-            if (!calledFunc.IsStatic)
-            {
-                stArgWrapper.ArgIndex--;
-            }
             stArgWrapper.ProgramFlowResolveDone = true;
             argProvidingWrapper.StackPushCount--;
             instructionWrappers.Insert(instructionWrappers.IndexOf(argProvidingWrapper) + 1, stArgWrapper);

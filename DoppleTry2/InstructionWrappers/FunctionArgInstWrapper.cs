@@ -7,7 +7,34 @@ namespace DoppleTry2.InstructionWrappers
 {
     public class LdArgInstructionWrapper : FunctionArgInstWrapper
     {
-        public LdArgInstructionWrapper(Instruction instruction, MethodDefinition method) : base(instruction, method) { }
+        public LdArgInstructionWrapper(Instruction instruction, MethodDefinition method) : base(instruction, method)
+        {
+            if (instruction.Operand == null && !method.IsStatic)
+            {
+                //ArgIndex++;
+            }
+        }
+        protected override bool TryGetCodeArgIndex(Instruction instruction, out int index)
+        {
+            switch (instruction.OpCode.Code)
+            {
+                case Code.Ldarg_0:
+                    index = 0;
+                    return true;
+                case Code.Ldarg_1:
+                    index = 1;
+                    return true;
+                case Code.Ldarg_2:
+                    index = 2;
+                    return true;
+                case Code.Ldarg_3:
+                    index = 3;
+                    return true;
+                default:
+                    index = -1;
+                    return false;
+            }
+        }
     }
 
     public class StArgInstructionWrapper : FunctionArgInstWrapper
@@ -29,34 +56,70 @@ namespace DoppleTry2.InstructionWrappers
     {
         public FunctionArgInstWrapper(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
-            ArgIndex = GetArgIndex(instruction);
-            ArgName = method.Parameters[ArgIndex].Name;
-            ArgType = method.Parameters[ArgIndex].ParameterType;
+            ArgIndex = GetArgIndex(instruction, method);
+            string argNameTemp;
+            TypeReference argTypeTemp;
+            GetArgNameAndType(ArgIndex, method, out argNameTemp, out argTypeTemp);
+            ArgName = argNameTemp;
+            ArgType = argTypeTemp;
         }
+
+        private static void GetArgNameAndType(int argIndex, MethodDefinition method, out string argName, out TypeReference argType)
+        {
+            int parameterArrayIndex;
+            if (method.IsStatic)
+            {
+                parameterArrayIndex = argIndex;
+            }
+            else
+            {
+                parameterArrayIndex = argIndex - 1;
+                if (parameterArrayIndex == -1)
+                {
+                    argName = "this";
+                    argType = method.DeclaringType;
+                    return;
+                }
+            }
+            argName = method.Parameters[parameterArrayIndex].Name;
+            argType = method.Parameters[parameterArrayIndex].ParameterType;
+        }
+
         public int ArgIndex { get; set; }
         public TypeReference ArgType { get; set; }
         public string ArgName { get; set; }
-        private int GetArgIndex(Instruction instruction)
+        private int GetArgIndex(Instruction instruction, MethodDefinition method)
         {
-            switch (instruction.OpCode.Code)
+            int indexByCode = 0;
+            if (TryGetCodeArgIndex(instruction, out indexByCode) != false)
             {
-                case Code.Ldarg_0:
-                    return 0;
-                case Code.Ldarg_1:
-                    return 1;
-                case Code.Ldarg_2:
-                    return 2;
-                case Code.Ldarg_3:
-                    return 3;
+                return indexByCode;
             }
+            int indexByOperand;
             if (instruction.Operand is ValueType)
-                return Convert.ToInt32(instruction.Operand);
-            else
-                if (instruction.Operand is VariableDefinition)
-                return ((VariableDefinition)instruction.Operand).Index - 1;
+                indexByOperand = Convert.ToInt32(instruction.Operand);
+            else if (instruction.Operand is VariableDefinition)
+                indexByOperand =((VariableDefinition)instruction.Operand).Index;
             else if (instruction.Operand is ParameterDefinition)
-                return ((ParameterDefinition)instruction.Operand).Index;
-            throw new Exception("shouldn't get here");
+                indexByOperand = ((ParameterDefinition)instruction.Operand).Index;
+            else
+            {
+                throw new Exception("shouldn't get here");
+            }
+            if (method.IsStatic)
+            {
+                return indexByOperand;
+            }
+            else
+            {
+                return indexByOperand + 1;
+            }
+        }
+
+        protected virtual bool TryGetCodeArgIndex(Instruction instruction, out int index)
+        {
+            index = -1;
+            return false;
         }
     }
 }

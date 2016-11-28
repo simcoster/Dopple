@@ -86,7 +86,7 @@ namespace DoppleTry2
             MergeLdArgs();
             MergeImmediateValue();
             //MergeLdLocs();
-            //MergeRecursionParalel();
+            MergeRecursionParalel();
             //MergeEquivilents();
         }
 
@@ -118,9 +118,8 @@ namespace DoppleTry2
         {
             RemoveInstWrappers(InstructionWrappers.Where(x => CodeGroups.StLocCodes.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(InstructionWrappers.Where(x => CodeGroups.LdLocCodes.Contains(x.Instruction.OpCode.Code)));
-            LdArgBacktracer ldArgBackTracer = new LdArgBacktracer(null);
             RemoveInstWrappers(InstructionWrappers.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code)));
-            RemoveInstWrappers(InstructionWrappers.Where(x => ldArgBackTracer.HandlesCodes.Contains(x.Instruction.OpCode.Code) && x.InliningProperties.Inlined));
+            RemoveInstWrappers(InstructionWrappers.Where(x => CodeGroups.LdArgCodes.Contains(x.Instruction.OpCode.Code) && x.InliningProperties.Inlined));
             RemoveInstWrappers(InstructionWrappers.Where(x => new[] { Code.Call, Code.Calli, Code.Callvirt }.Contains(x.Instruction.OpCode.Code) && x.InliningProperties.Inlined));
             RemoveInstWrappers(InstructionWrappers.Where(x => x.Instruction.OpCode.Code == Code.Ret && x.InliningProperties.Inlined));
             RemoveInstWrappers(InstructionWrappers.Where(x => x.Instruction.OpCode.Code == Code.Dup));

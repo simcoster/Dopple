@@ -330,14 +330,14 @@ namespace DoppleGraph
                 {
                     goNodeWrapper.Node.Text += ((MethodReference)goNodeWrapper.InstructionWrapper.Instruction.Operand).Name ?? " ";
                 }
+                else if (goNodeWrapper.InstructionWrapper is FunctionArgInstWrapper)
+                {
+                    var ArgInstWrapper = (FunctionArgInstWrapper)goNodeWrapper.InstructionWrapper;
+                    goNodeWrapper.Node.Text += " " + ArgInstWrapper.ArgName + " " + ArgInstWrapper.ArgIndex;
+                }
                 else if (goNodeWrapper.InstructionWrapper.Instruction.Operand != null)
                 {
                     goNodeWrapper.Node.Text += goNodeWrapper.InstructionWrapper.Instruction.Operand.ToString();
-                }
-                else if ( goNodeWrapper.InstructionWrapper is FunctionArgInstWrapper)
-                {
-                    var ArgName = ((FunctionArgInstWrapper)goNodeWrapper.InstructionWrapper).ArgName;
-                    goNodeWrapper.Node.Text += " " + ArgName + " ";
                 }
 
                 if (goNodeWrapper.InstructionWrapper.InliningProperties.Recursive)
