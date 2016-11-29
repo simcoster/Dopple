@@ -72,7 +72,7 @@ namespace DoppleTry2
             BackTrace();
 
             RemoveHelperCodes();
-            MergeSimilarInstructions();
+            //MergeSimilarInstructions();
 
             SetInstructionIndexes();
             Veirify();
@@ -284,8 +284,20 @@ namespace DoppleTry2
             var instWrapperToKeep = Wrappers.ElementAt(0);
             foreach (var wrapperToRemove in Wrappers.ToArray().Except(new[] { instWrapperToKeep }))
             {
-                instWrapperToKeep.BackDataFlowRelated.AddWithNewIndexes(wrapperToRemove.BackDataFlowRelated.ArgumentList.Select(x => x.Argument));
-                instWrapperToKeep.ForwardDataFlowRelated.AddWithNewIndex(wrapperToRemove.ForwardDataFlowRelated);
+                foreach (var backArgGroup in wrapperToRemove.BackDataFlowRelated.ArgumentList.GroupBy(x => x.ArgIndex))
+                {
+                    foreach(var backArg in backArgGroup)
+                    {
+                        instWrapperToKeep.BackDataFlowRelated.AddWithExistingIndex(backArg.Argument,backArg.ArgIndex);
+                    }
+                }
+                foreach (var forwardArgGroup in wrapperToRemove.ForwardDataFlowRelated.ArgumentList.GroupBy(x => x.ArgIndex))
+                {
+                    foreach (var forwardArg in forwardArgGroup)
+                    {
+                        instWrapperToKeep.ForwardDataFlowRelated.AddWithExistingIndex(forwardArg.Argument, forwardArg.ArgIndex);
+                    }
+                }
 
                 foreach (var backNode in wrapperToRemove.BackDataFlowRelated.ArgumentList)
                 {
@@ -302,24 +314,34 @@ namespace DoppleTry2
             }
         }
 
+        private void MergeBackArguments(InstructionWrapper instToKeep, InstructionWrapper instToRemove)
+        {
+            foreach(var argGroup in instToRemove.BackDataFlowRelated.ArgumentList.GroupBy(x => x.ArgIndex))
+            {
+                foreach (var arg in argGroup)
+                {
+                    instToKeep.BackDataFlowRelated.AddWithExistingIndex(arg.Argument, arg.ArgIndex);
+                }
+            }
+        }
+
         public void RemoveInstWrappers(IEnumerable<InstructionWrapper> instsToRemove)
         {
-            foreach (var instWrapper in instsToRemove.ToArray())
+            foreach (var instToRemove in instsToRemove.ToArray())
             {
-                foreach (var forInst in instWrapper.ForwardDataFlowRelated.ArgumentList.Select(x => x.Argument).Distinct().ToArray())
+                foreach (var forInst in instToRemove.ForwardDataFlowRelated.ArgumentList.Select(x => x.Argument).Distinct().ToArray())
                 {
-                    int backArgIndex = forInst.BackDataFlowRelated.ArgumentList.First(x => x.Argument == instWrapper).ArgIndex;
-                    forInst.BackDataFlowRelated.AddWithNewIndex(instWrapper.BackDataFlowRelated, backArgIndex);
-                    //forInst.Argument.BackDataFlowRelated.ArgumentList.Remove(forInst.Argument.BackDataFlowRelated.ArgumentList.First(x => x.Argument == instWrapper));
-                    //TODO should correct this, not preserving multiple connections to the same node
-                    forInst.BackDataFlowRelated.ArgumentList.RemoveAll(x => x.Argument == instWrapper);
+                    int index = forInst.BackDataFlowRelated.ArgumentList.First(x => x.Argument == instToRemove).ArgIndex;
+                    forInst.BackDataFlowRelated.AddWithExistingIndex(instToRemove.BackDataFlowRelated.ArgumentList.Select(x => x.Argument) ,index);
+                    forInst.BackDataFlowRelated.ArgumentList.RemoveAll(x => x.Argument == instToRemove);
                 }
-                foreach (var backInst in instWrapper.BackDataFlowRelated.ArgumentList.ToArray())
+                foreach (var backInst in instToRemove.BackDataFlowRelated.ArgumentList.Select(x => x.Argument).Distinct().ToArray())
                 {
-                    backInst.Argument.ForwardDataFlowRelated.AddWithNewIndex(instWrapper.ForwardDataFlowRelated);
-                    backInst.Argument.ForwardDataFlowRelated.ArgumentList.RemoveAll(x => x.Argument == instWrapper);
+                    int index = backInst.ForwardDataFlowRelated.ArgumentList.First(x => x.Argument == instToRemove).ArgIndex;
+                    backInst.ForwardDataFlowRelated.AddWithExistingIndex(instToRemove.BackDataFlowRelated.ArgumentList.Select(x => x.Argument), index);
+                    backInst.ForwardDataFlowRelated.ArgumentList.RemoveAll(x => x.Argument == instToRemove);
                 }
-                InstructionWrappers.Remove(instWrapper);
+                InstructionWrappers.Remove(instToRemove);
             }
             SetInstructionIndexes();
         }

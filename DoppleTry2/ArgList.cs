@@ -13,7 +13,8 @@ namespace DoppleTry2
 
         public void AddWithNewIndex(IEnumerable<InstructionWrapper> instructionWrappers)
         {
-            ArgumentList.AddRange(instructionWrappers.Select(x => new IndexedArgument(GetNewIndex() + 1, x)));
+            int index = GetNewIndex();
+            ArgumentList.AddRange(instructionWrappers.Select(x => new IndexedArgument(index, x)));
         }
         public void AddWithNewIndexes(IEnumerable<InstructionWrapper> instructionWrappers)
         {
@@ -22,17 +23,34 @@ namespace DoppleTry2
                 AddWithNewIndex(instWrapper);
             }
         }
+        public void AddWithExistingIndex(InstructionWrapper instructionWrapper , int index)
+        {
+            ArgumentList.Add(new IndexedArgument(index, instructionWrapper));
+        }
+        public void AddWithExistingIndex(IEnumerable<InstructionWrapper> instructionWrappers, int index)
+        {
+            foreach(var instWrapper in instructionWrappers)
+            {
+                AddWithExistingIndex(instWrapper, index);
+            }
+        }
+
 
         public void AddWithNewIndex(ArgList argList, int index =-1)
         {
             if (index == -1)
             {
-                ArgumentList.AddRange(argList.ArgumentList.Select(x => new IndexedArgument(GetNewIndex() + 1, x.Argument)).ToArray());
+                ArgumentList.AddRange(argList.ArgumentList.Select(x => new IndexedArgument(GetNewIndex(), x.Argument)).ToArray());
             }
             else
             {
                 ArgumentList.AddRange(argList.ArgumentList.Select(x => new IndexedArgument(index, x.Argument)).ToArray());
             }
+        }
+
+        public void AddPreserveIndexes(ArgList argList)
+        {
+            ArgumentList.AddRange(argList.ArgumentList);
         }
         public void AddWithNewIndex(InstructionWrapper instructionWrapper)
         {
