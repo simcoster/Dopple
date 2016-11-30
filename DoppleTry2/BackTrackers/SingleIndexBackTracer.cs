@@ -25,7 +25,7 @@ namespace DoppleTry2.BackTrackers
             {
                 return;
             }
-            var backRelatedInsts = GetDataflowBackRelated(currentInst);
+            IEnumerable<IEnumerable<InstructionWrapper>> backRelatedInsts = GetDataflowBackRelated(currentInst);
 
             foreach (var backRelatedGroup in backRelatedInsts)
             {

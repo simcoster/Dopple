@@ -16,26 +16,19 @@ namespace DoppleTry2.VerifierNs
 
         public override void Verify(InstructionWrapper instructionWrapper)
         {
-            //throw new NotImplementedException();
-        }
-
-        public void Verify(IEnumerable<InstructionWrapper> instructionWrappers)
-        {
-            foreach (var inst in instructionWrappers.OrderByDescending(x => x.InstructionIndex))
+            return;
+            foreach (var backInst in instructionWrapper.BackDataFlowRelated.ArgumentList)
             {
-                foreach (var backInst in inst.BackDataFlowRelated.ArgumentList)
+                if (!backInst.Argument.ForwardDataFlowRelated.ArgumentList.Select(x => x.Argument).Contains(instructionWrapper))
                 {
-                    if (!backInst.Argument.ForwardDataFlowRelated.ArgumentList.Select(x => x.Argument).Contains(inst))
-                    {
-                        throw new Exception();
-                    }
+                    throw new Exception();
                 }
-                foreach (var forInst in inst.ForwardDataFlowRelated.ArgumentList)
+            }
+            foreach (var forInst in instructionWrapper.ForwardDataFlowRelated.ArgumentList)
+            {
+                if (!forInst.Argument.BackDataFlowRelated.ArgumentList.Select(x => x.Argument).Contains(instructionWrapper))
                 {
-                    if (!forInst.Argument.BackDataFlowRelated.ArgumentList.Select(x => x.Argument).Contains(inst))
-                    {
-                        throw new Exception();
-                    }
+                    throw new Exception();
                 }
             }
         }
