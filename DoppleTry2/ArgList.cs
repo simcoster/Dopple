@@ -15,6 +15,7 @@ namespace DoppleTry2
         {
             int index = GetNewIndex();
             ArgumentList.AddRange(instructionWrappers.Select(x => new IndexedArgument(index, x)));
+            CheckNumberings();
         }
         public void AddWithNewIndexes(IEnumerable<InstructionWrapper> instructionWrappers)
         {
@@ -26,6 +27,11 @@ namespace DoppleTry2
         public void AddWithExistingIndex(InstructionWrapper instructionWrapper , int index)
         {
             ArgumentList.Add(new IndexedArgument(index, instructionWrapper));
+            CheckNumberings();
+        }
+        public void AddWithExistingIndex(IndexedArgument indexedArg)
+        {
+            AddWithExistingIndex(indexedArg.Argument,indexedArg.ArgIndex);
         }
         public void AddWithExistingIndex(IEnumerable<InstructionWrapper> instructionWrappers, int index)
         {
@@ -35,6 +41,13 @@ namespace DoppleTry2
             }
         }
 
+        internal void AddWithExistingIndex(List<IndexedArgument> argumentList)
+        {
+            foreach(var indexedArg in argumentList)
+            {
+                AddWithExistingIndex(indexedArg);
+            }
+        }
 
         public void AddWithNewIndex(ArgList argList, int index =-1)
         {
@@ -46,15 +59,18 @@ namespace DoppleTry2
             {
                 ArgumentList.AddRange(argList.ArgumentList.Select(x => new IndexedArgument(index, x.Argument)).ToArray());
             }
+            CheckNumberings();
         }
 
         public void AddPreserveIndexes(ArgList argList)
         {
             ArgumentList.AddRange(argList.ArgumentList);
+            CheckNumberings();
         }
         public void AddWithNewIndex(InstructionWrapper instructionWrapper)
         {
             AddWithNewIndex(new[] { instructionWrapper });
+            CheckNumberings();
         }
 
         public override bool Equals (object otherObject)
@@ -80,6 +96,21 @@ namespace DoppleTry2
                 return ArgumentList.Max(x => x.ArgIndex) + 1;
             }
         }
-    }
 
+        public void CheckNumberings()
+        {
+            if (ArgumentList.Count == 0)
+            {
+                return;
+            }
+            int maxIndex = ArgumentList.Max(x => x.ArgIndex);
+            for (int i = 0; i <= maxIndex; i++)
+            {
+                if (!ArgumentList.Any(x => x.ArgIndex == i))
+                {
+                    throw new Exception("Index missing");
+                }
+            }
+        }
+    }
 }

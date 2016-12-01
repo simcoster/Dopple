@@ -149,7 +149,6 @@ namespace Utility
                     }
                 }
 
-    */
         static void BubbleSort(int[] number)
         {
             bool flag = true;
@@ -190,6 +189,7 @@ namespace Utility
                 }
             }
         }
+            */
 
         static public void DoMerge(int[] numbers, int left, int mid, int right)
         {
@@ -230,7 +230,7 @@ namespace Utility
         }
 
 
-
+        /*
 
         static public void MergeSortRec(int[] numbers, int left, int right)
         {
@@ -341,5 +341,6 @@ namespace Utility
                 return true;
             }
         }
+        */
     }
 }

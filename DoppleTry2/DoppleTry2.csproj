@@ -66,6 +66,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArgIndexVerifier.cs" />
     <Compile Include="ArgList.cs" />
     <Compile Include="BackSearcher.cs" />
     <Compile Include="BackTrackers\BackTracer.cs" />
@@ -92,6 +93,7 @@
     <Compile Include="InstructionWrappers\FunctionArgInstWrapper.cs" />
     <Compile Include="InstructionWrappers\LdImmediateInstWrapper.cs" />
     <Compile Include="InstructionWrappers\TempLocationInstructionWrapper.cs" />
+    <Compile Include="LinqExtention.cs" />
     <Compile Include="OpcodeProperties\DataflowProperties.cs" />
     <Compile Include="OpcodeProperties\InstructionPropertiesHandler.cs" />
     <Compile Include="OpcodeProperties\MemoryProperties.cs" />
