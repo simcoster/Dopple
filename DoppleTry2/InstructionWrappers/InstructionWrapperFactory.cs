@@ -35,6 +35,10 @@ namespace DoppleTry2.InstructionWrappers
             {
                 return new LdImmediateInstWrapper(instruction, method);
             }
+            else if (CodeGroups.LdElemCodes.Contains(instruction.OpCode.Code))
+            {
+                return new LdElemInstructionWrapper(instruction, method);
+            }
             else
             {
                 return new InstructionWrapper(instruction, method);

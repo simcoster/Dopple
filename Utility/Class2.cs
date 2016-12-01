@@ -33,6 +33,7 @@ namespace Utility
             }
         }
 
+        /*
         public static void insertionSortWithHelpers(int[] array)
         {
             for (int i = 0; i < array.Length - 1; i++)
@@ -183,6 +184,8 @@ namespace Utility
                 {
                     if (number[j + 1] > number[j])
                     {
+                        number[j + 1] = number[j + 1] + number[j];
+                        number[j] = number[j + 1] + number[j];
                         flag = true;
                     }
                 }

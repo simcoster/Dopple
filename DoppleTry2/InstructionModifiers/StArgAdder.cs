@@ -57,14 +57,14 @@ namespace DoppleTry2.InstructionModifiers
         {
             stArgWrapper.Instruction.Offset = 99999;
             stArgWrapper.BackProgramFlow.Add(argProvidingWrapper);
-            stArgWrapper.NextPossibleProgramFlow.AddRange(argProvidingWrapper.NextPossibleProgramFlow);
-            foreach (var nextPossiblePrFlow in stArgWrapper.NextPossibleProgramFlow)
+            stArgWrapper.ForwardProgramFlow.AddRange(argProvidingWrapper.ForwardProgramFlow);
+            foreach (var nextPossiblePrFlow in stArgWrapper.ForwardProgramFlow)
             {
                 nextPossiblePrFlow.BackProgramFlow.Remove(argProvidingWrapper);
                 nextPossiblePrFlow.BackProgramFlow.Add(stArgWrapper);
             }
-            argProvidingWrapper.NextPossibleProgramFlow.Clear();
-            argProvidingWrapper.NextPossibleProgramFlow.Add(stArgWrapper);
+            argProvidingWrapper.ForwardProgramFlow.Clear();
+            argProvidingWrapper.ForwardProgramFlow.Add(stArgWrapper);
             stArgWrapper.AddBackDataflowTwoWaySingleIndex(new[] { argProvidingWrapper });
             stArgWrapper.StackPopCount--;
             stArgWrapper.ArgIndex = argIndex;

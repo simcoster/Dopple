@@ -110,7 +110,7 @@ namespace DoppleGraph
 
         private void DrawFlowLinks(GoNodeWrapper nodeWrapper, GoView myView)
         {
-            foreach (InstructionWrapper wrapper in nodeWrapper.InstructionWrapper.NextPossibleProgramFlow)
+            foreach (InstructionWrapper wrapper in nodeWrapper.InstructionWrapper.ForwardProgramFlow)
             {
                 Color randomColor;
                 GoLink link = new GoLink();
@@ -132,7 +132,7 @@ namespace DoppleGraph
         {
             foreach (var instWrapper in instructionWrappers)
             {
-                instWrapper.NextPossibleProgramFlow = GetStillExistingNextFlowInstructions(instWrapper).ToList();
+                instWrapper.ForwardProgramFlow = GetStillExistingNextFlowInstructions(instWrapper).ToList();
             }
         }
 
@@ -144,7 +144,7 @@ namespace DoppleGraph
             }
             visited.Add(instruction);
             List<InstructionWrapper> wrappersToReturn = new List<InstructionWrapper>();
-            foreach(var nextInst in instruction.NextPossibleProgramFlow)
+            foreach(var nextInst in instruction.ForwardProgramFlow)
             {
                 if (visited.Contains(nextInst))
                 {

@@ -10,6 +10,7 @@ namespace DoppleTry2
     public class ArgList
     {
         public List<IndexedArgument> ArgumentList { get; internal set; } = new List<IndexedArgument>();
+        public int MaxArgIndex = -1;
 
         public void AddWithNewIndex(IEnumerable<InstructionWrapper> instructionWrappers)
         {
@@ -107,6 +108,10 @@ namespace DoppleTry2
             if (ArgumentList.Count == 0)
             {
                 return;
+            }
+            if (ArgumentList.Any(x => x.ArgIndex > MaxArgIndex) && MaxArgIndex != -1)
+            {
+                //throw new Exception("Arg too big detected");
             }
             int maxIndex = ArgumentList.Max(x => x.ArgIndex);
             for (int i = 0; i <= maxIndex; i++)

@@ -42,41 +42,30 @@ namespace DoppleTry2.BackTrackers
             var foundInstructions = new List<InstructionWrapper>();
             int index = InstructionWrappers.IndexOf(startInstruction);
             if (index < 0)
-                return new List<InstructionWrapper>();
-            while (true)
-            {
-                var currInstruction = InstructionWrappers[index];
-                if (visitedInstructions.Contains(currInstruction))
-                {
-                    break;
-                }
-                else
-                {
-                    visitedInstructions.Add(currInstruction);
-                }
+                throw new Exception("shouldn't get here");
 
-                if (predicate.Invoke(currInstruction))
+            var currInstruction = InstructionWrappers[index];
+            if (visitedInstructions.Contains(currInstruction))
+            {
+                return new List<InstructionWrapper>();
+            }
+            else
+            {
+                visitedInstructions.Add(currInstruction);
+            }
+
+            if (predicate.Invoke(currInstruction))
+            {
+                foundInstructions.Add(currInstruction);
+            }
+
+            else
+            {
+                foreach (var instructionWrapper in currInstruction.BackProgramFlow)
                 {
-                    foundInstructions.Add(currInstruction);
-                    break;
-                }
-                else if (currInstruction.BackProgramFlow.Count == 0)
-                {
-                    break;
-                }
-                else if (currInstruction.BackProgramFlow.Count == 1)
-                {
-                    index = InstructionWrappers.IndexOf(currInstruction.BackProgramFlow[0]);
-                }
-                else
-                {
-                    foreach (var instructionWrapper in currInstruction.BackProgramFlow)
-                    {
-                        IEnumerable<InstructionWrapper> branchindexes =
-                            SafeSearchBackwardsForDataflowInstrcutions(InstructionWrappers, predicate, instructionWrapper, visitedInstructions);
-                        foundInstructions.AddRange(branchindexes);
-                    }
-                    break;
+                    IEnumerable<InstructionWrapper> branchindexes =
+                        SafeSearchBackwardsForDataflowInstrcutions(InstructionWrappers, predicate, instructionWrapper, visitedInstructions);
+                    foundInstructions.AddRange(branchindexes);
                 }
             }
             return foundInstructions;

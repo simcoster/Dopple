@@ -25,11 +25,11 @@ namespace DoppleTry2.ProgramFlowHanlder
         {
             if (wrapperToModify.InliningProperties.Inlined)
             {
-                foreach (var inst in wrapperToModify.NextPossibleProgramFlow)
+                foreach (var inst in wrapperToModify.ForwardProgramFlow)
                 {
                     inst.BackProgramFlow.Remove(wrapperToModify);
                 }
-                wrapperToModify.NextPossibleProgramFlow.Clear();
+                wrapperToModify.ForwardProgramFlow.Clear();
                 TwoWayLinkExecutionPath(wrapperToModify, instructionWrappers[instructionWrappers.IndexOf(wrapperToModify) + 1]);
             }
             else

@@ -46,7 +46,7 @@ namespace DoppleTry2
                     new StackPopBackTracer(InstructionWrappers),
                     new LdArgBacktracer(InstructionWrappers),
                     new LdStaticFieldBackTracer(InstructionWrappers),
-                    new LoadArrayElemBackTracer(InstructionWrappers),
+                    //new LoadArrayElemBackTracer(InstructionWrappers),
                     new LoadFieldByStackBackTracer(InstructionWrappers),
                     new LoadMemoryByOperandBackTracer(InstructionWrappers),
                     new TypedReferenceBackTracer(InstructionWrappers)
@@ -70,15 +70,27 @@ namespace DoppleTry2
             SetInstructionIndexes();
             AddStArgHelpers();
             BackTrace();
-
             RemoveHelperCodes();
             MergeSimilarInstructions();
-
+            PostMergeBackTrace();
             SetInstructionIndexes();
             Veirify();
             AddZeroNode();
 
             return InstructionWrappers;
+        }
+
+        private void PostMergeBackTrace()
+        {
+            LdElemBacktracer ldElemBacktracer = new LdElemBacktracer(InstructionWrappers);
+            foreach(var instWrapper in InstructionWrappers)
+            {
+                if (!ldElemBacktracer.HandlesCodes.Contains(instWrapper.Instruction.OpCode.Code))
+                {
+                    continue;
+                }
+                ldElemBacktracer.AddBackDataflowConnections(instWrapper);
+            }
         }
 
         private void MergeSimilarInstructions()
@@ -164,18 +176,6 @@ namespace DoppleTry2
                 }
             }
         }
-
-        private void BackTraceRec(InstructionWrapper instructionWrapper)
-        {
-            // start going backwards.
-            // if you come across someone with stack pop still left, do that first, then continue
-            // either the backtracer will signal me, and then i'll continue from where i left off, or trace back again
-            // it's performance vs readability
-            //  Backtracer shouldn't know of other backtracers
-            // we'll stop and run again....
-
-        }
-
 
         void MergeRecursionParalel()
         {
@@ -309,6 +309,11 @@ namespace DoppleTry2
                     forwardNode.Argument.BackDataFlowRelated.AddWithExistingIndex(instWrapperToKeep, backRelatedIndex);
                     forwardNode.Argument.BackDataFlowRelated.CheckNumberings();
                 }
+                foreach (var forwardFlowInst in InstructionWrappers.Where(x => x.BackProgramFlow.Contains(wrapperToRemove)).ToList())
+                {
+                    forwardFlowInst.BackProgramFlow.RemoveAll(x => x == wrapperToRemove);
+                    forwardFlowInst.BackProgramFlow.AddRange(wrapperToRemove.BackProgramFlow);
+                }
                 InstructionWrappers.Remove(wrapperToRemove);
             }
         }
@@ -330,6 +335,11 @@ namespace DoppleTry2
                     backInst.ForwardDataFlowRelated.AddWithExistingIndex(wrapperToRemove.ForwardDataFlowRelated.ArgumentList.Select(x => x.Argument),index);
                     backInst.ForwardDataFlowRelated.ArgumentList.RemoveAll(x => x.Argument == wrapperToRemove);
                     backInst.ForwardDataFlowRelated.CheckNumberings();
+                }
+                foreach(var forwardFlowInst in InstructionWrappers.Where(x => x.BackProgramFlow.Contains(wrapperToRemove)).ToList())
+                {
+                    forwardFlowInst.BackProgramFlow.RemoveAll(x => x == wrapperToRemove);
+                    forwardFlowInst.BackProgramFlow.AddRange(wrapperToRemove.BackProgramFlow);
                 }
                 InstructionWrappers.Remove(wrapperToRemove);
             }

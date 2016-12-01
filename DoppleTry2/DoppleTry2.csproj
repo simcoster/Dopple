@@ -66,10 +66,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ArgIndexVerifier.cs" />
+    <Compile Include="InstructionWrappers\LdElemInstructionWrapper.cs" />
+    <Compile Include="Verifier\ArgIndexVerifier.cs" />
     <Compile Include="ArgList.cs" />
     <Compile Include="BackSearcher.cs" />
     <Compile Include="BackTrackers\BackTracer.cs" />
+    <Compile Include="BackTrackers\LdElemBacktracer.cs" />
     <Compile Include="BackTrackers\SingleIndexBackSearcher.cs" />
     <Compile Include="GraphBuilder.cs" />
     <Compile Include="BackTrackers\LdArgBacktracer.cs" />

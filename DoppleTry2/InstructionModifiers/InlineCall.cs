@@ -95,7 +95,7 @@ namespace DoppleTry2.InstructionModifiers
                     if (inlinedInstWrappers.Count > 0)
                     {
                         calledFuncInstWrappers.InsertRange(instWrapperIndex + 1, inlinedInstWrappers);
-                        nestedCallInstWrapper.NextPossibleProgramFlow.Clear();
+                        nestedCallInstWrapper.ForwardProgramFlow.Clear();
                         ProgramFlowHandler.TwoWayLinkExecutionPath(nestedCallInstWrapper, inlinedInstWrappers[0]);
                     }
                 }
