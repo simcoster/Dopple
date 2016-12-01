@@ -26,6 +26,10 @@ namespace DoppleTry2
         }
         public void AddWithExistingIndex(InstructionWrapper instructionWrapper , int index)
         {
+            if (ArgumentList.Any(x => x.ArgIndex == index && x.Argument == instructionWrapper))
+            {
+                return;
+            }
             ArgumentList.Add(new IndexedArgument(index, instructionWrapper));
             CheckNumberings();
         }

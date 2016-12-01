@@ -169,37 +169,54 @@ namespace DoppleGraph
                 ColumnBaseColors.Add(nodeWrapper.DisplayCol, GetRandomColor());
             }
             //var linkGroupColor = ColumnBaseColors[nodeWrapper.DisplayCol];
-            foreach (var argumentGroup in nodeWrapper.InstructionWrapper.BackDataFlowRelated.ArgumentList.GroupBy(x => x.ArgIndex))
+
+            foreach (var indexedArg in nodeWrapper.InstructionWrapper.BackDataFlowRelated.ArgumentList)
             {
-                var linkGroupColor = GetRandomColor();
-                foreach (var indexedArg in argumentGroup)
+                Color linkColor = GetPredefinedColor(indexedArg.ArgIndex);
+                GoLink link = new GoLink();
+                var backNode = GetNodeWrapper(indexedArg.Argument);
+                link.BrushColor = linkColor;
+                link.PenColor = linkColor;
+                link.ToolTipText = indexedArg.ArgIndex.ToString() + " " + link.PenColor.R;
+                link.ToPort = nodeWrapper.Node.LeftPort;
+                if (backNode.Node == nodeWrapper.Node)
                 {
-                    GoLink link = new GoLink();
-                    var backNode = GetNodeWrapper(indexedArg.Argument);
-                    link.BrushColor = linkGroupColor;
-                    link.PenColor = linkGroupColor;
-                    link.ToolTipText = indexedArg.ArgIndex.ToString() + " " + link.PenColor.R;
-                    link.ToPort = nodeWrapper.Node.LeftPort;
-                    if (backNode.Node == nodeWrapper.Node)
+                    //link.Curviness = 200;
+                    link.FromPort = backNode.Node.RightPort;
+                    link.Style = GoStrokeStyle.Bezier;
+                    link.CalculateRoute();
+                    foreach (int index in new[] { 1, 2 })
                     {
-                        //link.Curviness = 200;
-                        link.FromPort = backNode.Node.RightPort;
-                        link.Style = GoStrokeStyle.Bezier;
-                        link.CalculateRoute();
-                        foreach (int index in new[] { 1,2})
-                        {
-                            link.SetPoint(index, new PointF(link.GetPoint(index).X, link.GetPoint(index).Y - 40));
-                        }
+                        link.SetPoint(index, new PointF(link.GetPoint(index).X, link.GetPoint(index).Y - 40));
                     }
-                    else
-                    {
-                        link.FromPort = backNode.Node.RightPort;
-                    }
-                    myView.Document.Add(link);
-                    link.PenWidth = 3;
                 }
+                else
+                {
+                    link.FromPort = backNode.Node.RightPort;
+                }
+                myView.Document.Add(link);
+                link.PenWidth = 3;
             }
             var allLinks = myView.Document.Where(x => x is GoLink).Cast<GoLink>().Select(y => y.PenColor);
+        }
+
+        private Color GetPredefinedColor(int argIndex)
+        {
+            switch (argIndex)
+            {
+                case 0:
+                    return Color.Blue;
+                case 1:
+                    return Color.Green;
+                case 2:
+                    return Color.Orange;
+                case 3:
+                    return Color.Purple;
+                case 4:
+                    return Color.Brown;
+                default:
+                    return Color.Red;
+            }
         }
 
         private Color GetRandomColor()

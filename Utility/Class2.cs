@@ -10,7 +10,6 @@ namespace Utility
 {
     public class Class2
     {
-        /*
         public static void insertionSort(int[] array)
         {
             for (int i = 0; i < array.Length - 1; i++)
@@ -189,7 +188,6 @@ namespace Utility
                 }
             }
         }
-            */
 
         static public void DoMerge(int[] numbers, int left, int mid, int right)
         {
