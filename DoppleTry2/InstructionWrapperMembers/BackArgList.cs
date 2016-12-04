@@ -16,36 +16,36 @@ namespace DoppleTry2
         InstructionWrapper containingWrapper;
         public int MaxArgIndex = -1;
 
-        public new void Remove(IndexedArgument backArgToRemove)
+        public void RemoveTwoWay(IndexedArgument backArgToRemove)
         {
-            base.Remove(backArgToRemove);
+            Remove(backArgToRemove);
             var forwardArg = backArgToRemove.Argument.ForwardDataFlowRelated.First(x => x == containingWrapper);
             backArgToRemove.Argument.ForwardDataFlowRelated.Remove(forwardArg);
         }
-        public new void RemoveAll(Predicate<IndexedArgument> predicate)
+        public void RemoveAllTwoWay(Predicate<IndexedArgument> predicate)
         {
             foreach (var toRemove in this.Where(x => predicate(x)))
             {
-                Remove(toRemove);
+                RemoveTwoWay(toRemove);
             }
         }
-        public new void Add(IndexedArgument toAdd)
+        public void AddTwoWay(IndexedArgument toAdd)
         {
-            base.Add(toAdd);
+            Add(toAdd);
             toAdd.Argument.ForwardDataFlowRelated.Add(containingWrapper);
         }
-        public new void AddRange(IEnumerable<IndexedArgument> rangeToAdd)
+        public void AddRangeTwoWay(IEnumerable<IndexedArgument> rangeToAdd)
         {
             foreach (var backArgToAdd in rangeToAdd)
             {
-                Add(backArgToAdd);
+                AddTwoWay(backArgToAdd);
             }
         }
 
         public void AddWithNewIndex(IEnumerable<InstructionWrapper> backInstructions)
         {
             int index = GetNewIndex();
-            AddRange(backInstructions.Select(x => new IndexedArgument(index, x)));
+            AddRangeTwoWay(backInstructions.Select(x => new IndexedArgument(index, x)));
             CheckNumberings();
         }
         public void AddWithNewIndexes(IEnumerable<InstructionWrapper> instructionWrappers)
@@ -61,7 +61,7 @@ namespace DoppleTry2
             {
                 return;
             }
-            this.Add(new IndexedArgument(index, backInstruction));
+            AddTwoWay(new IndexedArgument(index, backInstruction));
             CheckNumberings();
         }
         public void AddWithExistingIndex(IndexedArgument indexedArg)
@@ -78,7 +78,7 @@ namespace DoppleTry2
 
         public void AddPreserveIndexes(BackArgList argList)
         {
-            this.AddRange(argList);
+            AddRangeTwoWay(argList);
             CheckNumberings();
         }
         

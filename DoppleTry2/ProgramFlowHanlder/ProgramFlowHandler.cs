@@ -37,16 +37,6 @@ namespace DoppleTry2.ProgramFlowHanlder
 
         public abstract Code[] HandledCodes { get; }
 
-        public void SetForwardExecutionFlowInsts(InstructionWrapper wrapperToModify, List<InstructionWrapper> instructionWrappers)
-        {
-            if (wrapperToModify.ProgramFlowResolveDone)
-            {
-                return;
-            }
-            SetForwardExecutionFlowInstsInternal(wrapperToModify, instructionWrappers);
-            wrapperToModify.ProgramFlowResolveDone = true;
-        }
-
-        protected abstract void SetForwardExecutionFlowInstsInternal(InstructionWrapper wrapperToModify, List<InstructionWrapper> instructionWrappers);
+        public abstract void SetForwardExecutionFlowInsts(InstructionWrapper wrapperToModify, List<InstructionWrapper> instructionWrappers);
     }
 }

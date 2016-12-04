@@ -21,7 +21,7 @@ namespace DoppleTry2.InstructionWrappers
             MemoryReadCount = MemoryProperties.GetMemReadCount(instruction.OpCode.Code);
             MemoryStoreCount = MemoryProperties.GetMemStoreCount(instruction.OpCode.Code);
             _BackDataFlowRelated = new BackArgList(this);
-            BackProgramFlow = new BackFlowList(this);
+            _BackProgramFlow = new BackFlowList(this);
         }
 
         private int GetStackPopCount(Instruction instruction)
@@ -102,7 +102,15 @@ namespace DoppleTry2.InstructionWrappers
                 _BackDataFlowRelated = value;
             }
         }
-        public BackFlowList BackProgramFlow { get; set; }
+        public BackFlowList BackProgramFlow
+        {
+            get
+            {
+                return _BackProgramFlow;
+            }
+            set { _BackProgramFlow = value; }
+        }
+        BackFlowList _BackProgramFlow;
         List<InstructionWrapper> _ForwardDataFlowRelated = new List<InstructionWrapper>();
         public List<InstructionWrapper> ForwardDataFlowRelated
         {

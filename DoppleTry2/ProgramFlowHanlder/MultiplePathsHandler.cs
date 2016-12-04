@@ -18,11 +18,10 @@ namespace DoppleTry2.ProgramFlowHanlder
             Code.Ble_Un, Code.Ble_Un_S, Code.Bne_Un, Code.Bne_Un_S, Code.Blt, Code.Blt_S, Code.Blt_Un, Code.Blt_Un_S, 
         };
 
-        protected override void SetForwardExecutionFlowInstsInternal(InstructionWrapper wrapperToModify, List<InstructionWrapper> instructionWrappers)
+        public override void SetForwardExecutionFlowInsts(InstructionWrapper wrapperToModify, List<InstructionWrapper> instructionWrappers)
         {
             var forwardInstruction = instructionWrappers.First(x => x.Instruction == wrapperToModify.Instruction.Operand);
-            forwardInstruction.BackProgramFlow.AddTwoWay(forwardInstruction);
-            instructionWrappers.First(x => x.Instruction == wrapperToModify.Instruction.Next).BackProgramFlow.AddTwoWay(wrapperToModify);
+            forwardInstruction.BackProgramFlow.AddTwoWay(wrapperToModify);
         }
     }
 }

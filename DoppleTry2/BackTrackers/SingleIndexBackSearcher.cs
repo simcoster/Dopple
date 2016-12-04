@@ -18,12 +18,12 @@ namespace DoppleTry2.BackTrackers
         public List<InstructionWrapper> SearchBackwardsForDataflowInstrcutions(Func<InstructionWrapper, bool> predicate,
        InstructionWrapper startInstruction)
         {
-            List<InstructionWrapper> indexes = SafeSearchBackwardsForDataflowInstrcutions(predicate, startInstruction);
-            if (indexes.Count == 0)
+            List<InstructionWrapper> foundBackInstructions = SafeSearchBackwardsForDataflowInstrcutions(predicate, startInstruction);
+            if (foundBackInstructions.Count == 0)
             {
                 throw new Exception("Reached first instWrapper without correct one found");
             }
-            return indexes;
+            return foundBackInstructions;
         }
 
         public List<InstructionWrapper> SafeSearchBackwardsForDataflowInstrcutions(Func<InstructionWrapper, bool> predicate,

@@ -21,7 +21,7 @@ namespace DoppleTry2.ProgramFlowHanlder
             }
         }
 
-        protected override void SetForwardExecutionFlowInstsInternal(InstructionWrapper wrapperToModify, List<InstructionWrapper> instructionWrappers)
+        public override void SetForwardExecutionFlowInsts(InstructionWrapper wrapperToModify, List<InstructionWrapper> instructionWrappers)
         {
             if (wrapperToModify.InliningProperties.Inlined)
             {

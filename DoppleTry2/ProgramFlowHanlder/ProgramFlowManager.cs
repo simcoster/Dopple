@@ -24,11 +24,16 @@ namespace DoppleTry2.ProgramFlowHanlder
         {
             foreach (var instWrapper in instructionsWrappers)
             {
+                if (instWrapper.ProgramFlowResolveDone)
+                {
+                    continue;
+                }
                 var flowHandlers = _flowHandlers.Where(x => x.HandledCodes.Contains(instWrapper.Instruction.OpCode.Code));
                 foreach (var flowHandler in flowHandlers)
                 {
                     flowHandler.SetForwardExecutionFlowInsts(instWrapper, instructionsWrappers);
                 }
+                instWrapper.ProgramFlowResolveDone = true;
             }
         }
     }

@@ -22,7 +22,7 @@ namespace DoppleTry2.InstructionWrapperMembers
         }
         public void RemoveAllTwoWay (Predicate<InstructionWrapper> predicate)
         {
-            foreach (var toRemove in this.Where(x => predicate(x)))
+            foreach (var toRemove in this.Where(x => predicate(x)).ToList())
             {
                 RemoveTwoWay(toRemove);
             }
@@ -30,7 +30,7 @@ namespace DoppleTry2.InstructionWrapperMembers
         public void AddTwoWay(InstructionWrapper toAdd)
         {
             base.Add(toAdd);
-            toAdd.ForwardDataFlowRelated.Add(_ContainingWrapper);
+            toAdd.ForwardProgramFlow.Add(_ContainingWrapper);
         }
         public void AddRangeTwoWay(IEnumerable<InstructionWrapper> rangeToAdd)
         {

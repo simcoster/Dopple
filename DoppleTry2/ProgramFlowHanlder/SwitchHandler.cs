@@ -14,7 +14,7 @@ namespace DoppleTry2.ProgramFlowHanlder
     {
         public override Code[] HandledCodes => new[] {Code.Switch};
 
-        protected override void SetForwardExecutionFlowInstsInternal(InstructionWrapper wrapperToModify, List<InstructionWrapper> instructionWrappers)
+        public override void SetForwardExecutionFlowInsts(InstructionWrapper wrapperToModify, List<InstructionWrapper> instructionWrappers)
         {
             var targetInstructions = (Instruction[])wrapperToModify.Instruction.Operand;
             foreach (var targetInstruction in targetInstructions)
