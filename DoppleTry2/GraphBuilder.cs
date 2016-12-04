@@ -116,7 +116,7 @@ namespace DoppleTry2
                                     .Where(x =>  typeof(OpCodes).GetFields().Select(y => y.GetValue(null))
                                                 .Cast<OpCode>().Where(y => y.StackBehaviourPop != StackBehaviour.Pop0).Select(y=> y.Code)
                                                 .Contains(x.Instruction.OpCode.Code))
-                                    .Where(x => x.BackDataFlowRelated.ArgumentList.Select(y => y.Argument).SequenceEqual(inst.BackDataFlowRelated.ArgumentList.Select(z => z.Argument)))
+                                    .Where(x => x.BackDataFlowRelated.Select(y => y.Argument).SequenceEqual(inst.BackDataFlowRelated.Select(z => z.Argument)))
                                     .Where(x => !new[]{ Code.Ret}.Concat(CodeGroups.CallCodes).Contains(x.Instruction.OpCode.Code)) ;
                 if (toMerge.Count() >1)
                 {
@@ -128,7 +128,17 @@ namespace DoppleTry2
 
         private void RemoveHelperCodes()
         {
+            var problematic = InstructionWrappers.FirstOrDefault(x => x.ForwardDataFlowRelated.GroupBy(y => y.Instruction).Any(y => y.Count() != y.First().BackDataFlowRelated.Count(z => z.Argument == x)));
+            if (problematic != null)
+            {
+
+            }
             RemoveInstWrappers(InstructionWrappers.Where(x => CodeGroups.StLocCodes.Contains(x.Instruction.OpCode.Code)));
+            problematic = InstructionWrappers.FirstOrDefault(x => x.ForwardDataFlowRelated.GroupBy(y => y.Instruction).Any(y => y.Count() != y.First().BackDataFlowRelated.Count(z => z.Argument == x)));
+            if (problematic != null)
+            {
+
+            }
             RemoveInstWrappers(InstructionWrappers.Where(x => CodeGroups.LdLocCodes.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(InstructionWrappers.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(InstructionWrappers.Where(x => CodeGroups.LdArgCodes.Contains(x.Instruction.OpCode.Code) && x.InliningProperties.Inlined));
@@ -149,13 +159,13 @@ namespace DoppleTry2
             var inst = Instruction.Create(typeof(OpCodes).GetFields().Select(x => x.GetValue(null)).Cast<OpCode>().First(x => x.Code == Code.Nop));
             var nodeZero = InstructionWrapperFactory.GetInstructionWrapper(inst, metDef);
 
-            foreach (var firstNode in InstructionWrappers.Where(x => x.BackDataFlowRelated.ArgumentList.Count == 0 || x.FirstLineInstruction))
+            foreach (var firstNode in InstructionWrappers.Where(x => x.BackDataFlowRelated.Count == 0 || x.FirstLineInstruction))
             {
-                firstNode.AddBackDataflowTwoWaySingleIndex(new[] { nodeZero });
+                firstNode.BackDataFlowRelated.AddWithNewIndex(nodeZero);
             }
             foreach(var firstFromRecursion in InstructionWrappers.Where(x => BackSearcher.GetBackDataTree(x).Contains(x) && CodeGroups.LdArgCodes.Contains(x.Instruction.OpCode.Code)))
             {
-                firstFromRecursion.AddBackDataflowTwoWaySingleIndex(new[] { nodeZero });
+                firstFromRecursion.BackDataFlowRelated.AddWithNewIndex(nodeZero);
             }
             InstructionWrappers.Add(nodeZero);
             SetInstructionIndexes();
@@ -218,8 +228,8 @@ namespace DoppleTry2
                         continue;
                     }
                     var toMerge = ldLocSameIndex
-                                    .Where(x => x.BackDataFlowRelated.ArgumentList.Select(y => y.Argument)
-                                    .SequenceEqual(ldLocWrapper.BackDataFlowRelated.ArgumentList.Select(z => z.Argument)))
+                                    .Where(x => x.BackDataFlowRelated.Select(y => y.Argument)
+                                    .SequenceEqual(ldLocWrapper.BackDataFlowRelated.Select(z => z.Argument)))
                                     .Except(grouped).ToArray();
                     if (toMerge.Count() > 1 )
                     {
@@ -243,7 +253,7 @@ namespace DoppleTry2
             {
                 var ldArgGroupedByBackRelated = ldArgGroup
                                                     .Cast<InstructionWrapper>()
-                                                    .GroupBySequence(x => x.BackDataFlowRelated.ArgumentList.Select(y => y.Argument))
+                                                    .GroupBySequence(x => x.BackDataFlowRelated.Select(y => y.Argument))
                                                     .Where(x => x.Count()>1)
                                                     .ToList();
                 foreach (var ldArgSameBack in ldArgGroupedByBackRelated)
@@ -273,9 +283,9 @@ namespace DoppleTry2
 
         private void Veirify()
         {
-            var verifiers = new Verifier[] {new LdElemVerifier(InstructionWrappers), new StackPopPushVerfier(InstructionWrappers),
+            var verifiers = new Verifier[] {new StElemVerifier(InstructionWrappers), new StackPopPushVerfier(InstructionWrappers),
                                             new TwoWayVerifier(InstructionWrappers), new ArithmeticsVerifier(InstructionWrappers),
-                                            new ArgIndexVerifier(InstructionWrappers) };
+                                            new ArgIndexVerifier(InstructionWrappers), new LdElemVerifier(InstructionWrappers) };
             foreach (var instWrapper in InstructionWrappers.OrderByDescending(x => x.InstructionIndex))
             {
                 foreach(var verifier in verifiers)
@@ -290,31 +300,27 @@ namespace DoppleTry2
             var instWrapperToKeep = Wrappers.ElementAt(0);
             foreach (var wrapperToRemove in Wrappers.ToArray().Except(new[] { instWrapperToKeep }))
             {
-                foreach (var backNode in wrapperToRemove.BackDataFlowRelated.ArgumentList)
+                foreach (var backNode in wrapperToRemove.BackDataFlowRelated.ToList())
                 {
                     instWrapperToKeep.BackDataFlowRelated.AddWithExistingIndex(backNode);
+                    wrapperToRemove.BackDataFlowRelated.Remove(backNode);
+                    instWrapperToKeep.BackDataFlowRelated.Add(backNode);
                     instWrapperToKeep.BackDataFlowRelated.CheckNumberings();
-                    int forwardRelatedIndex = backNode.Argument.ForwardDataFlowRelated.ArgumentList.First(x => x.Argument == wrapperToRemove).ArgIndex;
-                    backNode.Argument.ForwardDataFlowRelated.ArgumentList.RemoveAll(x => x.Argument == wrapperToRemove && x.ArgIndex == forwardRelatedIndex);
-                    backNode.Argument.ForwardDataFlowRelated.AddWithExistingIndex(instWrapperToKeep, forwardRelatedIndex);
-                    backNode.Argument.ForwardDataFlowRelated.CheckNumberings();
                 }
 
-                foreach (var forwardNode in wrapperToRemove.ForwardDataFlowRelated.ArgumentList)
+                foreach (var forwardNode in wrapperToRemove.ForwardDataFlowRelated.ToList())
                 {
-                    instWrapperToKeep.ForwardDataFlowRelated.AddWithExistingIndex(forwardNode);
-                    instWrapperToKeep.ForwardDataFlowRelated.CheckNumberings();
-                    int backRelatedIndex = forwardNode.Argument.BackDataFlowRelated.ArgumentList.First(x => x.Argument == wrapperToRemove).ArgIndex;
-                    forwardNode.Argument.BackDataFlowRelated.ArgumentList.RemoveAll(x => x.Argument == wrapperToRemove && x.ArgIndex == backRelatedIndex);
-                    forwardNode.Argument.BackDataFlowRelated.AddWithExistingIndex(instWrapperToKeep, backRelatedIndex);
-                    forwardNode.Argument.BackDataFlowRelated.CheckNumberings();
-                }
-                foreach (var forwardFlowInst in InstructionWrappers.Where(x => x.BackProgramFlow.Contains(wrapperToRemove)).ToList())
-                {
-                    forwardFlowInst.BackProgramFlow.RemoveAll(x => x == wrapperToRemove);
-                    forwardFlowInst.BackProgramFlow.AddRange(wrapperToRemove.BackProgramFlow);
+                    var forwardBackRelated = forwardNode.BackDataFlowRelated.First(x => x.Argument == wrapperToRemove);
+                    forwardNode.BackDataFlowRelated.Remove(forwardBackRelated);
+                    forwardNode.BackDataFlowRelated.AddWithExistingIndex(forwardBackRelated.Argument, forwardBackRelated.ArgIndex);
+                    forwardNode.BackDataFlowRelated.CheckNumberings();
                 }
                 InstructionWrappers.Remove(wrapperToRemove);
+                if (InstructionWrappers.Any(x => x.BackDataFlowRelated.Any(y => y.Argument == wrapperToRemove)
+                                                && x.ForwardDataFlowRelated.Any(y => y == wrapperToRemove)))
+                {
+                    throw new Exception("there's someone still pointing to the rmoeved");
+                }
             }
         }
 
@@ -322,26 +328,23 @@ namespace DoppleTry2
         {
             foreach (var wrapperToRemove in instsToRemove.ToArray())
             {
-                foreach (var forInst in wrapperToRemove.ForwardDataFlowRelated.ArgumentList.Select(x => x.Argument).Distinct().ToArray())
+                foreach (var forInst in wrapperToRemove.ForwardDataFlowRelated.ToArray())
                 {
-                    int index = forInst.BackDataFlowRelated.ArgumentList.First(x => x.Argument == wrapperToRemove).ArgIndex;
-                    forInst.BackDataFlowRelated.AddWithExistingIndex(wrapperToRemove.BackDataFlowRelated.ArgumentList.Select(x => x.Argument),index);
-                    forInst.BackDataFlowRelated.ArgumentList.RemoveAll(x => x.Argument == wrapperToRemove);
+                    var backArgToRemove = forInst.BackDataFlowRelated.First(x => x.Argument == wrapperToRemove);
+                    forInst.BackDataFlowRelated.AddMultipleWithExistingIndex(wrapperToRemove.BackDataFlowRelated.Select(x => x.Argument), backArgToRemove.ArgIndex);
+                    forInst.BackDataFlowRelated.Remove(backArgToRemove);
                     forInst.BackDataFlowRelated.CheckNumberings();
                 }
-                foreach (var backInst in wrapperToRemove.BackDataFlowRelated.ArgumentList.Select(x => x.Argument).ToArray())
+                foreach(var backInst in wrapperToRemove.BackDataFlowRelated.ToArray())
                 {
-                    int index = backInst.ForwardDataFlowRelated.ArgumentList.First(x => x.Argument == wrapperToRemove).ArgIndex;
-                    backInst.ForwardDataFlowRelated.AddWithExistingIndex(wrapperToRemove.ForwardDataFlowRelated.ArgumentList.Select(x => x.Argument),index);
-                    backInst.ForwardDataFlowRelated.ArgumentList.RemoveAll(x => x.Argument == wrapperToRemove);
-                    backInst.ForwardDataFlowRelated.CheckNumberings();
-                }
-                foreach(var forwardFlowInst in InstructionWrappers.Where(x => x.BackProgramFlow.Contains(wrapperToRemove)).ToList())
-                {
-                    forwardFlowInst.BackProgramFlow.RemoveAll(x => x == wrapperToRemove);
-                    forwardFlowInst.BackProgramFlow.AddRange(wrapperToRemove.BackProgramFlow);
+                    wrapperToRemove.BackDataFlowRelated.Remove(backInst);
                 }
                 InstructionWrappers.Remove(wrapperToRemove);
+                if (InstructionWrappers.Any(x => x.BackDataFlowRelated.Any(y => y.Argument == wrapperToRemove)
+                                    && x.ForwardDataFlowRelated.Any(y => y == wrapperToRemove)))
+                {
+                    throw new Exception("there's someone still pointing to the rmoeved");
+                }
             }
             SetInstructionIndexes();
         }
@@ -357,7 +360,7 @@ namespace DoppleTry2
 
         private void AddHelperRetInstructions()
         {
-            AddHelperRetsModifer addRetsModifier = new AddHelperRetsModifer();
+            AddHelperReturnInstsModifer addRetsModifier = new AddHelperReturnInstsModifer();
             addRetsModifier.Modify(InstructionWrappers);
         }
 

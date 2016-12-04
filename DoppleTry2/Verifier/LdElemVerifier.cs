@@ -1,15 +1,12 @@
-﻿using DoppleTry2.InstructionWrappers;
-using DoppleTry2.VerifierNs;
-using Mono.Cecil;
-using Mono.Cecil.Cil;
+﻿using DoppleTry2.VerifierNs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DoppleTry2.InstructionWrappers;
 
-
-namespace DoppleTry2.VerifierNs
+namespace DoppleTry2
 {
     class LdElemVerifier : Verifier
     {
@@ -19,25 +16,28 @@ namespace DoppleTry2.VerifierNs
 
         public override void Verify(InstructionWrapper instructionWrapper)
         {
-            if (!CodeGroups.LdElemCodes.Concat(CodeGroups.StElemCodes).Contains(instructionWrapper.Instruction.OpCode.Code))
+            if (!CodeGroups.LdElemCodes.Contains(instructionWrapper.Instruction.OpCode.Code))
             {
                 return;
             }
-            var argumentGroups = instructionWrapper.BackDataFlowRelated.ArgumentList.GroupBy(x => x.ArgIndex).ToList();
-            var arrayArgGroup = argumentGroups.Where(x => x.SelectMany(y => BacktraceStLdLoc(y.Argument))
-                                .All(y => IsProvidingArray(y)));
-            if (arrayArgGroup.Count() < 1)
+            var stElemOptionalArgs = instructionWrapper.BackDataFlowRelated.Where(x => x.ArgIndex == 2);
+            if (!stElemOptionalArgs.All(x => CodeGroups.StElemCodes.Contains(x.Argument.Instruction.OpCode.Code)))
             {
-                throw new Exception("No array reference argument");
+                throw new Exception("Bad Stelem argument");
             }
-            argumentGroups = argumentGroups.Except(arrayArgGroup).ToList();
-            if (argumentGroups.SelectMany(x =>x).SelectMany(x => BacktraceStLdLoc(x.Argument)).All(x => IsProvidingNumber(x)))
+            var arrayRefArgs = instructionWrapper.BackDataFlowRelated.Where(x => x.ArgIndex == 1);
+            if (!arrayRefArgs.All(x => IsProvidingArray(x.Argument)))
             {
-                return;
+                throw new Exception("Bad array ref argument");
             }
-            else
+            var arrayIndexArgs = instructionWrapper.BackDataFlowRelated.Where(x => x.ArgIndex == 0);
+            if (!arrayIndexArgs.All(x => IsProvidingNumber(x.Argument)))
             {
-                //throw new Exception("Not all elements are providing numbers");
+                throw new Exception("Bad array index argument");
+            }
+            if (instructionWrapper.BackDataFlowRelated.Max(x => x.ArgIndex) > 2)
+            {
+                throw new Exception("too many arguments!");
             }
         }
     }

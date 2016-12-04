@@ -19,7 +19,7 @@ namespace DoppleTry2.ProgramFlowHanlder
             var targetInstructions = (Instruction[])wrapperToModify.Instruction.Operand;
             foreach (var targetInstruction in targetInstructions)
             {
-                TwoWayLinkExecutionPath(wrapperToModify, instructionWrappers.First(x => x.Instruction == targetInstruction));
+                instructionWrappers.First(x => x.Instruction == targetInstruction).BackProgramFlow.AddTwoWay(wrapperToModify);
             }
         }
     }

@@ -24,7 +24,7 @@ namespace DoppleTry2.VerifierNs
             {
                 return;
             }
-            foreach (var arg in instructionWrapper.BackDataFlowRelated.ArgumentList)
+            foreach (var arg in instructionWrapper.BackDataFlowRelated)
             {
                 if (BacktraceStLdLoc(arg.Argument).All(x => IsProvidingNumber(x)))
                 {

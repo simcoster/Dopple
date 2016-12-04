@@ -45,15 +45,15 @@ namespace DoppleTry2.InstructionModifiers
 
             foreach (var nestedCallInstWrapper in instructionWrappers.Where(x => x is CallInstructionWrapper && x.InliningProperties.Inlined))
             {
-                int index = instructionWrappers.IndexOf(nestedCallInstWrapper);
-                ProgramFlowHandler.TwoWayLinkExecutionPath(nestedCallInstWrapper, instructionWrappers[index+1]);
+                int nestedCallIndex = instructionWrappers.IndexOf(nestedCallInstWrapper);
+                instructionWrappers[nestedCallIndex + 1].BackProgramFlow.AddTwoWay(nestedCallInstWrapper);
                 nestedCallInstWrapper.ProgramFlowResolveDone = true;
             }
 
             foreach (var retCall in instructionWrappers.Where(x => x.Instruction.OpCode.Code == Code.Ret && x != instructionWrappers.Last()))
             {
-                int index = instructionWrappers.IndexOf(retCall);
-                ProgramFlowHandler.TwoWayLinkExecutionPath(retCall, instructionWrappers[index + 1]);
+                int retCallIndex = instructionWrappers.IndexOf(retCall);
+                instructionWrappers[retCallIndex + 1].BackProgramFlow.AddTwoWay(retCall);
                 retCall.ProgramFlowResolveDone = true;
                 if (retCall.Instruction.OpCode.Code == Code.Ret)
                 {
@@ -96,7 +96,7 @@ namespace DoppleTry2.InstructionModifiers
                     {
                         calledFuncInstWrappers.InsertRange(instWrapperIndex + 1, inlinedInstWrappers);
                         nestedCallInstWrapper.ForwardProgramFlow.Clear();
-                        ProgramFlowHandler.TwoWayLinkExecutionPath(nestedCallInstWrapper, inlinedInstWrappers[0]);
+                        inlinedInstWrappers[0].BackProgramFlow.AddTwoWay(nestedCallInstWrapper);
                     }
                 }
                 callInstWrapper.InliningProperties.Inlined = true;

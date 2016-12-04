@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace DoppleTry2.InstructionModifiers
 {
-    class AddHelperRetsModifer : IModifier
+    class AddHelperReturnInstsModifer : IModifier
     {
         public void Modify(List<InstructionWrapper> instructionWrappers)
         {
@@ -17,10 +17,12 @@ namespace DoppleTry2.InstructionModifiers
             {
                 var opcode = Instruction.Create(OpCodes.Ret);
                 InstructionWrapper retInstWrapper = InstructionWrapperFactory.GetInstructionWrapper(opcode, (MethodDefinition)callInst.Instruction.Operand);
-                retInstWrapper.BackProgramFlow.Add(callInst);
-                retInstWrapper.ForwardProgramFlow.AddRange(callInst.ForwardProgramFlow);
-                callInst.ForwardProgramFlow.Clear();
-                callInst.ForwardProgramFlow.Add(retInstWrapper);
+                retInstWrapper.BackProgramFlow.AddTwoWay(callInst);
+                foreach (var forwardFlowInst in callInst.ForwardProgramFlow)
+                {
+                    forwardFlowInst.BackProgramFlow.AddTwoWay(retInstWrapper);
+                    forwardFlowInst.BackProgramFlow.RemoveAllTwoWay(x => x == callInst);
+                }
                 instructionWrappers.Insert(instructionWrappers.IndexOf(callInst) + 1, retInstWrapper);
             }
         }

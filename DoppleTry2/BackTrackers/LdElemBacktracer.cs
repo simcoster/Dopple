@@ -24,11 +24,11 @@ namespace DoppleTry2.BackTrackers
 
         protected override IEnumerable<InstructionWrapper> GetDataflowBackRelatedArgGroup(InstructionWrapper instWrapper)
         {
-            var index0Arg = instWrapper.BackDataFlowRelated.ArgumentList.Where(x => x.ArgIndex == 0).Select(x => x.Argument);
-            var index1Arg = instWrapper.BackDataFlowRelated.ArgumentList.Where(x => x.ArgIndex == 1).Select(x => x.Argument);
+            var index0Arg = instWrapper.BackDataFlowRelated.Where(x => x.ArgIndex == 0).Select(x => x.Argument);
+            var index1Arg = instWrapper.BackDataFlowRelated.Where(x => x.ArgIndex == 1).Select(x => x.Argument);
             Func<InstructionWrapper, bool> predicate = x => CodeGroups.StElemCodes.Contains(x.Instruction.OpCode.Code) &&
-                                                             x.BackDataFlowRelated.ArgumentList.Where(y => y.ArgIndex == 1).Select(y => y.Argument).SequenceEqual(index0Arg) &&
-                                                             x.BackDataFlowRelated.ArgumentList.Where(y => y.ArgIndex == 2).Select(y => y.Argument).SequenceEqual(index1Arg);
+                                                             x.BackDataFlowRelated.Where(y => y.ArgIndex == 1).Select(y => y.Argument).SequenceEqual(index0Arg) &&
+                                                             x.BackDataFlowRelated.Where(y => y.ArgIndex == 2).Select(y => y.Argument).SequenceEqual(index1Arg);
             return _SingleIndexBackSearcher.SafeSearchBackwardsForDataflowInstrcutions(predicate,instWrapper);
         }
     }

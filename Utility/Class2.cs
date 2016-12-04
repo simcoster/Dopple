@@ -33,7 +33,6 @@ namespace Utility
             }
         }
 
-        /*
         public static void insertionSortWithHelpers(int[] array)
         {
             for (int i = 0; i < array.Length - 1; i++)
@@ -231,8 +230,6 @@ namespace Utility
         }
 
 
-        /*
-
         static public void MergeSortRec(int[] numbers, int left, int right)
         {
             int mid;
@@ -342,6 +339,5 @@ namespace Utility
                 return true;
             }
         }
-        */
     }
 }

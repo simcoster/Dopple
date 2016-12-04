@@ -30,7 +30,7 @@ namespace DoppleTry2.ProgramFlowHanlder
             {
                 return;
             }
-            TwoWayLinkExecutionPath(wrapperToModify, nextInstructionWrapper);
+            nextInstructionWrapper.BackProgramFlow.AddTwoWay(wrapperToModify);
         }
     }
 }

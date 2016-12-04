@@ -170,7 +170,7 @@ namespace DoppleGraph
             }
             //var linkGroupColor = ColumnBaseColors[nodeWrapper.DisplayCol];
 
-            foreach (var indexedArg in nodeWrapper.InstructionWrapper.BackDataFlowRelated.ArgumentList)
+            foreach (var indexedArg in nodeWrapper.InstructionWrapper.BackDataFlowRelated)
             {
                 Color linkColor = GetPredefinedColor(indexedArg.ArgIndex);
                 GoLink link = new GoLink();
@@ -230,7 +230,7 @@ namespace DoppleGraph
         private void SetCoordinates(List<GoNodeWrapper> nodeWrappers)
         {
             Dictionary<int, List<GoNodeWrapper>> nodeWrapperCols = new Dictionary<int, List<GoNodeWrapper>>();
-            var firstNode = nodeWrappers.Where(x => x.InstructionWrapper.BackDataFlowRelated.ArgumentList.Count == 0).ToList();
+            var firstNode = nodeWrappers.Where(x => x.InstructionWrapper.BackDataFlowRelated.Count == 0).ToList();
             SetLongestPathRec(firstNode);
             SetRowIndexes(nodeWrappers);
             FixDuplicateCoordinates(nodeWrappers);
@@ -276,8 +276,8 @@ namespace DoppleGraph
             {
                 try
                 {
-                    var nodesToUpdate = node.InstructionWrapper.ForwardDataFlowRelated.ArgumentList
-                   .Select(x => GetNodeWrapper(x.Argument))
+                    var nodesToUpdate = node.InstructionWrapper.ForwardDataFlowRelated
+                   .Select(x => GetNodeWrapper(x))
                    .Where(x => x.LongestPath.Count == 0 || !x.LongestPath.Intersect(node.LongestPath).SequenceEqual(x.LongestPath))
                    .Where(x => x.LongestPath.Count < node.LongestPath.Count + 1)
                    .ToList();
@@ -384,7 +384,7 @@ namespace DoppleGraph
             foreach (var nodeWrapper in nodeWrappers)
             {
                 DrawDataLinks(nodeWrapper, myView);
-                AcomodateFlowForRemovedNodes();
+                //AcomodateFlowForRemovedNodes();
                 DrawFlowLinks(nodeWrapper, myView);
             }
             //MarkLoops(nodeWrappers);

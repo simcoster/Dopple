@@ -12,7 +12,7 @@ namespace DoppleTry2.InstructionWrappers
     {
         public LdElemInstructionWrapper(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
-            BackDataFlowRelated.MaxArgIndex = 1;
+            BackDataFlowRelated.MaxArgIndex = 2;
         }
     }
 }

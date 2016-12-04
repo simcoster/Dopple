@@ -14,14 +14,14 @@ namespace DoppleTry2
 
         public override void Verify(InstructionWrapper instructionWrapper)
         {
-            if (instructionWrapper.BackDataFlowRelated.ArgumentList.Count == 0)
+            if (instructionWrapper.BackDataFlowRelated.Count == 0)
             {
                 return;
             }
-            int maxIndex = instructionWrapper.BackDataFlowRelated.ArgumentList.Max(x => x.ArgIndex);
+            int maxIndex = instructionWrapper.BackDataFlowRelated.Max(x => x.ArgIndex);
             for (int i =0; i <= maxIndex; i++)
             {
-                if (!instructionWrapper.BackDataFlowRelated.ArgumentList.Any(x => x.ArgIndex == i))
+                if (!instructionWrapper.BackDataFlowRelated.Any(x => x.ArgIndex == i))
                 {
                     throw new Exception("Index missing");
                 }

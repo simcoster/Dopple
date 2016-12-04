@@ -67,7 +67,7 @@ namespace DoppleTry2.VerifierNs
         {
             if (CodeGroups.LdLocCodes.Concat(CodeGroups.StLocCodes).Concat(new[] { Code.Dup }).Contains(instructionWrapper.Instruction.OpCode.Code))
             {
-                return instructionWrapper.BackDataFlowRelated.ArgumentList.SelectMany(x => BacktraceStLdLoc(x.Argument)).ToArray();
+                return instructionWrapper.BackDataFlowRelated.SelectMany(x => BacktraceStLdLoc(x.Argument)).ToArray();
             }
             else
             {

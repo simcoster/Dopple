@@ -69,7 +69,6 @@ namespace DoppleTry2.BackTrackers
                 currentInst.BackDataFlowRelated.AddWithNewIndex(argumentGroup);
                 foreach (InstructionWrapper arg in argumentGroup)
                 {
-                    arg.ForwardDataFlowRelated.AddWithNewIndex(currentInst);
                     arg.StackPushCount--;
                 }
             }
@@ -112,7 +111,7 @@ namespace DoppleTry2.BackTrackers
         {
             foreach (var callInstWrapper in InstructionWrappers.Where(x => CodeGroups.CallCodes.Contains(x.Instruction.OpCode.Code)))
             {
-                callInstWrapper.BackProgramFlow.AddRange(CallWrappersFlowBackup[callInstWrapper]);
+                callInstWrapper.BackProgramFlow.AddRangeTwoWay(CallWrappersFlowBackup[callInstWrapper]);
             }
         }
 

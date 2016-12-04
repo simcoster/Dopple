@@ -27,10 +27,9 @@ namespace DoppleTry2.ProgramFlowHanlder
             {
                 foreach (var inst in wrapperToModify.ForwardProgramFlow)
                 {
-                    inst.BackProgramFlow.Remove(wrapperToModify);
+                    inst.BackProgramFlow.RemoveTwoWay(wrapperToModify);
                 }
-                wrapperToModify.ForwardProgramFlow.Clear();
-                TwoWayLinkExecutionPath(wrapperToModify, instructionWrappers[instructionWrappers.IndexOf(wrapperToModify) + 1]);
+                instructionWrappers[instructionWrappers.IndexOf(wrapperToModify) + 1].BackProgramFlow.AddTwoWay(wrapperToModify);
             }
             else
             {

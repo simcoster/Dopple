@@ -30,10 +30,6 @@ namespace DoppleTry2.BackTrackers
             foreach (var backRelatedGroup in backRelatedGroups)
             {
                 currentInst.BackDataFlowRelated.AddWithNewIndex(backRelatedGroup);
-                foreach (var backInst in backRelatedGroup)
-                {
-                    backInst.ForwardDataFlowRelated.AddWithNewIndex(currentInst);
-                }
             }
             currentInst.DoneBackTracers.Add(GetType());
         }

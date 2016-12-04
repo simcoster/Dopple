@@ -15,7 +15,7 @@ namespace DoppleTry2.ProgramFlowHanlder
         {
             InstructionWrapper nextInstruction =
              instructionWrappers.First(x => x.Instruction == wrapperToModify.Instruction.Operand);
-            TwoWayLinkExecutionPath(wrapperToModify, nextInstruction);
+            nextInstruction.BackProgramFlow.AddTwoWay(wrapperToModify);
         }
     }
 }

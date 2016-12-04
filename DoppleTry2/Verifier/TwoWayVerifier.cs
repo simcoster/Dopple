@@ -16,17 +16,16 @@ namespace DoppleTry2.VerifierNs
 
         public override void Verify(InstructionWrapper instructionWrapper)
         {
-            return;
-            foreach (var backInst in instructionWrapper.BackDataFlowRelated.ArgumentList)
+            foreach (var backInst in instructionWrapper.BackDataFlowRelated)
             {
-                if (!backInst.Argument.ForwardDataFlowRelated.ArgumentList.Select(x => x.Argument).Contains(instructionWrapper))
+                if (!backInst.Argument.ForwardDataFlowRelated.Contains(instructionWrapper))
                 {
                     throw new Exception();
                 }
             }
-            foreach (var forInst in instructionWrapper.ForwardDataFlowRelated.ArgumentList)
+            foreach (var forInst in instructionWrapper.ForwardDataFlowRelated)
             {
-                if (!forInst.Argument.BackDataFlowRelated.ArgumentList.Select(x => x.Argument).Contains(instructionWrapper))
+                if (!forInst.BackDataFlowRelated.Select(x => x.Argument).Contains(instructionWrapper))
                 {
                     throw new Exception();
                 }

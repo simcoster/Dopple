@@ -4,12 +4,13 @@ using DoppleTry2.InstructionModifiers;
 using Mono.Cecil.Cil;
 using Mono.Cecil;
 using System;
+using DoppleTry2.InstructionWrapperMembers;
 
 namespace DoppleTry2.InstructionWrappers
 {
     public class InstructionWrapper
     {
-        private ArgList _BackDataFlowRelated = new ArgList();
+        private BackArgList _BackDataFlowRelated;
 
         public InstructionWrapper(Instruction instruction, MethodDefinition method)
         {
@@ -19,6 +20,8 @@ namespace DoppleTry2.InstructionWrappers
             StackPopCount = GetStackPopCount(instruction);
             MemoryReadCount = MemoryProperties.GetMemReadCount(instruction.OpCode.Code);
             MemoryStoreCount = MemoryProperties.GetMemStoreCount(instruction.OpCode.Code);
+            _BackDataFlowRelated = new BackArgList(this);
+            BackProgramFlow = new BackFlowList(this);
         }
 
         private int GetStackPopCount(Instruction instruction)
@@ -88,25 +91,7 @@ namespace DoppleTry2.InstructionWrappers
             }
         }
 
-        public void AddBackDataflowTwoWaySingleIndex(IEnumerable<InstructionWrapper> wrappersToAdd)
-        {
-            BackDataFlowRelated.AddWithNewIndex(wrappersToAdd);
-            foreach (var instWrapper in wrappersToAdd)
-            {
-                instWrapper.ForwardDataFlowRelated.AddWithNewIndex(this);
-            }
-        }
-
-        public void AddForwardTwoWaySingleIndex(IEnumerable<InstructionWrapper> wrappersToAdd)
-        {
-            BackDataFlowRelated.AddWithNewIndex(wrappersToAdd);
-            foreach (var instWrapper in wrappersToAdd)
-            {
-                instWrapper.BackDataFlowRelated.AddWithNewIndex(this);
-            }
-        }
-
-        public ArgList BackDataFlowRelated
+        public BackArgList BackDataFlowRelated
         {
             get
             {
@@ -117,17 +102,17 @@ namespace DoppleTry2.InstructionWrappers
                 _BackDataFlowRelated = value;
             }
         }
-        public List<InstructionWrapper> BackProgramFlow { get; set; } = new List<InstructionWrapper>();
-        ArgList forwardDataFlowRelated = new ArgList();
-        public ArgList ForwardDataFlowRelated
+        public BackFlowList BackProgramFlow { get; set; }
+        List<InstructionWrapper> _ForwardDataFlowRelated = new List<InstructionWrapper>();
+        public List<InstructionWrapper> ForwardDataFlowRelated
         {
             get
             {
-                return forwardDataFlowRelated;
+                return _ForwardDataFlowRelated;
             }
             internal set
             {
-                forwardDataFlowRelated = value;
+                _ForwardDataFlowRelated = value;
             }
         }
         public Instruction Instruction { get; set; }

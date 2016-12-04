@@ -56,16 +56,18 @@ namespace DoppleTry2.InstructionModifiers
         private static void AddStArgInst(List<InstructionWrapper> instructionWrappers, List<InstructionWrapper> addedInstructions, MethodDefinition calledFunc, int argIndex, InstructionWrapper argProvidingWrapper, StArgInstructionWrapper stArgWrapper)
         {
             stArgWrapper.Instruction.Offset = 99999;
-            stArgWrapper.BackProgramFlow.Add(argProvidingWrapper);
-            stArgWrapper.ForwardProgramFlow.AddRange(argProvidingWrapper.ForwardProgramFlow);
+            stArgWrapper.BackProgramFlow.AddTwoWay(argProvidingWrapper);
+            foreach(var forwardFlowArg in argProvidingWrapper.ForwardProgramFlow)
+            {
+                forwardFlowArg.BackProgramFlow.AddTwoWay(stArgWrapper);
+                forwardFlowArg.BackProgramFlow.Remove(argProvidingWrapper);
+            }
             foreach (var nextPossiblePrFlow in stArgWrapper.ForwardProgramFlow)
             {
-                nextPossiblePrFlow.BackProgramFlow.Remove(argProvidingWrapper);
-                nextPossiblePrFlow.BackProgramFlow.Add(stArgWrapper);
+                nextPossiblePrFlow.BackProgramFlow.RemoveTwoWay(argProvidingWrapper);
+                nextPossiblePrFlow.BackProgramFlow.AddTwoWay(stArgWrapper);
             }
-            argProvidingWrapper.ForwardProgramFlow.Clear();
-            argProvidingWrapper.ForwardProgramFlow.Add(stArgWrapper);
-            stArgWrapper.AddBackDataflowTwoWaySingleIndex(new[] { argProvidingWrapper });
+            stArgWrapper.BackDataFlowRelated.AddWithNewIndex(argProvidingWrapper);
             stArgWrapper.StackPopCount--;
             stArgWrapper.ArgIndex = argIndex;
             stArgWrapper.ProgramFlowResolveDone = true;

@@ -21,8 +21,8 @@ namespace DoppleTry2.ProgramFlowHanlder
         protected override void SetForwardExecutionFlowInstsInternal(InstructionWrapper wrapperToModify, List<InstructionWrapper> instructionWrappers)
         {
             var forwardInstruction = instructionWrappers.First(x => x.Instruction == wrapperToModify.Instruction.Operand);
-            TwoWayLinkExecutionPath(wrapperToModify, forwardInstruction);
-            TwoWayLinkExecutionPath(wrapperToModify, instructionWrappers.First(x => x.Instruction == wrapperToModify.Instruction.Next));
+            forwardInstruction.BackProgramFlow.AddTwoWay(forwardInstruction);
+            instructionWrappers.First(x => x.Instruction == wrapperToModify.Instruction.Next).BackProgramFlow.AddTwoWay(wrapperToModify);
         }
     }
 }

@@ -25,15 +25,15 @@ namespace DoppleTry2
                     return new InstructionWrapper[] {};
                 }
                 visited.Add(instWrapper);
-                switch (instWrapper.BackDataFlowRelated.ArgumentList.Count)
+                switch (instWrapper.BackDataFlowRelated.Count)
                 {
                     case 0:
                         return new[] { instWrapper };
                     case 1:
-                        instWrapper = instWrapper.BackDataFlowRelated.ArgumentList[0].Argument;
+                        instWrapper = instWrapper.BackDataFlowRelated[0].Argument;
                         break;
                     default:
-                        return instWrapper.BackDataFlowRelated.ArgumentList.SelectMany(x => GetStackPushAncestor(x.Argument, visited));
+                        return instWrapper.BackDataFlowRelated.SelectMany(x => GetStackPushAncestor(x.Argument, visited));
                 }
             }
         }
@@ -49,7 +49,7 @@ namespace DoppleTry2
                 return new InstructionWrapper[0];
             }
             visited.Add(startInst);
-            visited.AddRange(startInst.BackDataFlowRelated.ArgumentList.SelectMany(x => GetBackDataTree(x.Argument, visited)).ToArray());
+            visited.AddRange(startInst.BackDataFlowRelated.SelectMany(x => GetBackDataTree(x.Argument, visited)).ToArray());
             return visited.Distinct();
         }
 

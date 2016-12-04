@@ -80,9 +80,9 @@ namespace ForceBasedDiagram
 
                 foreach (var nodeWrapper in nodeWrappers)
                 {
-                    foreach (var wrapper in nodeWrapper.InstWrapper.ForwardDataFlowRelated.ArgumentList)
+                    foreach (var forwardNode in nodeWrapper.InstWrapper.ForwardDataFlowRelated)
                     {
-                        nodeWrapper.SpotNode.AddChild(nodeWrappers.First(x => x.InstWrapper == wrapper.Argument).SpotNode);
+                        nodeWrapper.SpotNode.AddChild(nodeWrappers.First(x => x.InstWrapper == forwardNode).SpotNode);
                     }
                 }
 

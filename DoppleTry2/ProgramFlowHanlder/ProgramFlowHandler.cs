@@ -8,12 +8,6 @@ namespace DoppleTry2.ProgramFlowHanlder
 {
     abstract class ProgramFlowHandler
     {
-        public static void TwoWayLinkExecutionPath(InstructionWrapper backInstruction, InstructionWrapper forwardInstruction)
-        {
-            backInstruction.ForwardProgramFlow.Add(forwardInstruction);
-            forwardInstruction.BackProgramFlow.Add(backInstruction);
-        }
-
         public List<InstructionWrapper> GetAllPreviousConnected(InstructionWrapper startInstruction, List<InstructionWrapper> visited = null)
         {
             if (visited == null)
