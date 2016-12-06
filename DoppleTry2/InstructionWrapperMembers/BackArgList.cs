@@ -13,9 +13,24 @@ namespace DoppleTry2
         {
             containingWrapper = instructionWrapper;
         }
+        public override bool Equals(object obj)
+        {
+            if (obj is BackArgList)
+            {
+                return this.All(x => ((BackArgList)obj).Any(y => y.ArgIndex == x.ArgIndex && y.Argument == x.Argument));
+            }
+            return base.Equals(obj);
+        }
         InstructionWrapper containingWrapper;
         public int MaxArgIndex = -1;
 
+        public bool SelfFeeding
+        {
+            get
+            {
+                return this.Any(x => x.Argument == containingWrapper);
+            }
+        }
         public void RemoveTwoWay(IndexedArgument backArgToRemove)
         {
             Remove(backArgToRemove);

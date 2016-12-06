@@ -92,31 +92,33 @@ namespace DoppleTry2
             MergeImmediateValue();
             //MergeLdLocs();
             MergeRecursionParalel();
-            //MergeEquivilents();
+            MergeEquivilents();
         }
 
         private void MergeEquivilents()
         {
-            List<InstructionWrapper> Merged = new List<InstructionWrapper>();
-            foreach (var inst in InstructionWrappers.ToArray())
+            bool mergesWereDone;
+            do
             {
-                if (Merged.Contains(inst))
+                mergesWereDone = false;
+                foreach (var inst in InstructionWrappers.ToArray())
                 {
-                    continue;
+                    var toMerge = InstructionWrappers
+                                        .Where(x => x.Instruction.OpCode.Code == inst.Instruction.OpCode.Code)
+                                        .Where(x => typeof(OpCodes).GetFields().Select(y => y.GetValue(null))
+                                                    .Cast<OpCode>().Where(y => y.StackBehaviourPop != StackBehaviour.Pop0).Select(y => y.Code)
+                                                    .Contains(x.Instruction.OpCode.Code))
+                                        .Where(x => x.BackDataFlowRelated.Equals(inst.BackDataFlowRelated))
+                                        .Where(x => !new[] { Code.Ret }.Concat(CodeGroups.CallCodes).Contains(x.Instruction.OpCode.Code))
+                                        .Where(x => !x.BackDataFlowRelated.SelfFeeding)
+                                        .ToList();
+                    if (toMerge.Count() > 1)
+                    {
+                        MergeInsts(toMerge);
+                        mergesWereDone = true;
+                    }
                 }
-                var toMerge = InstructionWrappers
-                                    .Where(x => x.Instruction.OpCode.Code == inst.Instruction.OpCode.Code)
-                                    .Where(x =>  typeof(OpCodes).GetFields().Select(y => y.GetValue(null))
-                                                .Cast<OpCode>().Where(y => y.StackBehaviourPop != StackBehaviour.Pop0).Select(y=> y.Code)
-                                                .Contains(x.Instruction.OpCode.Code))
-                                    .Where(x => x.BackDataFlowRelated.Select(y => y.Argument).SequenceEqual(inst.BackDataFlowRelated.Select(z => z.Argument)))
-                                    .Where(x => !new[]{ Code.Ret}.Concat(CodeGroups.CallCodes).Contains(x.Instruction.OpCode.Code)) ;
-                if (toMerge.Count() >1)
-                {
-                    MergeInsts(toMerge);
-                    Merged.AddRange(toMerge);
-                }
-            }
+            } while (mergesWereDone);
         }
 
         private void RemoveHelperCodes()
@@ -319,6 +321,7 @@ namespace DoppleTry2
                     throw new Exception("there's someone still pointing to the rmoeved");
                 }
             }
+            SetInstructionIndexes();
         }
 
         public void RemoveInstWrappers(IEnumerable<InstructionWrapper> instsToRemove)

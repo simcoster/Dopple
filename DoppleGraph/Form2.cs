@@ -536,15 +536,23 @@ namespace DoppleGraph
 
         private void ShowOnlyMinMax()
         {
-            int minIndexInt = Convert.ToInt32(minIndex.Text);
-            int maxIndexInt = Convert.ToInt32(maxIndex.Text);
-            var nodesToShow = instructionWrappers
-                                .Where(x => x.InstructionIndex >= minIndexInt && x.InstructionIndex <= maxIndexInt)
-                                .Select(x => GetNodeWrapper(x).Node)
-                                .ToList();
-            NodesToShow.Clear();
-            NodesToShow.AddRange(nodesToShow);
-            ReShow();
+            try
+            {
+                int minIndexInt = Convert.ToInt32(minIndex.Text);
+                int maxIndexInt = Convert.ToInt32(maxIndex.Text);
+                var nodesToShow = instructionWrappers
+                                    .Where(x => x.InstructionIndex >= minIndexInt && x.InstructionIndex <= maxIndexInt)
+                                    .Select(x => GetNodeWrapper(x).Node)
+                                    .ToList();
+                NodesToShow.Clear();
+                NodesToShow.AddRange(nodesToShow);
+                ReShow();
+            }
+            catch
+            {
+                NodesToShow.Clear();
+                ReShow();
+            }
         }
     }
 }
