@@ -101,7 +101,6 @@
     <Compile Include="OpcodeProperties\InstructionPropertiesHandler.cs" />
     <Compile Include="OpcodeProperties\MemoryProperties.cs" />
     <Compile Include="ProgramFlowHanlder\BrProgramFlowHandler.cs" />
-    <Compile Include="ProgramFlowHanlder\CallProgramFlowHandler.cs" />
     <Compile Include="ProgramFlowHanlder\ProgramFlowHandler.cs" />
     <Compile Include="InstructionModifiers\IModifier.cs" />
     <Compile Include="InstructionModifiers\InlineCall.cs" />

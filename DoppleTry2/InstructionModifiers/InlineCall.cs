@@ -41,13 +41,15 @@ namespace DoppleTry2.InstructionModifiers
                     }
                     recursionInstanceIndex++;
                 }
-            }
-
-            foreach (var nestedCallInstWrapper in instructionWrappers.Where(x => x is CallInstructionWrapper && x.InliningProperties.Inlined))
-            {
-                int nestedCallIndex = instructionWrappers.IndexOf(nestedCallInstWrapper);
-                instructionWrappers[nestedCallIndex + 1].BackProgramFlow.AddTwoWay(nestedCallInstWrapper);
-                nestedCallInstWrapper.ProgramFlowResolveDone = true;
+                foreach(var inlinedCallInst in instructionWrappers.Where(x => x is CallInstructionWrapper && x.InliningProperties.Inlined))
+                {
+                    foreach(var forwardInst in inlinedCallInst.ForwardProgramFlow.ToList())
+                    {
+                        forwardInst.BackProgramFlow.RemoveTwoWay(inlinedCallInst);
+                    }
+                    var newNextInstIndex = instructionWrappers.IndexOf(inlinedCallInst) + 1;
+                    instructionWrappers[newNextInstIndex].BackProgramFlow.AddTwoWay(inlinedCallInst);
+                }
             }
 
             foreach (var retCall in instructionWrappers.Where(x => x.Instruction.OpCode.Code == Code.Ret && x != instructionWrappers.Last()))
@@ -95,7 +97,10 @@ namespace DoppleTry2.InstructionModifiers
                     if (inlinedInstWrappers.Count > 0)
                     {
                         calledFuncInstWrappers.InsertRange(instWrapperIndex + 1, inlinedInstWrappers);
-                        nestedCallInstWrapper.ForwardProgramFlow.Clear();
+                        foreach (var forwardFlowInst in nestedCallInstWrapper.ForwardProgramFlow.ToList())
+                        {
+                            forwardFlowInst.BackProgramFlow.RemoveTwoWay(nestedCallInstWrapper);
+                        }
                         inlinedInstWrappers[0].BackProgramFlow.AddTwoWay(nestedCallInstWrapper);
                     }
                 }

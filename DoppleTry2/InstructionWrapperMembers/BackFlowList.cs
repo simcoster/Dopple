@@ -46,5 +46,24 @@ namespace DoppleTry2.InstructionWrapperMembers
             base.Add(instructionWrapper);
         }
 
+
+        [Obsolete("Please use AddRangeTwoWay instead")]
+        public new void AddRange(IEnumerable<InstructionWrapper> instructionWrappers)
+        {
+            base.AddRange(instructionWrappers);
+        }
+
+        [Obsolete("Please use RemoveTwoWay instead")]
+        public new void Remove(InstructionWrapper instructionWrapper)
+        {
+            base.Remove(instructionWrapper);
+        }
+
+        [Obsolete("Please use RemoveAllTwoWay instead")]
+        public new void RemoveAll(Predicate<InstructionWrapper> predicate)
+        {
+            base.RemoveAll(predicate);
+        }
+
     }
 }

@@ -129,7 +129,18 @@ namespace DoppleTry2.InstructionWrappers
         public int MemoryReadCount { get; set; }
         public int MemoryStoreCount { get; set; }
         public MethodDefinition Method { get; set; }
-        public List<InstructionWrapper> ForwardProgramFlow { get; set; } = new List<InstructionWrapper>();
+        public List<InstructionWrapper> ForwardProgramFlow
+        {
+            get
+            {
+                return _ForwardProgramFlow;
+            }
+            set
+            {
+                _ForwardProgramFlow = value;
+            }
+        }
+        private List<InstructionWrapper> _ForwardProgramFlow = new List<InstructionWrapper>();
         public int StackPopCount { get; set; }
         public int StackPushCount { get; set; }
         public bool FirstLineInstruction { get; set; } = false;
@@ -137,6 +148,4 @@ namespace DoppleTry2.InstructionWrappers
         public bool ProgramFlowResolveDone { get; set; } = false;
         public InliningProperties InliningProperties = new InliningProperties();
     }
-
-   
 }
