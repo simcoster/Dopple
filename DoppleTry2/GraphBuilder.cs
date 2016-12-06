@@ -92,33 +92,54 @@ namespace DoppleTry2
             MergeImmediateValue();
             //MergeLdLocs();
             MergeRecursionParalel();
-            MergeEquivilents();
+            MergeEquivilentPairs();
         }
 
-        private void MergeEquivilents()
+        private void MergeEquivilentPairs()
         {
             bool mergesWereDone;
             do
             {
                 mergesWereDone = false;
-                foreach (var inst in InstructionWrappers.ToArray())
+                for (int i =0;  i < InstructionWrappers.Count; i++)
                 {
-                    var toMerge = InstructionWrappers
-                                        .Where(x => x.Instruction.OpCode.Code == inst.Instruction.OpCode.Code)
+                    var firstInst = InstructionWrappers[i];
+                    var secondInst = InstructionWrappers
+                                        .Where(x => x != firstInst)
+                                        .Where(x => x.Instruction.OpCode.Code == firstInst.Instruction.OpCode.Code)
                                         .Where(x => typeof(OpCodes).GetFields().Select(y => y.GetValue(null))
                                                     .Cast<OpCode>().Where(y => y.StackBehaviourPop != StackBehaviour.Pop0).Select(y => y.Code)
                                                     .Contains(x.Instruction.OpCode.Code))
-                                        .Where(x => x.BackDataFlowRelated.Equals(inst.BackDataFlowRelated))
+                                        .Where(x => x.BackDataFlowRelated.Equals(firstInst.BackDataFlowRelated))
                                         .Where(x => !new[] { Code.Ret }.Concat(CodeGroups.CallCodes).Contains(x.Instruction.OpCode.Code))
                                         .Where(x => !x.BackDataFlowRelated.SelfFeeding)
-                                        .ToList();
-                    if (toMerge.Count() > 1)
+                                        .FirstOrDefault(x => !DifferentArgumentsToSameInst(x, firstInst));
+                    if (secondInst != null)
                     {
-                        MergeInsts(toMerge);
+                        MergeInsts(new[] { firstInst, secondInst });
                         mergesWereDone = true;
                     }
                 }
             } while (mergesWereDone);
+        }
+
+        private bool DifferentArgumentsToSameInst(InstructionWrapper firstInst, InstructionWrapper secondInst)
+        {
+            var allForwardArgs = firstInst.ForwardDataFlowRelated.Concat(secondInst.ForwardDataFlowRelated).Distinct();
+            foreach(var forwardArg in allForwardArgs)
+            {
+                var firstInstArg = forwardArg.BackDataFlowRelated.FirstOrDefault(x => x.Argument == firstInst);
+                var secondInstArg = forwardArg.BackDataFlowRelated.FirstOrDefault(x => x.Argument == secondInst);
+                if (firstInstArg == null || secondInstArg == null)
+                {
+                    continue;
+                }
+                if (firstInstArg.ArgIndex != secondInstArg.ArgIndex)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private void RemoveHelperCodes()
