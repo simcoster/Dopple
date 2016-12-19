@@ -121,9 +121,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DoppleTry2\DoppleTry2.csproj">
+    <ProjectReference Include="..\DoppleTry2\GraphBuilder.csproj">
       <Project>{77c5971e-3c37-4932-911d-9c6050e67ffa}</Project>
-      <Name>DoppleTry2</Name>
+      <Name>GraphBuilder</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

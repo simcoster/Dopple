@@ -64,7 +64,7 @@ namespace DoppleTry2
             AddStArgHelpers();
             BackTrace();
             RemoveHelperCodes();
-            MergeSimilarInstructions();
+            //MergeSimilarInstructions();
             PostMergeBackTrace();
             SetInstructionIndexes();
             Veirify();
@@ -144,11 +144,6 @@ namespace DoppleTry2
 
         private void RemoveHelperCodes()
         {
-            var problematic = InstructionWrappers.FirstOrDefault(x => x.ForwardDataFlowRelated.GroupBy(y => y.Instruction).Any(y => y.Count() != y.First().BackDataFlowRelated.Count(z => z.Argument == x)));
-            if (problematic != null)
-            {
-
-            }
             RemoveInstWrappers(InstructionWrappers.Where(x => CodeGroups.StLocCodes.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(InstructionWrappers.Where(x => CodeGroups.LdLocCodes.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(InstructionWrappers.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code)));

@@ -53,9 +53,9 @@ namespace ForceBasedDiagram
             AssemblyDefinition myLibrary = AssemblyDefinition.ReadAssembly(@"C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\Utility\bin\Release\Utility.dll");
 
             CodeColorHanlder colorCode = new CodeColorHanlder();
-            TypeDefinition type = myLibrary.MainModule.Types[1];
+            TypeDefinition type = myLibrary.MainModule.Types[2];
 
-            foreach (var method in type.Methods.Where(x => !x.IsConstructor && x.Name.Contains("ort")))
+            foreach (var method in type.Methods)
             {
                 Form1 newForm = new Form1();
                 newForm.btnGenerate.Hide();

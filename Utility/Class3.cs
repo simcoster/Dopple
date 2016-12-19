@@ -10,6 +10,15 @@ namespace Utility
 {
     public class Class3
     {
+        public void SimpleTwoLoops()
+        {
+
+            int j = 0;
+            if (j> 5)
+            {
+                Console.Write("blah");
+            } 
+        }
         public int SumArray(int[] array)
         {
             int sum = 0;

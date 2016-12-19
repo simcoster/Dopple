@@ -10,6 +10,14 @@ namespace Utility
 {
     public class Class2
     {
+        public static int SumInSingleStep(int a, int b, int c)
+        {
+            return a + b +c;
+        }
+        public static int SumInTwoStep(int a, int b, int c)
+        {
+            return new[] { a, b, c }.Sum();
+        }
         public static void insertionSort(int[] array)
         {
             for (int i = 0; i < array.Length - 1; i++)
@@ -101,51 +109,51 @@ namespace Utility
             return arr;
         }
 
-                public static void QuickSortMiddle(int[] arr)
+        public static void QuickSortMiddle(int[] arr)
+        {
+            QuicksortMiddleRec(arr, 0, arr.Length);
+        }
+
+        public static void QuicksortMiddleRec(int[] elements, int left, int right)
+        {
+            int i = left, j = right;
+            int pivot = elements[(left + right) / 2];
+
+            while (i <= j)
+            {
+                while (elements[i] < pivot)
                 {
-                    QuicksortMiddleRec(arr, 0, arr.Length);
+                    i++;
                 }
 
-                public static void QuicksortMiddleRec(int[] elements, int left, int right)
+                while (elements[j] > pivot)
                 {
-                    int i = left, j = right;
-                    int pivot = elements[(left + right) / 2];
-
-                    while (i <= j)
-                    {
-                        while (elements[i] <pivot )
-                        {
-                            i++;
-                        }
-
-                        while (elements[j] > pivot)
-                        {
-                            j--;
-                        }
-
-                        if (i <= j)
-                        {
-                            // Swap
-                            int tmp = elements[i];
-                            elements[i] = elements[j];
-                            elements[j] = tmp;
-
-                            i++;
-                            j--;
-                        }
-                    }
-
-                    // Recursive calls
-                    if (left < j)
-                    {
-                        QuicksortMiddleRec(elements, left, j);
-                    }
-
-                    if (i < right)
-                    {
-                        QuicksortMiddleRec(elements, i, right);
-                    }
+                    j--;
                 }
+
+                if (i <= j)
+                {
+                    // Swap
+                    int tmp = elements[i];
+                    elements[i] = elements[j];
+                    elements[j] = tmp;
+
+                    i++;
+                    j--;
+                }
+            }
+
+            // Recursive calls
+            if (left < j)
+            {
+                QuicksortMiddleRec(elements, left, j);
+            }
+
+            if (i < right)
+            {
+                QuicksortMiddleRec(elements, i, right);
+            }
+        }
 
         static void BubbleSort(int[] number)
         {
@@ -247,51 +255,55 @@ namespace Utility
         {
             MergeSortRec(numbers, numbers.Length, 0);
         }
-        
- static public void TestRec (int[] arr, int left, int right)
- {
-     var lefttemp = left + 5;
-     var rightTemp = 4;
-     TestRec(arr, lefttemp,rightTemp);
-     TestRec(new int[4], lefttemp, rightTemp);
- }
+
+        static public void TestRec(int[] arr, int left, int right)
+        {
+            var lefttemp = left + 5;
+            var rightTemp = 4;
+            TestRec(arr, lefttemp, rightTemp);
+            TestRec(new int[4], lefttemp, rightTemp);
+        }
+
+        static void QuickSortLeftPivot(int[] a)
+        {
+            QuickSortLeftPivotRec(a, 0, a.Length - 1);
+        }
 
 
+        static void QuickSortLeftPivotRec(int[] a, int start, int end)
+        {
+            if (start >= end)
+            {
+                return;
+            }
 
- static void QuickSortLeftPivot(int[] a, int start, int end)
- {
-     if (start >= end)
-     {
-         return;
-     }
+            int num = a[start];
 
-     int num = a[start];
+            int i = start, j = end;
 
-     int i = start, j = end;
+            while (i < j)
+            {
+                while (i < j && a[j] > num)
+                {
+                    j--;
+                }
 
-     while (i < j)
-     {
-         while (i < j && a[j] > num)
-         {
-             j--;
-         }
+                a[i] = a[j];
 
-         a[i] = a[j];
+                while (i < j && a[i] < num)
+                {
+                    i++;
+                }
 
-         while (i < j && a[i] < num)
-         {
-             i++;
-         }
+                a[j] = a[i];
+            }
 
-         a[j] = a[i];
-     }
+            a[i] = num;
+            QuickSortLeftPivotRec(a, start, i - 1);
+            QuickSortLeftPivotRec(a, i + 1, end);
+        }
 
-     a[i] = num;
-     QuickSortLeftPivot(a, start, i - 1);
-     QuickSortLeftPivot(a, i + 1, end);
- }
 
- 
         public static bool BinarySearch(int first, int last, int[] mynumbers, int target)
         {
             while (first <= last)
