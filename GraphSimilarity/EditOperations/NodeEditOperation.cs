@@ -18,7 +18,7 @@ namespace GraphSimilarity
             var computedNodeOperation = new CalculatedOperation();
             computedNodeOperation.NodeOperation = this;
             computedNodeOperation.EdgeOperations = GetEdgeOperations();
-            computedNodeOperation.TotalCost = computedNodeOperation.NodeOperation.Cost + computedNodeOperation.EdgeOperations.Sum(x => x.Cost);
+            computedNodeOperation.Cost = computedNodeOperation.NodeOperation.Cost + computedNodeOperation.EdgeOperations.Sum(x => x.Cost);
             return computedNodeOperation;
         }
         protected abstract List<EdgeEditOperation> GetEdgeOperations();

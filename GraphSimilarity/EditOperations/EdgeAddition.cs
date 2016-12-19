@@ -9,7 +9,7 @@ namespace GraphSimilarity.EditOperations
 {
     class EdgeAddition : EdgeEditOperation
     {
-        public EdgeAddition(List<InstructionWrapper> graph) : base(graph)
+        public EdgeAddition(List<InstructionWrapper> graph, GraphEdge edge) : base(graph, edge)
         {
         }
 

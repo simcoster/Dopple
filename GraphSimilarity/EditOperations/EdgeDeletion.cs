@@ -9,7 +9,7 @@ namespace GraphSimilarity.EditOperations
 {
     class EdgeDeletion : EdgeEditOperation
     {
-        public EdgeDeletion(List<InstructionWrapper> graph) : base(graph)
+        public EdgeDeletion(List<InstructionWrapper> graph, GraphEdge edge) : base(graph, edge)
         {
         }
 

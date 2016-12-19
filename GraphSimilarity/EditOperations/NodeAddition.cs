@@ -9,9 +9,12 @@ namespace GraphSimilarity.EditOperations
 {
     internal class NodeAddition : NodeEditOperation
     {
-        public NodeAddition(List<InstructionWrapper> graph) : base(graph)
+        public NodeAddition(List<InstructionWrapper> graph, Dictionary<InstructionWrapper,List<GraphEdge>> edgesToBeAdded) : base(graph)
         {
+            EdgesToBeAdded = edgesToBeAdded;
         }
+
+        readonly Dictionary<InstructionWrapper, List<GraphEdge>> EdgesToBeAdded;
 
         public override int Cost
         {
@@ -31,7 +34,16 @@ namespace GraphSimilarity.EditOperations
 
         protected override List<EdgeEditOperation> GetEdgeOperations()
         {
-            throw new NotImplementedException();
+            var addedEdges = new List<EdgeEditOperation>();
+            if (EdgesToBeAdded.ContainsKey(InstructionWrapper))
+            {
+                foreach(var edge in EdgesToBeAdded[InstructionWrapper])
+                {
+                    var edgeAddition = new EdgeAddition(graph,edge);
+                    edgeAddition.Edge = edge;
+                    addedEdges.Add();
+                }
+            }
         }
     }
 }

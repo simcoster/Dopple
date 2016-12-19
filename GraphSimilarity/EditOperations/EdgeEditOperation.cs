@@ -7,8 +7,9 @@ namespace GraphSimilarity
 {
     internal abstract class EdgeEditOperation : EditOperation
     {
-        public EdgeEditOperation(List<InstructionWrapper> graph) : base(graph)
+        public EdgeEditOperation(List<InstructionWrapper> graph, GraphEdge edge) : base(graph)
         {
+            this.Edge = edge;
         }
 
         public GraphEdge Edge { get; set; }

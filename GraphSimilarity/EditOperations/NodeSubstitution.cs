@@ -10,6 +10,11 @@ namespace GraphSimilarity.EditOperations
     internal class NodeSubstitution : NodeEditOperation
     {
         public InstructionWrapper ReplacedWith;
+
+        public NodeSubstitution(List<InstructionWrapper> graph) : base(graph)
+        {
+        }
+
         public override int Cost
         {
             get
@@ -32,6 +37,11 @@ namespace GraphSimilarity.EditOperations
             {
                 return "NodeSubstitution";
             }
+        }
+
+        protected override List<EdgeEditOperation> GetEdgeOperations()
+        {
+            throw new NotImplementedException();
         }
     }
 }
