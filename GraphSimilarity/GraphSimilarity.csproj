@@ -59,12 +59,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EditOperations\EdgeAddition.cs" />
+    <Compile Include="EditOperations\EdgeEditOperation.cs" />
+    <Compile Include="EditOperations\GraphEdge.cs" />
+    <Compile Include="EditOperations\NodeEditOperation.cs" />
+    <Compile Include="EditOperations\EditPath.cs" />
     <Compile Include="EditOperations\EdgeDeletion.cs" />
     <Compile Include="EditOperations\EditOperation.cs" />
     <Compile Include="EditOperations\NodeDeletion.cs" />
     <Compile Include="EditOperations\NodeAddition.cs" />
     <Compile Include="EditOperations\NodeSubstitution.cs" />
-    <Compile Include="EditOperations\OperationsCalculator.cs" />
     <Compile Include="GraphEditDistanceCalc.cs" />
     <Compile Include="HeuristicDistanceCalc.cs" />
     <Compile Include="NodeTypes.cs" />
