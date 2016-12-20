@@ -9,17 +9,20 @@ namespace GraphSimilarity.EditOperations
 {
     internal class NodeSubstitution : NodeEditOperation
     {
-        public InstructionWrapper ReplacedWith;
+        private readonly List<GraphEdge> edgeAdditionsPending;
+        private readonly InstructionWrapper replacedWith;
 
-        public NodeSubstitution(List<InstructionWrapper> graph) : base(graph)
+        public NodeSubstitution(List<InstructionWrapper> graph, List<GraphEdge> edgeAdditionsPending, InstructionWrapper node, InstructionWrapper replacedWith) : base(graph, node)
         {
+            this.replacedWith = replacedWith;
+            this.edgeAdditionsPending = edgeAdditionsPending;
         }
 
         public override int Cost
         {
             get
             {
-                if (InstructionWrapper.Instruction.OpCode.Code == ReplacedWith.Instruction.OpCode.Code)
+                if (Node.Instruction.OpCode.Code == replacedWith.Instruction.OpCode.Code)
                 {
                     return 1;
                 }
@@ -41,7 +44,9 @@ namespace GraphSimilarity.EditOperations
 
         protected override List<EdgeEditOperation> GetEdgeOperations()
         {
-            throw new NotImplementedException();
+            var nodeDeletion = new NodeDeletion(graph, Node);
+            var nodeAddition = new NodeAddition(graph, replacedWith, edgeAdditionsPending);
+            return nodeDeletion.G
         }
     }
 }

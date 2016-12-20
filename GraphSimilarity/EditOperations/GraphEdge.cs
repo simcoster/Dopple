@@ -17,5 +17,16 @@ namespace GraphSimilarity.EditOperations
             SourceNode = sourceNode;
             DestinationNode = destinationNode;
         }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is GraphEdge)
+            {
+                var otherEdge =(GraphEdge) obj;
+                return SourceNode == otherEdge.SourceNode && DestinationNode == otherEdge.DestinationNode;
+
+            }
+            return base.Equals(obj);
+        }
     }
 }

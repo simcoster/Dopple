@@ -8,11 +8,12 @@ namespace GraphSimilarity
 {
     internal abstract class NodeEditOperation : EditOperation
     {
-        public NodeEditOperation(List<InstructionWrapper> graph) : base(graph)
+        public NodeEditOperation(List<InstructionWrapper> graph, InstructionWrapper node) : base(graph)
         {
+            Node = node;
         }
 
-        public InstructionWrapper InstructionWrapper { get; set; }
+        public InstructionWrapper Node { get; private set; }
         public CalculatedOperation ComputeAndCommit()
         {
             var computedNodeOperation = new CalculatedOperation();

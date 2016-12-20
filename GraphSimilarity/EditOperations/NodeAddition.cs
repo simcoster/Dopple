@@ -9,12 +9,12 @@ namespace GraphSimilarity.EditOperations
 {
     internal class NodeAddition : NodeEditOperation
     {
-        public NodeAddition(List<InstructionWrapper> graph, Dictionary<InstructionWrapper,List<GraphEdge>> edgesToBeAdded) : base(graph)
-        {
-            EdgesToBeAdded = edgesToBeAdded;
-        }
+        readonly List<GraphEdge> edgeAdditionsPending;
 
-        readonly Dictionary<InstructionWrapper, List<GraphEdge>> EdgesToBeAdded;
+        public NodeAddition(List<InstructionWrapper> graph, InstructionWrapper node, List<GraphEdge> edgeAdditionsPending) : base(graph, node)
+        {
+            this.edgeAdditionsPending = edgeAdditionsPending;
+        }
 
         public override int Cost
         {
@@ -35,15 +35,25 @@ namespace GraphSimilarity.EditOperations
         protected override List<EdgeEditOperation> GetEdgeOperations()
         {
             var addedEdges = new List<EdgeEditOperation>();
-            if (EdgesToBeAdded.ContainsKey(InstructionWrapper))
+            List<GraphEdge> relatedEdgesToAdd = Node.BackDataFlowRelated.Select(x => new GraphEdge(x.Argument, Node))
+                                                 .Concat(Node.ForwardDataFlowRelated.Select(x => new GraphEdge(x, Node)))
+                                                 .ToList();
+            IEnumerable<GraphEdge> triggeredEdgeAdds = edgeAdditionsPending.Where(x => x.DestinationNode == Node || x.SourceNode == Node);
+
+            foreach (var edge in triggeredEdgeAdds.ToArray())
             {
-                foreach(var edge in EdgesToBeAdded[InstructionWrapper])
-                {
-                    var edgeAddition = new EdgeAddition(graph,edge);
-                    edgeAddition.Edge = edge;
-                    addedEdges.Add();
-                }
+                var edgeAddition = new EdgeAddition(graph, edge);
+                edgeAddition.Edge = edge;
+                edgeAdditionsPending.Remove(edge);
+                relatedEdgesToAdd.Remove(edge);
+                addedEdges.Add(edgeAddition);
             }
+
+            foreach (var edgeLeftToBeAdded in relatedEdgesToAdd)
+            {
+                edgeAdditionsPending.Add(edgeLeftToBeAdded);
+            }
+            return addedEdges;
         }
     }
 }
