@@ -22,45 +22,57 @@ namespace GraphSimilarity
                  //step 2 = concider for each one, replacing with each one of the second graph
                  //step 3 = concider for each one, deleting
                  //continue until no more nodes left of the first graph
-            IEnumerable<InstructionWrapper> targetGraphNodesToResolve = new List<InstructionWrapper>(targetGraph);
-            IEnumerable<InstructionWrapper> sourceGraphNodesToResolve = new List<InstructionWrapper>(sourceGraph);
+
             var pathsToConcider = new List<EditPath>();
-            var currGraph = sourceGraph;
+            var currEditPath = new EditPath(sourceGraph, targetGraph);
             while (true)
             {
-                IEnumerable<CalculatedOperation> possibleOperations = currGraph.SelectMany(x => GetPossibleSubsAndDelete(sourceGraph, x, targetGraph));
-                foreach (var possibleOperation in possibleOperations)
+                if (currEditPath.SourceNodesLeftToResolve.Count !=0)
                 {
-                    var tempPathToConsider = new EditPath(currGraph, targetGraph);
-                    tempPathToConsider.AddEditOperation(possibleOperation);
-                    pathsToConcider.Add(tempPathToConsider);
+                    foreach (var node in currEditPath.Graph)
+                    {
+                        List<CalculatedOperation> possibleOperations = GetPossibleSubsAndDelete(currEditPath, node, targetGraph);
+                        foreach (var possibleOperation in possibleOperations)
+                        {
+                            var tempPathToConsider = new EditPath(currEditPath.Graph, targetGraph);
+                            tempPathToConsider.AddEditOperation(possibleOperation);
+                            pathsToConcider.Add(tempPathToConsider);
+                        }
+                    }
                 }
-                var cheapestPath = pathsToConcider.First(x => x.CumelativeCostPlusHeuristic == pathsToConcider.Min(y => y.CumelativeCostPlusHeuristic));               
+                else
+                {
+                    foreach (var nodeToAdd in currEditPath.TargetNodesLeftToResolve)
+                    {
+                        CalculatedOperation nodeAddition = new NodeAddition(currEditPath.Graph,nodeToAdd,currEditPath.EdgeAdditionsPending).GetCalculated();
+                        EditPath additionPath = new EditPath(currEditPath.Graph, targetGraph);
+                        additionPath.AddEditOperation(nodeAddition);
+                        pathsToConcider.Add(additionPath);
+                    }
+                }
+                var cheapestPath = pathsToConcider.First(x => x.CumelativeCostPlusHeuristic == pathsToConcider.Min(y => y.CumelativeCostPlusHeuristic));
                 if (cheapestPath.HeuristicCost == 0)
                 {
                     return cheapestPath;
                 }
                 else
                 {
-                    currGraph = cheapestPath.Graph;
+                    currEditPath = cheapestPath;
                 }
             }
-            return 0;
         }
 
-        private static List<CalculatedOperation> GetPossibleSubsAndDelete(List<InstructionWrapper> graphToChange, InstructionWrapper nodeToCheck, List<InstructionWrapper> targetGraph)
+        private static List<CalculatedOperation> GetPossibleSubsAndDelete(EditPath currentPath, InstructionWrapper nodeToCheck, List<InstructionWrapper> targetGraph)
         {
             var calculatedOperations = new List<CalculatedOperation>();
 
             foreach (var secondGraphNode in targetGraph)
             {
-                var startWithReplacePath = new EditPath(graphToChange);
-                var nodeSubstitution = new NodeSubstitution(startWithReplacePath.Graph, startWithReplacePath.EdgeAdditionsPending, nodeToCheck, secondGraphNode);
+                var nodeSubstitution = new NodeSubstitution(currentPath.Graph, currentPath.EdgeAdditionsPending, nodeToCheck, secondGraphNode);
                 calculatedOperations.Add(nodeSubstitution.GetCalculated());
             }
-            var startWithDeletePath = new EditPath(graphToChange);
-            var nodeDeletion = new NodeDeletion(startWithDeletePath.Graph, nodeToCheck);
-            startWithDeletePath.AddEditOperation(nodeDeletion.GetCalculated());
+            var nodeDeletion = new NodeDeletion(currentPath.Graph, nodeToCheck);
+            calculatedOperations.Add(nodeDeletion.GetCalculated());
             return calculatedOperations;
         }
     }

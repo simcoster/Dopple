@@ -12,6 +12,8 @@ namespace GraphSimilarity.EditOperations
         public NodeEditOperation NodeOperation { get;  set; }
         public List<EdgeEditOperation> EdgeOperations { get;  set; }
         public List<InstructionWrapper> EditedGraph { get;  set; }
+        public List<InstructionWrapper> DeletedNodes { get; set; }
+        public List<InstructionWrapper> AddedNodes { get; set; }
         public int Cost { get; set; }
         public void Commit()
         {

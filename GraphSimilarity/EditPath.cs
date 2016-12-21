@@ -6,12 +6,14 @@ namespace GraphSimilarity
 {
     internal class EditPath
     {
+        public List<InstructionWrapper> TargetNodesLeftToResolve;
+        public List<InstructionWrapper> SourceNodesLeftToResolve;
         public void AddEditOperation(CalculatedOperation calculatedOperation)
         {
             Path.Add(calculatedOperation);
             CumelativeCost += calculatedOperation.Cost;
             Graph = calculatedOperation.EditedGraph;
-            HeuristicCost = HeuristicDistanceCalc.HeuristicNodeDistance(Graph, targetGraph);
+            HeuristicCost = TargetNodesLeftToResolve.Count + SourceNodesLeftToResolve.Count;
             CumelativeCostPlusHeuristic = CumelativeCost + HeuristicCost;
         }
         public List<GraphEdge> EdgeAdditionsPending { get; private set; } = new List<GraphEdge>();
@@ -28,6 +30,8 @@ namespace GraphSimilarity
         {
             this.Graph = new List<InstructionWrapper>(graphToClone);
             this.targetGraph = targetGraph;
+            TargetNodesLeftToResolve = new List<InstructionWrapper>(targetGraph);
+            SourceNodesLeftToResolve = new List<InstructionWrapper>(graphToClone);
         }
     }
 }

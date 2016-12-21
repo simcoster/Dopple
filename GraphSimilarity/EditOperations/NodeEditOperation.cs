@@ -18,11 +18,15 @@ namespace GraphSimilarity
         {
             var computedNodeOperation = new CalculatedOperation();
             computedNodeOperation.NodeOperation = this;
+            computedNodeOperation.DeletedNodes = GetDeletedNodes();
+            computedNodeOperation.AddedNodes = GetAddeddNodes();
             computedNodeOperation.EdgeOperations = GetEdgeOperations();
             computedNodeOperation.Cost = computedNodeOperation.NodeOperation.Cost + computedNodeOperation.EdgeOperations.Sum(x => x.Cost);
             return computedNodeOperation;
         }
-        internal abstract List<EdgeEditOperation> GetEdgeOperations();
 
+        internal abstract List<InstructionWrapper> GetAddeddNodes();
+        internal abstract List<InstructionWrapper> GetDeletedNodes();
+        internal abstract List<EdgeEditOperation> GetEdgeOperations();
     }
 }

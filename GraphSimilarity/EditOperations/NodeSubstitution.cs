@@ -10,11 +10,11 @@ namespace GraphSimilarity.EditOperations
     internal class NodeSubstitution : NodeEditOperation
     {
         private readonly List<GraphEdge> edgeAdditionsPending;
-        private readonly InstructionWrapper replacedWith;
+        private readonly InstructionWrapper NodeToReplaceWith;
 
         public NodeSubstitution(List<InstructionWrapper> graph, List<GraphEdge> edgeAdditionsPending, InstructionWrapper node, InstructionWrapper replacedWith) : base(graph, node)
         {
-            this.replacedWith = replacedWith;
+            this.NodeToReplaceWith = replacedWith;
             this.edgeAdditionsPending = edgeAdditionsPending;
         }
 
@@ -22,7 +22,7 @@ namespace GraphSimilarity.EditOperations
         {
             get
             {
-                if (Node.Instruction.OpCode.Code == replacedWith.Instruction.OpCode.Code)
+                if (Node.Instruction.OpCode.Code == NodeToReplaceWith.Instruction.OpCode.Code)
                 {
                     return 1;
                 }
@@ -45,13 +45,23 @@ namespace GraphSimilarity.EditOperations
         public override void Commit()
         {
             graph.Remove(Node);
-            graph.Add(replacedWith);
+            graph.Add(NodeToReplaceWith);
+        }
+
+        internal override List<InstructionWrapper> GetAddeddNodes()
+        {
+            return new List<InstructionWrapper>() { NodeToReplaceWith };
+        }
+
+        internal override List<InstructionWrapper> GetDeletedNodes()
+        {
+            return new List<InstructionWrapper>() { Node };
         }
 
         internal override List<EdgeEditOperation> GetEdgeOperations()
         {
             var nodeDeletion = new NodeDeletion(graph, Node);
-            var nodeAddition = new NodeAddition(graph, replacedWith, edgeAdditionsPending);
+            var nodeAddition = new NodeAddition(graph, NodeToReplaceWith, edgeAdditionsPending);
             return nodeDeletion.GetEdgeOperations().Concat(nodeAddition.GetEdgeOperations()).ToList();
         }
     }

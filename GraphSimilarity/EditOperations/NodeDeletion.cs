@@ -35,6 +35,16 @@ namespace GraphSimilarity.EditOperations
             graph.Remove(Node);
         }
 
+        internal override List<InstructionWrapper> GetAddeddNodes()
+        {
+            return new List<InstructionWrapper>(){ };
+        }
+
+        internal override List<InstructionWrapper> GetDeletedNodes()
+        {
+            return new List<InstructionWrapper>() {Node };
+        }
+
         internal override List<EdgeEditOperation> GetEdgeOperations()
         {
             var relatedEdgeOperations = new List<EdgeEditOperation>();
