@@ -32,11 +32,16 @@ namespace GraphSimilarity.EditOperations
             }
         }
 
-        protected override List<EdgeEditOperation> GetEdgeOperations()
+        public override void Commit()
+        {
+            graph.Add(Node);
+        }
+
+        internal override List<EdgeEditOperation> GetEdgeOperations()
         {
             var addedEdges = new List<EdgeEditOperation>();
-            List<GraphEdge> relatedEdgesToAdd = Node.BackDataFlowRelated.Select(x => new GraphEdge(x.Argument, Node))
-                                                 .Concat(Node.ForwardDataFlowRelated.Select(x => new GraphEdge(x, Node)))
+            List<GraphEdge> relatedEdgesToAdd = Node.BackDataFlowRelated.Select(x => new GraphEdge(x.Argument, Node, x.ArgIndex))
+                                                 .Concat(Node.ForwardDataFlowRelated.Select(x => new GraphEdge(x, Node, x.BackDataFlowRelated.First(y => y.Argument ==x).ArgIndex)))
                                                  .ToList();
             IEnumerable<GraphEdge> triggeredEdgeAdds = edgeAdditionsPending.Where(x => x.DestinationNode == Node || x.SourceNode == Node);
 

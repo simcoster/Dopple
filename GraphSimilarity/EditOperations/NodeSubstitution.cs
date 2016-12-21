@@ -42,11 +42,17 @@ namespace GraphSimilarity.EditOperations
             }
         }
 
-        protected override List<EdgeEditOperation> GetEdgeOperations()
+        public override void Commit()
+        {
+            graph.Remove(Node);
+            graph.Add(replacedWith);
+        }
+
+        internal override List<EdgeEditOperation> GetEdgeOperations()
         {
             var nodeDeletion = new NodeDeletion(graph, Node);
             var nodeAddition = new NodeAddition(graph, replacedWith, edgeAdditionsPending);
-            return nodeDeletion.G
+            return nodeDeletion.GetEdgeOperations().Concat(nodeAddition.GetEdgeOperations()).ToList();
         }
     }
 }

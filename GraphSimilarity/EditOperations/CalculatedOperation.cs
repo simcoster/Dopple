@@ -13,5 +13,13 @@ namespace GraphSimilarity.EditOperations
         public List<EdgeEditOperation> EdgeOperations { get;  set; }
         public List<InstructionWrapper> EditedGraph { get;  set; }
         public int Cost { get; set; }
+        public void Commit()
+        {
+            NodeOperation.Commit();
+            foreach(var edgeEdit in EdgeOperations)
+            {
+                edgeEdit.Commit();
+            }
+        }
     }
 }

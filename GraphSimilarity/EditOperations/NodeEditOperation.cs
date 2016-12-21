@@ -14,7 +14,7 @@ namespace GraphSimilarity
         }
 
         public InstructionWrapper Node { get; private set; }
-        public CalculatedOperation ComputeAndCommit()
+        public CalculatedOperation GetCalculated()
         {
             var computedNodeOperation = new CalculatedOperation();
             computedNodeOperation.NodeOperation = this;
@@ -22,7 +22,7 @@ namespace GraphSimilarity
             computedNodeOperation.Cost = computedNodeOperation.NodeOperation.Cost + computedNodeOperation.EdgeOperations.Sum(x => x.Cost);
             return computedNodeOperation;
         }
-        protected abstract List<EdgeEditOperation> GetEdgeOperations();
+        internal abstract List<EdgeEditOperation> GetEdgeOperations();
 
     }
 }

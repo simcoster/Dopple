@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DoppleTry2.InstructionWrappers;
+using DoppleTry2;
 
 namespace GraphSimilarity.EditOperations
 {
@@ -27,6 +28,11 @@ namespace GraphSimilarity.EditOperations
             {
                 return "Edge Addition";
             }
+        }
+
+        public override void Commit()
+        {
+            Edge.DestinationNode.BackDataFlowRelated.AddTwoWay(new IndexedArgument(Edge.Index, Edge.SourceNode));
         }
     }
 }

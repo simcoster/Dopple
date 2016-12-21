@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DoppleTry2.InstructionWrappers;
+using DoppleTry2;
 
 namespace GraphSimilarity.EditOperations
 {
@@ -27,6 +28,12 @@ namespace GraphSimilarity.EditOperations
             {
                 return "Edge Deletion";
             }
+        }
+
+        public override void Commit()
+        {
+            BackArgList backNodes = Edge.DestinationNode.BackDataFlowRelated;
+            backNodes.RemoveTwoWay(backNodes.First(x => x.Argument == Edge.SourceNode));
         }
     }
 }

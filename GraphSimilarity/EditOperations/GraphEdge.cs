@@ -11,11 +11,13 @@ namespace GraphSimilarity.EditOperations
     {
         public InstructionWrapper SourceNode { get; private set; }
         public InstructionWrapper DestinationNode { get; private set; }
+        public int Index { get; private set; }
 
-        public GraphEdge(InstructionWrapper sourceNode, InstructionWrapper destinationNode)
+        public GraphEdge(InstructionWrapper sourceNode, InstructionWrapper destinationNode, int index)
         {
             SourceNode = sourceNode;
             DestinationNode = destinationNode;
+            this.Index = index;
         }
 
         public override bool Equals(object obj)

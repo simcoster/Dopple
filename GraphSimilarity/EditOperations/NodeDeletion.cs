@@ -30,19 +30,24 @@ namespace GraphSimilarity.EditOperations
             }
         }
 
-        protected override List<EdgeEditOperation> GetEdgeOperations()
+        public override void Commit()
+        {
+            graph.Remove(Node);
+        }
+
+        internal override List<EdgeEditOperation> GetEdgeOperations()
         {
             var relatedEdgeOperations = new List<EdgeEditOperation>();
             InstructionWrapper nodeToRemove = Node;
             foreach (var backNode in nodeToRemove.BackDataFlowRelated.ToArray())
             {
-                var tempEdgeDeletion = new EdgeDeletion(graph, new GraphEdge(backNode.Argument, nodeToRemove));
+                var tempEdgeDeletion = new EdgeDeletion(graph, new GraphEdge(backNode.Argument, nodeToRemove, backNode.ArgIndex));
                 nodeToRemove.BackDataFlowRelated.RemoveTwoWay(backNode);
                 relatedEdgeOperations.Add(tempEdgeDeletion);
             }
             foreach (var forwardNode in nodeToRemove.ForwardDataFlowRelated.ToArray())
             {
-                var tempEdgeDeletion = new EdgeDeletion(graph, new GraphEdge(forwardNode, nodeToRemove));
+                var tempEdgeDeletion = new EdgeDeletion(graph, new GraphEdge(forwardNode, nodeToRemove, forwardNode.BackDataFlowRelated.First(x => x.Argument == nodeToRemove).ArgIndex));
                 IndexedArgument backRelatedToRemove = forwardNode.BackDataFlowRelated.First(x => x.Argument == nodeToRemove);
                 forwardNode.BackDataFlowRelated.RemoveTwoWay(backRelatedToRemove);
                 relatedEdgeOperations.Add(tempEdgeDeletion);
