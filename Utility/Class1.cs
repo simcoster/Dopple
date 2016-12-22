@@ -10,6 +10,51 @@ namespace Utility
 {
     public class Class1
     {
+        public static void QuickSortMiddle(int[] arr)
+        {
+            QuicksortMiddleRec(arr, 0, arr.Length);
+        }
+
+        public static void QuicksortMiddleRec(int[] elements, int left, int right)
+        {
+            int i = left, j = right;
+            int pivot = elements[(left + right) / 2];
+
+            while (i <= j)
+            {
+                while (elements[i] < pivot)
+                {
+                    i++;
+                }
+
+                while (elements[j] > pivot)
+                {
+                    j--;
+                }
+
+                if (i <= j)
+                {
+                    // Swap
+                    int tmp = elements[i];
+                    elements[i] = elements[j];
+                    elements[j] = tmp;
+
+                    i++;
+                    j--;
+                }
+            }
+
+            // Recursive calls
+            if (left < j)
+            {
+                QuicksortMiddleRec(elements, left, j);
+            }
+
+            if (i < right)
+            {
+                QuicksortMiddleRec(elements, i, right);
+            }
+        }
         static void QuickSortLeftPivot(int[] a)
         {
             QuickSortLeftPivotRec(a, 0, a.Length - 1);

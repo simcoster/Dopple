@@ -10,6 +10,9 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Northwoods.Go;
 using DoppleTry2.BackTrackers;
+using DoppleTry2.InstructionWrappers;
+using GraphSimilarity;
+using System.Diagnostics;
 
 namespace DoppleGraph
 {
@@ -28,15 +31,23 @@ namespace DoppleGraph
 
             TypeDefinition type = myLibrary.MainModule.Types[2];
 
+            var Graphs = new List<List<InstructionWrapper>>();
             foreach (var method in type.Methods.Where(x => !x.IsConstructor))
             //foreach (var method in type.Methods.Where(x => !x.IsConstructor))
             {
-                GraphBuilder backTraceManager = new GraphBuilder(method);
-                var instructionWrappers = backTraceManager.Run();
-
-                Form2 newForm = new Form2(instructionWrappers);
+                var backTraceManager = new GraphBuilder(method);
+                List<InstructionWrapper> instructionWrappers = backTraceManager.Run();
+                Graphs.Add(instructionWrappers);
+                var newForm = new Form2(instructionWrappers);
                 newForm.Show();
             }
+            var problematics = Graphs.SelectMany(x => x).Where(x => x.ForwardDataFlowRelated.Any(y => !y.BackDataFlowRelated.Any(z => z.Argument == x))).ToList();
+            if (problematics.Count > 0)
+            {
+                Debugger.Break();
+            }
+
+           // var editDistance = GraphEditDistanceCalc.GetEditDistance(Graphs[0], Graphs[1]);
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace GraphSimilarity
 {
-    internal abstract class NodeEditOperation : EditOperation
+    public abstract class NodeEditOperation : EditOperation
     {
         public NodeEditOperation(List<InstructionWrapper> graph, InstructionWrapper node) : base(graph)
         {

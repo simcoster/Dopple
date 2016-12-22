@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace GraphSimilarity
 {
-    internal class EditPath
+    public class EditPath
     {
         public List<InstructionWrapper> TargetNodesLeftToResolve;
         public List<InstructionWrapper> SourceNodesLeftToResolve;

@@ -10,7 +10,6 @@ namespace GraphSimilarity
     {
         static void Main(string[] args)
         {
-            GraphEditDistanceCalc graphEditCalc = new GraphEditDistanceCalc();
         }
     }
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GraphSimilarity.EditOperations
 {
-    internal class CalculatedOperation
+    public class CalculatedOperation
     {
         public NodeEditOperation NodeOperation { get;  set; }
         public List<EdgeEditOperation> EdgeOperations { get;  set; }

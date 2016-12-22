@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace GraphSimilarity
 {
-    internal abstract class EditOperation
+    public abstract class EditOperation
     {
         public abstract string Name { get; }
         public abstract int Cost { get; }

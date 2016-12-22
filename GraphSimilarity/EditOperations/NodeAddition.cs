@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DoppleTry2.InstructionWrappers;
+using System.Diagnostics;
 
 namespace GraphSimilarity.EditOperations
 {
@@ -50,6 +51,11 @@ namespace GraphSimilarity.EditOperations
         internal override List<EdgeEditOperation> GetEdgeOperations()
         {
             var addedEdges = new List<EdgeEditOperation>();
+            var problematics = Node.ForwardDataFlowRelated.Where(x => !x.BackDataFlowRelated.Any(y => y.Argument == x)).ToList();
+            if (problematics.Count > 0)
+            {
+                Debugger.Break();
+            }
             List<GraphEdge> relatedEdgesToAdd = Node.BackDataFlowRelated.Select(x => new GraphEdge(x.Argument, Node, x.ArgIndex))
                                                  .Concat(Node.ForwardDataFlowRelated.Select(x => new GraphEdge(x, Node, x.BackDataFlowRelated.First(y => y.Argument ==x).ArgIndex)))
                                                  .ToList();

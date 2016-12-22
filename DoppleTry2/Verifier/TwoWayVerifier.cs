@@ -16,6 +16,12 @@ namespace DoppleTry2.VerifierNs
 
         public override void Verify(InstructionWrapper instructionWrapper)
         {
+            var problematics = instructionWrapper.ForwardDataFlowRelated.Where(x => !x.BackDataFlowRelated.Any(y => y.Argument == x)).ToList();
+            if (problematics.Count > 0)
+            {
+               // throw new Exception();
+            }
+
             foreach (var backInst in instructionWrapper.BackDataFlowRelated)
             {
                 if (!backInst.Argument.ForwardDataFlowRelated.Contains(instructionWrapper))

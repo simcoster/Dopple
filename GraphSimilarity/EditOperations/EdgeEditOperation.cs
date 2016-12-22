@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace GraphSimilarity
 {
-    internal abstract class EdgeEditOperation : EditOperation
+    public abstract class EdgeEditOperation : EditOperation
     {
         public EdgeEditOperation(List<InstructionWrapper> graph, GraphEdge edge) : base(graph)
         {

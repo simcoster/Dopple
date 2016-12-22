@@ -110,10 +110,11 @@ namespace DoppleTry2
                                         .Where(x => typeof(OpCodes).GetFields().Select(y => y.GetValue(null))
                                                     .Cast<OpCode>().Where(y => y.StackBehaviourPop != StackBehaviour.Pop0).Select(y => y.Code)
                                                     .Contains(x.Instruction.OpCode.Code))
-                                        .Where(x => x.BackDataFlowRelated.Equals(firstInst.BackDataFlowRelated))
                                         .Where(x => !new[] { Code.Ret }.Concat(CodeGroups.CallCodes).Contains(x.Instruction.OpCode.Code))
+                                        .Where(x => x.BackDataFlowRelated.Equals(firstInst.BackDataFlowRelated))
                                         .Where(x => !x.BackDataFlowRelated.SelfFeeding)
-                                        .FirstOrDefault(x => !DifferentArgumentsToSameInst(x, firstInst));
+                                        .FirstOrDefault();
+                                        //.FirstOrDefault(x => !DifferentArgumentsToSameInst(x, firstInst));
                     if (secondInst != null)
                     {
                         MergeInsts(new[] { firstInst, secondInst });
@@ -370,7 +371,7 @@ namespace DoppleTry2
                                                || x.BackProgramFlow.Any(y => y == wrapperToRemove)
                                                || x.ForwardProgramFlow.Any(y => y == wrapperToRemove)))
                 {
-                    throw new Exception("there's someone still pointing to the rmoeved");
+                    throw new Exception("there's someone still pointing to the removed");
                 }
             }
             SetInstructionIndexes();

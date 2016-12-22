@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace GraphSimilarity
 {
-    class GraphEditDistanceCalc
+    public static class GraphEditDistanceCalc
     {
         public const int NodeAdditionCost = 1;
         public const int NodeDeletionCost = 1;

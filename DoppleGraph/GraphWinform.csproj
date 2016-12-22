@@ -125,6 +125,10 @@
       <Project>{77c5971e-3c37-4932-911d-9c6050e67ffa}</Project>
       <Name>GraphBuilder</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GraphSimilarity\GraphSimilarity.csproj">
+      <Project>{bca16d37-4d5b-43d3-af84-2feb636580bb}</Project>
+      <Name>GraphSimilarity</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

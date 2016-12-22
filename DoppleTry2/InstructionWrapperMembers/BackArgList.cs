@@ -21,7 +21,8 @@ namespace DoppleTry2
             }
             return base.Equals(obj);
         }
-        InstructionWrapper containingWrapper;
+
+        readonly InstructionWrapper containingWrapper;
         public int MaxArgIndex = -1;
 
         public bool SelfFeeding
@@ -31,11 +32,21 @@ namespace DoppleTry2
                 return this.Any(x => x.Argument == containingWrapper);
             }
         }
+
+        [Obsolete("Use remove 2 way instead")]
+        public new bool Remove(IndexedArgument item)
+        {
+            return base.Remove(item);
+        }
         public void RemoveTwoWay(IndexedArgument backArgToRemove)
         {
             Remove(backArgToRemove);
-            var forwardArg = backArgToRemove.Argument.ForwardDataFlowRelated.First(x => x == containingWrapper);
+            InstructionWrapper forwardArg = backArgToRemove.Argument.ForwardDataFlowRelated.First(x => x == containingWrapper);
             backArgToRemove.Argument.ForwardDataFlowRelated.Remove(forwardArg);
+            if (this.Any(x => !x.Argument.ForwardDataFlowRelated.Contains(containingWrapper)))
+            {
+                throw new Exception("Validation Failed");
+            }
         }
         public void RemoveAllTwoWay(Predicate<IndexedArgument> predicate)
         {
