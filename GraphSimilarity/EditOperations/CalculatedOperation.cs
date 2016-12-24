@@ -15,6 +15,10 @@ namespace GraphSimilarity.EditOperations
         public List<InstructionWrapper> DeletedNodes { get; set; }
         public List<InstructionWrapper> AddedNodes { get; set; }
         public int Cost { get; set; }
+        public string Description
+        {
+            get { return NodeOperation.Description + EdgeOperations.Select(x => x.Description).Aggregate((x, y) => x + "," + y); }
+        }
         public void Commit()
         {
             NodeOperation.Commit();

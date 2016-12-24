@@ -22,6 +22,14 @@ namespace GraphSimilarity.EditOperations
             }
         }
 
+        public override string Description
+        {
+            get
+            {
+                return "Deleted edge from " + Edge.SourceNode.InstructionIndex + "to " + Edge.DestinationNode.InstructionIndex;
+            }
+        }
+
         public override string Name
         {
             get

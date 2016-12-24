@@ -22,6 +22,14 @@ namespace GraphSimilarity.EditOperations
             }
         }
 
+        public override string Description
+        {
+            get
+            {
+                return "Delete node with index " + Node.InstructionIndex;
+            }
+        }
+
         public override string Name
         {
             get

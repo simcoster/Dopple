@@ -23,56 +23,53 @@ namespace GraphSimilarity
                  //step 3 = concider for each one, deleting
                  //continue until no more nodes left of the first graph
 
-            var pathsToConcider = new List<EditPath>();
-            var currEditPath = new EditPath(sourceGraph, targetGraph);
+            var pathsToConcider = new SortedList<int, EditPath>();
+            pathsToConcider.Add(0, new EditPath(sourceGraph, targetGraph));
+            KeyValuePair<int, EditPath> cheapestPathValuePair = pathsToConcider.First();
+            EditPath cheapestEditPath = cheapestPathValuePair.Value;
             while (true)
             {
-                if (currEditPath.SourceNodesLeftToResolve.Count !=0)
+                if (cheapestEditPath.SourceNodesLeftToResolve.Count != 0)
                 {
-                    foreach (var node in currEditPath.Graph)
+                    List<CalculatedOperation> possibleOperations = GetPossibleSubsAndDelete(cheapestEditPath);
+                    foreach (var possibleOperation in possibleOperations)
                     {
-                        List<CalculatedOperation> possibleOperations = GetPossibleSubsAndDelete(currEditPath, node, targetGraph);
-                        foreach (var possibleOperation in possibleOperations)
-                        {
-                            var tempPathToConsider = new EditPath(currEditPath.Graph, targetGraph);
-                            tempPathToConsider.AddEditOperation(possibleOperation);
-                            pathsToConcider.Add(tempPathToConsider);
-                        }
+                        EditPath tempPathToConsider = cheapestEditPath.CloneWithEditOperation(possibleOperation);
+                        pathsToConcider.Add(tempPathToConsider.CumelativeCostPlusHeuristic, tempPathToConsider);
                     }
                 }
                 else
                 {
-                    foreach (var nodeToAdd in currEditPath.TargetNodesLeftToResolve)
+                    foreach (var nodeToAdd in cheapestEditPath.TargetNodesLeftToResolve)
                     {
-                        CalculatedOperation nodeAddition = new NodeAddition(currEditPath.Graph,nodeToAdd,currEditPath.EdgeAdditionsPending).GetCalculated();
-                        EditPath additionPath = new EditPath(currEditPath.Graph, targetGraph);
-                        additionPath.AddEditOperation(nodeAddition);
-                        pathsToConcider.Add(additionPath);
+                        CalculatedOperation nodeAddition = new NodeAddition(cheapestEditPath.Graph, nodeToAdd, cheapestEditPath.EdgeAdditionsPending).GetCalculated();
+                        EditPath additionPath = cheapestEditPath.CloneWithEditOperation(nodeAddition);
+                        pathsToConcider.Add(additionPath.CumelativeCostPlusHeuristic,additionPath);
                     }
                 }
-                var cheapestPath = pathsToConcider.First(x => x.CumelativeCostPlusHeuristic == pathsToConcider.Min(y => y.CumelativeCostPlusHeuristic));
-                if (cheapestPath.HeuristicCost == 0)
+                pathsToConcider.Remove(cheapestPathValuePair.Key);
+                cheapestPathValuePair = pathsToConcider.First();
+                cheapestEditPath = cheapestPathValuePair.Value;
+                if (cheapestEditPath.HeuristicCost == 0)
                 {
-                    return cheapestPath;
-                }
-                else
-                {
-                    currEditPath = cheapestPath;
+                    return cheapestEditPath;
                 }
             }
         }
 
-        private static List<CalculatedOperation> GetPossibleSubsAndDelete(EditPath currentPath, InstructionWrapper nodeToCheck, List<InstructionWrapper> targetGraph)
+        private static List<CalculatedOperation> GetPossibleSubsAndDelete(EditPath currentPath)
         {
             var calculatedOperations = new List<CalculatedOperation>();
-
-            foreach (var secondGraphNode in targetGraph)
+            foreach (var node in currentPath.SourceNodesLeftToResolve)
             {
-                var nodeSubstitution = new NodeSubstitution(currentPath.Graph, currentPath.EdgeAdditionsPending, nodeToCheck, secondGraphNode);
-                calculatedOperations.Add(nodeSubstitution.GetCalculated());
+                foreach (var secondGraphNode in currentPath.TargetNodesLeftToResolve)
+                {
+                    var nodeSubstitution = new NodeSubstitution(currentPath.Graph, currentPath.EdgeAdditionsPending, node, secondGraphNode);
+                    calculatedOperations.Add(nodeSubstitution.GetCalculated());
+                }
+                var nodeDeletion = new NodeDeletion(currentPath.Graph, node);
+                calculatedOperations.Add(nodeDeletion.GetCalculated());
             }
-            var nodeDeletion = new NodeDeletion(currentPath.Graph, nodeToCheck);
-            calculatedOperations.Add(nodeDeletion.GetCalculated());
             return calculatedOperations;
         }
     }

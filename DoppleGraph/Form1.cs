@@ -29,7 +29,7 @@ namespace DoppleGraph
             AssemblyDefinition myLibrary = AssemblyDefinition.ReadAssembly(@"C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\Utility\bin\Release\Utility.dll");
             //myLibrary = AssemblyDefinition.ReadAssembly(@"C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\Utility\bin\Debug\Utility.dll");
 
-            TypeDefinition type = myLibrary.MainModule.Types[2];
+            TypeDefinition type = myLibrary.MainModule.Types[3];
 
             var Graphs = new List<List<InstructionWrapper>>();
             foreach (var method in type.Methods.Where(x => !x.IsConstructor))
@@ -47,7 +47,7 @@ namespace DoppleGraph
                 Debugger.Break();
             }
 
-           // var editDistance = GraphEditDistanceCalc.GetEditDistance(Graphs[0], Graphs[1]);
+            var editDistance = GraphEditDistanceCalc.GetEditDistance(Graphs[0], Graphs[1]);
         }
     }
 }

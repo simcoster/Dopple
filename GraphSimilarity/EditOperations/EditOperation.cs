@@ -11,6 +11,7 @@ namespace GraphSimilarity
         public abstract int Cost { get; }
         protected List<InstructionWrapper> graph;
         public abstract void Commit();
+        public abstract string Description { get;}
 
         public EditOperation(List<InstructionWrapper> graph)
         {

@@ -25,6 +25,14 @@ namespace GraphSimilarity.EditOperations
             }
         }
 
+        public override string Description
+        {
+            get
+            {
+                return "Added node with index " + Node.InstructionIndex;
+            }
+        }
+
         public override string Name
         {
             get
@@ -51,13 +59,13 @@ namespace GraphSimilarity.EditOperations
         internal override List<EdgeEditOperation> GetEdgeOperations()
         {
             var addedEdges = new List<EdgeEditOperation>();
-            var problematics = Node.ForwardDataFlowRelated.Where(x => !x.BackDataFlowRelated.Any(y => y.Argument == x)).ToList();
+            var problematics = Node.ForwardDataFlowRelated.Where(x => !x.BackDataFlowRelated.Any(y => y.Argument == Node)).ToList();
             if (problematics.Count > 0)
             {
                 Debugger.Break();
             }
             List<GraphEdge> relatedEdgesToAdd = Node.BackDataFlowRelated.Select(x => new GraphEdge(x.Argument, Node, x.ArgIndex))
-                                                 .Concat(Node.ForwardDataFlowRelated.Select(x => new GraphEdge(x, Node, x.BackDataFlowRelated.First(y => y.Argument ==x).ArgIndex)))
+                                                 .Concat(Node.ForwardDataFlowRelated.Select(x => new GraphEdge(x, Node, x.BackDataFlowRelated.First(y => y.Argument ==Node).ArgIndex)))
                                                  .ToList();
             IEnumerable<GraphEdge> triggeredEdgeAdds = edgeAdditionsPending.Where(x => x.DestinationNode == Node || x.SourceNode == Node);
 

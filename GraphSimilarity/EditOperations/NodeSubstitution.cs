@@ -34,6 +34,14 @@ namespace GraphSimilarity.EditOperations
             }
         }
 
+        public override string Description
+        {
+            get
+            {
+                return "Replaced node " + Node.InstructionIndex + " with node " + NodeToReplaceWith.InstructionIndex;
+            }
+        }
+
         public override string Name
         {
             get

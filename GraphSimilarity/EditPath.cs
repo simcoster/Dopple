@@ -1,5 +1,6 @@
 ﻿using DoppleTry2.InstructionWrappers;
 using GraphSimilarity.EditOperations;
+using System;
 using System.Collections.Generic;
 
 namespace GraphSimilarity
@@ -8,30 +9,41 @@ namespace GraphSimilarity
     {
         public List<InstructionWrapper> TargetNodesLeftToResolve;
         public List<InstructionWrapper> SourceNodesLeftToResolve;
-        public void AddEditOperation(CalculatedOperation calculatedOperation)
+        public EditPath CloneWithEditOperation(CalculatedOperation calculatedOperation)
         {
-            Path.Add(calculatedOperation);
-            CumelativeCost += calculatedOperation.Cost;
-            Graph = calculatedOperation.EditedGraph;
+            EditPath pathClone = Clone();
+            pathClone.Path.Add(calculatedOperation);
+            cumelativeCost += calculatedOperation.Cost;
+            LatestOperation = calculatedOperation;
             HeuristicCost = TargetNodesLeftToResolve.Count + SourceNodesLeftToResolve.Count;
-            CumelativeCostPlusHeuristic = CumelativeCost + HeuristicCost;
+            CumelativeCostPlusHeuristic = cumelativeCost + HeuristicCost;
+            return pathClone;
         }
+
+        private EditPath Clone()
+        {
+            var editPathClone = new EditPath(Graph, targetGraph);
+            editPathClone.EdgeAdditionsPending = new List<GraphEdge>(EdgeAdditionsPending);
+            editPathClone.Path = new List<CalculatedOperation>(Path);
+            editPathClone.cumelativeCost = cumelativeCost;
+            return editPathClone;
+        }
+
         public List<GraphEdge> EdgeAdditionsPending { get; private set; } = new List<GraphEdge>();
         public List<InstructionWrapper> Graph;
-        private int CumelativeCost = 0;
+        private int cumelativeCost = 0;
         public int CumelativeCostPlusHeuristic = 0;
-        public List<CalculatedOperation> ReadOnlyPath { get; private set; } = new List<CalculatedOperation>();
         public int HeuristicCost { get; private set; }
-
-        private readonly List<CalculatedOperation> Path = new List<CalculatedOperation>();
+        public CalculatedOperation LatestOperation { get; private set; }
+        public List<CalculatedOperation> Path { get; set; } = new List<CalculatedOperation>();
         private readonly List<InstructionWrapper> targetGraph;
 
-        public EditPath(List<InstructionWrapper> graphToClone, List<InstructionWrapper> targetGraph)
+        public EditPath(List<InstructionWrapper> originGraph, List<InstructionWrapper> targetGraph)
         {
-            this.Graph = new List<InstructionWrapper>(graphToClone);
+            this.Graph = originGraph;
             this.targetGraph = targetGraph;
             TargetNodesLeftToResolve = new List<InstructionWrapper>(targetGraph);
-            SourceNodesLeftToResolve = new List<InstructionWrapper>(graphToClone);
+            SourceNodesLeftToResolve = new List<InstructionWrapper>(originGraph);
         }
     }
 }
