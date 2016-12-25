@@ -41,7 +41,7 @@ namespace GraphSimilarity
                     foreach (var possibleOperation in possibleOperations)
                     {
                         EditPath tempPathToConsider = cheapestPath.CloneWithEditOperation(possibleOperation);
-                        pathsToConcider.Add(tempPathToConsider.CumelativeCostPlusHeuristic,tempPathToConsider);
+                        pathsToConcider.Add(tempPathToConsider);
                     }
                 }
                 else
@@ -50,7 +50,7 @@ namespace GraphSimilarity
                     {
                         CalculatedOperation nodeAddition = new NodeAddition(cheapestPath.Graph, nodeToAdd, cheapestPath.EdgeAdditionsPending).GetCalculated();
                         EditPath additionPath = cheapestPath.CloneWithEditOperation(nodeAddition);
-                        pathsToConcider.Add(additionPath.CumelativeCostPlusHeuristic, additionPath);
+                        pathsToConcider.Add(additionPath);
                     }
                 }
                 pathsToConcider.Remove(cheapestPath);
