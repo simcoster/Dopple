@@ -63,7 +63,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DuplicateKeyComparer.cs" />
+    <Compile Include="DuplicateKeySortedDictionary.cs" />
     <Compile Include="EditOperations\EdgeAddition.cs" />
     <Compile Include="EditOperations\EdgeEditOperation.cs" />
     <Compile Include="EditOperations\GraphEdge.cs" />

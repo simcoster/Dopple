@@ -29,10 +29,10 @@ namespace GraphSimilarity
             // the code that you want to measure comes here
 
             int index = 0;
-            var pathsToConcider = new SortedList<int,EditPath>(new DuplicateKeyComparer<int>());
-            pathsToConcider.Add(0,new EditPath(sourceGraph, targetGraph));
-            System.Collections.Generic.KeyValuePair<int, EditPath> cheapestPathValuePair = pathsToConcider.First();
-            EditPath cheapestPath = cheapestPathValuePair.Value;
+            var pathsToConcider = new DuplicateKeySortedDictionary();
+            pathsToConcider.Add(new EditPath(sourceGraph, targetGraph));
+            var cheapestPaths = pathsToConcider.First().Value;
+            EditPath cheapestPath = cheapestPaths[0];
             while (true)
             {
                 if (cheapestPath.SourceNodesLeftToResolve.Count != 0)
@@ -53,8 +53,8 @@ namespace GraphSimilarity
                         pathsToConcider.Add(additionPath.CumelativeCostPlusHeuristic, additionPath);
                     }
                 }
-                pathsToConcider.Remove(cheapestPathValuePair.Key);
-                cheapestPathValuePair = pathsToConcider.First();
+                pathsToConcider.Remove(cheapestPath);
+                cheapestPath = pathsToConcider.First().Value[0];
                 if (cheapestPath.HeuristicCost == 0)
                 {
                     watch.Stop();
