@@ -26,7 +26,7 @@ namespace GraphSimilarity.EditOperations
         {
             get
             {
-                return "Deleted edge from " + Edge.SourceNode.InstructionIndex + "to " + Edge.DestinationNode.InstructionIndex;
+                return "Deleted edge from " + Edge.SourceNode.InstructionIndex + " to " + Edge.DestinationNode.InstructionIndex;
             }
         }
 

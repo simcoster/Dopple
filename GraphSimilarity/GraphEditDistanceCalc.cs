@@ -1,8 +1,10 @@
-﻿using DoppleTry2.InstructionWrappers;
+﻿using C5;
+using DoppleTry2.InstructionWrappers;
 using GraphSimilarity.EditOperations;
 using Mono.Cecil.Cil;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,36 +25,41 @@ namespace GraphSimilarity
                  //step 3 = concider for each one, deleting
                  //continue until no more nodes left of the first graph
 
-            var pathsToConcider = new SortedList<int, EditPath>();
-            pathsToConcider.Add(0, new EditPath(sourceGraph, targetGraph));
-            KeyValuePair<int, EditPath> cheapestPathValuePair = pathsToConcider.First();
-            EditPath cheapestEditPath = cheapestPathValuePair.Value;
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            // the code that you want to measure comes here
+
+            int index = 0;
+            var pathsToConcider = new SortedList<int,EditPath>(new DuplicateKeyComparer<int>());
+            pathsToConcider.Add(0,new EditPath(sourceGraph, targetGraph));
+            System.Collections.Generic.KeyValuePair<int, EditPath> cheapestPathValuePair = pathsToConcider.First();
+            EditPath cheapestPath = cheapestPathValuePair.Value;
             while (true)
             {
-                if (cheapestEditPath.SourceNodesLeftToResolve.Count != 0)
+                if (cheapestPath.SourceNodesLeftToResolve.Count != 0)
                 {
-                    List<CalculatedOperation> possibleOperations = GetPossibleSubsAndDelete(cheapestEditPath);
+                    List<CalculatedOperation> possibleOperations = GetPossibleSubsAndDelete(cheapestPath);
                     foreach (var possibleOperation in possibleOperations)
                     {
-                        EditPath tempPathToConsider = cheapestEditPath.CloneWithEditOperation(possibleOperation);
-                        pathsToConcider.Add(tempPathToConsider.CumelativeCostPlusHeuristic, tempPathToConsider);
+                        EditPath tempPathToConsider = cheapestPath.CloneWithEditOperation(possibleOperation);
+                        pathsToConcider.Add(tempPathToConsider.CumelativeCostPlusHeuristic,tempPathToConsider);
                     }
                 }
                 else
                 {
-                    foreach (var nodeToAdd in cheapestEditPath.TargetNodesLeftToResolve)
+                    foreach (var nodeToAdd in cheapestPath.TargetNodesLeftToResolve)
                     {
-                        CalculatedOperation nodeAddition = new NodeAddition(cheapestEditPath.Graph, nodeToAdd, cheapestEditPath.EdgeAdditionsPending).GetCalculated();
-                        EditPath additionPath = cheapestEditPath.CloneWithEditOperation(nodeAddition);
-                        pathsToConcider.Add(additionPath.CumelativeCostPlusHeuristic,additionPath);
+                        CalculatedOperation nodeAddition = new NodeAddition(cheapestPath.Graph, nodeToAdd, cheapestPath.EdgeAdditionsPending).GetCalculated();
+                        EditPath additionPath = cheapestPath.CloneWithEditOperation(nodeAddition);
+                        pathsToConcider.Add(additionPath.CumelativeCostPlusHeuristic, additionPath);
                     }
                 }
                 pathsToConcider.Remove(cheapestPathValuePair.Key);
                 cheapestPathValuePair = pathsToConcider.First();
-                cheapestEditPath = cheapestPathValuePair.Value;
-                if (cheapestEditPath.HeuristicCost == 0)
+                if (cheapestPath.HeuristicCost == 0)
                 {
-                    return cheapestEditPath;
+                    watch.Stop();
+                    var elapsedMs = watch.ElapsedMilliseconds;
+                    return cheapestPath;
                 }
             }
         }

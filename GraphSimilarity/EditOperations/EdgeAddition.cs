@@ -26,7 +26,7 @@ namespace GraphSimilarity.EditOperations
         {
             get
             {
-                return "Added edge from " + Edge.SourceNode.InstructionIndex + "to " + Edge.DestinationNode.InstructionIndex; 
+                return "Added edge from " + Edge.SourceNode.InstructionIndex + " to " + Edge.DestinationNode.InstructionIndex; 
             }
         }
 

@@ -10,14 +10,25 @@ namespace GraphSimilarity.EditOperations
     public class CalculatedOperation
     {
         public NodeEditOperation NodeOperation { get;  set; }
-        public List<EdgeEditOperation> EdgeOperations { get;  set; }
+        public List<EdgeEditOperation> EdgeOperations { get; set; } = new List<EdgeEditOperation>();
         public List<InstructionWrapper> EditedGraph { get;  set; }
         public List<InstructionWrapper> DeletedNodes { get; set; }
         public List<InstructionWrapper> AddedNodes { get; set; }
         public int Cost { get; set; }
         public string Description
         {
-            get { return NodeOperation.Description + EdgeOperations.Select(x => x.Description).Aggregate((x, y) => x + "," + y); }
+            get {
+                if (NodeOperation == null)
+                {
+                    return "";
+                }
+                string edgeOperationsDesc = "";
+                foreach(var edgeOperation in EdgeOperations)
+                {
+                    edgeOperationsDesc += edgeOperation.Description + " , ";
+                }
+                return NodeOperation.Description + " , " + edgeOperationsDesc;
+            }
         }
         public void Commit()
         {
