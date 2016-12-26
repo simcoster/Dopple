@@ -60,14 +60,11 @@ namespace GraphSimilarity.EditOperations
             foreach (var backNode in nodeToRemove.BackDataFlowRelated.ToArray())
             {
                 var tempEdgeDeletion = new EdgeDeletion(graph, new GraphEdge(backNode.Argument, nodeToRemove, backNode.ArgIndex));
-                nodeToRemove.BackDataFlowRelated.RemoveTwoWay(backNode);
                 relatedEdgeOperations.Add(tempEdgeDeletion);
             }
             foreach (var forwardNode in nodeToRemove.ForwardDataFlowRelated.ToArray())
             {
                 var tempEdgeDeletion = new EdgeDeletion(graph, new GraphEdge(forwardNode, nodeToRemove, forwardNode.BackDataFlowRelated.First(x => x.Argument == nodeToRemove).ArgIndex));
-                IndexedArgument backRelatedToRemove = forwardNode.BackDataFlowRelated.First(x => x.Argument == nodeToRemove);
-                forwardNode.BackDataFlowRelated.RemoveTwoWay(backRelatedToRemove);
                 relatedEdgeOperations.Add(tempEdgeDeletion);
             }
             return relatedEdgeOperations;

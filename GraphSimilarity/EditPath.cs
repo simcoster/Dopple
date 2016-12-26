@@ -17,7 +17,15 @@ namespace GraphSimilarity
             pathClone.Path.Add(calculatedOperation);
             pathClone.cumelativeCost += calculatedOperation.Cost;
             pathClone.LatestOperation = calculatedOperation;
-            pathClone.HeuristicCost = TargetNodesLeftToResolve.Count + SourceNodesLeftToResolve.Count;
+            foreach(var sourceNodeToRemove in calculatedOperation.DeletedNodes)
+            {
+                pathClone.SourceNodesLeftToResolve.Remove(sourceNodeToRemove);
+            }
+            foreach (var targetNodeToRemove in calculatedOperation.AddedNodes)
+            {
+                pathClone.TargetNodesLeftToResolve.Remove(targetNodeToRemove);
+            }
+            pathClone.HeuristicCost = pathClone.TargetNodesLeftToResolve.Count + pathClone.SourceNodesLeftToResolve.Count;
             pathClone.CumelativeCostPlusHeuristic = pathClone.cumelativeCost + pathClone.HeuristicCost;
             return pathClone;
         }
@@ -28,6 +36,8 @@ namespace GraphSimilarity
             editPathClone.EdgeAdditionsPending = new List<GraphEdge>(EdgeAdditionsPending);
             editPathClone.Path = new List<CalculatedOperation>(Path);
             editPathClone.cumelativeCost = cumelativeCost;
+            editPathClone.SourceNodesLeftToResolve = new List<InstructionWrapper>(SourceNodesLeftToResolve);
+            editPathClone.TargetNodesLeftToResolve= new List<InstructionWrapper>(TargetNodesLeftToResolve);
             return editPathClone;
         }
 

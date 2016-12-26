@@ -3,6 +3,7 @@ using DoppleTry2.InstructionWrappers;
 using GraphSimilarity.EditOperations;
 using Mono.Cecil.Cil;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -38,10 +39,14 @@ namespace GraphSimilarity
                 if (cheapestPath.SourceNodesLeftToResolve.Count != 0)
                 {
                     List<CalculatedOperation> possibleOperations = GetPossibleSubsAndDelete(cheapestPath);
-                    foreach (var possibleOperation in possibleOperations)
+                    var tempAddedPaths = new ConcurrentBag<EditPath>();
+                    Parallel.ForEach(possibleOperations, (possibleOperation) =>
                     {
-                        EditPath tempPathToConsider = cheapestPath.CloneWithEditOperation(possibleOperation);
-                        pathsToConcider.Add(tempPathToConsider);
+                       tempAddedPaths.Add(cheapestPath.CloneWithEditOperation(possibleOperation));
+                    });
+                    foreach (var pathToConcider in tempAddedPaths)
+                    {
+                        pathsToConcider.Add(pathToConcider);
                     }
                 }
                 else
@@ -53,6 +58,7 @@ namespace GraphSimilarity
                         pathsToConcider.Add(additionPath);
                     }
                 }
+                var oldCheapestPath = cheapestPath;
                 pathsToConcider.Remove(cheapestPath);
                 cheapestPath = pathsToConcider.First().Value[0];
                 if (cheapestPath.HeuristicCost == 0)
@@ -66,18 +72,19 @@ namespace GraphSimilarity
 
         private static List<CalculatedOperation> GetPossibleSubsAndDelete(EditPath currentPath)
         {
-            var calculatedOperations = new List<CalculatedOperation>();
-            foreach (var node in currentPath.SourceNodesLeftToResolve)
+            var calculatedOperations = new ConcurrentBag<CalculatedOperation>();
+            Parallel.ForEach(currentPath.SourceNodesLeftToResolve, (sourceNode) =>
             {
-                foreach (var secondGraphNode in currentPath.TargetNodesLeftToResolve)
+
+                Parallel.ForEach(currentPath.TargetNodesLeftToResolve, (targetNode) =>
                 {
-                    var nodeSubstitution = new NodeSubstitution(currentPath.Graph, currentPath.EdgeAdditionsPending, node, secondGraphNode);
+                    var nodeSubstitution = new NodeSubstitution(currentPath.Graph, currentPath.EdgeAdditionsPending, sourceNode, targetNode);
                     calculatedOperations.Add(nodeSubstitution.GetCalculated());
-                }
-                var nodeDeletion = new NodeDeletion(currentPath.Graph, node);
+                });
+                var nodeDeletion = new NodeDeletion(currentPath.Graph, sourceNode);
                 calculatedOperations.Add(nodeDeletion.GetCalculated());
-            }
-            return calculatedOperations;
+            });
+            return calculatedOperations.ToList();
         }
     }
 }

@@ -11,6 +11,8 @@ namespace GraphSimilarity.EditOperations
     internal class NodeAddition : NodeEditOperation
     {
         readonly List<GraphEdge> edgeAdditionsPending;
+        private List<GraphEdge> edgeAddsToBeTriggered;
+        private IEnumerable<GraphEdge> triggeredEdgeAdds;
 
         public NodeAddition(List<InstructionWrapper> graph, InstructionWrapper node, List<GraphEdge> edgeAdditionsPending) : base(graph, node)
         {
@@ -44,6 +46,15 @@ namespace GraphSimilarity.EditOperations
         public override void Commit()
         {
             graph.Add(Node);
+            foreach (var triggeredEdgeToAdd in triggeredEdgeAdds)
+            {
+                edgeAdditionsPending.Remove(triggeredEdgeToAdd);
+            }
+            foreach (var edgeLeftToBeAdded in edgeAddsToBeTriggered)
+            {
+                edgeAdditionsPending.Add(edgeLeftToBeAdded);
+            }
+
         }
 
         internal override List<InstructionWrapper> GetAddeddNodes()
@@ -67,20 +78,14 @@ namespace GraphSimilarity.EditOperations
             List<GraphEdge> relatedEdgesToAdd = Node.BackDataFlowRelated.Select(x => new GraphEdge(x.Argument, Node, x.ArgIndex))
                                                  .Concat(Node.ForwardDataFlowRelated.Select(x => new GraphEdge(x, Node, x.BackDataFlowRelated.First(y => y.Argument ==Node).ArgIndex)))
                                                  .ToList();
-            IEnumerable<GraphEdge> triggeredEdgeAdds = edgeAdditionsPending.Where(x => x.DestinationNode == Node || x.SourceNode == Node);
-
-            foreach (var edge in triggeredEdgeAdds.ToArray())
+            triggeredEdgeAdds = edgeAdditionsPending.Where(x => x.DestinationNode == Node || x.SourceNode == Node);
+            edgeAddsToBeTriggered = relatedEdgesToAdd.Except(triggeredEdgeAdds).ToList();
+            foreach (var triggeredEdgeToAdd in triggeredEdgeAdds.ToArray())
             {
-                var edgeAddition = new EdgeAddition(graph, edge);
-                edgeAddition.Edge = edge;
-                edgeAdditionsPending.Remove(edge);
-                relatedEdgesToAdd.Remove(edge);
+                var edgeAddition = new EdgeAddition(graph, triggeredEdgeToAdd);
+                edgeAddition.Edge = triggeredEdgeToAdd;
+                edgeAdditionsPending.Remove(triggeredEdgeToAdd);
                 addedEdges.Add(edgeAddition);
-            }
-
-            foreach (var edgeLeftToBeAdded in relatedEdgesToAdd)
-            {
-                edgeAdditionsPending.Add(edgeLeftToBeAdded);
             }
             return addedEdges;
         }
