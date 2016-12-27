@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Mono.Cecil.Cil;
-using DoppleTry2.InstructionWrappers;
+using DoppleTry2.InstructionNodes;
 
 namespace DoppleTry2.BackTrackers
 {
@@ -20,43 +20,43 @@ namespace DoppleTry2.BackTrackers
         /// <param name="instructionWrappers"></param>
         /// <param name="predicate"></param>
         /// <param name="startInstruction"></param>
-        /// <param name="visitedInstructions"></param>
+        /// <param name="visitedNodes"></param>
         /// <returns></returns>
-        public IEnumerable<InstructionWrapper> SearchAndAddDataflowInstrcutions(InstructionWrapper startInstruction, List<InstructionWrapper> visitedInstructions = null)
+        public IEnumerable<InstructionNode> SearchAndAddDataflowInstrcutions(InstructionNode startInstruction, List<InstructionNode> visitedNodes = null)
         {
-            var foundInstructions = new List<InstructionWrapper>();
-            if (visitedInstructions == null)
+            var foundInstructions = new List<InstructionNode>();
+            if (visitedNodes == null)
             {
-                visitedInstructions = new List<InstructionWrapper>();
+                visitedNodes = new List<InstructionNode>();
             }
-            foreach (var backInstructionWrapper in startInstruction.BackProgramFlow)
+            foreach (var backNode in startInstruction.ProgramFlowBackRoutes)
             {
-                if (visitedInstructions.Contains(backInstructionWrapper))
+                if (visitedNodes.Contains(backNode))
                 {
                     continue;
                 }
                 else
                 {
-                    visitedInstructions.Add(backInstructionWrapper);
+                    visitedNodes.Add(backNode);
                 }
-                bool mustBacktraceCurrentFirst = backInstructionWrapper.StackPopCount != 0;
+                bool mustBacktraceCurrentFirst = backNode.StackPopCount != 0;
                 if (mustBacktraceCurrentFirst)
                 {
-                    AddBackDataflowConnections(backInstructionWrapper);
+                    AddBackDataflowConnections(backNode);
                 }
-                if (backInstructionWrapper.StackPushCount >0 )
+                if (backNode.StackPushCount >0 )
                 {
-                    foundInstructions.Add(backInstructionWrapper);
+                    foundInstructions.Add(backNode);
                 }
                 else
                 {
-                    foundInstructions.AddRange(SearchAndAddDataflowInstrcutions(backInstructionWrapper, visitedInstructions));
+                    foundInstructions.AddRange(SearchAndAddDataflowInstrcutions(backNode, visitedNodes));
                 }
             }
             return foundInstructions;
         }
 
-        public override void AddBackDataflowConnections(InstructionWrapper currentInst)
+        public override void AddBackDataflowConnections(InstructionNode currentInst)
         {
             for (int i = 0; i < currentInst.StackPopCount; i++)
             {
@@ -66,8 +66,8 @@ namespace DoppleTry2.BackTrackers
                 {
                     throw new Exception("Couldn't find back data connections");
                 }
-                currentInst.BackDataFlowRelated.AddWithNewIndex(argumentGroup);
-                foreach (InstructionWrapper arg in argumentGroup)
+                currentInst.DataFlowBackRelated.AddWithNewIndex(argumentGroup);
+                foreach (InstructionNode arg in argumentGroup)
                 {
                     arg.StackPushCount--;
                 }
@@ -98,20 +98,20 @@ namespace DoppleTry2.BackTrackers
         //    RestoreCallsProgramFlow(CallWrappersFlowBackup);
         //}
 
-        private void BackupCallsProgramFlow(Dictionary<InstructionWrapper, List<InstructionWrapper>> CallWrappersFlowBackup)
+        private void BackupCallsProgramFlow(Dictionary<InstructionNode, List<InstructionNode>> CallWrappersFlowBackup)
         {
             foreach (var callInstWrapper in InstructionWrappers.Where(x => CodeGroups.CallCodes.Contains(x.Instruction.OpCode.Code)))
             {
-                CallWrappersFlowBackup.Add(callInstWrapper, new List<InstructionWrapper>(callInstWrapper.BackProgramFlow));
-                callInstWrapper.BackProgramFlow.Clear();
+                CallWrappersFlowBackup.Add(callInstWrapper, new List<InstructionNode>(callInstWrapper.ProgramFlowBackRoutes));
+                callInstWrapper.ProgramFlowBackRoutes.Clear();
             }
         }
 
-        private void RestoreCallsProgramFlow(Dictionary<InstructionWrapper, List<InstructionWrapper>> CallWrappersFlowBackup)
+        private void RestoreCallsProgramFlow(Dictionary<InstructionNode, List<InstructionNode>> CallWrappersFlowBackup)
         {
             foreach (var callInstWrapper in InstructionWrappers.Where(x => CodeGroups.CallCodes.Contains(x.Instruction.OpCode.Code)))
             {
-                callInstWrapper.BackProgramFlow.AddRangeTwoWay(CallWrappersFlowBackup[callInstWrapper]);
+                callInstWrapper.ProgramFlowBackRoutes.AddRangeTwoWay(CallWrappersFlowBackup[callInstWrapper]);
             }
         }
 
@@ -122,7 +122,7 @@ namespace DoppleTry2.BackTrackers
                     .Where(x => x.StackBehaviourPop != StackBehaviour.Pop0)
                     .Select(x => x.Code).ToArray();
 
-        public StackPopBackTracer(List<InstructionWrapper> instructionWrappers) : base(instructionWrappers)
+        public StackPopBackTracer(List<InstructionNode> instructionWrappers) : base(instructionWrappers)
         {
         }
     }

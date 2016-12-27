@@ -6,13 +6,12 @@ using Mono.Cecil;
 using System;
 using DoppleTry2.InstructionWrapperMembers;
 
-namespace DoppleTry2.InstructionWrappers
+namespace DoppleTry2.InstructionNodes
 {
-    public class InstructionWrapper
+    public class InstructionNode
     {
-        private BackArgList _BackDataFlowRelated;
 
-        public InstructionWrapper(Instruction instruction, MethodDefinition method)
+        public InstructionNode(Instruction instruction, MethodDefinition method)
         {
             Instruction = instruction;
             Method = method;
@@ -20,9 +19,33 @@ namespace DoppleTry2.InstructionWrappers
             StackPopCount = GetStackPopCount(instruction);
             MemoryReadCount = MemoryProperties.GetMemReadCount(instruction.OpCode.Code);
             MemoryStoreCount = MemoryProperties.GetMemStoreCount(instruction.OpCode.Code);
-            _BackDataFlowRelated = new BackArgList(this);
-            _BackProgramFlow = new BackFlowList(this);
+            DataFlowBackRelated = new BackArgList(this);
+            ProgramFlowBackRoutes = new ProgramFlowBackRoutes(this);
+            ProgramFlowBackAffected = new ProgramFlowBackAffected(this);
         }
+
+
+        public ProgramFlowBackRoutes ProgramFlowBackRoutes { get; set; }
+        public List<InstructionNode> ProgramFlowForwardRoutes = new List<InstructionNode>();
+        public List<InstructionNode> DataFlowForwardRelated = new List<InstructionNode>();
+        public BackArgList DataFlowBackRelated { get; private set; }
+        public List<InstructionNode> ProgramFlowForwardAffecting { get; internal set; } = new List<InstructionNode>();
+        public ProgramFlowBackAffected ProgramFlowBackAffected { get; set; }
+
+        public Instruction Instruction { get; set; }
+        public int InstructionIndex { get; internal set; }
+        public bool MarkForDebugging { get; internal set; }
+        public int MemoryReadCount { get; set; }
+        public int MemoryStoreCount { get; set; }
+        public MethodDefinition Method { get; set; }
+        public int StackPopCount { get; set; }
+        public int StackPushCount { get; set; }
+        public bool FirstLineInstruction { get; set; } = false;
+        public List<Type> DoneBackTracers = new List<Type>();
+        public bool ProgramFlowResolveDone { get; set; } = false;
+        
+
+        public InliningProperties InliningProperties = new InliningProperties();
 
         private int GetStackPopCount(Instruction instruction)
         {
@@ -90,62 +113,5 @@ namespace DoppleTry2.InstructionWrappers
                     return 1;
             }
         }
-
-        public BackArgList BackDataFlowRelated
-        {
-            get
-            {
-                return _BackDataFlowRelated;
-            }
-            internal set
-            {
-                _BackDataFlowRelated = value;
-            }
-        }
-        public BackFlowList BackProgramFlow
-        {
-            get
-            {
-                return _BackProgramFlow;
-            }
-            set { _BackProgramFlow = value; }
-        }
-        BackFlowList _BackProgramFlow;
-        List<InstructionWrapper> _ForwardDataFlowRelated = new List<InstructionWrapper>();
-        public List<InstructionWrapper> ForwardDataFlowRelated
-        {
-            get
-            {
-                return _ForwardDataFlowRelated;
-            }
-            internal set
-            {
-                _ForwardDataFlowRelated = value;
-            }
-        }
-        public Instruction Instruction { get; set; }
-        public int InstructionIndex { get; internal set; }
-        public bool MarkForDebugging { get; internal set; }
-        public int MemoryReadCount { get; set; }
-        public int MemoryStoreCount { get; set; }
-        public MethodDefinition Method { get; set; }
-        public List<InstructionWrapper> ForwardProgramFlow
-        {
-            get
-            {
-                return _ForwardProgramFlow;
-            }
-            set
-            {
-                _ForwardProgramFlow = value;
-            }
-        }
-        private List<InstructionWrapper> _ForwardProgramFlow = new List<InstructionWrapper>();
-        public int StackPopCount { get; set; }
-        public int StackPushCount { get; set; }
-        public bool FirstLineInstruction { get; set; } = false;
-        public List<Type> DoneBackTracers = new List<Type>();
-        public bool ProgramFlowResolveDone { get; set; } = false;
-        public InliningProperties InliningProperties = new InliningProperties();
     }
 }

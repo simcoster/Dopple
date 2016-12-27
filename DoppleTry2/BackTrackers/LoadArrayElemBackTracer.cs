@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Mono.Cecil.Cil;
-using DoppleTry2.InstructionWrappers;
+using DoppleTry2.InstructionNodes;
 
 namespace DoppleTry2.BackTrackers
 {
@@ -12,11 +12,11 @@ namespace DoppleTry2.BackTrackers
     {
         private readonly Code[] _stArrayCodes = CodeGroups.StElemCodes.Concat(CodeGroups.LdArgCodes).ToArray();
 
-        public LoadArrayElemBackTracer(List<InstructionWrapper> instructionsWrappers) : base(instructionsWrappers)
+        public LoadArrayElemBackTracer(List<InstructionNode> instructionsWrappers) : base(instructionsWrappers)
         {
         }
 
-        protected override IEnumerable<InstructionWrapper> GetDataflowBackRelatedArgGroup(InstructionWrapper instWrapper)
+        protected override IEnumerable<InstructionNode> GetDataflowBackRelatedArgGroup(InstructionNode instWrapper)
         {
             return  _SingleIndexBackSearcher.SafeSearchBackwardsForDataflowInstrcutions(x => _stArrayCodes.Contains(x.Instruction.OpCode.Code)
                                                                && BackSearcher.HaveCommonStackPushAncestor(x, instWrapper), instWrapper);

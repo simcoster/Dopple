@@ -67,7 +67,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BackTrackers\ConditionionalsBackTracer.cs" />
-    <Compile Include="InstructionWrapperMembers\BackFlowList.cs" />
+    <Compile Include="InstructionWrapperMembers\ProgramFlowBackAffected.cs" />
+    <Compile Include="InstructionWrapperMembers\ProgramFlowBackRoutes.cs" />
+    <Compile Include="InstructionWrapperMembers\RelatedList.cs" />
     <Compile Include="InstructionWrappers\LdElemInstructionWrapper.cs" />
     <Compile Include="Verifier\ArgIndexVerifier.cs" />
     <Compile Include="InstructionWrapperMembers\BackArgList.cs" />

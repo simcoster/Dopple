@@ -1,5 +1,5 @@
 ﻿using DoppleTry2;
-using DoppleTry2.InstructionWrappers;
+using DoppleTry2.InstructionNodes;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Northwoods.Go;
@@ -28,7 +28,7 @@ namespace DoppleGraph
             InitializeComponent();
         }
 
-        public Form2(List<InstructionWrapper> instructionWrappers)
+        public Form2(List<InstructionNode> instructionWrappers)
         {
             this.instructionWrappers = instructionWrappers;
             InitializeComponent();
@@ -37,7 +37,7 @@ namespace DoppleGraph
         private List<GoNode> NodesToShow = new List<GoNode>();
         private List<GoObject> ObjectsToHide = new List<GoObject>();
         private Random rnd = new Random();
-        private List<InstructionWrapper> instructionWrappers;
+        private List<InstructionNode> instructionWrappers;
 
         private void Node_UnSelected(object sender, EventArgs e)
         {
@@ -110,7 +110,7 @@ namespace DoppleGraph
 
         private void DrawFlowLinks(GoNodeWrapper nodeWrapper, GoView myView)
         {
-            foreach (InstructionWrapper wrapper in nodeWrapper.InstructionWrapper.ForwardProgramFlow)
+            foreach (InstructionNode wrapper in nodeWrapper.InstructionWrapper.ProgramFlowForwardRoutes)
             {
                 Color randomColor;
                 GoLink link = new GoLink();
@@ -132,19 +132,19 @@ namespace DoppleGraph
         {
             foreach (var instWrapper in instructionWrappers)
             {
-                instWrapper.ForwardProgramFlow = GetStillExistingNextFlowInstructions(instWrapper).ToList();
+                instWrapper.ProgramFlowForwardRoutes = GetStillExistingNextFlowInstructions(instWrapper).ToList();
             }
         }
 
-        public IEnumerable<InstructionWrapper> GetStillExistingNextFlowInstructions(InstructionWrapper instruction, List<InstructionWrapper> visited =null)
+        public IEnumerable<InstructionNode> GetStillExistingNextFlowInstructions(InstructionNode instruction, List<InstructionNode> visited =null)
         {
             if (visited == null)
             {
-                visited = new List<InstructionWrapper>();
+                visited = new List<InstructionNode>();
             }
             visited.Add(instruction);
-            List<InstructionWrapper> wrappersToReturn = new List<InstructionWrapper>();
-            foreach(var nextInst in instruction.ForwardProgramFlow)
+            List<InstructionNode> wrappersToReturn = new List<InstructionNode>();
+            foreach(var nextInst in instruction.ProgramFlowForwardRoutes)
             {
                 if (visited.Contains(nextInst))
                 {
@@ -168,36 +168,46 @@ namespace DoppleGraph
             {
                 ColumnBaseColors.Add(nodeWrapper.DisplayCol, GetRandomColor());
             }
-            //var linkGroupColor = ColumnBaseColors[nodeWrapper.DisplayCol];
 
-            foreach (var indexedArg in nodeWrapper.InstructionWrapper.BackDataFlowRelated)
+            foreach (var indexedArg in nodeWrapper.InstructionWrapper.DataFlowBackRelated)
             {
                 Color linkColor = GetPredefinedColor(indexedArg.ArgIndex);
-                GoLink link = new GoLink();
-                var backNode = GetNodeWrapper(indexedArg.Argument);
-                link.BrushColor = linkColor;
-                link.PenColor = linkColor;
-                link.ToolTipText = indexedArg.ArgIndex.ToString() + " " + link.PenColor.R;
-                link.ToPort = nodeWrapper.Node.LeftPort;
-                if (backNode.Node == nodeWrapper.Node)
-                {
-                    //link.Curviness = 200;
-                    link.FromPort = backNode.Node.RightPort;
-                    link.Style = GoStrokeStyle.Bezier;
-                    link.CalculateRoute();
-                    foreach (int index in new[] { 1, 2 })
-                    {
-                        link.SetPoint(index, new PointF(link.GetPoint(index).X, link.GetPoint(index).Y - 40));
-                    }
-                }
-                else
-                {
-                    link.FromPort = backNode.Node.RightPort;
-                }
-                myView.Document.Add(link);
-                link.PenWidth = 3;
+                GoLink edge = DrawEdge(nodeWrapper, myView, indexedArg.Argument, linkColor);
+                edge.ToolTipText = indexedArg.ArgIndex.ToString() + " " + edge.PenColor.R;
+
+            }
+            foreach (var flowAffectingNode in nodeWrapper.InstructionWrapper.ProgramFlowBackAffected)
+            {
+                DrawEdge(nodeWrapper, myView, flowAffectingNode, Color.Purple);
+
             }
             var allLinks = myView.Document.Where(x => x is GoLink).Cast<GoLink>().Select(y => y.PenColor);
+        }
+
+        private GoLink DrawEdge(GoNodeWrapper nodeWrapper, GoView myView, InstructionNode backNode, Color linkColor)
+        {
+            GoLink link = new GoLink();
+            var backNodeWrapper = GetNodeWrapper(backNode);
+            link.PenColor = linkColor;
+            link.ToPort = nodeWrapper.Node.LeftPort;
+            if (backNodeWrapper.Node == nodeWrapper.Node)
+            {
+                //link.Curviness = 200;
+                link.FromPort = backNodeWrapper.Node.RightPort;
+                link.Style = GoStrokeStyle.Bezier;
+                link.CalculateRoute();
+                foreach (int index in new[] { 1, 2 })
+                {
+                    link.SetPoint(index, new PointF(link.GetPoint(index).X, link.GetPoint(index).Y - 40));
+                }
+            }
+            else
+            {
+                link.FromPort = backNodeWrapper.Node.RightPort;
+            }
+            myView.Document.Add(link);
+            link.PenWidth = 3;
+            return link;
         }
 
         private Color GetPredefinedColor(int argIndex)
@@ -219,18 +229,10 @@ namespace DoppleGraph
             }
         }
 
-        private Color GetRandomColor()
-        {
-            Color color = new Color();
-            color = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
-            return color;
-            //return Color.FromArgb((color.R + 30) % 255, (color.G + 20) % 255, (color.B + 10) % 255);
-        }
-
         private void SetCoordinates(List<GoNodeWrapper> nodeWrappers)
         {
             Dictionary<int, List<GoNodeWrapper>> nodeWrapperCols = new Dictionary<int, List<GoNodeWrapper>>();
-            var firstNode = nodeWrappers.Where(x => x.InstructionWrapper.BackDataFlowRelated.Count == 0).ToList();
+            var firstNode = nodeWrappers.Where(x => x.InstructionWrapper.DataFlowBackRelated.Count == 0).ToList();
             SetLongestPathRec(firstNode);
             SetRowIndexes(nodeWrappers);
             FixDuplicateCoordinates(nodeWrappers);
@@ -242,7 +244,6 @@ namespace DoppleGraph
             {
                 nodeWrapper.Node.Location = new PointF(nodeWrapper.DisplayCol * widthOffset, (nodeWrapper.DisplayRow - 0.7f) * heightOffset);
             }
-
         }
 
         private void FixDuplicateCoordinates(List<GoNodeWrapper> nodeWrappers)
@@ -260,7 +261,7 @@ namespace DoppleGraph
             }
         }
 
-        private GoNodeWrapper GetNodeWrapper(InstructionWrapper instWrapper)
+        private GoNodeWrapper GetNodeWrapper(InstructionNode instWrapper)
         {
             return nodeWrappers.FirstOrDefault(x => x.InstructionWrapper == instWrapper);
         }
@@ -276,7 +277,7 @@ namespace DoppleGraph
             {
                 try
                 {
-                    var nodesToUpdate = node.InstructionWrapper.ForwardDataFlowRelated
+                    var nodesToUpdate = node.InstructionWrapper.DataFlowForwardRelated
                    .Select(x => GetNodeWrapper(x))
                    .Where(x => x.LongestPath.Count == 0 || !x.LongestPath.Intersect(node.LongestPath).SequenceEqual(x.LongestPath))
                    .Where(x => x.LongestPath.Count < node.LongestPath.Count + 1)
@@ -387,8 +388,6 @@ namespace DoppleGraph
                 //AcomodateFlowForRemovedNodes();
                 DrawFlowLinks(nodeWrapper, myView);
             }
-            //MarkLoops(nodeWrappers);
-
         }
 
 

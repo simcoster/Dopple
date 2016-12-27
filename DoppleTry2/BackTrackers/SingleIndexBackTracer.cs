@@ -1,4 +1,4 @@
-﻿using DoppleTry2.InstructionWrappers;
+﻿using DoppleTry2.InstructionNodes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,32 +9,32 @@ namespace DoppleTry2.BackTrackers
 {
     public abstract class SingeIndexBackTracer : BackTracer
     {
-        public SingeIndexBackTracer(List<InstructionWrapper> instructionsWrappers) : base(instructionsWrappers)
+        public SingeIndexBackTracer(List<InstructionNode> instructionsWrappers) : base(instructionsWrappers)
         {
             _SingleIndexBackSearcher = new SingleIndexBackSearcher(instructionsWrappers);
         }
         protected SingleIndexBackSearcher _SingleIndexBackSearcher;
 
-        protected IEnumerable<IEnumerable<InstructionWrapper>> GetDataflowBackRelated(InstructionWrapper instWrapper)
+        protected IEnumerable<IEnumerable<InstructionNode>> GetDataflowBackRelated(InstructionNode instWrapper)
         {
-            return new List<List<InstructionWrapper>>() { { GetDataflowBackRelatedArgGroup(instWrapper).ToList() } };
+            return new List<List<InstructionNode>>() { { GetDataflowBackRelatedArgGroup(instWrapper).ToList() } };
         }
-        public override void AddBackDataflowConnections(InstructionWrapper currentInst)
+        public override void AddBackDataflowConnections(InstructionNode currentInst)
         {
             if (currentInst.DoneBackTracers.Contains(GetType()))
             {
                 return;
             }
-            IEnumerable<IEnumerable<InstructionWrapper>> backRelatedGroups = GetDataflowBackRelated(currentInst);
+            IEnumerable<IEnumerable<InstructionNode>> backRelatedGroups = GetDataflowBackRelated(currentInst);
 
             foreach (var backRelatedGroup in backRelatedGroups)
             {
-                currentInst.BackDataFlowRelated.AddWithNewIndex(backRelatedGroup);
+                currentInst.DataFlowBackRelated.AddWithNewIndex(backRelatedGroup);
             }
             currentInst.DoneBackTracers.Add(GetType());
         }
 
-        protected abstract IEnumerable<InstructionWrapper> GetDataflowBackRelatedArgGroup(InstructionWrapper instWrapper);
+        protected abstract IEnumerable<InstructionNode> GetDataflowBackRelatedArgGroup(InstructionNode instWrapper);
 
        
     }

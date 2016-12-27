@@ -1,4 +1,4 @@
-﻿using DoppleTry2.InstructionWrappers;
+﻿using DoppleTry2.InstructionNodes;
 using Mono.Cecil.Cil;
 using System;
 using System.Collections.Generic;
@@ -10,9 +10,9 @@ namespace DoppleTry2.VerifierNs
 {
     class ArithmeticsVerifier : Verifier
     {
-        public ArithmeticsVerifier(List<InstructionWrapper> instructionWrappers) : base(instructionWrappers) {}
+        public ArithmeticsVerifier(List<InstructionNode> instructionWrappers) : base(instructionWrappers) {}
 
-        public override void Verify(InstructionWrapper instructionWrapper)
+        public override void Verify(InstructionNode instructionWrapper)
         {
             Code[] handledCodes = new[] 
                     {Code.Add, Code.Add_Ovf, Code.Add_Ovf_Un,
@@ -24,7 +24,7 @@ namespace DoppleTry2.VerifierNs
             {
                 return;
             }
-            foreach (var arg in instructionWrapper.BackDataFlowRelated)
+            foreach (var arg in instructionWrapper.DataFlowBackRelated)
             {
                 if (BacktraceStLdLoc(arg.Argument).All(x => IsProvidingNumber(x)))
                 {

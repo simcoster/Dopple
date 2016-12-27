@@ -1,5 +1,5 @@
 ﻿using DoppleTry2;
-using DoppleTry2.InstructionWrappers;
+using DoppleTry2.InstructionNodes;
 using Northwoods.Go;
 using System;
 using System.Collections.Generic;
@@ -9,14 +9,14 @@ namespace DoppleGraph
 {
     public class GoNodeWrapper
     {
-        public GoNodeWrapper(GoTextNodeHoverable node, InstructionWrapper instructionWrapper)
+        public GoNodeWrapper(GoTextNodeHoverable node, InstructionNode instructionWrapper)
         {
             Node = node;
             InstructionWrapper = instructionWrapper;
         }
 
         public GoTextNodeHoverable Node {  get; private set; }
-        public InstructionWrapper InstructionWrapper { get; private set; }
+        public InstructionNode InstructionWrapper { get; private set; }
         public int Index { get; set; }
         public float DisplayRow { get; set; }
         public int DisplayCol { get; set; }

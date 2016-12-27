@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DoppleTry2.InstructionWrappers;
+using DoppleTry2.InstructionNodes;
 using DoppleTry2;
 
 namespace GraphSimilarity.EditOperations
 {
     class EdgeAddition : EdgeEditOperation
     {
-        public EdgeAddition(List<InstructionWrapper> graph, GraphEdge edge) : base(graph, edge)
+        public EdgeAddition(List<InstructionNode> graph, GraphEdge edge) : base(graph, edge)
         {
         }
 
@@ -40,7 +40,7 @@ namespace GraphSimilarity.EditOperations
 
         public override void Commit()
         {
-            Edge.DestinationNode.BackDataFlowRelated.AddTwoWay(new IndexedArgument(Edge.Index, Edge.SourceNode));
+            Edge.DestinationNode.DataFlowBackRelated.AddTwoWay(new IndexedArgument(Edge.Index, Edge.SourceNode));
         }
     }
 }

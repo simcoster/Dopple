@@ -1,16 +1,16 @@
 ﻿using DoppleTry2;
-using DoppleTry2.InstructionWrappers;
+using DoppleTry2.InstructionNodes;
 
 namespace ForceBasedDiagram
 {
     internal class GoNodeWrapper
     {
         public SpotNode SpotNode;
-        public InstructionWrapper InstWrapper;
+        public InstructionNode InstWrapper;
 
         public int Index { get; internal set; }
 
-        public GoNodeWrapper(SpotNode spotNode, InstructionWrapper instWrapper)
+        public GoNodeWrapper(SpotNode spotNode, InstructionNode instWrapper)
         {
             SpotNode = spotNode;
             InstWrapper = instWrapper;

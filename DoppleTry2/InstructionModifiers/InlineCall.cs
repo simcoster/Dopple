@@ -7,7 +7,7 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 using DoppleTry2.BackTrackers;
 using DoppleTry2.ProgramFlowHanlder;
-using DoppleTry2.InstructionWrappers;
+using DoppleTry2.InstructionNodes;
 
 namespace DoppleTry2.InstructionModifiers
 {
@@ -16,7 +16,7 @@ namespace DoppleTry2.InstructionModifiers
         public static readonly Code[] CallOpCodes = CodeGroups.CallCodes;
         ProgramFlowManager programFlowHanlder = new ProgramFlowManager();
 
-        public void Modify(List<InstructionWrapper> instructionWrappers)
+        public void Modify(List<InstructionNode> instructionWrappers)
         {
             int recursionInstanceIndex = 1;
             foreach (var nestedCallInstWrapper in instructionWrappers.Where(x => x is CallInstructionWrapper).Cast<CallInstructionWrapper>().ToArray())
@@ -43,19 +43,19 @@ namespace DoppleTry2.InstructionModifiers
                 }
                 foreach(var inlinedCallInst in instructionWrappers.Where(x => x is CallInstructionWrapper && x.InliningProperties.Inlined))
                 {
-                    foreach(var forwardInst in inlinedCallInst.ForwardProgramFlow.ToList())
+                    foreach(var forwardInst in inlinedCallInst.ProgramFlowForwardRoutes.ToList())
                     {
-                        forwardInst.BackProgramFlow.RemoveTwoWay(inlinedCallInst);
+                        forwardInst.ProgramFlowBackRoutes.RemoveTwoWay(inlinedCallInst);
                     }
                     var newNextInstIndex = instructionWrappers.IndexOf(inlinedCallInst) + 1;
-                    instructionWrappers[newNextInstIndex].BackProgramFlow.AddTwoWay(inlinedCallInst);
+                    instructionWrappers[newNextInstIndex].ProgramFlowBackRoutes.AddTwoWay(inlinedCallInst);
                 }
             }
 
             foreach (var retCall in instructionWrappers.Where(x => x.Instruction.OpCode.Code == Code.Ret && x != instructionWrappers.Last()))
             {
                 int retCallIndex = instructionWrappers.IndexOf(retCall);
-                instructionWrappers[retCallIndex + 1].BackProgramFlow.AddTwoWay(retCall);
+                instructionWrappers[retCallIndex + 1].ProgramFlowBackRoutes.AddTwoWay(retCall);
                 retCall.ProgramFlowResolveDone = true;
                 if (retCall.Instruction.OpCode.Code == Code.Ret)
                 {
@@ -71,7 +71,7 @@ namespace DoppleTry2.InstructionModifiers
             }
         }
 
-        List<InstructionWrapper> GetDeepInlineRec(InstructionWrapper callInstWrapper, List<MethodDefinition> callSequence)
+        List<InstructionNode> GetDeepInlineRec(InstructionNode callInstWrapper, List<MethodDefinition> callSequence)
         {
             if (!(callInstWrapper is CallInstructionWrapper))
             {
@@ -80,7 +80,7 @@ namespace DoppleTry2.InstructionModifiers
             var calledFunc = (MethodDefinition)callInstWrapper.Instruction.Operand;
             if (callSequence.Count(x => x == calledFunc) > 1)
             {
-                return new List<InstructionWrapper>();
+                return new List<InstructionNode>();
             }
             else
             {
@@ -97,11 +97,11 @@ namespace DoppleTry2.InstructionModifiers
                     if (inlinedInstWrappers.Count > 0)
                     {
                         calledFuncInstWrappers.InsertRange(instWrapperIndex + 1, inlinedInstWrappers);
-                        foreach (var forwardFlowInst in nestedCallInstWrapper.ForwardProgramFlow.ToList())
+                        foreach (var forwardFlowInst in nestedCallInstWrapper.ProgramFlowForwardRoutes.ToList())
                         {
-                            forwardFlowInst.BackProgramFlow.RemoveTwoWay(nestedCallInstWrapper);
+                            forwardFlowInst.ProgramFlowBackRoutes.RemoveTwoWay(nestedCallInstWrapper);
                         }
-                        inlinedInstWrappers[0].BackProgramFlow.AddTwoWay(nestedCallInstWrapper);
+                        inlinedInstWrappers[0].ProgramFlowBackRoutes.AddTwoWay(nestedCallInstWrapper);
                     }
                 }
                 callInstWrapper.InliningProperties.Inlined = true;
@@ -109,7 +109,7 @@ namespace DoppleTry2.InstructionModifiers
             }
         }
 
-        private void InFuncBackTrace(List<InstructionWrapper> calledFuncInstructions)
+        private void InFuncBackTrace(List<InstructionNode> calledFuncInstructions)
         {
             LdLocBackTracer LoadLocationBacktracer = new LdLocBackTracer(calledFuncInstructions);
             foreach(var inst in calledFuncInstructions.Where(x => LoadLocationBacktracer.HandlesCodes.Contains(x.Instruction.OpCode.Code)).OrderByDescending(x => x.InstructionIndex))

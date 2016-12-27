@@ -1,14 +1,14 @@
-﻿using DoppleTry2.InstructionWrappers;
+﻿using DoppleTry2.InstructionNodes;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System;
 using System.Linq;
 
-namespace DoppleTry2.InstructionWrappers
+namespace DoppleTry2.InstructionNodes
 {
     public class InstructionWrapperFactory
     {
-        public static InstructionWrapper GetInstructionWrapper(Instruction instruction, MethodDefinition method)
+        public static InstructionNode GetInstructionWrapper(Instruction instruction, MethodDefinition method)
         {
             if (CodeGroups.CallCodes.Contains(instruction.OpCode.Code)
                 && instruction.Operand is MethodDefinition)
@@ -41,7 +41,7 @@ namespace DoppleTry2.InstructionWrappers
             }
             else
             {
-                return new InstructionWrapper(instruction, method);
+                return new InstructionNode(instruction, method);
             }
         }
     }

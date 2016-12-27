@@ -1,4 +1,4 @@
-﻿using DoppleTry2.InstructionWrappers;
+﻿using DoppleTry2.InstructionNodes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +20,7 @@ namespace DoppleTry2.ProgramFlowHanlder
                    .Cast<ProgramFlowHandler>();
         }
 
-        public void AddFlowConnections(List<InstructionWrapper> instructionsWrappers)
+        public void AddFlowConnections(List<InstructionNode> instructionsWrappers)
         {
             foreach (var instWrapper in instructionsWrappers)
             {

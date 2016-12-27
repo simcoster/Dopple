@@ -1,5 +1,5 @@
 using System;
-using DoppleTry2.InstructionWrappers;
+using DoppleTry2.InstructionNodes;
 using GraphSimilarity.EditOperations;
 using System.Collections.Generic;
 
@@ -7,7 +7,7 @@ namespace GraphSimilarity
 {
     public abstract class EdgeEditOperation : EditOperation
     {
-        public EdgeEditOperation(List<InstructionWrapper> graph, GraphEdge edge) : base(graph)
+        public EdgeEditOperation(List<InstructionNode> graph, GraphEdge edge) : base(graph)
         {
             this.Edge = edge;
         }

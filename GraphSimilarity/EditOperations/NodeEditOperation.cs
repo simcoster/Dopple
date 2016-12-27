@@ -1,5 +1,5 @@
 using System;
-using DoppleTry2.InstructionWrappers;
+using DoppleTry2.InstructionNodes;
 using GraphSimilarity.EditOperations;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,12 +8,12 @@ namespace GraphSimilarity
 {
     public abstract class NodeEditOperation : EditOperation
     {
-        public NodeEditOperation(List<InstructionWrapper> graph, InstructionWrapper node) : base(graph)
+        public NodeEditOperation(List<InstructionNode> graph, InstructionNode node) : base(graph)
         {
             Node = node;
         }
 
-        public InstructionWrapper Node { get; private set; }
+        public InstructionNode Node { get; private set; }
         public CalculatedOperation GetCalculated()
         {
             var computedNodeOperation = new CalculatedOperation();
@@ -25,8 +25,8 @@ namespace GraphSimilarity
             return computedNodeOperation;
         }
 
-        internal abstract List<InstructionWrapper> GetAddeddNodes();
-        internal abstract List<InstructionWrapper> GetDeletedNodes();
+        internal abstract List<InstructionNode> GetAddeddNodes();
+        internal abstract List<InstructionNode> GetDeletedNodes();
         internal abstract List<EdgeEditOperation> GetEdgeOperations();
     }
 }

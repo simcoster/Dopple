@@ -1,4 +1,4 @@
-﻿using DoppleTry2.InstructionWrappers;
+﻿using DoppleTry2.InstructionNodes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,9 +10,9 @@ namespace GraphSimilarity.EditOperations
     internal class NodeSubstitution : NodeEditOperation
     {
         private readonly List<GraphEdge> edgeAdditionsPending;
-        private readonly InstructionWrapper NodeToReplaceWith;
+        private readonly InstructionNode NodeToReplaceWith;
 
-        public NodeSubstitution(List<InstructionWrapper> graph, List<GraphEdge> edgeAdditionsPending, InstructionWrapper node, InstructionWrapper replacedWith) : base(graph, node)
+        public NodeSubstitution(List<InstructionNode> graph, List<GraphEdge> edgeAdditionsPending, InstructionNode node, InstructionNode replacedWith) : base(graph, node)
         {
             this.NodeToReplaceWith = replacedWith;
             this.edgeAdditionsPending = edgeAdditionsPending;
@@ -56,14 +56,14 @@ namespace GraphSimilarity.EditOperations
             graph.Add(NodeToReplaceWith);
         }
 
-        internal override List<InstructionWrapper> GetAddeddNodes()
+        internal override List<InstructionNode> GetAddeddNodes()
         {
-            return new List<InstructionWrapper>() { NodeToReplaceWith };
+            return new List<InstructionNode>() { NodeToReplaceWith };
         }
 
-        internal override List<InstructionWrapper> GetDeletedNodes()
+        internal override List<InstructionNode> GetDeletedNodes()
         {
-            return new List<InstructionWrapper>() { Node };
+            return new List<InstructionNode>() { Node };
         }
 
         internal override List<EdgeEditOperation> GetEdgeOperations()

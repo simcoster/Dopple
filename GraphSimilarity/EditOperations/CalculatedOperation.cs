@@ -1,4 +1,4 @@
-﻿using DoppleTry2.InstructionWrappers;
+﻿using DoppleTry2.InstructionNodes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,9 +11,9 @@ namespace GraphSimilarity.EditOperations
     {
         public NodeEditOperation NodeOperation { get;  set; }
         public List<EdgeEditOperation> EdgeOperations { get; set; } = new List<EdgeEditOperation>();
-        public List<InstructionWrapper> EditedGraph { get;  set; }
-        public List<InstructionWrapper> DeletedNodes { get; set; }
-        public List<InstructionWrapper> AddedNodes { get; set; }
+        public List<InstructionNode> EditedGraph { get;  set; }
+        public List<InstructionNode> DeletedNodes { get; set; }
+        public List<InstructionNode> AddedNodes { get; set; }
         public int Cost { get; set; }
         public string Description
         {

@@ -10,7 +10,7 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Northwoods.Go;
 using DoppleTry2.BackTrackers;
-using DoppleTry2.InstructionWrappers;
+using DoppleTry2.InstructionNodes;
 using GraphSimilarity;
 using System.Diagnostics;
 
@@ -31,17 +31,17 @@ namespace DoppleGraph
 
             TypeDefinition type = myLibrary.MainModule.Types[3];
 
-            var Graphs = new List<List<InstructionWrapper>>();
+            var Graphs = new List<List<InstructionNode>>();
             foreach (var method in type.Methods.Where(x => !x.IsConstructor))
             //foreach (var method in type.Methods.Where(x => !x.IsConstructor))
             {
                 var backTraceManager = new GraphBuilder(method);
-                List<InstructionWrapper> instructionWrappers = backTraceManager.Run();
+                List<InstructionNode> instructionWrappers = backTraceManager.Run();
                 Graphs.Add(instructionWrappers);
                 var newForm = new Form2(instructionWrappers);
                 newForm.Show();
             }
-            var problematics = Graphs.SelectMany(x => x).Where(x => x.ForwardDataFlowRelated.Any(y => !y.BackDataFlowRelated.Any(z => z.Argument == x))).ToList();
+            var problematics = Graphs.SelectMany(x => x).Where(x => x.DataFlowForwardRelated.Any(y => !y.DataFlowBackRelated.Any(z => z.Argument == x))).ToList();
             if (problematics.Count > 0)
             {
                 Debugger.Break();

@@ -1,4 +1,4 @@
-﻿namespace DoppleTry2.InstructionWrappers
+﻿namespace DoppleTry2.InstructionNodes
 {
     public enum ArgType
     {

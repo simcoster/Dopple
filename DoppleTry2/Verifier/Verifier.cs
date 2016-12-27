@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using DoppleTry2.InstructionWrappers;
+using DoppleTry2.InstructionNodes;
 using Mono.Cecil.Cil;
 using System.Linq;
 
@@ -8,12 +8,12 @@ namespace DoppleTry2.VerifierNs
 {
     public abstract class Verifier
     {
-        public Verifier(List<InstructionWrapper> instructionWrappers)
+        public Verifier(List<InstructionNode> instructionWrappers)
         {
             _instructionWrappers = instructionWrappers;
         }
-        protected List<InstructionWrapper> _instructionWrappers;
-        public abstract void Verify(InstructionWrapper instructionWrapper);
+        protected List<InstructionNode> _instructionWrappers;
+        public abstract void Verify(InstructionNode instructionWrapper);
 
         public static bool IsNumberType(Type value)
         {
@@ -29,7 +29,7 @@ namespace DoppleTry2.VerifierNs
                     || value == typeof(double)
                     || value == typeof(decimal);
         }
-        public bool IsProvidingArray(InstructionWrapper insturctionWrapper)
+        public bool IsProvidingArray(InstructionNode insturctionWrapper)
         {
             if (insturctionWrapper.Instruction.OpCode.Code == Code.Newarr)
             {
@@ -46,7 +46,7 @@ namespace DoppleTry2.VerifierNs
             }
             return false;
         }
-        public bool IsProvidingNumber(InstructionWrapper instructionWrapper)
+        public bool IsProvidingNumber(InstructionNode instructionWrapper)
         {
             if (instructionWrapper is LdImmediateInstWrapper)
             {
@@ -63,11 +63,11 @@ namespace DoppleTry2.VerifierNs
             return true;
         }
 
-        public InstructionWrapper[] BacktraceStLdLoc (InstructionWrapper instructionWrapper)
+        public InstructionNode[] BacktraceStLdLoc (InstructionNode instructionWrapper)
         {
             if (CodeGroups.LdLocCodes.Concat(CodeGroups.StLocCodes).Concat(new[] { Code.Dup }).Contains(instructionWrapper.Instruction.OpCode.Code))
             {
-                return instructionWrapper.BackDataFlowRelated.SelectMany(x => BacktraceStLdLoc(x.Argument)).ToArray();
+                return instructionWrapper.DataFlowBackRelated.SelectMany(x => BacktraceStLdLoc(x.Argument)).ToArray();
             }
             else
             {

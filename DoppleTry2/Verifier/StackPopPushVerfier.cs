@@ -1,4 +1,4 @@
-﻿using DoppleTry2.InstructionWrappers;
+﻿using DoppleTry2.InstructionNodes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,12 +7,12 @@ namespace DoppleTry2.VerifierNs
 {
     class StackPopPushVerfier : Verifier
     {
-        public StackPopPushVerfier(List<InstructionWrapper> instructionWrappers) : base(instructionWrappers)
+        public StackPopPushVerfier(List<InstructionNode> instructionWrappers) : base(instructionWrappers)
         {
 
         }
 
-        public override void Verify(InstructionWrapper instructionWrapper)
+        public override void Verify(InstructionNode instructionWrapper)
         {
             if (instructionWrapper.Instruction.OpCode.Code == Mono.Cecil.Cil.Code.Ret && instructionWrapper.InliningProperties.Inlined == false)
             {

@@ -1,5 +1,5 @@
 ﻿using DoppleTry2;
-using DoppleTry2.InstructionWrappers;
+using DoppleTry2.InstructionNodes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +10,7 @@ namespace GraphSimilarity.EditOperations
 {
     internal class NodeDeletion : NodeEditOperation
     {
-        public NodeDeletion(List<InstructionWrapper> graph, InstructionWrapper node) : base(graph, node)
+        public NodeDeletion(List<InstructionNode> graph, InstructionNode node) : base(graph, node)
         {
         }
 
@@ -43,28 +43,28 @@ namespace GraphSimilarity.EditOperations
             graph.Remove(Node);
         }
 
-        internal override List<InstructionWrapper> GetAddeddNodes()
+        internal override List<InstructionNode> GetAddeddNodes()
         {
-            return new List<InstructionWrapper>(){ };
+            return new List<InstructionNode>(){ };
         }
 
-        internal override List<InstructionWrapper> GetDeletedNodes()
+        internal override List<InstructionNode> GetDeletedNodes()
         {
-            return new List<InstructionWrapper>() {Node };
+            return new List<InstructionNode>() {Node };
         }
 
         internal override List<EdgeEditOperation> GetEdgeOperations()
         {
             var relatedEdgeOperations = new List<EdgeEditOperation>();
-            InstructionWrapper nodeToRemove = Node;
-            foreach (var backNode in nodeToRemove.BackDataFlowRelated.ToArray())
+            InstructionNode nodeToRemove = Node;
+            foreach (var backNode in nodeToRemove.DataFlowBackRelated.ToArray())
             {
                 var tempEdgeDeletion = new EdgeDeletion(graph, new GraphEdge(backNode.Argument, nodeToRemove, backNode.ArgIndex));
                 relatedEdgeOperations.Add(tempEdgeDeletion);
             }
-            foreach (var forwardNode in nodeToRemove.ForwardDataFlowRelated.ToArray())
+            foreach (var forwardNode in nodeToRemove.DataFlowForwardRelated.ToArray())
             {
-                var tempEdgeDeletion = new EdgeDeletion(graph, new GraphEdge(forwardNode, nodeToRemove, forwardNode.BackDataFlowRelated.First(x => x.Argument == nodeToRemove).ArgIndex));
+                var tempEdgeDeletion = new EdgeDeletion(graph, new GraphEdge(forwardNode, nodeToRemove, forwardNode.DataFlowBackRelated.First(x => x.Argument == nodeToRemove).ArgIndex));
                 relatedEdgeOperations.Add(tempEdgeDeletion);
             }
             return relatedEdgeOperations;

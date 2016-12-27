@@ -1,4 +1,4 @@
-﻿using DoppleTry2.InstructionWrappers;
+﻿using DoppleTry2.InstructionNodes;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,7 +8,7 @@ namespace DoppleTry2.InstructionModifiers
 {
     interface IModifier
     {
-        void Modify(List<InstructionWrapper> instructionWrappers);
+        void Modify(List<InstructionNode> instructionWrappers);
     }
 
     interface IPreBacktraceModifier : IModifier {}

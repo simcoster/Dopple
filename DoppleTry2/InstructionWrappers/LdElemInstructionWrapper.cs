@@ -6,13 +6,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DoppleTry2.InstructionWrappers
+namespace DoppleTry2.InstructionNodes
 {
-    public class LdElemInstructionWrapper : InstructionWrapper
+    public class LdElemInstructionWrapper : InstructionNode
     {
         public LdElemInstructionWrapper(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
-            BackDataFlowRelated.MaxArgIndex = 2;
+            DataFlowBackRelated.MaxArgIndex = 2;
         }
     }
 }

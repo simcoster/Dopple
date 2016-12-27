@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DoppleTry2.InstructionModifiers;
 using Mono.Cecil.Cil;
-using DoppleTry2.InstructionWrappers;
+using DoppleTry2.InstructionNodes;
 
 namespace DoppleTry2.ProgramFlowHanlder
 {
@@ -22,15 +22,15 @@ namespace DoppleTry2.ProgramFlowHanlder
 
         public override Code[] HandledCodes { get; }
 
-        public override void SetForwardExecutionFlowInsts(InstructionWrapper wrapperToModify, List<InstructionWrapper> instructionWrappers)
+        public override void SetForwardExecutionFlowInsts(InstructionNode wrapperToModify, List<InstructionNode> instructionWrappers)
         {
-            InstructionWrapper nextInstructionWrapper =
+            InstructionNode nextInstructionWrapper =
                instructionWrappers.FirstOrDefault(x => x.Instruction == wrapperToModify.Instruction.Next);
             if (nextInstructionWrapper == null)
             {
                 return;
             }
-            nextInstructionWrapper.BackProgramFlow.AddTwoWay(wrapperToModify);
+            nextInstructionWrapper.ProgramFlowBackRoutes.AddTwoWay(wrapperToModify);
         }
     }
 }

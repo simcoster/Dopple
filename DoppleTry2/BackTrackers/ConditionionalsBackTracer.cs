@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DoppleTry2.InstructionWrappers;
+using DoppleTry2.InstructionNodes;
 using Mono.Cecil.Cil;
 using System.Diagnostics;
 
@@ -11,7 +11,7 @@ namespace DoppleTry2.BackTrackers
 {
     class ConditionionalsBackTracer : BackTracer
     {
-        public ConditionionalsBackTracer(List<InstructionWrapper> instructionsWrappers) : base(instructionsWrappers)
+        public ConditionionalsBackTracer(List<InstructionNode> instructionsWrappers) : base(instructionsWrappers)
         {
         }
 
@@ -23,51 +23,51 @@ namespace DoppleTry2.BackTrackers
             }
         }
 
-        public override void AddBackDataflowConnections(InstructionWrapper currentInst)
+        public override void AddBackDataflowConnections(InstructionNode currentInst)
         {
             var targerInst = (Instruction) currentInst.Instruction.Operand;
-            InstructionWrapper targetInstWrapper = InstructionWrappers.First(x => x.Instruction == targerInst);
+            InstructionNode targetInstWrapper = InstructionWrappers.First(x => x.Instruction == targerInst);
             bool isLoopCondition = targerInst.Offset < currentInst.Instruction.Offset;
             if (isLoopCondition)
             {
                 foreach (var loopedNode in GetLoopedNodes(targetInstWrapper, currentInst))
                 {
-                    loopedNode.BackDataFlowRelated.AddTwoWay(currentInst);
+                    loopedNode.ProgramFlowBackAffected.AddTwoWay(currentInst);
                 }
             }
             else
             {
                 foreach (var conditionedNode in GetConditionedNodes(currentInst, targetInstWrapper))
                 {
-                    conditionedNode.BackDataFlowRelated.AddTwoWay(currentInst);
+                    conditionedNode.ProgramFlowBackAffected.AddTwoWay(currentInst);
                 }
             }
         }
 
-        public List<InstructionWrapper> GetLoopedNodes (InstructionWrapper startNode, InstructionWrapper loopEnd)
+        public List<InstructionNode> GetLoopedNodes (InstructionNode startNode, InstructionNode loopEnd)
         {
-            var nodesToReturn = new List<InstructionWrapper>();
-            InstructionWrapper currentNode = startNode;
+            var nodesToReturn = new List<InstructionNode>();
+            InstructionNode currentNode = startNode;
             while(currentNode != loopEnd)
             {
                 nodesToReturn.Add(currentNode);
-                if (currentNode.ForwardProgramFlow.Count == 1)
+                if (currentNode.ProgramFlowForwardRoutes.Count == 1)
                 {
-                    currentNode = currentNode.ForwardProgramFlow[0];
+                    currentNode = currentNode.ProgramFlowForwardRoutes[0];
                 }
                 else
                 {
-                    List<InstructionWrapper> splitPathsNodes = currentNode.ForwardProgramFlow.SelectMany(x => GetLoopedNodes(x, loopEnd)).ToList();
+                    List<InstructionNode> splitPathsNodes = currentNode.ProgramFlowForwardRoutes.SelectMany(x => GetLoopedNodes(x, loopEnd)).ToList();
                     return nodesToReturn.Concat(splitPathsNodes).Distinct().ToList();
                 }
             }
             return nodesToReturn;
         }
 
-        public IEnumerable<InstructionWrapper> GetConditionedNodes(InstructionWrapper conditionNode, InstructionWrapper targetInstWrapper)
+        public IEnumerable<InstructionNode> GetConditionedNodes(InstructionNode conditionNode, InstructionNode targetInstWrapper)
         {
             int ifClauseFinalIndex;
-            InstructionWrapper prevInstWrapper = InstructionWrappers[InstructionWrappers.IndexOf(targetInstWrapper) - 1];
+            InstructionNode prevInstWrapper = InstructionWrappers[InstructionWrappers.IndexOf(targetInstWrapper) - 1];
             bool hasElse = prevInstWrapper.Instruction.OpCode.Code == Code.Br;
             if (hasElse)
             {
@@ -83,13 +83,13 @@ namespace DoppleTry2.BackTrackers
             }
         }
 
-        private List<InstructionWrapper> GetForwardPath(InstructionWrapper startNode, List<InstructionWrapper> visited = null)
+        private List<InstructionNode> GetForwardPath(InstructionNode startNode, List<InstructionNode> visited = null)
         {
             if (visited == null)
             {
-                visited = new List<InstructionWrapper>();
+                visited = new List<InstructionNode>();
             }
-            InstructionWrapper currentNode = startNode;
+            InstructionNode currentNode = startNode;
             while(true)
             {
                 if (visited.Contains(currentNode))
@@ -97,17 +97,17 @@ namespace DoppleTry2.BackTrackers
                     return visited;
                 }
                 visited.Add(currentNode);
-                if (currentNode.ForwardProgramFlow.Count ==0)
+                if (currentNode.ProgramFlowForwardRoutes.Count ==0)
                 {
                     return visited.Distinct().ToList();
                 }
-                else if (currentNode.ForwardProgramFlow.Count == 1)
+                else if (currentNode.ProgramFlowForwardRoutes.Count == 1)
                 {
-                    currentNode = currentNode.ForwardProgramFlow[0];
+                    currentNode = currentNode.ProgramFlowForwardRoutes[0];
                 }
                 else
                 {
-                    IEnumerable<InstructionWrapper> subPaths = currentNode.ForwardProgramFlow.SelectMany(x => GetForwardPath(x, visited));
+                    IEnumerable<InstructionNode> subPaths = currentNode.ProgramFlowForwardRoutes.SelectMany(x => GetForwardPath(x, visited));
                     return visited.Concat(subPaths).Distinct().ToList();
                 }
             }

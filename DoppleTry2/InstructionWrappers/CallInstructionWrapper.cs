@@ -3,9 +3,9 @@ using Mono.Cecil.Cil;
 using System;
 using System.Linq;
 
-namespace DoppleTry2.InstructionWrappers
+namespace DoppleTry2.InstructionNodes
 {
-    public class CallInstructionWrapper : InstructionWrapper
+    public class CallInstructionWrapper : InstructionNode
     {
         public CallInstructionWrapper(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {

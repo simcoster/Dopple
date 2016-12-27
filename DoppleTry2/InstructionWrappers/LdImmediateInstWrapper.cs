@@ -3,9 +3,9 @@ using Mono.Cecil.Cil;
 using System;
 using System.Linq;
 
-namespace DoppleTry2.InstructionWrappers
+namespace DoppleTry2.InstructionNodes
 {
-    class LdImmediateInstWrapper : InstructionWrapper
+    class LdImmediateInstWrapper : InstructionNode
     {
         public int ImmediateIntValue { get; private set; }
         public LdImmediateInstWrapper(Instruction instruction, MethodDefinition method) : base(instruction, method)

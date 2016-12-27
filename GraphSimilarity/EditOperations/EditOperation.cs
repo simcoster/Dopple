@@ -1,5 +1,5 @@
 ﻿using System;
-using DoppleTry2.InstructionWrappers;
+using DoppleTry2.InstructionNodes;
 using GraphSimilarity.EditOperations;
 using System.Collections.Generic;
 
@@ -9,11 +9,11 @@ namespace GraphSimilarity
     {
         public abstract string Name { get; }
         public abstract int Cost { get; }
-        protected List<InstructionWrapper> graph;
+        protected List<InstructionNode> graph;
         public abstract void Commit();
         public abstract string Description { get;}
 
-        public EditOperation(List<InstructionWrapper> graph)
+        public EditOperation(List<InstructionNode> graph)
         {
             this.graph = graph;
         }

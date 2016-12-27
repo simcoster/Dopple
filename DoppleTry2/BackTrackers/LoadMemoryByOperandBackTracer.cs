@@ -4,17 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Mono.Cecil.Cil;
-using DoppleTry2.InstructionWrappers;
+using DoppleTry2.InstructionNodes;
 
 namespace DoppleTry2.BackTrackers
 {
     class LoadMemoryByOperandBackTracer : SingeIndexBackTracer
     {
-        public LoadMemoryByOperandBackTracer(List<InstructionWrapper> instructionsWrappers) : base(instructionsWrappers)
+        public LoadMemoryByOperandBackTracer(List<InstructionNode> instructionsWrappers) : base(instructionsWrappers)
         {
         }
 
-        protected override IEnumerable<InstructionWrapper> GetDataflowBackRelatedArgGroup(InstructionWrapper instWrapper)
+        protected override IEnumerable<InstructionNode> GetDataflowBackRelatedArgGroup(InstructionNode instWrapper)
         {
             var storeIndex =
             _SingleIndexBackSearcher.SearchBackwardsForDataflowInstrcutions(x => x.MemoryStoreCount > 0 &&

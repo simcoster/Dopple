@@ -1,4 +1,4 @@
-﻿using DoppleTry2.InstructionWrappers;
+﻿using DoppleTry2.InstructionNodes;
 using DoppleTry2.VerifierNs;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
@@ -13,32 +13,32 @@ namespace DoppleTry2.VerifierNs
 {
     class StElemVerifier : Verifier
     {
-        public StElemVerifier(List<InstructionWrapper> instructionWrappers) : base(instructionWrappers)
+        public StElemVerifier(List<InstructionNode> instructionWrappers) : base(instructionWrappers)
         {
         }
 
-        public override void Verify(InstructionWrapper instructionWrapper)
+        public override void Verify(InstructionNode instructionWrapper)
         {
             if (!CodeGroups.StElemCodes.Contains(instructionWrapper.Instruction.OpCode.Code))
             {
                 return;
             }
-            var ldArgGroup = instructionWrapper.BackDataFlowRelated.Where(x => x.ArgIndex == 2);
+            var ldArgGroup = instructionWrapper.DataFlowBackRelated.Where(x => x.ArgIndex == 2);
             if (!ldArgGroup.All(x => IsProvidingArray(x.Argument)))
             {
                 throw new Exception("Bad array reference argument");
             }
-            var locationArgGroup = instructionWrapper.BackDataFlowRelated.Where(x => x.ArgIndex == 1);
+            var locationArgGroup = instructionWrapper.DataFlowBackRelated.Where(x => x.ArgIndex == 1);
             if (!locationArgGroup.All(x => IsProvidingNumber(x.Argument)))
             {
                 throw new Exception("Bad array location argument");
             }
-            var valueArgGroup = instructionWrapper.BackDataFlowRelated.Where(x => x.ArgIndex == 0);
+            var valueArgGroup = instructionWrapper.DataFlowBackRelated.Where(x => x.ArgIndex == 0);
             if (!locationArgGroup.All(x => IsProvidingNumber(x.Argument)))
             {
                 throw new Exception("Bad value argument");
             }
-            if (instructionWrapper.BackDataFlowRelated.Max(x => x.ArgIndex) > 2)
+            if (instructionWrapper.DataFlowBackRelated.Max(x => x.ArgIndex) > 2)
             {
                 throw new Exception("too many arguments!");
             }

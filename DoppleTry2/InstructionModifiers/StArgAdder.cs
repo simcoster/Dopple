@@ -1,5 +1,5 @@
 ﻿using DoppleTry2.BackTrackers;
-using DoppleTry2.InstructionWrappers;
+using DoppleTry2.InstructionNodes;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System;
@@ -12,9 +12,9 @@ namespace DoppleTry2.InstructionModifiers
 {
     public class StArgAdder : IModifier
     {
-        private static List<InstructionWrapper> InsertHelperSTargs(List<InstructionWrapper> instructionWrappers, CallInstructionWrapper callInstWrapper)
+        private static List<InstructionNode> InsertHelperSTargs(List<InstructionNode> instructionWrappers, CallInstructionWrapper callInstWrapper)
         {
-            var addedInstructions = new List<InstructionWrapper>();
+            var addedInstructions = new List<InstructionNode>();
             var calledFunc = callInstWrapper.CalledFunction;
             var stackPopBacktracer = new StackPopBackTracer(instructionWrappers);
             if (calledFunc.IsStatic)
@@ -53,16 +53,16 @@ namespace DoppleTry2.InstructionModifiers
             return addedInstructions;
         }
 
-        private static void AddStArgInst(List<InstructionWrapper> instructionWrappers, List<InstructionWrapper> addedInstructions, MethodDefinition calledFunc, int argIndex, InstructionWrapper argProvidingWrapper, StArgInstructionWrapper stArgWrapper)
+        private static void AddStArgInst(List<InstructionNode> instructionWrappers, List<InstructionNode> addedInstructions, MethodDefinition calledFunc, int argIndex, InstructionNode argProvidingWrapper, StArgInstructionWrapper stArgWrapper)
         {
             stArgWrapper.Instruction.Offset = 99999;
-            foreach (var forwardFlowInst in argProvidingWrapper.ForwardProgramFlow.ToList())
+            foreach (var forwardFlowInst in argProvidingWrapper.ProgramFlowForwardRoutes.ToList())
             {
-                forwardFlowInst.BackProgramFlow.RemoveTwoWay(argProvidingWrapper);
-                forwardFlowInst.BackProgramFlow.AddTwoWay(stArgWrapper);
+                forwardFlowInst.ProgramFlowBackRoutes.RemoveTwoWay(argProvidingWrapper);
+                forwardFlowInst.ProgramFlowBackRoutes.AddTwoWay(stArgWrapper);
             }
-            stArgWrapper.BackProgramFlow.AddTwoWay(argProvidingWrapper);
-            stArgWrapper.BackDataFlowRelated.AddWithNewIndex(argProvidingWrapper);
+            stArgWrapper.ProgramFlowBackRoutes.AddTwoWay(argProvidingWrapper);
+            stArgWrapper.DataFlowBackRelated.AddWithNewIndex(argProvidingWrapper);
             stArgWrapper.StackPopCount--;
             stArgWrapper.ArgIndex = argIndex;
             stArgWrapper.ProgramFlowResolveDone = true;
@@ -71,7 +71,7 @@ namespace DoppleTry2.InstructionModifiers
             addedInstructions.Add(stArgWrapper);
         }
 
-        public void Modify(List<InstructionWrapper> instructionWrappers)
+        public void Modify(List<InstructionNode> instructionWrappers)
         {
             var callInstructions = instructionWrappers
                                     .Where(x => x is CallInstructionWrapper && x.InliningProperties.Inlined)

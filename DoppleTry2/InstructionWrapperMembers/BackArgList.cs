@@ -1,4 +1,4 @@
-﻿using DoppleTry2.InstructionWrappers;
+﻿using DoppleTry2.InstructionNodes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,7 @@ namespace DoppleTry2
 {
     public class BackArgList : List<IndexedArgument>
     {
-        public BackArgList(InstructionWrapper instructionWrapper)
+        public BackArgList(InstructionNode instructionWrapper)
         {
             containingWrapper = instructionWrapper;
         }
@@ -22,7 +22,7 @@ namespace DoppleTry2
             return base.Equals(obj);
         }
 
-        readonly InstructionWrapper containingWrapper;
+        readonly InstructionNode containingWrapper;
         public int MaxArgIndex = -1;
 
         public bool SelfFeeding
@@ -41,9 +41,9 @@ namespace DoppleTry2
         public void RemoveTwoWay(IndexedArgument backArgToRemove)
         {
             Remove(backArgToRemove);
-            InstructionWrapper forwardArg = backArgToRemove.Argument.ForwardDataFlowRelated.First(x => x == containingWrapper);
-            backArgToRemove.Argument.ForwardDataFlowRelated.Remove(forwardArg);
-            if (this.Any(x => !x.Argument.ForwardDataFlowRelated.Contains(containingWrapper)))
+            InstructionNode forwardArg = backArgToRemove.Argument.DataFlowForwardRelated.First(x => x == containingWrapper);
+            backArgToRemove.Argument.DataFlowForwardRelated.Remove(forwardArg);
+            if (this.Any(x => !x.Argument.DataFlowForwardRelated.Contains(containingWrapper)))
             {
                 throw new Exception("Validation Failed");
             }
@@ -58,9 +58,9 @@ namespace DoppleTry2
         public void AddTwoWay(IndexedArgument toAdd)
         {
             Add(toAdd);
-            toAdd.Argument.ForwardDataFlowRelated.Add(containingWrapper);
+            toAdd.Argument.DataFlowForwardRelated.Add(containingWrapper);
         }
-        public void AddTwoWay(InstructionWrapper toAdd)
+        public void AddTwoWay(InstructionNode toAdd)
         {
             var indexedToAdd = new IndexedArgument(GetNewIndex(), toAdd);
             AddTwoWay(indexedToAdd);
@@ -73,20 +73,20 @@ namespace DoppleTry2
             }
         }
 
-        public void AddWithNewIndex(IEnumerable<InstructionWrapper> backInstructions)
+        public void AddWithNewIndex(IEnumerable<InstructionNode> backInstructions)
         {
             int index = GetNewIndex();
             AddRangeTwoWay(backInstructions.Select(x => new IndexedArgument(index, x)));
             CheckNumberings();
         }
-        public void AddWithNewIndexes(IEnumerable<InstructionWrapper> instructionWrappers)
+        public void AddWithNewIndexes(IEnumerable<InstructionNode> instructionWrappers)
         {
             foreach (var instWrapper in instructionWrappers)
             {
                 AddWithNewIndex(instWrapper);
             }
         }
-        public void AddWithExistingIndex(InstructionWrapper backInstruction , int index)
+        public void AddWithExistingIndex(InstructionNode backInstruction , int index)
         {
             if (this.Any(x => x.ArgIndex == index && x.Argument == backInstruction))
             {
@@ -99,7 +99,7 @@ namespace DoppleTry2
         {
             AddWithExistingIndex(indexedArg.Argument,indexedArg.ArgIndex);
         }
-        public void AddMultipleWithExistingIndex(IEnumerable<InstructionWrapper> instructionWrappers, int index)
+        public void AddMultipleWithExistingIndex(IEnumerable<InstructionNode> instructionWrappers, int index)
         {
             foreach(var instWrapper in instructionWrappers)
             {
@@ -113,7 +113,7 @@ namespace DoppleTry2
             CheckNumberings();
         }
         
-        public void AddWithNewIndex(InstructionWrapper backInst)
+        public void AddWithNewIndex(InstructionNode backInst)
         {
             AddWithNewIndex(new[] { backInst });
             CheckNumberings();
@@ -133,8 +133,6 @@ namespace DoppleTry2
 
         public void CheckNumberings()
         {
-            //TODO skip
-            return;
             if (this.Count == 0)
             {
                 return;

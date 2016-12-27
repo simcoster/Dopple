@@ -1,4 +1,4 @@
-﻿using DoppleTry2.InstructionWrappers;
+﻿using DoppleTry2.InstructionNodes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,7 @@ namespace GraphSimilarity
 {
     class HeuristicDistanceCalc
     {
-        public static int HeuristicNodeDistance(IEnumerable<InstructionWrapper> firstGraph, IEnumerable<InstructionWrapper> secondGraph)
+        public static int HeuristicNodeDistance(IEnumerable<InstructionNode> firstGraph, IEnumerable<InstructionNode> secondGraph)
         {
             return firstGraph.Select(x => x.Instruction).Except(secondGraph.Select(x => x.Instruction)).Count();
         }

@@ -1,5 +1,5 @@
 ﻿using C5;
-using DoppleTry2.InstructionWrappers;
+using DoppleTry2.InstructionNodes;
 using GraphSimilarity.EditOperations;
 using Mono.Cecil.Cil;
 using System;
@@ -18,7 +18,7 @@ namespace GraphSimilarity
         public const int NodeDeletionCost = 1;
         public const int NodeLabelSubstitutionCost = 1;
 
-        public static EditPath GetEditDistance(List<InstructionWrapper> sourceGraph, List<InstructionWrapper> targetGraph)
+        public static EditPath GetEditDistance(List<InstructionNode> sourceGraph, List<InstructionNode> targetGraph)
         {
             http://www.springer.com/cda/content/document/cda_downloaddocument/9783319272511-c2.pdf?SGWID=0-0-45-1545097-p177820399
                  //step 1 = take all the first graph nodes

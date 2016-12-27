@@ -4,20 +4,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Mono.Cecil.Cil;
-using DoppleTry2.InstructionWrappers;
+using DoppleTry2.InstructionNodes;
 
 namespace DoppleTry2.BackTrackers
 {
     class LoadFieldByStackBackTracer : SingeIndexBackTracer
     {
-        public LoadFieldByStackBackTracer(List<InstructionWrapper> instructionsWrappers) : base(instructionsWrappers)
+        public LoadFieldByStackBackTracer(List<InstructionNode> instructionsWrappers) : base(instructionsWrappers)
         {
         }
 
-        protected override IEnumerable<InstructionWrapper> GetDataflowBackRelatedArgGroup(InstructionWrapper instWrapper)
+        protected override IEnumerable<InstructionNode> GetDataflowBackRelatedArgGroup(InstructionNode instWrapper)
         {
 
-            Func<InstructionWrapper, bool> predicate = x =>
+            Func<InstructionNode, bool> predicate = x =>
                                   x.Instruction.OpCode.Code == Code.Stfld &&
                                   BackSearcher.HaveCommonStackPushAncestor(x, instWrapper) &&
                                   x.Instruction.Operand == instWrapper.Instruction.Operand;
@@ -34,7 +34,7 @@ namespace DoppleTry2.BackTrackers
             {
                 return storeObjInsts;
             }
-            return new InstructionWrapper[0];
+            return new InstructionNode[0];
         }
 
         public override Code[] HandlesCodes => new[] {Code.Ldfld, Code.Ldflda};

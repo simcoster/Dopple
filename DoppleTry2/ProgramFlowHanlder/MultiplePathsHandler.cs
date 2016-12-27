@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DoppleTry2.InstructionModifiers;
 using Mono.Cecil.Cil;
-using DoppleTry2.InstructionWrappers;
+using DoppleTry2.InstructionNodes;
 
 namespace DoppleTry2.ProgramFlowHanlder
 {
@@ -18,10 +18,10 @@ namespace DoppleTry2.ProgramFlowHanlder
             Code.Ble_Un, Code.Ble_Un_S, Code.Bne_Un, Code.Bne_Un_S, Code.Blt, Code.Blt_S, Code.Blt_Un, Code.Blt_Un_S, 
         };
 
-        public override void SetForwardExecutionFlowInsts(InstructionWrapper wrapperToModify, List<InstructionWrapper> instructionWrappers)
+        public override void SetForwardExecutionFlowInsts(InstructionNode wrapperToModify, List<InstructionNode> instructionWrappers)
         {
             var forwardInstruction = instructionWrappers.First(x => x.Instruction == wrapperToModify.Instruction.Operand);
-            forwardInstruction.BackProgramFlow.AddTwoWay(wrapperToModify);
+            forwardInstruction.ProgramFlowBackRoutes.AddTwoWay(wrapperToModify);
         }
     }
 }

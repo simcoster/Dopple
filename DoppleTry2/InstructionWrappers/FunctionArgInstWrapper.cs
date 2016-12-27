@@ -3,7 +3,7 @@ using Mono.Cecil.Cil;
 using System;
 using System.Linq;
 
-namespace DoppleTry2.InstructionWrappers
+namespace DoppleTry2.InstructionNodes
 {
     public class LdArgInstructionWrapper : FunctionArgInstWrapper
     {
@@ -52,7 +52,7 @@ namespace DoppleTry2.InstructionWrappers
         }
     }
 
-    public abstract class FunctionArgInstWrapper : InstructionWrapper
+    public abstract class FunctionArgInstWrapper : InstructionNode
     {
         public FunctionArgInstWrapper(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {

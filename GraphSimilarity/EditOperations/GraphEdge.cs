@@ -1,4 +1,4 @@
-﻿using DoppleTry2.InstructionWrappers;
+﻿using DoppleTry2.InstructionNodes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +9,11 @@ namespace GraphSimilarity.EditOperations
 {
     public class GraphEdge
     {
-        public InstructionWrapper SourceNode { get; private set; }
-        public InstructionWrapper DestinationNode { get; private set; }
+        public InstructionNode SourceNode { get; private set; }
+        public InstructionNode DestinationNode { get; private set; }
         public int Index { get; private set; }
 
-        public GraphEdge(InstructionWrapper sourceNode, InstructionWrapper destinationNode, int index)
+        public GraphEdge(InstructionNode sourceNode, InstructionNode destinationNode, int index)
         {
             SourceNode = sourceNode;
             DestinationNode = destinationNode;

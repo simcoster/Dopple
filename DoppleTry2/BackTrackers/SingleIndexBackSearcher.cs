@@ -1,4 +1,4 @@
-﻿using DoppleTry2.InstructionWrappers;
+﻿using DoppleTry2.InstructionNodes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,16 +9,16 @@ namespace DoppleTry2.BackTrackers
 {
     public class SingleIndexBackSearcher
     {
-        private List<InstructionWrapper> InstructionWrappers;
-        public SingleIndexBackSearcher(List<InstructionWrapper> instructionsWrappers)
+        private List<InstructionNode> InstructionWrappers;
+        public SingleIndexBackSearcher(List<InstructionNode> instructionsWrappers)
         {
             InstructionWrappers = instructionsWrappers;
         }
 
-        public List<InstructionWrapper> SearchBackwardsForDataflowInstrcutions(Func<InstructionWrapper, bool> predicate,
-       InstructionWrapper startInstruction)
+        public List<InstructionNode> SearchBackwardsForDataflowInstrcutions(Func<InstructionNode, bool> predicate,
+       InstructionNode startInstruction)
         {
-            List<InstructionWrapper> foundBackInstructions = SafeSearchBackwardsForDataflowInstrcutions(predicate, startInstruction);
+            List<InstructionNode> foundBackInstructions = SafeSearchBackwardsForDataflowInstrcutions(predicate, startInstruction);
             if (foundBackInstructions.Count == 0)
             {
                 throw new Exception("Reached first instWrapper without correct one found");
@@ -26,20 +26,20 @@ namespace DoppleTry2.BackTrackers
             return foundBackInstructions;
         }
 
-        public List<InstructionWrapper> SafeSearchBackwardsForDataflowInstrcutions(Func<InstructionWrapper, bool> predicate,
-           InstructionWrapper startInstruction)
+        public List<InstructionNode> SafeSearchBackwardsForDataflowInstrcutions(Func<InstructionNode, bool> predicate,
+           InstructionNode startInstruction)
         {
-            return startInstruction.BackProgramFlow.SelectMany(x => SafeSearchBackwardsForDataflowInstrcutions(InstructionWrappers, predicate, x, new List<InstructionWrapper>())).ToList();
+            return startInstruction.ProgramFlowBackRoutes.SelectMany(x => SafeSearchBackwardsForDataflowInstrcutions(InstructionWrappers, predicate, x, new List<InstructionNode>())).ToList();
         }
 
-        public List<InstructionWrapper> SafeSearchBackwardsForDataflowInstrcutions(List<InstructionWrapper> InstructionWrappers, Func<InstructionWrapper, bool> predicate,
-        InstructionWrapper startInstruction, List<InstructionWrapper> visitedInstructions)
+        public List<InstructionNode> SafeSearchBackwardsForDataflowInstrcutions(List<InstructionNode> InstructionWrappers, Func<InstructionNode, bool> predicate,
+        InstructionNode startInstruction, List<InstructionNode> visitedInstructions)
         {
             if (visitedInstructions == null)
             {
-                visitedInstructions = new List<InstructionWrapper>();
+                visitedInstructions = new List<InstructionNode>();
             }
-            var foundInstructions = new List<InstructionWrapper>();
+            var foundInstructions = new List<InstructionNode>();
             int index = InstructionWrappers.IndexOf(startInstruction);
             if (index < 0)
                 throw new Exception("shouldn't get here");
@@ -47,7 +47,7 @@ namespace DoppleTry2.BackTrackers
             var currInstruction = InstructionWrappers[index];
             if (visitedInstructions.Contains(currInstruction))
             {
-                return new List<InstructionWrapper>();
+                return new List<InstructionNode>();
             }
             else
             {
@@ -61,9 +61,9 @@ namespace DoppleTry2.BackTrackers
 
             else
             {
-                foreach (var instructionWrapper in currInstruction.BackProgramFlow)
+                foreach (var instructionWrapper in currInstruction.ProgramFlowBackRoutes)
                 {
-                    IEnumerable<InstructionWrapper> branchindexes =
+                    IEnumerable<InstructionNode> branchindexes =
                         SafeSearchBackwardsForDataflowInstrcutions(InstructionWrappers, predicate, instructionWrapper, visitedInstructions);
                     foundInstructions.AddRange(branchindexes);
                 }

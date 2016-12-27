@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Mono.Cecil.Cil;
 using Mono.Cecil;
 
-namespace DoppleTry2.InstructionWrappers
+namespace DoppleTry2.InstructionNodes
 {
     public class LocationStoreInstructionWrapper : TempLocationInstructionWrapper
     {
@@ -18,7 +18,7 @@ namespace DoppleTry2.InstructionWrappers
         public LocationLoadInstructionWrapper(Instruction instruction, MethodDefinition method) : base(instruction, method) { }
     }
 
-    public abstract class TempLocationInstructionWrapper : InstructionWrapper
+    public abstract class TempLocationInstructionWrapper : InstructionNode
     {
         public TempLocationInstructionWrapper(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {

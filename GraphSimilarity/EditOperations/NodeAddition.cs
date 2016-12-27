@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DoppleTry2.InstructionWrappers;
+using DoppleTry2.InstructionNodes;
 using System.Diagnostics;
 
 namespace GraphSimilarity.EditOperations
@@ -14,7 +14,7 @@ namespace GraphSimilarity.EditOperations
         private List<GraphEdge> edgeAddsToBeTriggered;
         private IEnumerable<GraphEdge> triggeredEdgeAdds;
 
-        public NodeAddition(List<InstructionWrapper> graph, InstructionWrapper node, List<GraphEdge> edgeAdditionsPending) : base(graph, node)
+        public NodeAddition(List<InstructionNode> graph, InstructionNode node, List<GraphEdge> edgeAdditionsPending) : base(graph, node)
         {
             this.edgeAdditionsPending = edgeAdditionsPending;
         }
@@ -57,26 +57,26 @@ namespace GraphSimilarity.EditOperations
 
         }
 
-        internal override List<InstructionWrapper> GetAddeddNodes()
+        internal override List<InstructionNode> GetAddeddNodes()
         {
-            return new List<InstructionWrapper>() { Node };
+            return new List<InstructionNode>() { Node };
         }
 
-        internal override List<InstructionWrapper> GetDeletedNodes()
+        internal override List<InstructionNode> GetDeletedNodes()
         {
-            return new List<InstructionWrapper>();
+            return new List<InstructionNode>();
         }
 
         internal override List<EdgeEditOperation> GetEdgeOperations()
         {
             var addedEdges = new List<EdgeEditOperation>();
-            var problematics = Node.ForwardDataFlowRelated.Where(x => !x.BackDataFlowRelated.Any(y => y.Argument == Node)).ToList();
+            var problematics = Node.DataFlowForwardRelated.Where(x => !x.DataFlowBackRelated.Any(y => y.Argument == Node)).ToList();
             if (problematics.Count > 0)
             {
                 Debugger.Break();
             }
-            List<GraphEdge> relatedEdgesToAdd = Node.BackDataFlowRelated.Select(x => new GraphEdge(x.Argument, Node, x.ArgIndex))
-                                                 .Concat(Node.ForwardDataFlowRelated.Select(x => new GraphEdge(x, Node, x.BackDataFlowRelated.First(y => y.Argument ==Node).ArgIndex)))
+            List<GraphEdge> relatedEdgesToAdd = Node.DataFlowBackRelated.Select(x => new GraphEdge(x.Argument, Node, x.ArgIndex))
+                                                 .Concat(Node.DataFlowForwardRelated.Select(x => new GraphEdge(x, Node, x.DataFlowBackRelated.First(y => y.Argument ==Node).ArgIndex)))
                                                  .ToList();
             triggeredEdgeAdds = edgeAdditionsPending.Where(x => x.DestinationNode == Node || x.SourceNode == Node);
             edgeAddsToBeTriggered = relatedEdgesToAdd.Except(triggeredEdgeAdds).ToList();

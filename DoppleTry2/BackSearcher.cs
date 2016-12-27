@@ -1,4 +1,4 @@
-﻿using DoppleTry2.InstructionWrappers;
+﻿using DoppleTry2.InstructionNodes;
 using Mono.Cecil.Cil;
 using System;
 using System.Collections.Generic;
@@ -10,65 +10,65 @@ namespace DoppleTry2
 {
     public static class BackSearcher
     {
-        public static IEnumerable<InstructionWrapper> GetStackPushAncestor(InstructionWrapper startInst, List<InstructionWrapper> visited = null)
+        public static IEnumerable<InstructionNode> GetStackPushAncestor(InstructionNode startInst, List<InstructionNode> visited = null)
         {
             var nonModifyingCodes = new Code[0].Concat(CodeGroups.LdLocCodes).Concat(CodeGroups.StLocCodes);
             if (visited == null)
             {
-                visited = new List<InstructionWrapper>();
+                visited = new List<InstructionNode>();
             }
             var instWrapper = startInst;
             while (true)
             {
                 if (visited.Contains(instWrapper))
                 {
-                    return new InstructionWrapper[] {};
+                    return new InstructionNode[] {};
                 }
                 visited.Add(instWrapper);
-                switch (instWrapper.BackDataFlowRelated.Count)
+                switch (instWrapper.DataFlowBackRelated.Count)
                 {
                     case 0:
                         return new[] { instWrapper };
                     case 1:
-                        instWrapper = instWrapper.BackDataFlowRelated[0].Argument;
+                        instWrapper = instWrapper.DataFlowBackRelated[0].Argument;
                         break;
                     default:
-                        return instWrapper.BackDataFlowRelated.SelectMany(x => GetStackPushAncestor(x.Argument, visited));
+                        return instWrapper.DataFlowBackRelated.SelectMany(x => GetStackPushAncestor(x.Argument, visited));
                 }
             }
         }
 
-        public static IEnumerable<InstructionWrapper> GetBackDataTree(InstructionWrapper startInst, List<InstructionWrapper> visited = null)
+        public static IEnumerable<InstructionNode> GetBackDataTree(InstructionNode startInst, List<InstructionNode> visited = null)
         {
             if (visited == null)
             {
-                visited = new List<InstructionWrapper>();
+                visited = new List<InstructionNode>();
             }
             if (visited.Contains(startInst))
             {
-                return new InstructionWrapper[0];
+                return new InstructionNode[0];
             }
             visited.Add(startInst);
-            visited.AddRange(startInst.BackDataFlowRelated.SelectMany(x => GetBackDataTree(x.Argument, visited)).ToArray());
+            visited.AddRange(startInst.DataFlowBackRelated.SelectMany(x => GetBackDataTree(x.Argument, visited)).ToArray());
             return visited.Distinct();
         }
 
-        public static IEnumerable<InstructionWrapper> GetBackFlowTree(InstructionWrapper startInst, List<InstructionWrapper> visited = null)
+        public static IEnumerable<InstructionNode> GetBackFlowTree(InstructionNode startInst, List<InstructionNode> visited = null)
         {
             if (visited == null)
             {
-                visited = new List<InstructionWrapper>();
+                visited = new List<InstructionNode>();
             }
             if (visited.Contains(startInst))
             {
-                return new InstructionWrapper[0];
+                return new InstructionNode[0];
             }
             visited.Add(startInst);
-            visited.AddRange(startInst.BackProgramFlow.SelectMany(x => GetBackDataTree(x, visited)).ToArray());
+            visited.AddRange(startInst.ProgramFlowBackRoutes.SelectMany(x => GetBackDataTree(x, visited)).ToArray());
             return visited.Distinct();
         }
 
-        public static bool HaveCommonStackPushAncestor(InstructionWrapper firstInstruction, InstructionWrapper secondInstructions)
+        public static bool HaveCommonStackPushAncestor(InstructionNode firstInstruction, InstructionNode secondInstructions)
         {
             var firstAncestors = GetStackPushAncestor(firstInstruction).ToArray();
             var secondAncestors = GetStackPushAncestor(secondInstructions).ToArray();
@@ -86,7 +86,7 @@ namespace DoppleTry2
             return false;
         }
 
-        public static bool SameOrEquivilent(InstructionWrapper firstAncestor, InstructionWrapper secondAncestor)
+        public static bool SameOrEquivilent(InstructionNode firstAncestor, InstructionNode secondAncestor)
         {
             return firstAncestor == secondAncestor ||
                    (firstAncestor.Instruction.OpCode.Code == secondAncestor.Instruction.OpCode.Code &&
