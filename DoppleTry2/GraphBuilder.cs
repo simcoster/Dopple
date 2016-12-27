@@ -49,7 +49,8 @@ namespace DoppleTry2
                     //new LoadArrayElemBackTracer(InstructionWrappers),
                     new LoadFieldByStackBackTracer(InstructionWrappers),
                     new LoadMemoryByOperandBackTracer(InstructionWrappers),
-                    new TypedReferenceBackTracer(InstructionWrappers)
+                    new TypedReferenceBackTracer(InstructionWrappers),
+                    new ConditionionalsBackTracer(InstructionWrappers)
                 };
         }
 
@@ -64,7 +65,7 @@ namespace DoppleTry2
             AddStArgHelpers();
             BackTrace();
             RemoveHelperCodes();
-            MergeSimilarInstructions();
+            //MergeSimilarInstructions();
             PostMergeBackTrace();
             SetInstructionIndexes();
             Veirify();

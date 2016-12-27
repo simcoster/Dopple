@@ -60,6 +60,11 @@ namespace DoppleTry2
             Add(toAdd);
             toAdd.Argument.ForwardDataFlowRelated.Add(containingWrapper);
         }
+        public void AddTwoWay(InstructionWrapper toAdd)
+        {
+            var indexedToAdd = new IndexedArgument(GetNewIndex(), toAdd);
+            AddTwoWay(indexedToAdd);
+        }
         public void AddRangeTwoWay(IEnumerable<IndexedArgument> rangeToAdd)
         {
             foreach (var backArgToAdd in rangeToAdd)

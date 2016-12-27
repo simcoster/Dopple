@@ -47,7 +47,7 @@ namespace DoppleGraph
                 Debugger.Break();
             }
 
-            var editDistance = GraphEditDistanceCalc.GetEditDistance(Graphs[0], Graphs[1]);
+            //var editDistance = GraphEditDistanceCalc.GetEditDistance(Graphs[0], Graphs[1]);
         }
     }
 }

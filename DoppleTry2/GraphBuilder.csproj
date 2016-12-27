@@ -66,6 +66,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BackTrackers\ConditionionalsBackTracer.cs" />
     <Compile Include="InstructionWrapperMembers\BackFlowList.cs" />
     <Compile Include="InstructionWrappers\LdElemInstructionWrapper.cs" />
     <Compile Include="Verifier\ArgIndexVerifier.cs" />

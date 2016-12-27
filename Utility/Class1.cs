@@ -10,14 +10,26 @@ namespace Utility
 {
     public class Class1
     {
-        public static int Add(int a, int b)
+        public int Add()
         {
-            return a + b + 5;
-        }
-
-        public static int Sub(int a, int b)
-        {
-            return a - b + 5;
+            int c = 4;
+            //for (int i = 0; i < 5; i++)
+            //{
+            int i = 0;
+                if (i > 3)
+                {
+                    Console.WriteLine("fsafsa");
+                    //c++;
+                }
+                //else
+                //{
+                //    c = 2;
+                //    c--;
+                //}
+                c = c * 5;
+            //}
+            c = 0;
+            return c;
         }
     }
 }
