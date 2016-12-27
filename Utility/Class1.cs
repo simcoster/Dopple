@@ -10,26 +10,48 @@ namespace Utility
 {
     public class Class1
     {
-        public int Add()
+        static void BubbleSort(int[] number)
         {
-            int c = 4;
-            //for (int i = 0; i < 5; i++)
-            //{
-            int i = 0;
-                if (i > 3)
+            bool flag = true;
+            int temp;
+            int numLength = number.Length;
+            //sorting an array
+            for (int i = 1; (i <= (numLength - 1)) && flag; i++)
+            {
+                flag = false;
+                for (int j = 0; j < (numLength - 1); j++)
                 {
-                    Console.WriteLine("fsafsa");
-                    //c++;
+                    if (number[j + 1] > number[j])
+                    {
+                        temp = number[j];
+                        number[j] = number[j + 1];
+                        number[j + 1] = temp;
+                        flag = true;
+                    }
                 }
-                //else
-                //{
-                //    c = 2;
-                //    c--;
-                //}
-                c = c * 5;
-            //}
-            c = 0;
-            return c;
+            }
         }
+
+        static void BubbleSum(int[] number)
+        {
+            bool flag = true;
+            int temp;
+            int numLength = number.Length;
+            //sorting an array
+            for (int i = 1; (i <= (numLength - 1)) && flag; i++)
+            {
+                flag = false;
+                for (int j = 0; j < (numLength - 1); j++)
+                {
+                    if (number[j + 1] > number[j])
+                    {
+                        number[j + 1] = number[j + 1] + number[j];
+                        number[j] = number[j + 1] + number[j];
+                        flag = true;
+                    }
+                }
+            }
+        }
+
     }
 }

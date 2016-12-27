@@ -68,7 +68,7 @@ namespace DoppleTry2
             //MergeSimilarInstructions();
             PostMergeBackTrace();
             SetInstructionIndexes();
-            Veirify();
+           // Veirify();
             AddZeroNode();
 
             return InstructionWrappers;

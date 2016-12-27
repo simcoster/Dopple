@@ -25,34 +25,22 @@ namespace DoppleTry2.BackTrackers
 
         public override void AddBackDataflowConnections(InstructionWrapper currentInst)
         {
-            return;
-            try
+            var targerInst = (Instruction) currentInst.Instruction.Operand;
+            InstructionWrapper targetInstWrapper = InstructionWrappers.First(x => x.Instruction == targerInst);
+            bool isLoopCondition = targerInst.Offset < currentInst.Instruction.Offset;
+            if (isLoopCondition)
             {
-                var targerInst = (Instruction) currentInst.Instruction.Operand;
-                InstructionWrapper targetInstWrapper = InstructionWrappers.First(x => x.Instruction == targerInst);
-                bool isLoopCondition = targerInst.Offset < currentInst.Instruction.Offset;
-                if (isLoopCondition)
+                foreach (var loopedNode in GetLoopedNodes(targetInstWrapper, currentInst))
                 {
-                    foreach (var loopedNode in GetLoopedNodes(targetInstWrapper, currentInst))
-                    {
-                        loopedNode.BackDataFlowRelated.AddTwoWay(currentInst);
-                    }
-                }
-                else
-                {
-                    int ifClauseFinalIndex;
-                    InstructionWrapper prevInstWrapper = InstructionWrappers[InstructionWrappers.IndexOf(targetInstWrapper) - 1];
-                    bool hasElse = prevInstWrapper.Instruction.OpCode.Code == Code.Br;
-                    if (hasElse)
-                    {
-                        var jumpToInst = ((Instruction) prevInstWrapper.Instruction.Operand);
-                        ifClauseFinalIndex = 
-                    }
+                    loopedNode.BackDataFlowRelated.AddTwoWay(currentInst);
                 }
             }
-            catch
+            else
             {
-                Debugger.Break();
+                foreach (var conditionedNode in GetConditionedNodes(currentInst, targetInstWrapper))
+                {
+                    conditionedNode.BackDataFlowRelated.AddTwoWay(currentInst);
+                }
             }
         }
 
@@ -76,9 +64,23 @@ namespace DoppleTry2.BackTrackers
             return nodesToReturn;
         }
 
-        public List<InstructionWrapper> GetConditionedNodes(InstructionWrapper conditionNode)
+        public IEnumerable<InstructionWrapper> GetConditionedNodes(InstructionWrapper conditionNode, InstructionWrapper targetInstWrapper)
         {
-            if (conditionNode.Instruction)
+            int ifClauseFinalIndex;
+            InstructionWrapper prevInstWrapper = InstructionWrappers[InstructionWrappers.IndexOf(targetInstWrapper) - 1];
+            bool hasElse = prevInstWrapper.Instruction.OpCode.Code == Code.Br;
+            if (hasElse)
+            {
+                ifClauseFinalIndex = InstructionWrappers.First(x => x.Instruction == ((Instruction) prevInstWrapper.Instruction.Operand)).InstructionIndex;
+            }
+            else
+            {
+                ifClauseFinalIndex = targetInstWrapper.InstructionIndex;
+            }
+            for (int i = conditionNode.InstructionIndex; i < ifClauseFinalIndex; i++)
+            {
+                yield return InstructionWrappers[i];
+            }
         }
 
         private List<InstructionWrapper> GetForwardPath(InstructionWrapper startNode, List<InstructionWrapper> visited = null)
