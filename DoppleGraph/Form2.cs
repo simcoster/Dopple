@@ -164,11 +164,6 @@ namespace DoppleGraph
 
         public void DrawDataLinks(GoNodeWrapper nodeWrapper, GoView myView)
         {
-            if (!ColumnBaseColors.ContainsKey(nodeWrapper.DisplayCol))
-            {
-                ColumnBaseColors.Add(nodeWrapper.DisplayCol, GetRandomColor());
-            }
-
             foreach (var indexedArg in nodeWrapper.InstructionWrapper.DataFlowBackRelated)
             {
                 Color linkColor = GetPredefinedColor(indexedArg.ArgIndex);
@@ -178,7 +173,7 @@ namespace DoppleGraph
             }
             foreach (var flowAffectingNode in nodeWrapper.InstructionWrapper.ProgramFlowBackAffected)
             {
-                DrawEdge(nodeWrapper, myView, flowAffectingNode, Color.Purple);
+                DrawEdge(nodeWrapper, myView, flowAffectingNode, Color.LightPink);
 
             }
             var allLinks = myView.Document.Where(x => x is GoLink).Cast<GoLink>().Select(y => y.PenColor);
@@ -244,6 +239,7 @@ namespace DoppleGraph
             {
                 nodeWrapper.Node.Location = new PointF(nodeWrapper.DisplayCol * widthOffset, (nodeWrapper.DisplayRow - 0.7f) * heightOffset);
             }
+
         }
 
         private void FixDuplicateCoordinates(List<GoNodeWrapper> nodeWrappers)

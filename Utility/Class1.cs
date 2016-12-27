@@ -10,48 +10,37 @@ namespace Utility
 {
     public class Class1
     {
-        static void BubbleSort(int[] number)
+        static void IfElse(int a)
         {
-            bool flag = true;
-            int temp;
-            int numLength = number.Length;
-            //sorting an array
-            for (int i = 1; (i <= (numLength - 1)) && flag; i++)
+            for (int i = 0; i < 5; i++)
             {
-                flag = false;
-                for (int j = 0; j < (numLength - 1); j++)
+                if (a == 1)
                 {
-                    if (number[j + 1] > number[j])
-                    {
-                        temp = number[j];
-                        number[j] = number[j + 1];
-                        number[j + 1] = temp;
-                        flag = true;
-                    }
+                    a--;
+                }
+                else if (a == 2)
+                {
+                    a++;
                 }
             }
+            a = 0;
         }
 
-        static void BubbleSum(int[] number)
+        static void SwitchCase(int a)
         {
-            bool flag = true;
-            int temp;
-            int numLength = number.Length;
-            //sorting an array
-            for (int i = 1; (i <= (numLength - 1)) && flag; i++)
+            for (int i = 0; i < 5; i++)
             {
-                flag = false;
-                for (int j = 0; j < (numLength - 1); j++)
+                switch (a)
                 {
-                    if (number[j + 1] > number[j])
-                    {
-                        number[j + 1] = number[j + 1] + number[j];
-                        number[j] = number[j + 1] + number[j];
-                        flag = true;
-                    }
+                    case 1:
+                        a--;
+                        break;
+                    case 2:
+                        a++;
+                        break;
                 }
             }
+            a = 0;
         }
-
     }
 }
