@@ -12,14 +12,14 @@ namespace DoppleTry2.BackTrackers
     public abstract class BackTracer
     {
         protected InstructionNode Instruction;
-        protected readonly List<InstructionNode> InstructionWrappers;
+        protected readonly List<InstructionNode> InstructionNodes;
 
         protected readonly IEnumerable<OpCode> AllOpCodes =
             typeof(OpCodes).GetFields().Select(x => x.GetValue(null)).Cast<OpCode>();
 
         protected BackTracer(List<InstructionNode> instructionsWrappers)
         {
-            InstructionWrappers = instructionsWrappers;
+            InstructionNodes = instructionsWrappers;
         }
         public abstract void AddBackDataflowConnections(InstructionNode currentInst);
        

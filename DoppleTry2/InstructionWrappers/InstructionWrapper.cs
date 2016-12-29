@@ -40,7 +40,6 @@ namespace DoppleTry2.InstructionNodes
         public MethodDefinition Method { get; set; }
         public int StackPopCount { get; set; }
         public int StackPushCount { get; set; }
-        public bool FirstLineInstruction { get; set; } = false;
         public List<Type> DoneBackTracers = new List<Type>();
         public bool ProgramFlowResolveDone { get; set; } = false;
         

@@ -100,7 +100,7 @@ namespace DoppleTry2.BackTrackers
 
         private void BackupCallsProgramFlow(Dictionary<InstructionNode, List<InstructionNode>> CallWrappersFlowBackup)
         {
-            foreach (var callInstWrapper in InstructionWrappers.Where(x => CodeGroups.CallCodes.Contains(x.Instruction.OpCode.Code)))
+            foreach (var callInstWrapper in InstructionNodes.Where(x => CodeGroups.CallCodes.Contains(x.Instruction.OpCode.Code)))
             {
                 CallWrappersFlowBackup.Add(callInstWrapper, new List<InstructionNode>(callInstWrapper.ProgramFlowBackRoutes));
                 callInstWrapper.ProgramFlowBackRoutes.Clear();
@@ -109,7 +109,7 @@ namespace DoppleTry2.BackTrackers
 
         private void RestoreCallsProgramFlow(Dictionary<InstructionNode, List<InstructionNode>> CallWrappersFlowBackup)
         {
-            foreach (var callInstWrapper in InstructionWrappers.Where(x => CodeGroups.CallCodes.Contains(x.Instruction.OpCode.Code)))
+            foreach (var callInstWrapper in InstructionNodes.Where(x => CodeGroups.CallCodes.Contains(x.Instruction.OpCode.Code)))
             {
                 callInstWrapper.ProgramFlowBackRoutes.AddRangeTwoWay(CallWrappersFlowBackup[callInstWrapper]);
             }

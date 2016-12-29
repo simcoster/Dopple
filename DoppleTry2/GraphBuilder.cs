@@ -64,7 +64,7 @@ namespace DoppleTry2
             SetInstructionIndexes();
             AddStArgHelpers();
             BackTrace();
-            RemoveHelperCodes();
+            //RemoveHelperCodes();
             //MergeSimilarInstructions();
             PostMergeBackTrace();
             SetInstructionIndexes();
@@ -167,7 +167,7 @@ namespace DoppleTry2
             var inst = Instruction.Create(typeof(OpCodes).GetFields().Select(x => x.GetValue(null)).Cast<OpCode>().First(x => x.Code == Code.Nop));
             var nodeZero = InstructionWrapperFactory.GetInstructionWrapper(inst, metDef);
 
-            foreach (var firstNode in InstructionNodes.Where(x => x.DataFlowBackRelated.Count == 0 || x.FirstLineInstruction))
+            foreach (var firstNode in InstructionNodes.Where(x => x.DataFlowBackRelated.Count == 0))
             {
                 firstNode.DataFlowBackRelated.AddWithNewIndex(nodeZero);
             }
@@ -175,6 +175,7 @@ namespace DoppleTry2
             {
                 firstFromRecursion.DataFlowBackRelated.AddWithNewIndex(nodeZero);
             }
+            InstructionNodes[0].ProgramFlowBackRoutes.AddTwoWay(nodeZero);
             InstructionNodes.Add(nodeZero);
             SetInstructionIndexes();
         }
