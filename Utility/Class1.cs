@@ -12,47 +12,35 @@ namespace Utility
     {
         static void IfElse(int a)
         {
-            if (a == 3)
+            for (int i = 0; i < 5; i++)
             {
-                a++;
-            }
-            else
-            {
-                while (a > 5)
+                if (a==1)
                 {
-                    for (int i = 0; i < 5; i++)
-                    {
-                        if (a == 1)
-                        {
-                            a--;
-                        }
-                        else if (a == 2)
-                        {
-                            a++;
-                        }
-                    }
+                    a--;
                 }
-
-                a = 0;
+                else if (a==2)
+                {
+                    a++;
+                }
             }
-            a = 2;
+            a = a*5;
         }
 
-        //static void SwitchCase(int a)
-        //{
-        //    for (int i = 0; i < 5; i++)
-        //    {
-        //        switch (a)
-        //        {
-        //            case 1:
-        //                a--;
-        //                break;
-        //            case 2:
-        //                a++;
-        //                break;
-        //        }
-        //    }
-        //    a = 0;
-        //}
+        static void SwitchCase(int a)
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                switch (a)
+                {
+                    case 1:
+                        a--;
+                        break;
+                    case 2:
+                        a++;
+                        break;
+                }
+            }
+            a = a * 5;
+        }
     }
 }

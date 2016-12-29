@@ -32,13 +32,9 @@ namespace DoppleTry2.BackTrackers
             var currentNode = startNode;
             while (true)
             {
-                if (currentNode.ProgramFlowForwardRoutes.Count == 0)
+                if (currentNode.ProgramFlowForwardRoutes.Count == 0 || currentPath.Contains(currentNode))
                 {
                     currentPath.Add(currentNode);
-                    return new List<List<InstructionNode>>() { currentPath };
-                }
-                else if (currentPath.Contains(currentNode))
-                {
                     return new List<List<InstructionNode>>() { currentPath };
                 }
                 else if (currentNode.ProgramFlowForwardRoutes.Count ==1)
@@ -66,35 +62,30 @@ namespace DoppleTry2.BackTrackers
             }
         }
 
-        public override void AddBackDataflowConnections(InstructionNode currentInst)
+        public override void AddBackDataflowConnections(InstructionNode currentNode)
         {
-            if (allPossibleTracks == null)
+            var relevantTracks = MapAllPossibleExecutionRoutes(currentNode).Select(x => x.Skip(1));
+            List<InstructionNode> sharedNodes = relevantTracks.Aggregate((x, y) => x.Intersect(y).ToList()).ToList();
+            IEnumerable<InstructionNode> nodesInCondition;
+            if (sharedNodes.Count > 0)
             {
-                allPossibleTracks = MapAllPossibleExecutionRoutes(InstructionNodes[0]);
+                InstructionNode conditionEndNode = sharedNodes.First();
+                nodesInCondition = relevantTracks
+                                          .Select(x => x.TakeWhile(y => y != conditionEndNode))
+                                          .Aggregate((x, y) => x.Concat(y))
+                                          .Distinct();
             }
-            var relevantTracks = allPossibleTracks.Where(x => x.Contains(currentInst)).ToList();
-            foreach(var relevantTrack in relevantTracks)
+            else
             {
-                RotateList(relevantTrack,currentInst);
+                nodesInCondition = relevantTracks
+                                            .Where(x => x.Contains(currentNode))
+                                            .Aggregate((x, y) => x.Concat(y))
+                                            .Distinct();
             }
-            var sharedNodes = relevantTracks[0];
-            foreach(var relevantTrack in relevantTracks.Skip(1))
+          
+            foreach(var node in nodesInCondition)
             {
-                sharedNodes = sharedNodes.Intersect(relevantTrack).ToList();
-            }
-        }
-
-        private void RotateList(List<InstructionNode> relevantTrack, InstructionNode currentInst)
-        {
-            throw new NotImplementedException();
-        }
-
-        private List<InstructionNode> SearchForInConditionNodes(InstructionNode conditionNode)
-        {
-            // either you end with ret or with a node with number of avaiable tracks back to you
-            int routeCount = 0;
-            while (true)
-            {
+                node.ProgramFlowBackAffected.AddTwoWay(currentNode);
             }
         }
     }
