@@ -77,10 +77,23 @@ namespace DoppleTry2.BackTrackers
             }
             else
             {
-                nodesInCondition = relevantTracks
-                                            .Where(x => x.Contains(currentNode))
-                                            .Aggregate((x, y) => x.Concat(y))
-                                            .Distinct();
+                try
+                {
+                    var loopTracks = relevantTracks.Where(x => x.Contains(currentNode)).ToList();
+                    if (loopTracks.Count > 1)
+                    {
+                        nodesInCondition = loopTracks.Aggregate((x, y) => x.Concat(y)).Distinct();
+                    }
+                    else
+                    {
+                        nodesInCondition = loopTracks[0];
+                    }
+                }
+              catch
+                {
+                    nodesInCondition = new List<InstructionNode>();
+                    Debug.WriteLine("problem with current node");
+                }
             }
           
             foreach(var node in nodesInCondition)

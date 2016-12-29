@@ -64,8 +64,8 @@ namespace DoppleTry2
             SetInstructionIndexes();
             AddStArgHelpers();
             BackTrace();
-            //RemoveHelperCodes();
-            //MergeSimilarInstructions();
+            RemoveHelperCodes();
+            MergeSimilarInstructions();
             PostMergeBackTrace();
             SetInstructionIndexes();
             Veirify();
@@ -252,7 +252,7 @@ namespace DoppleTry2
 
         private void MergeLdArgs()
         {
-            List<InstructionNode> doneWrappers = new List<InstructionNode>();
+            var doneWrappers = new List<InstructionNode>();
             var ldArgGroups = InstructionNodes.Where(x => x is LdArgInstructionNode)
                                                  .Cast<FunctionArgInstWrapper>()
                                                  .GroupBy(x => new { x.ArgIndex, x.Method })

@@ -173,8 +173,15 @@ namespace DoppleGraph
             }
             foreach (var flowAffectingNode in nodeWrapper.InstructionWrapper.ProgramFlowBackAffected)
             {
-                DrawEdge(nodeWrapper, myView, flowAffectingNode, Color.LightPink);
+                try
+                {
+                    DrawEdge(nodeWrapper, myView, flowAffectingNode, Color.LightPink);
 
+                }
+                catch
+                {
+
+                }
             }
             var allLinks = myView.Document.Where(x => x is GoLink).Cast<GoLink>().Select(y => y.PenColor);
         }
@@ -273,8 +280,8 @@ namespace DoppleGraph
             {
                 try
                 {
-                    //var nodesToUpdate = node.InstructionWrapper.DataFlowForwardRelated
-                    var nodesToUpdate = node.InstructionWrapper.ProgramFlowForwardRoutes
+                    var nodesToUpdate = node.InstructionWrapper.DataFlowForwardRelated
+                    //var nodesToUpdate = node.InstructionWrapper.ProgramFlowForwardRoutes
                    .Select(x => GetNodeWrapper(x))
                    .Where(x => x.LongestPath.Count == 0 || !x.LongestPath.Intersect(node.LongestPath).SequenceEqual(x.LongestPath))
                    .Where(x => x.LongestPath.Count < node.LongestPath.Count + 1)
