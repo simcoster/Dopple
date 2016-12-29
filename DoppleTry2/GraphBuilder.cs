@@ -29,7 +29,7 @@ namespace DoppleTry2
         {
             metDef = methodDefinition;
             InstructionNodes =
-                methodDefinition.Body.Instructions.Select(x => InstructionWrapperFactory.GetInstructionWrapper(x, methodDefinition)).ToList();
+                methodDefinition.Body.Instructions.Select(x => InstructionNodeFactory.GetInstructionWrapper(x, methodDefinition)).ToList();
             foreach (var inst in InstructionNodes)
             {
                 inst.InstructionIndex = InstructionNodes.IndexOf(inst);
@@ -165,7 +165,7 @@ namespace DoppleTry2
         private void AddZeroNode()
         {
             var inst = Instruction.Create(typeof(OpCodes).GetFields().Select(x => x.GetValue(null)).Cast<OpCode>().First(x => x.Code == Code.Nop));
-            var nodeZero = InstructionWrapperFactory.GetInstructionWrapper(inst, metDef);
+            var nodeZero = InstructionNodeFactory.GetInstructionWrapper(inst, metDef);
 
             foreach (var firstNode in InstructionNodes.Where(x => x.DataFlowBackRelated.Count == 0))
             {
@@ -210,11 +210,11 @@ namespace DoppleTry2
 
         private void MergeImmediateValue()
         {
-            foreach (var imeddiateValueNode in InstructionNodes.Where(x => x is LdImmediateInstWrapper).Cast<LdImmediateInstWrapper>().ToList())
+            foreach (var imeddiateValueNode in InstructionNodes.Where(x => x is LdImmediateInstNode).Cast<LdImmediateInstNode>().ToList())
             {
                 var instsToMerge = InstructionNodes
-                    .Where(x => x is LdImmediateInstWrapper)
-                    .Cast<LdImmediateInstWrapper>()
+                    .Where(x => x is LdImmediateInstNode)
+                    .Cast<LdImmediateInstNode>()
                     .Where(x => imeddiateValueNode.ImmediateIntValue == x.ImmediateIntValue)
                     .ToArray();
                 if (instsToMerge.Length > 0)
@@ -228,7 +228,7 @@ namespace DoppleTry2
         private void MergeLdLocs()
         {
             var grouped = new List<InstructionNode>();
-            foreach (var ldLocSameIndex in InstructionNodes.Where(x => x is LocationLoadInstructionWrapper).Cast<LocationLoadInstructionWrapper>().GroupBy(x => x.LocIndex))
+            foreach (var ldLocSameIndex in InstructionNodes.Where(x => x is LocationLoadInstructionNode).Cast<LocationLoadInstructionNode>().GroupBy(x => x.LocIndex))
             {
                 foreach(var ldLocWrapper in ldLocSameIndex)
                 {
@@ -253,7 +253,7 @@ namespace DoppleTry2
         private void MergeLdArgs()
         {
             List<InstructionNode> doneWrappers = new List<InstructionNode>();
-            var ldArgGroups = InstructionNodes.Where(x => x is LdArgInstructionWrapper)
+            var ldArgGroups = InstructionNodes.Where(x => x is LdArgInstructionNode)
                                                  .Cast<FunctionArgInstWrapper>()
                                                  .GroupBy(x => new { x.ArgIndex, x.Method })
                                                  .Where(x => x.Count() >1)

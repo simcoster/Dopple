@@ -67,10 +67,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BackTrackers\ConditionionalsBackTracer.cs" />
+    <Compile Include="InstructionModifiers\SetStackPopPushForCalls.cs" />
     <Compile Include="InstructionWrapperMembers\ProgramFlowBackAffected.cs" />
     <Compile Include="InstructionWrapperMembers\ProgramFlowBackRoutes.cs" />
     <Compile Include="InstructionWrapperMembers\RelatedList.cs" />
-    <Compile Include="InstructionWrappers\LdElemInstructionWrapper.cs" />
+    <Compile Include="InstructionWrappers\ExternalCallInstructionNode.cs" />
+    <Compile Include="InstructionWrappers\LdElemInstructionNode.cs" />
     <Compile Include="Verifier\ArgIndexVerifier.cs" />
     <Compile Include="InstructionWrapperMembers\BackArgList.cs" />
     <Compile Include="BackSearcher.cs" />
@@ -93,12 +95,12 @@
     <Compile Include="InstructionModifiers\AddHelperRetsModifer.cs" />
     <Compile Include="InstructionModifiers\StArgAdder.cs" />
     <Compile Include="InstructionWrappers\ArgType.cs" />
-    <Compile Include="InstructionWrappers\CallInstructionWrapper.cs" />
+    <Compile Include="InstructionWrappers\InternalCallInstructionNode.cs" />
     <Compile Include="InstructionWrappers\InliningProperties.cs" />
-    <Compile Include="InstructionWrappers\InstructionWrapperFactory.cs" />
-    <Compile Include="InstructionWrappers\FunctionArgInstWrapper.cs" />
-    <Compile Include="InstructionWrappers\LdImmediateInstWrapper.cs" />
-    <Compile Include="InstructionWrappers\TempLocationInstructionWrapper.cs" />
+    <Compile Include="InstructionWrappers\InstructionNodeFactory.cs" />
+    <Compile Include="InstructionWrappers\LdArgInstructionNode.cs" />
+    <Compile Include="InstructionWrappers\LdImmediateInstNode.cs" />
+    <Compile Include="InstructionWrappers\LocationStoreInstructionNode.cs" />
     <Compile Include="LinqExtention.cs" />
     <Compile Include="OpcodeProperties\DataflowProperties.cs" />
     <Compile Include="OpcodeProperties\InstructionPropertiesHandler.cs" />
@@ -108,7 +110,7 @@
     <Compile Include="InstructionModifiers\IModifier.cs" />
     <Compile Include="InstructionModifiers\InlineCall.cs" />
     <Compile Include="InstructionModifiers\RemoveUselessModifier.cs" />
-    <Compile Include="InstructionWrappers\InstructionWrapper.cs" />
+    <Compile Include="InstructionWrappers\InstructionNode.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="ProgramFlowHanlder\MultiplePathsHandler.cs" />
     <Compile Include="ProgramFlowHanlder\ProgramFlowManager.cs" />

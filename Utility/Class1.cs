@@ -12,18 +12,11 @@ namespace Utility
     {
         static void IfElse(int a)
         {
-            for (int i = 0; i < 5; i++)
+            if (a > 5)
             {
-                if (a==1)
-                {
-                    a--;
-                }
-                else if (a==2)
-                {
-                    a++;
-                }
+                a = 2;
             }
-            a = a*5;
+            Console.Write(Math.Abs(-6));
         }
 
         static void SwitchCase(int a)

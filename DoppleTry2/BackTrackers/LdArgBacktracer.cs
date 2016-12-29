@@ -21,11 +21,11 @@ namespace DoppleTry2.BackTrackers
             if (instWrapper.InliningProperties.Inlined)
             {
                 return _SingleIndexBackSearcher.SearchBackwardsForDataflowInstrcutions(x => x is StArgInstructionWrapper &&
-                                                                    ((StArgInstructionWrapper)x).ArgIndex == ((LdArgInstructionWrapper)instWrapper).ArgIndex, instWrapper);
+                                                                    ((StArgInstructionWrapper)x).ArgIndex == ((LdArgInstructionNode)instWrapper).ArgIndex, instWrapper);
             }
             else
             {
-                return _SingleIndexBackSearcher.SafeSearchBackwardsForDataflowInstrcutions(x => x is StArgInstructionWrapper && ((StArgInstructionWrapper)x).ArgIndex == ((LdArgInstructionWrapper)instWrapper).ArgIndex, instWrapper);
+                return _SingleIndexBackSearcher.SafeSearchBackwardsForDataflowInstrcutions(x => x is StArgInstructionWrapper && ((StArgInstructionWrapper)x).ArgIndex == ((LdArgInstructionNode)instWrapper).ArgIndex, instWrapper);
             }
         }
 

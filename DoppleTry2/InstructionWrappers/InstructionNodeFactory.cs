@@ -6,18 +6,24 @@ using System.Linq;
 
 namespace DoppleTry2.InstructionNodes
 {
-    public class InstructionWrapperFactory
+    public class InstructionNodeFactory
     {
         public static InstructionNode GetInstructionWrapper(Instruction instruction, MethodDefinition method)
         {
-            if (CodeGroups.CallCodes.Contains(instruction.OpCode.Code)
-                && instruction.Operand is MethodDefinition)
+            if (CodeGroups.CallCodes.Contains(instruction.OpCode.Code))
             {
-                return new CallInstructionWrapper(instruction, method);
+                if (instruction.Operand is MethodDefinition)
+                {
+                    return new InternalCallInstructionNode(instruction, method);
+                }
+                else
+                {
+                    return new ExternalCallInstructionNode(instruction, method);
+                }
             }
             else if (CodeGroups.LdArgCodes.Contains(instruction.OpCode.Code))
             {
-                return new LdArgInstructionWrapper(instruction, method);
+                return new LdArgInstructionNode(instruction, method);
             }
             else if (CodeGroups.StArgCodes.Contains(instruction.OpCode.Code))
             {
@@ -25,19 +31,19 @@ namespace DoppleTry2.InstructionNodes
             }
             else if (CodeGroups.LdLocCodes.Contains(instruction.OpCode.Code))
             {
-                return new LocationLoadInstructionWrapper(instruction, method);
+                return new LocationLoadInstructionNode(instruction, method);
             }
             else if (CodeGroups.StLocCodes.Contains(instruction.OpCode.Code))
             {
-                return new LocationStoreInstructionWrapper(instruction, method);
+                return new LocationStoreInstructionNode(instruction, method);
             }
             else if (CodeGroups.LdImmediateFromOperandCodes.Concat(CodeGroups.LdImmediateValueCodes).Contains(instruction.OpCode.Code))
             {
-                return new LdImmediateInstWrapper(instruction, method);
+                return new LdImmediateInstNode(instruction, method);
             }
             else if (CodeGroups.LdElemCodes.Contains(instruction.OpCode.Code))
             {
-                return new LdElemInstructionWrapper(instruction, method);
+                return new LdElemInstructionNode(instruction, method);
             }
             else
             {

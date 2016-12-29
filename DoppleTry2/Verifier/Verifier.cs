@@ -35,8 +35,8 @@ namespace DoppleTry2.VerifierNs
             {
                 return true;
             }
-            if (insturctionWrapper is LdArgInstructionWrapper &&
-            ((LdArgInstructionWrapper)insturctionWrapper).ArgType.IsArray)
+            if (insturctionWrapper is LdArgInstructionNode &&
+            ((LdArgInstructionNode)insturctionWrapper).ArgType.IsArray)
             {
                 return true;
             }
@@ -48,11 +48,11 @@ namespace DoppleTry2.VerifierNs
         }
         public bool IsProvidingNumber(InstructionNode instructionWrapper)
         {
-            if (instructionWrapper is LdImmediateInstWrapper)
+            if (instructionWrapper is LdImmediateInstNode)
             {
                 return true;
             }
-            if (instructionWrapper is LdArgInstructionWrapper && ((LdArgInstructionWrapper)instructionWrapper).ArgType.IsPrimitive)
+            if (instructionWrapper is LdArgInstructionNode && ((LdArgInstructionNode)instructionWrapper).ArgType.IsPrimitive)
             {
                 return true;
             }

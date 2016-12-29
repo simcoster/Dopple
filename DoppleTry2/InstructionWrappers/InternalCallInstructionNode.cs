@@ -5,9 +5,9 @@ using System.Linq;
 
 namespace DoppleTry2.InstructionNodes
 {
-    public class CallInstructionWrapper : InstructionNode
+    public class InternalCallInstructionNode : InstructionNode
     {
-        public CallInstructionWrapper(Instruction instruction, MethodDefinition method) : base(instruction, method)
+        public InternalCallInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
             CalledFunction = (MethodDefinition)Instruction.Operand;
         }

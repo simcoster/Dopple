@@ -5,10 +5,10 @@ using System.Linq;
 
 namespace DoppleTry2.InstructionNodes
 {
-    class LdImmediateInstWrapper : InstructionNode
+    class LdImmediateInstNode : InstructionNode
     {
         public int ImmediateIntValue { get; private set; }
-        public LdImmediateInstWrapper(Instruction instruction, MethodDefinition method) : base(instruction, method)
+        public LdImmediateInstNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
             ImmediateIntValue = GetImmediateInt(instruction);
         }

@@ -5,9 +5,9 @@ using System.Linq;
 
 namespace DoppleTry2.InstructionNodes
 {
-    public class LdArgInstructionWrapper : FunctionArgInstWrapper
+    public class LdArgInstructionNode : FunctionArgInstWrapper
     {
-        public LdArgInstructionWrapper(Instruction instruction, MethodDefinition method) : base(instruction, method)
+        public LdArgInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
             if (instruction.Operand == null && !method.IsStatic)
             {

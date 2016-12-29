@@ -12,7 +12,7 @@ namespace DoppleTry2.InstructionModifiers
 {
     public class StArgAdder : IModifier
     {
-        private static List<InstructionNode> InsertHelperSTargs(List<InstructionNode> instructionWrappers, CallInstructionWrapper callInstWrapper)
+        private static List<InstructionNode> InsertHelperSTargs(List<InstructionNode> instructionWrappers, InternalCallInstructionNode callInstWrapper)
         {
             var addedInstructions = new List<InstructionNode>();
             var calledFunc = callInstWrapper.CalledFunction;
@@ -25,7 +25,7 @@ namespace DoppleTry2.InstructionModifiers
                     foreach (var argProvidingWrapper in argProvidingWrappers)
                     {
                         Instruction opcode = Instruction.Create(OpCodes.Starg, calledFunc.Parameters[i]);
-                        var stArgWrapper = (StArgInstructionWrapper)InstructionWrapperFactory.GetInstructionWrapper(opcode, calledFunc);
+                        var stArgWrapper = (StArgInstructionWrapper)InstructionNodeFactory.GetInstructionWrapper(opcode, calledFunc);
                         AddStArgInst(instructionWrappers, addedInstructions, calledFunc, i, argProvidingWrapper, stArgWrapper);
                     }
                 }
@@ -38,7 +38,7 @@ namespace DoppleTry2.InstructionModifiers
                     foreach (var argProvidingWrapper in argProvidingWrappers)
                     {
                         Instruction opcode = Instruction.Create(OpCodes.Starg, calledFunc.Parameters[i -1]);
-                        var stArgWrapper = (StArgInstructionWrapper)InstructionWrapperFactory.GetInstructionWrapper(opcode, calledFunc);
+                        var stArgWrapper = (StArgInstructionWrapper)InstructionNodeFactory.GetInstructionWrapper(opcode, calledFunc);
                         AddStArgInst(instructionWrappers, addedInstructions, calledFunc, i, argProvidingWrapper, stArgWrapper);
                     }
                 }
@@ -74,9 +74,9 @@ namespace DoppleTry2.InstructionModifiers
         public void Modify(List<InstructionNode> instructionWrappers)
         {
             var callInstructions = instructionWrappers
-                                    .Where(x => x is CallInstructionWrapper && x.InliningProperties.Inlined)
+                                    .Where(x => x is InternalCallInstructionNode && x.InliningProperties.Inlined)
                                     .OrderByDescending(x => instructionWrappers.IndexOf(x))
-                                    .Cast<CallInstructionWrapper>()
+                                    .Cast<InternalCallInstructionNode>()
                                     .ToArray();
             foreach (var callInst in callInstructions)
             {

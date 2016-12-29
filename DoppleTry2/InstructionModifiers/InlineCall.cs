@@ -19,7 +19,7 @@ namespace DoppleTry2.InstructionModifiers
         public void Modify(List<InstructionNode> instructionWrappers)
         {
             int recursionInstanceIndex = 1;
-            foreach (var nestedCallInstWrapper in instructionWrappers.Where(x => x is CallInstructionWrapper).Cast<CallInstructionWrapper>().ToArray())
+            foreach (var nestedCallInstWrapper in instructionWrappers.Where(x => x is InternalCallInstructionNode).Cast<InternalCallInstructionNode>().ToArray())
             {
                 var inlinedInstWrappers = GetDeepInlineRec(nestedCallInstWrapper, new List<MethodDefinition>() { instructionWrappers[0].Method });
                 if (inlinedInstWrappers.Count == 0)
@@ -41,7 +41,7 @@ namespace DoppleTry2.InstructionModifiers
                     }
                     recursionInstanceIndex++;
                 }
-                foreach(var inlinedCallInst in instructionWrappers.Where(x => x is CallInstructionWrapper && x.InliningProperties.Inlined))
+                foreach(var inlinedCallInst in instructionWrappers.Where(x => x is InternalCallInstructionNode && x.InliningProperties.Inlined))
                 {
                     foreach(var forwardInst in inlinedCallInst.ProgramFlowForwardRoutes.ToList())
                     {
@@ -71,13 +71,9 @@ namespace DoppleTry2.InstructionModifiers
             }
         }
 
-        List<InstructionNode> GetDeepInlineRec(InstructionNode callInstWrapper, List<MethodDefinition> callSequence)
+        List<InstructionNode> GetDeepInlineRec(InternalCallInstructionNode callInstWrapper, List<MethodDefinition> callSequence)
         {
-            if (!(callInstWrapper is CallInstructionWrapper))
-            {
-                throw new Exception("only user functions should be inlined");
-            }
-            var calledFunc = (MethodDefinition)callInstWrapper.Instruction.Operand;
+            MethodDefinition calledFunc = callInstWrapper.CalledFunction;
             if (callSequence.Count(x => x == calledFunc) > 1)
             {
                 return new List<InstructionNode>();
@@ -87,10 +83,10 @@ namespace DoppleTry2.InstructionModifiers
                 var callSequenceClone = new List<MethodDefinition>(callSequence);
                 callSequenceClone.Add(calledFunc);
                 var calledFuncInstructions = calledFunc.Body.Instructions.ToList();
-                var calledFuncInstWrappers = calledFuncInstructions.Select(x => InstructionWrapperFactory.GetInstructionWrapper(x, calledFunc)).ToList();
+                var calledFuncInstWrappers = calledFuncInstructions.Select(x => InstructionNodeFactory.GetInstructionWrapper(x, calledFunc)).ToList();
                 programFlowHanlder.AddFlowConnections(calledFuncInstWrappers);
                 InFuncBackTrace(calledFuncInstWrappers);
-                foreach (var nestedCallInstWrapper in calledFuncInstWrappers.Where(x => x is CallInstructionWrapper).ToArray())
+                foreach (var nestedCallInstWrapper in calledFuncInstWrappers.Where(x => x is InternalCallInstructionNode).Cast<InternalCallInstructionNode>().ToArray())
                 {
                     int instWrapperIndex = calledFuncInstWrappers.IndexOf(nestedCallInstWrapper);
                     var inlinedInstWrappers = GetDeepInlineRec(nestedCallInstWrapper, callSequenceClone);

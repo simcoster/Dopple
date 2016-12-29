@@ -39,8 +39,8 @@ namespace DoppleTry2.BackTrackers
                 {
                     visitedNodes.Add(backNode);
                 }
-                bool mustBacktraceCurrentFirst = backNode.StackPopCount != 0;
-                if (mustBacktraceCurrentFirst)
+                bool mustRecurseFirst = backNode.StackPopCount != 0;
+                if (mustRecurseFirst)
                 {
                     AddBackDataflowConnections(backNode);
                 }
@@ -74,29 +74,6 @@ namespace DoppleTry2.BackTrackers
             }
             currentInst.StackPopCount = 0;
         }
-
-        //public void TryAddBackDataflowConnectionsInFuncBoundry(InstructionWrapper currentInst)
-        //{
-        //    var CallWrappersFlowBackup = new Dictionary<InstructionWrapper, List<InstructionWrapper>>();
-        //    BackupCallsProgramFlow(CallWrappersFlowBackup);
-        //    var backRelatedGroups = new List<List<InstructionWrapper>>();
-        //    for (int i = currentInst.StackPopCount; i > 0; i--)
-        //    {
-        //        var argumentGroup = SafeSearchBackwardsForDataflowInstrcutions(InstructionWrappers, x => x.StackPushCount > 0, currentInst);
-        //        if (argumentGroup.Count == 0)
-        //        {
-        //            return;
-        //        }
-        //        currentInst.BackDataFlowRelated.AddWithNewIndex(argumentGroup);
-        //        currentInst.StackPopCount--;
-        //        foreach (var backInst in argumentGroup)
-        //        {
-        //            backInst.ForwardDataFlowRelated.AddWithNewIndex(currentInst);
-        //            backInst.StackPushCount--;
-        //        }
-        //    }
-        //    RestoreCallsProgramFlow(CallWrappersFlowBackup);
-        //}
 
         private void BackupCallsProgramFlow(Dictionary<InstructionNode, List<InstructionNode>> CallWrappersFlowBackup)
         {

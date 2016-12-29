@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace DoppleTry2.InstructionNodes
 {
-    public class LdElemInstructionWrapper : InstructionNode
+    public class LdElemInstructionNode : InstructionNode
     {
-        public LdElemInstructionWrapper(Instruction instruction, MethodDefinition method) : base(instruction, method)
+        public LdElemInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
             DataFlowBackRelated.MaxArgIndex = 2;
         }
