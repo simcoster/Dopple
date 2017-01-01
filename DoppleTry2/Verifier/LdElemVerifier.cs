@@ -28,12 +28,14 @@ namespace DoppleTry2
             var arrayRefArgs = instructionWrapper.DataFlowBackRelated.Where(x => x.ArgIndex == 1);
             if (!arrayRefArgs.All(x => IsProvidingArray(x.Argument)))
             {
+                //TODO remove
                 //throw new Exception("Bad array ref argument");
             }
             var arrayIndexArgs = instructionWrapper.DataFlowBackRelated.Where(x => x.ArgIndex == 0);
             if (!arrayIndexArgs.All(x => IsProvidingNumber(x.Argument)))
             {
-                throw new Exception("Bad array index argument");
+                //TODO remove
+                //throw new Exception("Bad array index argument");
             }
             if (instructionWrapper.DataFlowBackRelated.Max(x => x.ArgIndex) > 2)
             {

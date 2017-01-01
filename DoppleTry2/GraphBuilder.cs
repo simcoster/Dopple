@@ -37,7 +37,6 @@ namespace DoppleTry2
 
             _preBacktraceModifiers = new IPreBacktraceModifier[] { new InlineCallModifier(), new RemoveUselessModifier() };
 
-            //_postBacktraceModifiers = new IPostBackTraceModifier[] { new RecursionStArgModifier() };
             _postBacktraceModifiers = new IPostBackTraceModifier[] { };
 
             _backTracers =
@@ -46,7 +45,6 @@ namespace DoppleTry2
                     new StackPopBackTracer(InstructionNodes),
                     new LdArgBacktracer(InstructionNodes),
                     new LdStaticFieldBackTracer(InstructionNodes),
-                    //new LoadArrayElemBackTracer(InstructionWrappers),
                     new LoadFieldByStackBackTracer(InstructionNodes),
                     new LoadMemoryByOperandBackTracer(InstructionNodes),
                     new TypedReferenceBackTracer(InstructionNodes),
@@ -64,8 +62,8 @@ namespace DoppleTry2
             SetInstructionIndexes();
             AddStArgHelpers();
             BackTrace();
-            RemoveHelperCodes();
-            MergeSimilarInstructions();
+            //RemoveHelperCodes();
+            //MergeSimilarInstructions();
             PostMergeBackTrace();
             SetInstructionIndexes();
             Veirify();
@@ -91,9 +89,8 @@ namespace DoppleTry2
         {
             MergeLdArgs();
             MergeImmediateValue();
-            //MergeLdLocs();
-            MergeRecursionParalel();
-            MergeEquivilentPairs();
+            //MergeRecursionParalel();
+            //MergeEquivilentPairs();
         }
 
         private void MergeEquivilentPairs()
@@ -115,7 +112,6 @@ namespace DoppleTry2
                                         .Where(x => x.DataFlowBackRelated.Equals(firstInst.DataFlowBackRelated))
                                         .Where(x => !x.DataFlowBackRelated.SelfFeeding)
                                         .FirstOrDefault();
-                                        //.FirstOrDefault(x => !DifferentArgumentsToSameInst(x, firstInst));
                     if (secondInst != null)
                     {
                         MergeInsts(new[] { firstInst, secondInst });
@@ -148,9 +144,10 @@ namespace DoppleTry2
         {
             RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.StLocCodes.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.LdLocCodes.Contains(x.Instruction.OpCode.Code)));
-            RemoveInstWrappers(InstructionNodes.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code)));
+            //RemoveInstWrappers(InstructionNodes.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.LdArgCodes.Contains(x.Instruction.OpCode.Code) && x.InliningProperties.Inlined));
-            RemoveInstWrappers(InstructionNodes.Where(x => new[] { Code.Call, Code.Calli, Code.Callvirt }.Contains(x.Instruction.OpCode.Code) && x.InliningProperties.Inlined));
+            //TODO remove
+            //RemoveInstWrappers(InstructionNodes.Where(x => new[] { Code.Call, Code.Calli, Code.Callvirt }.Contains(x.Instruction.OpCode.Code) && x.InliningProperties.Inlined));
             RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Ret && x.InliningProperties.Inlined));
             RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Dup));
         }
@@ -191,7 +188,13 @@ namespace DoppleTry2
                 }
                 foreach (var backTracer in backTracers)
                 {
-                    backTracer.AddBackDataflowConnections(instWrapper);
+                    //TODO remove
+                    try
+                    {
+                        backTracer.AddBackDataflowConnections(instWrapper);
+                    }
+                    catch
+                    { }
                 }
             }
         }

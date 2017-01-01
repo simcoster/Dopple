@@ -11,8 +11,6 @@ namespace DoppleTry2.BackTrackers
 {
     class ConditionionalsBackTracer : BackTracer
     {
-        private List<List<InstructionNode>> allPossibleTracks;
-
         public ConditionionalsBackTracer(List<InstructionNode> instructionNodes) : base(instructionNodes)
         {
         }
@@ -77,9 +75,10 @@ namespace DoppleTry2.BackTrackers
             }
             else
             {
+                //TODO change this
                 try
                 {
-                    var loopTracks = relevantTracks.Where(x => x.Contains(currentNode)).ToList();
+                    List<IEnumerable<InstructionNode>> loopTracks = relevantTracks.Where(x => x.Contains(currentNode)).ToList();
                     if (loopTracks.Count > 1)
                     {
                         nodesInCondition = loopTracks.Aggregate((x, y) => x.Concat(y)).Distinct();
@@ -89,11 +88,11 @@ namespace DoppleTry2.BackTrackers
                         nodesInCondition = loopTracks[0];
                     }
                 }
-              catch
+                catch
                 {
                     nodesInCondition = new List<InstructionNode>();
-                    Debug.WriteLine("problem with current node");
                 }
+                    
             }
           
             foreach(var node in nodesInCondition)
