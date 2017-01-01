@@ -14,43 +14,31 @@ namespace DoppleTry2.InstructionModifiers
     class InlineCallModifier : IPreBacktraceModifier
     {
         public static readonly Code[] CallOpCodes = CodeGroups.CallCodes;
-        ProgramFlowManager programFlowHanlder = new ProgramFlowManager();
+        readonly ProgramFlowManager programFlowHanlder = new ProgramFlowManager();
 
         public void Modify(List<InstructionNode> instructionNodes)
         {
             int recursionInstanceIndex = 1;
-            foreach (var nestedCallInstWrapper in instructionNodes.Where(x => x is InternalCallInstructionNode).Cast<InternalCallInstructionNode>().ToArray())
+            foreach (var callNode in instructionNodes.Where(x => x is InternalCallInstructionNode).Cast<InternalCallInstructionNode>().ToArray())
             {
-                var inlinedInstNodes = GetDeepInlineRec(nestedCallInstWrapper, new List<MethodDefinition>() { instructionNodes[0].Method });
+                List<InstructionNode> oldCallForwardNodes = callNode.ProgramFlowForwardRoutes;
+                List<InstructionNode> inlinedInstNodes = GetDeepInlineRec(callNode, new List<MethodDefinition>() { instructionNodes[0].Method });
                 if (inlinedInstNodes.Count == 0)
                 {
                     continue;
                 }
-                int instWrapperIndex = instructionNodes.IndexOf(nestedCallInstWrapper);
+                int instWrapperIndex = instructionNodes.IndexOf(callNode);
                 instructionNodes.InsertRange(instWrapperIndex + 1, inlinedInstNodes);
-                foreach (var inlinedInstNode in inlinedInstNodes)
+                foreach (var inlinedEndNode in inlinedInstNodes.Where(x => x.ProgramFlowForwardRoutes.Count == 0))
                 {
-                    inlinedInstNode.InliningProperties.Inlined = true;
-                    if (inlinedInstNode is InternalCallInstructionNode)
-                    {
-                        foreach (var forwardInst in inlinedInstNode.ProgramFlowForwardRoutes.ToList())
-                        {
-                            forwardInst.ProgramFlowBackRoutes.RemoveTwoWay(inlinedInstNode);
-                        }
-                        var newNextInstIndex = instructionNodes.IndexOf(inlinedInstNode) + 1;
-                        instructionNodes[newNextInstIndex].ProgramFlowBackRoutes.AddTwoWay(inlinedInstNode);
-                    }
+                    StitchProgramFlow(inlinedEndNode, ) 
                 }
-                if (nestedCallInstWrapper.CalledFunction == nestedCallInstWrapper.Method)
+                if (callNode.CalledFunction == callNode.Method)
                 {
                     foreach(var inst in inlinedInstNodes)
                     {
                         inst.InliningProperties.RecursionInstanceIndex = recursionInstanceIndex;
                         inst.InliningProperties.Recursive = true;
-                        if (inst is InternalCallInstructionNode && ((InternalCallInstructionNode) inst).CalledFunction == nestedCallInstWrapper.CalledFunction)
-                        {
-                            inlinedInstNodes[0].ProgramFlowBackRoutes.AddTwoWay(inst);
-                        }
                     }
                     recursionInstanceIndex++;
                 }
@@ -75,9 +63,11 @@ namespace DoppleTry2.InstructionModifiers
             }
         }
 
-        List<InstructionNode> GetDeepInlineRec(InternalCallInstructionNode callInstWrapper, List<MethodDefinition> callSequence)
+
+        //TODO this is all messed up, needs to be changed
+        List<InstructionNode> GetDeepInlineRec(InternalCallInstructionNode callNode, List<MethodDefinition> callSequence)
         {
-            MethodDefinition calledFunc = callInstWrapper.CalledFunction;
+            MethodDefinition calledFunc = callNode.CalledFunction;
             if (callSequence.Count(x => x == calledFunc) > 1)
             {
                 return new List<InstructionNode>();
@@ -86,27 +76,38 @@ namespace DoppleTry2.InstructionModifiers
             {
                 var callSequenceClone = new List<MethodDefinition>(callSequence);
                 callSequenceClone.Add(calledFunc);
-                var calledFuncInstructions = calledFunc.Body.Instructions.ToList();
-                var calledFuncInstNodes = calledFuncInstructions.Select(x => InstructionNodeFactory.GetInstructionWrapper(x, calledFunc)).ToList();
+                List<InstructionNode> calledFuncInstNodes = calledFunc.Body.Instructions.Select(x => InstructionNodeFactory.GetInstructionWrapper(x, calledFunc)).ToList();
                 programFlowHanlder.AddFlowConnections(calledFuncInstNodes);
                 InFuncBackTrace(calledFuncInstNodes);
-                foreach (var nestedCallInstWrapper in calledFuncInstNodes.Where(x => x is InternalCallInstructionNode).Cast<InternalCallInstructionNode>().ToArray())
+                if (calledFuncInstNodes.Count > 0)
                 {
-                    int instWrapperIndex = calledFuncInstNodes.IndexOf(nestedCallInstWrapper);
-                    var inlinedInstNodes = GetDeepInlineRec(nestedCallInstWrapper, callSequenceClone);
+                    StitchProgramFlow(callNode, calledFuncInstNodes[0]);
+                }
+                foreach (var nestedCallNode in calledFuncInstNodes.Where(x => x is InternalCallInstructionNode).Cast<InternalCallInstructionNode>().ToArray())
+                {
+                    int instWrapperIndex = calledFuncInstNodes.IndexOf(callNode);
+                    var inlinedInstNodes = GetDeepInlineRec(callNode, callSequenceClone);
                     if (inlinedInstNodes.Count > 0)
                     {
                         calledFuncInstNodes.InsertRange(instWrapperIndex + 1, inlinedInstNodes);
-                        foreach (var forwardFlowInst in nestedCallInstWrapper.ProgramFlowForwardRoutes.ToList())
-                        {
-                            forwardFlowInst.ProgramFlowBackRoutes.RemoveTwoWay(nestedCallInstWrapper);
-                        }
-                        inlinedInstNodes[0].ProgramFlowBackRoutes.AddTwoWay(nestedCallInstWrapper);
+                    }
+                    else if (nestedCallNode.CalledFunction == callNode.CalledFunction)
+                    {
+                        calledFuncInstNodes[0].ProgramFlowBackRoutes.AddTwoWay(nestedCallNode);
                     }
                 }
-                callInstWrapper.InliningProperties.Inlined = true;
+                callNode.InliningProperties.Inlined = true;
                 return calledFuncInstNodes;
             }
+        }
+
+        private static void StitchProgramFlow(InternalCallInstructionNode backNode, InstructionNode forwardNode)
+        {
+            foreach (var forwardFlowInst in backNode.ProgramFlowForwardRoutes.ToList())
+            {
+                forwardFlowInst.ProgramFlowBackRoutes.RemoveTwoWay(backNode);
+            }
+            forwardNode.ProgramFlowBackRoutes.AddTwoWay(backNode);
         }
 
         private void InFuncBackTrace(List<InstructionNode> calledFuncInstructions)
