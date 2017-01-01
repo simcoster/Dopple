@@ -18,7 +18,7 @@ namespace DoppleTry2.ProgramFlowHanlder
                 Except(_unhandledCodes).ToArray();
         }
 
-        private readonly Code[] _unhandledCodes = new[] { Code.Br, Code.Br_S };
+        private readonly Code[] _unhandledCodes = new[] { Code.Br, Code.Br_S, Code.Ret };
 
         public override Code[] HandledCodes { get; }
 

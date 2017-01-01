@@ -65,17 +65,6 @@ namespace DoppleTry2.InstructionNodes
                 return 0;
                 //return ((Mono.Cecil.MethodReference) instruction.Operand).Parameters.Count;
             }
-            else if (instruction.OpCode.Code == Code.Ret)
-            {
-                if (Method.ReturnType.FullName == "System.Void")
-                {
-                    return 0;
-                }
-                else
-                {
-                    return 1;
-                }
-            }
             else if (Instruction.OpCode.StackBehaviourPop == StackBehaviour.Pop0)
             {
                 return 0;

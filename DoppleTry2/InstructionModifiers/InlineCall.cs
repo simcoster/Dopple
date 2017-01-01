@@ -31,7 +31,7 @@ namespace DoppleTry2.InstructionModifiers
                 instructionNodes.InsertRange(instWrapperIndex + 1, inlinedInstNodes);
                 foreach (var inlinedEndNode in inlinedInstNodes.Where(x => x.ProgramFlowForwardRoutes.Count == 0))
                 {
-                    StitchProgramFlow(inlinedEndNode, ) 
+                    StitchProgramFlow(inlinedEndNode, oldCallForwardNodes); 
                 }
                 if (callNode.CalledFunction == callNode.Method)
                 {
@@ -43,30 +43,13 @@ namespace DoppleTry2.InstructionModifiers
                     recursionInstanceIndex++;
                 }
             }
-
-            foreach (var retCall in instructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Ret && x != instructionNodes.Last()))
-            {
-                int retCallIndex = instructionNodes.IndexOf(retCall);
-                instructionNodes[retCallIndex + 1].ProgramFlowBackRoutes.AddTwoWay(retCall);
-                retCall.ProgramFlowResolveDone = true;
-                if (retCall.Instruction.OpCode.Code == Code.Ret)
-                {
-                    if (retCall.Method.ReturnType.FullName == "System.Void")
-                    {
-                        retCall.StackPushCount = 0;
-                    }
-                    else
-                    {
-                        retCall.StackPushCount = 1;
-                    }
-                }
-            }
         }
 
 
         //TODO this is all messed up, needs to be changed
         List<InstructionNode> GetDeepInlineRec(InternalCallInstructionNode callNode, List<MethodDefinition> callSequence)
         {
+            List<InstructionNode> oldForwardNodes = callNode.ProgramFlowForwardRoutes;
             MethodDefinition calledFunc = callNode.CalledFunction;
             if (callSequence.Count(x => x == calledFunc) > 1)
             {
@@ -90,6 +73,10 @@ namespace DoppleTry2.InstructionModifiers
                     if (inlinedInstNodes.Count > 0)
                     {
                         calledFuncInstNodes.InsertRange(instWrapperIndex + 1, inlinedInstNodes);
+                        foreach(var endNode in inlinedInstNodes.Where(x => x.ProgramFlowForwardRoutes.Count == 0))
+                        {
+                            StitchProgramFlow(endNode, oldForwardNodes);
+                        }
                     }
                     else if (nestedCallNode.CalledFunction == callNode.CalledFunction)
                     {
@@ -101,21 +88,29 @@ namespace DoppleTry2.InstructionModifiers
             }
         }
 
-        private static void StitchProgramFlow(InternalCallInstructionNode backNode, InstructionNode forwardNode)
+        private static void StitchProgramFlow(InstructionNode backNode, InstructionNode forwardNode)
+        {
+            StitchProgramFlow(backNode, new InstructionNode[] { forwardNode });
+        }
+
+        private static void StitchProgramFlow(InstructionNode backNode, IEnumerable<InstructionNode> forwardNodes)
         {
             foreach (var forwardFlowInst in backNode.ProgramFlowForwardRoutes.ToList())
             {
                 forwardFlowInst.ProgramFlowBackRoutes.RemoveTwoWay(backNode);
             }
-            forwardNode.ProgramFlowBackRoutes.AddTwoWay(backNode);
+            foreach(var newForwardNode in forwardNodes)
+            {
+                newForwardNode.ProgramFlowBackRoutes.AddTwoWay(backNode);
+            }
         }
 
         private void InFuncBackTrace(List<InstructionNode> calledFuncInstructions)
         {
-            LdLocBackTracer LoadLocationBacktracer = new LdLocBackTracer(calledFuncInstructions);
-            foreach(var inst in calledFuncInstructions.Where(x => LoadLocationBacktracer.HandlesCodes.Contains(x.Instruction.OpCode.Code)).OrderByDescending(x => x.InstructionIndex))
+            var loadLocationBacktracer = new LdLocBackTracer(calledFuncInstructions);
+            foreach(var inst in calledFuncInstructions.Where(x => loadLocationBacktracer.HandlesCodes.Contains(x.Instruction.OpCode.Code)).OrderByDescending(x => x.InstructionIndex))
             {
-                LoadLocationBacktracer.AddBackDataflowConnections(inst);
+                loadLocationBacktracer.AddBackDataflowConnections(inst);
             }
         }
     }

@@ -14,22 +14,18 @@ namespace DoppleTry2.ProgramFlowHanlder
             {
                 visited = new List<InstructionNode>();
             }
-            List<InstructionNode> prevInstructions = new List<InstructionNode>();
+            var prevInstructions = new List<InstructionNode>();
             if (startInstruction.ProgramFlowBackRoutes.Count == 0)
             {
-                return prevInstructions;
-            }
-            if (CodeGroups.CallCodes.Concat(new[] { Code.Ret }).Contains( startInstruction.Instruction.OpCode.Code ))
-            {
-                return prevInstructions;
+                return new List<InstructionNode>();
             }
             if (visited.Contains(startInstruction))
             {
-                return prevInstructions;
+                return new List<InstructionNode>();
             }
             visited.Add(startInstruction);
 
-            var recursivePrevConnected = startInstruction.ProgramFlowBackRoutes.SelectMany(x => GetAllPreviousConnected(x, visited));
+            IEnumerable<InstructionNode> recursivePrevConnected = startInstruction.ProgramFlowBackRoutes.SelectMany(x => GetAllPreviousConnected(x, visited));
             prevInstructions.AddRange(recursivePrevConnected);
             prevInstructions.Add(startInstruction);
             return prevInstructions;

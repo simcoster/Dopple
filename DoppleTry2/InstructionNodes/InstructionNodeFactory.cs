@@ -45,6 +45,10 @@ namespace DoppleTry2.InstructionNodes
             {
                 return new LdElemInstructionNode(instruction, method);
             }
+            else if (instruction.OpCode.Code == Code.Ret)
+            {
+                return new RetInstructionNode(instruction, method);
+            }
             else
             {
                 return new InstructionNode(instruction, method);
