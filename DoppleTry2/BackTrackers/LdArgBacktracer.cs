@@ -14,7 +14,7 @@ namespace DoppleTry2.BackTrackers
         {
             stackPopBacktracer = new StackPopBackTracer(instructionNodes);
         }
-        private StackPopBackTracer stackPopBacktracer;
+        private readonly StackPopBackTracer stackPopBacktracer;
         protected override IEnumerable<InstructionNode> GetDataflowBackRelatedArgGroup(InstructionNode instNode)
         {
             if (instNode.InliningProperties.Inlined)
