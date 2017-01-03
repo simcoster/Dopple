@@ -35,7 +35,7 @@ namespace DoppleTry2.InstructionWrapperMembers
             base.Add(toAdd);
             GetRelatedList(toAdd).Add(_ContainingNode);
         }
-        public void AddRangeTwoWay(IEnumerable<InstructionNode> rangeToAdd)
+        public void AddTwoWay(IEnumerable<InstructionNode> rangeToAdd)
         {
             foreach (var backArgToAdd in rangeToAdd)
             {

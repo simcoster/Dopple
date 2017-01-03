@@ -18,6 +18,7 @@ namespace DoppleTry2.InstructionNodes
             }
             else
             {
+                StackPopCount = 1;
                 StackPushCount = 1;
             }
         }

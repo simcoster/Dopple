@@ -92,7 +92,6 @@ namespace DoppleTry2.BackTrackers
                 {
                     nodesInCondition = new List<InstructionNode>();
                 }
-                    
             }
           
             foreach(var node in nodesInCondition)

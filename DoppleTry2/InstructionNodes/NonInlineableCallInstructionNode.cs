@@ -1,11 +1,12 @@
-﻿using Mono.Cecil;
+﻿using System;
+using Mono.Cecil;
 using Mono.Cecil.Cil;
 
 namespace DoppleTry2.InstructionNodes
 {
-    internal class ExternalCallInstructionNode : InstructionNode
+    internal class NonInlineableCallInstructionNode : InstructionNode
     {
-        public ExternalCallInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
+        public NonInlineableCallInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
             var targetMethod = (MethodReference) instruction.Operand;
             StackPopCount = targetMethod.Parameters.Count;

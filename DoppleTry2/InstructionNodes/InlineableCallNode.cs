@@ -5,11 +5,12 @@ using System.Linq;
 
 namespace DoppleTry2.InstructionNodes
 {
-    public class InternalCallInstructionNode : InstructionNode
+    public class InlineableCallNode : InstructionNode
     {
-        public InternalCallInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
+        public InlineableCallNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
             CalledFunction = (MethodDefinition)Instruction.Operand;
+            StackPopCount = CalledFunction.Parameters.Count;
         }
         public MethodDefinition CalledFunction { get; private set; }
     }

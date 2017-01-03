@@ -5,14 +5,10 @@ using System.Linq;
 
 namespace DoppleTry2.InstructionNodes
 {
-    public class LdArgInstructionNode : FunctionArgInstWrapper
+    public class LdArgInstructionNode : FunctionArgInstNode
     {
         public LdArgInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
-            if (instruction.Operand == null && !method.IsStatic)
-            {
-                //ArgIndex++;
-            }
         }
         protected override bool TryGetCodeArgIndex(Instruction instruction, out int index)
         {
@@ -37,12 +33,12 @@ namespace DoppleTry2.InstructionNodes
         }
     }
 
-    public class StArgInstructionWrapper : FunctionArgInstWrapper
+    public class StArgInstructionNode : FunctionArgInstNode
     {
-        public StArgInstructionWrapper(Instruction instruction, MethodDefinition method) : base(instruction, method) { }
+        public StArgInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method) { }
     }
 
-    public class StThisArgInstructionWrapper : StArgInstructionWrapper
+    public class StThisArgInstructionWrapper : StArgInstructionNode
     {
         public StThisArgInstructionWrapper(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
@@ -52,9 +48,9 @@ namespace DoppleTry2.InstructionNodes
         }
     }
 
-    public abstract class FunctionArgInstWrapper : InstructionNode
+    public abstract class FunctionArgInstNode : InstructionNode
     {
-        public FunctionArgInstWrapper(Instruction instruction, MethodDefinition method) : base(instruction, method)
+        public FunctionArgInstNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
             ArgIndex = GetArgIndex(instruction, method);
             string argNameTemp;

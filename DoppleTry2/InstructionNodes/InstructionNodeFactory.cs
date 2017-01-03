@@ -14,11 +14,11 @@ namespace DoppleTry2.InstructionNodes
             {
                 if (instruction.Operand is MethodDefinition)
                 {
-                    return new InternalCallInstructionNode(instruction, method);
+                    return new InlineableCallNode(instruction, method);
                 }
                 else
                 {
-                    return new ExternalCallInstructionNode(instruction, method);
+                    return new NonInlineableCallInstructionNode(instruction, method);
                 }
             }
             else if (CodeGroups.LdArgCodes.Contains(instruction.OpCode.Code))
@@ -27,7 +27,7 @@ namespace DoppleTry2.InstructionNodes
             }
             else if (CodeGroups.StArgCodes.Contains(instruction.OpCode.Code))
             {
-                return new StArgInstructionWrapper(instruction, method);
+                return new StArgInstructionNode(instruction, method);
             }
             else if (CodeGroups.LdLocCodes.Contains(instruction.OpCode.Code))
             {

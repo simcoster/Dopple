@@ -18,7 +18,9 @@ namespace Utility
             }
             else
             {
-                return AddRec(arr, toSearch, toSearch + 1);
+                var a =  AddRec(arr, toSearch, toSearch + 1);
+                a = toSearch;
+                return a;
             }
         }
 

@@ -60,7 +60,7 @@ namespace DoppleTry2
             PreInlineBackTrace();
             InlineFunctionCalls();
             SetInstructionIndexes();
-            AddStArgHelpers();
+            //AddStArgHelpers();
             BackTrace();
             //RemoveHelperCodes();
             //MergeSimilarInstructions();
@@ -154,7 +154,7 @@ namespace DoppleTry2
 
         void AddStArgHelpers()
         {
-            StArgAdder stArgAdder = new StArgAdder();
+            StArgAddModifier stArgAdder = new StArgAddModifier();
             stArgAdder.Modify(InstructionNodes);
             SetInstructionIndexes();
         }
@@ -166,12 +166,12 @@ namespace DoppleTry2
 
             foreach (var firstNode in InstructionNodes.Where(x => x.DataFlowBackRelated.Count == 0))
             {
-                firstNode.DataFlowBackRelated.AddWithNewIndex(nodeZero);
+                firstNode.DataFlowBackRelated.AddTwoWay(nodeZero);
             }
-            foreach(var firstFromRecursion in InstructionNodes.Where(x => BackSearcher.GetBackDataTree(x).Contains(x) && CodeGroups.LdArgCodes.Contains(x.Instruction.OpCode.Code)))
-            {
-                firstFromRecursion.DataFlowBackRelated.AddWithNewIndex(nodeZero);
-            }
+            //foreach(var firstFromRecursion in InstructionNodes.Where(x => BackSearcher.GetBackDataTree(x).Contains(x) && CodeGroups.LdArgCodes.Contains(x.Instruction.OpCode.Code)))
+            //{
+            //    firstFromRecursion.DataFlowBackRelated.AddWithNewIndex(nodeZero);
+            //}
             InstructionNodes[0].ProgramFlowBackRoutes.AddTwoWay(nodeZero);
             InstructionNodes.Add(nodeZero);
             SetInstructionIndexes();
@@ -188,13 +188,7 @@ namespace DoppleTry2
                 }
                 foreach (var backTracer in backTracers)
                 {
-                    //TODO remove
-                    try
-                    {
-                        backTracer.AddBackDataflowConnections(instWrapper);
-                    }
-                    catch
-                    { }
+                    backTracer.AddBackDataflowConnections(instWrapper);
                 }
             }
         }
@@ -257,7 +251,7 @@ namespace DoppleTry2
         {
             var doneWrappers = new List<InstructionNode>();
             var ldArgGroups = InstructionNodes.Where(x => x is LdArgInstructionNode)
-                                                 .Cast<FunctionArgInstWrapper>()
+                                                 .Cast<FunctionArgInstNode>()
                                                  .GroupBy(x => new { x.ArgIndex, x.Method })
                                                  .Where(x => x.Count() >1)
                                                  .ToList();
@@ -314,13 +308,13 @@ namespace DoppleTry2
             {
                 foreach (var backDataNode in wrapperToRemove.DataFlowBackRelated.ToList())
                 {
-                    instWrapperToKeep.DataFlowBackRelated.AddWithExistingIndex(backDataNode);
+                    instWrapperToKeep.DataFlowBackRelated.AddTwoWay(backDataNode);
                     wrapperToRemove.DataFlowBackRelated.RemoveTwoWay(backDataNode);
                 }
                 foreach (var forwardDataNode in wrapperToRemove.DataFlowForwardRelated.ToList())
                 {
                     var forwardBackRelated = forwardDataNode.DataFlowBackRelated.First(x => x.Argument == wrapperToRemove);
-                    forwardDataNode.DataFlowBackRelated.AddWithExistingIndex(instWrapperToKeep, forwardBackRelated.ArgIndex);
+                    forwardDataNode.DataFlowBackRelated.AddTwoWay(instWrapperToKeep, forwardBackRelated.ArgIndex);
                     forwardDataNode.DataFlowBackRelated.RemoveTwoWay(forwardBackRelated);
                 }
                 instWrapperToKeep.DataFlowBackRelated.CheckNumberings();
@@ -353,7 +347,7 @@ namespace DoppleTry2
                 foreach (var forInst in wrapperToRemove.DataFlowForwardRelated.ToArray())
                 {
                     var backArgToRemove = forInst.DataFlowBackRelated.First(x => x.Argument == wrapperToRemove);
-                    forInst.DataFlowBackRelated.AddMultipleWithExistingIndex(wrapperToRemove.DataFlowBackRelated.Select(x => x.Argument), backArgToRemove.ArgIndex);
+                    forInst.DataFlowBackRelated.AddTwoWay(wrapperToRemove.DataFlowBackRelated.Select(x => x.Argument), backArgToRemove.ArgIndex);
                     forInst.DataFlowBackRelated.RemoveTwoWay(backArgToRemove);
                     forInst.DataFlowBackRelated.CheckNumberings();
                 }
@@ -364,7 +358,7 @@ namespace DoppleTry2
                 foreach(var forwardBackFlowInst in wrapperToRemove.ProgramFlowForwardRoutes.ToList())
                 {
                     forwardBackFlowInst.ProgramFlowBackRoutes.RemoveAllTwoWay(x => x == wrapperToRemove);
-                    forwardBackFlowInst.ProgramFlowBackRoutes.AddRangeTwoWay(wrapperToRemove.ProgramFlowBackRoutes);
+                    forwardBackFlowInst.ProgramFlowBackRoutes.AddTwoWay(wrapperToRemove.ProgramFlowBackRoutes);
                 }
                 foreach(var backFlowInst in wrapperToRemove.ProgramFlowBackRoutes.ToList())
                 {

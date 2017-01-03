@@ -29,7 +29,7 @@ namespace DoppleTry2.BackTrackers
 
             foreach (var backRelatedGroup in backRelatedGroups)
             {
-                currentInst.DataFlowBackRelated.AddWithNewIndex(backRelatedGroup);
+                currentInst.DataFlowBackRelated.AddTwoWaySingleIndex(backRelatedGroup);
             }
             currentInst.DoneBackTracers.Add(GetType());
         }

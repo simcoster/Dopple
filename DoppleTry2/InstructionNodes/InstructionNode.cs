@@ -24,7 +24,6 @@ namespace DoppleTry2.InstructionNodes
             ProgramFlowBackAffected = new ProgramFlowBackAffected(this);
         }
 
-
         public ProgramFlowBackRoutes ProgramFlowBackRoutes { get; set; }
         public List<InstructionNode> ProgramFlowForwardRoutes = new List<InstructionNode>();
         public List<InstructionNode> DataFlowForwardRelated = new List<InstructionNode>();

@@ -19,13 +19,17 @@ namespace DoppleTry2.InstructionModifiers
         public void Modify(List<InstructionNode> instructionNodes)
         {
             int recursionInstanceIndex = 1;
-            foreach (var callNode in instructionNodes.Where(x => x is InternalCallInstructionNode).Cast<InternalCallInstructionNode>().ToArray())
+            foreach (var callNode in instructionNodes.Where(x => x is InlineableCallNode).Cast<InlineableCallNode>().ToArray())
             {
-                List<InstructionNode> oldCallForwardNodes = callNode.ProgramFlowForwardRoutes;
+                List<InstructionNode> oldCallForwardNodes = callNode.ProgramFlowForwardRoutes.ToList();
                 List<InstructionNode> inlinedInstNodes = GetDeepInlineRec(callNode, new List<MethodDefinition>() { instructionNodes[0].Method });
                 if (inlinedInstNodes.Count == 0)
                 {
                     continue;
+                }
+                foreach (var inst in inlinedInstNodes)
+                {
+                    inst.InliningProperties.Inlined = true;
                 }
                 int instWrapperIndex = instructionNodes.IndexOf(callNode);
                 instructionNodes.InsertRange(instWrapperIndex + 1, inlinedInstNodes);
@@ -46,10 +50,11 @@ namespace DoppleTry2.InstructionModifiers
         }
 
 
+
         //TODO this is all messed up, needs to be changed
-        List<InstructionNode> GetDeepInlineRec(InternalCallInstructionNode callNode, List<MethodDefinition> callSequence)
+        List<InstructionNode> GetDeepInlineRec(InlineableCallNode callNode, List<MethodDefinition> callSequence)
         {
-            List<InstructionNode> oldForwardNodes = callNode.ProgramFlowForwardRoutes;
+            List<InstructionNode> oldForwardNodes = callNode.ProgramFlowForwardRoutes.ToList();
             MethodDefinition calledFunc = callNode.CalledFunction;
             if (callSequence.Count(x => x == calledFunc) > 1)
             {
@@ -61,12 +66,14 @@ namespace DoppleTry2.InstructionModifiers
                 callSequenceClone.Add(calledFunc);
                 List<InstructionNode> calledFuncInstNodes = calledFunc.Body.Instructions.Select(x => InstructionNodeFactory.GetInstructionWrapper(x, calledFunc)).ToList();
                 programFlowHanlder.AddFlowConnections(calledFuncInstNodes);
-                InFuncBackTrace(calledFuncInstNodes);
+                
+                //TODO check if this is neccesary
+                //InFuncBackTrace(calledFuncInstNodes);
                 if (calledFuncInstNodes.Count > 0)
                 {
                     StitchProgramFlow(callNode, calledFuncInstNodes[0]);
                 }
-                foreach (var nestedCallNode in calledFuncInstNodes.Where(x => x is InternalCallInstructionNode).Cast<InternalCallInstructionNode>().ToArray())
+                foreach (var nestedCallNode in calledFuncInstNodes.Where(x => x is InlineableCallNode).Cast<InlineableCallNode>().ToArray())
                 {
                     int instWrapperIndex = calledFuncInstNodes.IndexOf(callNode);
                     var inlinedInstNodes = GetDeepInlineRec(callNode, callSequenceClone);
@@ -80,11 +87,48 @@ namespace DoppleTry2.InstructionModifiers
                     }
                     else if (nestedCallNode.CalledFunction == callNode.CalledFunction)
                     {
-                        calledFuncInstNodes[0].ProgramFlowBackRoutes.AddTwoWay(nestedCallNode);
+                        //var nonInlinedCallNode = ReplaceWithNonInlineable(nestedCallNode, calledFuncInstNodes);
+                        var oldForwardPaths = nestedCallNode.ProgramFlowForwardRoutes.ToList();
+                        StitchProgramFlow(nestedCallNode, calledFuncInstNodes[0]);
+                        IEnumerable<InstructionNode> inaccessiblePaths = oldForwardPaths.Where(x => x.ProgramFlowBackRoutes.Count == 0);
+                        foreach(var inaccessbilePath in inaccessiblePaths)
+                        {
+                            RemovePathUntilJunction(calledFuncInstNodes, inaccessbilePath);
+                        }
                     }
                 }
                 callNode.InliningProperties.Inlined = true;
                 return calledFuncInstNodes;
+            }
+        }
+
+        private NonInlineableCallInstructionNode ReplaceWithNonInlineable(InlineableCallNode nodeToReplace, List<InstructionNode> calledFuncInstNodes)
+        {
+            var clonedNode = new NonInlineableCallInstructionNode(nodeToReplace.Instruction, nodeToReplace.Method);
+            foreach(var backNode in nodeToReplace.ProgramFlowBackRoutes.ToList())
+            {
+                clonedNode.ProgramFlowBackRoutes.AddTwoWay(backNode);
+                nodeToReplace.ProgramFlowBackRoutes.RemoveTwoWay(backNode);
+            }
+            foreach(var forwardNode in nodeToReplace.ProgramFlowForwardRoutes.ToList())
+            {
+                forwardNode.ProgramFlowBackRoutes.AddTwoWay(clonedNode);
+                forwardNode.ProgramFlowBackRoutes.RemoveTwoWay(nodeToReplace);
+            }
+            calledFuncInstNodes[calledFuncInstNodes.IndexOf(nodeToReplace)] = clonedNode;
+            return clonedNode;
+        }
+
+        private static void RemovePathUntilJunction(List<InstructionNode> calledFuncInstNodes, InstructionNode inaccessbileNode)
+        {
+            var currentNode = inaccessbileNode;
+            if (inaccessbileNode.ProgramFlowBackRoutes.Count < 2)
+            {
+                calledFuncInstNodes.Remove(inaccessbileNode);
+                foreach(var nextNode in inaccessbileNode.ProgramFlowForwardRoutes)
+                {
+                    RemovePathUntilJunction(calledFuncInstNodes, nextNode);
+                }
             }
         }
 

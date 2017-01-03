@@ -72,7 +72,7 @@
     <Compile Include="InstructionWrapperMembers\ProgramFlowBackAffected.cs" />
     <Compile Include="InstructionWrapperMembers\ProgramFlowBackRoutes.cs" />
     <Compile Include="InstructionWrapperMembers\RelatedList.cs" />
-    <Compile Include="InstructionNodes\ExternalCallInstructionNode.cs" />
+    <Compile Include="InstructionNodes\NonInlineableCallInstructionNode.cs" />
     <Compile Include="InstructionNodes\LdElemInstructionNode.cs" />
     <Compile Include="Verifier\ArgIndexVerifier.cs" />
     <Compile Include="InstructionWrapperMembers\BackArgList.cs" />
@@ -94,9 +94,9 @@
     <Compile Include="OpcodeProperties\CodeMemoryRefCount.cs" />
     <Compile Include="InstructionWrapperMembers\IndexedArgument.cs" />
     <Compile Include="InstructionModifiers\AddHelperRetsModifer.cs" />
-    <Compile Include="InstructionModifiers\StArgAdder.cs" />
+    <Compile Include="InstructionModifiers\StArgAddModifier.cs" />
     <Compile Include="InstructionNodes\ArgType.cs" />
-    <Compile Include="InstructionNodes\InternalCallInstructionNode.cs" />
+    <Compile Include="InstructionNodes\InlineableCallNode.cs" />
     <Compile Include="InstructionNodes\InliningProperties.cs" />
     <Compile Include="InstructionNodes\InstructionNodeFactory.cs" />
     <Compile Include="InstructionNodes\LdArgInstructionNode.cs" />
@@ -109,7 +109,7 @@
     <Compile Include="ProgramFlowHanlder\BrProgramFlowHandler.cs" />
     <Compile Include="ProgramFlowHanlder\ProgramFlowHandler.cs" />
     <Compile Include="InstructionModifiers\IModifier.cs" />
-    <Compile Include="InstructionModifiers\InlineCall.cs" />
+    <Compile Include="InstructionModifiers\InlineCallModifier.cs" />
     <Compile Include="InstructionModifiers\RemoveUselessModifier.cs" />
     <Compile Include="InstructionNodes\InstructionNode.cs" />
     <Compile Include="Program.cs" />

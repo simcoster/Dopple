@@ -61,12 +61,18 @@ namespace DoppleTry2.BackTrackers
             for (int i = 0; i < currentInst.StackPopCount; i++)
             {
                 var argumentGroup = SearchAndAddDataflowInstrcutions(currentInst);
-                if (argumentGroup.Count() ==0
-                    )
+                if (argumentGroup.Count() ==0)
                 {
                     throw new Exception("Couldn't find back data connections");
                 }
-                currentInst.DataFlowBackRelated.AddWithNewIndex(argumentGroup);
+                if (CodeGroups.CallCodes.Contains(currentInst.Instruction.OpCode.Code))
+                {
+                    currentInst.DataFlowBackRelated.AddTwoWay(argumentGroup, currentInst.StackPopCount-i-1);
+                }
+                else
+                {
+                    currentInst.DataFlowBackRelated.AddTwoWaySingleIndex(argumentGroup);
+                }
                 foreach (InstructionNode arg in argumentGroup)
                 {
                     arg.StackPushCount--;
@@ -88,7 +94,7 @@ namespace DoppleTry2.BackTrackers
         {
             foreach (var callInstWrapper in InstructionNodes.Where(x => CodeGroups.CallCodes.Contains(x.Instruction.OpCode.Code)))
             {
-                callInstWrapper.ProgramFlowBackRoutes.AddRangeTwoWay(CallWrappersFlowBackup[callInstWrapper]);
+                callInstWrapper.ProgramFlowBackRoutes.AddTwoWay(CallWrappersFlowBackup[callInstWrapper]);
             }
         }
 
@@ -97,9 +103,10 @@ namespace DoppleTry2.BackTrackers
                     .Select(x => x.GetValue(null))
                     .Cast<OpCode>()
                     .Where(x => x.StackBehaviourPop != StackBehaviour.Pop0)
-                    .Select(x => x.Code).ToArray();
+                    .Select(x => x.Code)
+                    .ToArray();
 
-        public StackPopBackTracer(List<InstructionNode> instructionWrappers) : base(instructionWrappers)
+        public StackPopBackTracer(List<InstructionNode> instructionNodes) : base(instructionNodes)
         {
         }
     }

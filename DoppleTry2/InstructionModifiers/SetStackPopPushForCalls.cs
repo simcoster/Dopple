@@ -11,7 +11,7 @@ namespace DoppleTry2.InstructionModifiers
     {
         public void Modify(List<InstructionNode> instructionNodes)
         {
-            foreach(var callNode in instructionNodes.Where(x => x is InternalCallInstructionNode))
+            foreach(var callNode in instructionNodes.Where(x => x is InlineableCallNode))
             {
 
             }

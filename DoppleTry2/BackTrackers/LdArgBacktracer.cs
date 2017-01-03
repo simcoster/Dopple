@@ -10,22 +10,30 @@ namespace DoppleTry2.BackTrackers
 {
     class LdArgBacktracer : SingeIndexBackTracer
     {
-        public LdArgBacktracer(List<InstructionNode> instructionsWrappers) : base(instructionsWrappers)
+        public LdArgBacktracer(List<InstructionNode> instructionNodes) : base(instructionNodes)
         {
+            stackPopBacktracer = new StackPopBackTracer(instructionNodes);
         }
-
-        protected override IEnumerable<InstructionNode> GetDataflowBackRelatedArgGroup(InstructionNode instWrapper)
+        private StackPopBackTracer stackPopBacktracer;
+        protected override IEnumerable<InstructionNode> GetDataflowBackRelatedArgGroup(InstructionNode instNode)
         {
-            List<List<InstructionNode>> backRelated = new List<List<InstructionNode>>();
-            List<InstructionNode> stArgInst = new List<InstructionNode>();
-            if (instWrapper.InliningProperties.Inlined)
+            if (instNode.InliningProperties.Inlined)
             {
-                return _SingleIndexBackSearcher.SearchBackwardsForDataflowInstrcutions(x => x is StArgInstructionWrapper &&
-                                                                    ((StArgInstructionWrapper)x).ArgIndex == ((LdArgInstructionNode)instWrapper).ArgIndex, instWrapper);
+                IEnumerable<InlineableCallNode> inlinedCalls = _SingleIndexBackSearcher.SearchBackwardsForDataflowInstrcutions(x => x is InlineableCallNode,instNode).Cast<InlineableCallNode>();
+                var argSuppliers = new List<InstructionNode>();
+                foreach(var inlinedCall in inlinedCalls)
+                {
+                    if (inlinedCall.StackPopCount > 0)
+                    {
+                        stackPopBacktracer.AddBackDataflowConnections(inlinedCall);
+                    }
+                    argSuppliers.AddRange(inlinedCall.DataFlowBackRelated.Where(x => x.ArgIndex == ((LdArgInstructionNode) instNode).ArgIndex).Select(x => x.Argument));
+                }
+                return argSuppliers;          
             }
             else
             {
-                return _SingleIndexBackSearcher.SafeSearchBackwardsForDataflowInstrcutions(x => x is StArgInstructionWrapper && ((StArgInstructionWrapper)x).ArgIndex == ((LdArgInstructionNode)instWrapper).ArgIndex, instWrapper);
+                return _SingleIndexBackSearcher.SafeSearchBackwardsForDataflowInstrcutions(x => x is StArgInstructionNode && ((StArgInstructionNode)x).ArgIndex == ((LdArgInstructionNode)instNode).ArgIndex, instNode);
             }
         }
 

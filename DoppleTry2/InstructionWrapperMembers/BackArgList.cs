@@ -65,7 +65,7 @@ namespace DoppleTry2
             var indexedToAdd = new IndexedArgument(GetNewIndex(), toAdd);
             AddTwoWay(indexedToAdd);
         }
-        public void AddRangeTwoWay(IEnumerable<IndexedArgument> rangeToAdd)
+        public void AddTwoWay(IEnumerable<IndexedArgument> rangeToAdd)
         {
             foreach (var backArgToAdd in rangeToAdd)
             {
@@ -73,51 +73,28 @@ namespace DoppleTry2
             }
         }
 
-        public void AddWithNewIndex(IEnumerable<InstructionNode> backInstructions)
+        public void AddTwoWaySingleIndex(IEnumerable<InstructionNode> backInstructions)
         {
             int index = GetNewIndex();
-            AddRangeTwoWay(backInstructions.Select(x => new IndexedArgument(index, x)));
-            CheckNumberings();
+            AddTwoWay(backInstructions.Select(x => new IndexedArgument(index, x)));
         }
-        public void AddWithNewIndexes(IEnumerable<InstructionNode> instructionWrappers)
-        {
-            foreach (var instWrapper in instructionWrappers)
-            {
-                AddWithNewIndex(instWrapper);
-            }
-        }
-        public void AddWithExistingIndex(InstructionNode backInstruction , int index)
+        public void AddTwoWay(InstructionNode backInstruction , int index)
         {
             if (this.Any(x => x.ArgIndex == index && x.Argument == backInstruction))
             {
+                //TODO to prevent clones
                 return;
             }
             AddTwoWay(new IndexedArgument(index, backInstruction));
-            CheckNumberings();
         }
-        public void AddWithExistingIndex(IndexedArgument indexedArg)
+
+        public void AddTwoWay(IEnumerable<InstructionNode> instructionNodes, int index)
         {
-            AddWithExistingIndex(indexedArg.Argument,indexedArg.ArgIndex);
-        }
-        public void AddMultipleWithExistingIndex(IEnumerable<InstructionNode> instructionWrappers, int index)
-        {
-            foreach(var instWrapper in instructionWrappers)
+            foreach(var instWrapper in instructionNodes)
             {
-                AddWithExistingIndex(instWrapper, index);
+                AddTwoWay(instWrapper, index);
             }
         }       
-
-        public void AddPreserveIndexes(BackArgList argList)
-        {
-            AddRangeTwoWay(argList);
-            CheckNumberings();
-        }
-        
-        public void AddWithNewIndex(InstructionNode backInst)
-        {
-            AddWithNewIndex(new[] { backInst });
-            CheckNumberings();
-        }     
 
         private int GetNewIndex()
         {

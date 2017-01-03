@@ -280,8 +280,8 @@ namespace DoppleGraph
             {
                 try
                 {
-                    //var nodesToUpdate = node.InstructionWrapper.DataFlowForwardRelated
-                    var nodesToUpdate = node.InstructionWrapper.ProgramFlowForwardRoutes
+                    var nodesToUpdate = node.InstructionWrapper.DataFlowForwardRelated
+                    //var nodesToUpdate = node.InstructionWrapper.ProgramFlowForwardRoutes
                    .Select(x => GetNodeWrapper(x))
                    .Where(x => x.LongestPath.Count == 0 || !x.LongestPath.Intersect(node.LongestPath).SequenceEqual(x.LongestPath))
                    .Where(x => x.LongestPath.Count < node.LongestPath.Count + 1)
@@ -367,9 +367,9 @@ namespace DoppleGraph
                 {
                     goNodeWrapper.Node.Text += ((MethodReference)goNodeWrapper.InstructionWrapper.Instruction.Operand).Name ?? " ";
                 }
-                else if (goNodeWrapper.InstructionWrapper is FunctionArgInstWrapper)
+                else if (goNodeWrapper.InstructionWrapper is FunctionArgInstNode)
                 {
-                    var ArgInstWrapper = (FunctionArgInstWrapper)goNodeWrapper.InstructionWrapper;
+                    var ArgInstWrapper = (FunctionArgInstNode)goNodeWrapper.InstructionWrapper;
                     goNodeWrapper.Node.Text += " " + ArgInstWrapper.ArgName + " " + ArgInstWrapper.ArgIndex;
                 }
                 else if (goNodeWrapper.InstructionWrapper.Instruction.Operand != null)
@@ -389,7 +389,6 @@ namespace DoppleGraph
             foreach (var nodeWrapper in nodeWrappers)
             {
                 DrawDataLinks(nodeWrapper, myView);
-                //AcomodateFlowForRemovedNodes();
                 DrawFlowLinks(nodeWrapper, myView);
             }
         }
