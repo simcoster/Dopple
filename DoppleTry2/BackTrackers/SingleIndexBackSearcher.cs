@@ -32,7 +32,7 @@ namespace DoppleTry2.BackTrackers
             return startInstruction.ProgramFlowBackRoutes.SelectMany(x => SafeSearchBackwardsForDataflowInstrcutions(InstructionWrappers, predicate, x, new List<InstructionNode>())).ToList();
         }
 
-        public List<InstructionNode> SafeSearchBackwardsForDataflowInstrcutions(List<InstructionNode> InstructionWrappers, Func<InstructionNode, bool> predicate,
+        public List<InstructionNode> SafeSearchBackwardsForDataflowInstrcutions(List<InstructionNode> InstructionNodes, Func<InstructionNode, bool> predicate,
         InstructionNode startInstruction, List<InstructionNode> visitedInstructions)
         {
             if (visitedInstructions == null)
@@ -40,11 +40,13 @@ namespace DoppleTry2.BackTrackers
                 visitedInstructions = new List<InstructionNode>();
             }
             var foundInstructions = new List<InstructionNode>();
-            int index = InstructionWrappers.IndexOf(startInstruction);
+            int index = InstructionNodes.IndexOf(startInstruction);
             if (index < 0)
-                throw new Exception("shouldn't get here");
+                //TODO change
+                //throw new Exception("shouldn't get here");
+                return new List<InstructionNode>();
 
-            var currInstruction = InstructionWrappers[index];
+            var currInstruction = InstructionNodes[index];
             if (visitedInstructions.Contains(currInstruction))
             {
                 return new List<InstructionNode>();
@@ -64,7 +66,7 @@ namespace DoppleTry2.BackTrackers
                 foreach (var instructionWrapper in currInstruction.ProgramFlowBackRoutes)
                 {
                     IEnumerable<InstructionNode> branchindexes =
-                        SafeSearchBackwardsForDataflowInstrcutions(InstructionWrappers, predicate, instructionWrapper, visitedInstructions);
+                        SafeSearchBackwardsForDataflowInstrcutions(InstructionNodes, predicate, instructionWrapper, visitedInstructions);
                     foundInstructions.AddRange(branchindexes);
                 }
             }

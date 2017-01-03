@@ -17,7 +17,7 @@ namespace DoppleTry2
             {
                 visited = new List<InstructionNode>();
             }
-            var instWrapper = startInst;
+            InstructionNode instWrapper = startInst;
             while (true)
             {
                 if (visited.Contains(instWrapper))
