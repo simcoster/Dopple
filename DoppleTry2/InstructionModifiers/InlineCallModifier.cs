@@ -66,9 +66,6 @@ namespace DoppleTry2.InstructionModifiers
                 callSequenceClone.Add(calledFunc);
                 List<InstructionNode> calledFuncInstNodes = calledFunc.Body.Instructions.Select(x => InstructionNodeFactory.GetInstructionWrapper(x, calledFunc)).ToList();
                 programFlowHanlder.AddFlowConnections(calledFuncInstNodes);
-                
-                //TODO check if this is neccesary
-                //InFuncBackTrace(calledFuncInstNodes);
                 if (calledFuncInstNodes.Count > 0)
                 {
                     StitchProgramFlow(callNode, calledFuncInstNodes[0]);
@@ -87,7 +84,6 @@ namespace DoppleTry2.InstructionModifiers
                     }
                     else if (nestedCallNode.CalledFunction == callNode.CalledFunction)
                     {
-                        //var nonInlinedCallNode = ReplaceWithNonInlineable(nestedCallNode, calledFuncInstNodes);
                         var oldForwardPaths = nestedCallNode.ProgramFlowForwardRoutes.ToList();
                         StitchProgramFlow(nestedCallNode, calledFuncInstNodes[0]);
                         IEnumerable<InstructionNode> inaccessiblePaths = oldForwardPaths.Where(x => x.ProgramFlowBackRoutes.Count == 0);
@@ -146,15 +142,6 @@ namespace DoppleTry2.InstructionModifiers
             foreach(var newForwardNode in forwardNodes)
             {
                 newForwardNode.ProgramFlowBackRoutes.AddTwoWay(backNode);
-            }
-        }
-
-        private void InFuncBackTrace(List<InstructionNode> calledFuncInstructions)
-        {
-            var loadLocationBacktracer = new LdLocBackTracer(calledFuncInstructions);
-            foreach(var inst in calledFuncInstructions.Where(x => loadLocationBacktracer.HandlesCodes.Contains(x.Instruction.OpCode.Code)).OrderByDescending(x => x.InstructionIndex))
-            {
-                loadLocationBacktracer.AddBackDataflowConnections(inst);
             }
         }
     }

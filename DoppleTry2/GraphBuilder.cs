@@ -63,11 +63,11 @@ namespace DoppleTry2
             //AddStArgHelpers();
             BackTrace();
             RemoveHelperCodes();
+            AddZeroNode();
             MergeSimilarInstructions();
             PostMergeBackTrace();
             SetInstructionIndexes();
             Veirify();
-            AddZeroNode();
 
             return InstructionNodes;
         }
@@ -89,7 +89,7 @@ namespace DoppleTry2
         {
             MergeLdArgs();
             MergeImmediateValue();
-            //MergeRecursionParalel();
+            MergeRecursionParalel();
             //MergeEquivilentPairs();
         }
 
@@ -114,7 +114,7 @@ namespace DoppleTry2
                                         .FirstOrDefault();
                     if (secondInst != null)
                     {
-                        MergeInsts(new[] { firstInst, secondInst });
+                        MergeNodes(new[] { firstInst, secondInst });
                         mergesWereDone = true;
                     }
                 }
@@ -144,7 +144,7 @@ namespace DoppleTry2
         {
             RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.StLocCodes.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.LdLocCodes.Contains(x.Instruction.OpCode.Code)));
-            //RemoveInstWrappers(InstructionNodes.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code)));
+            RemoveInstWrappers(InstructionNodes.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code)));
             //RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.LdArgCodes.Contains(x.Instruction.OpCode.Code) && x.InliningProperties.Inlined));
             RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.CallCodes.Contains(x.Instruction.OpCode.Code) && x.InliningProperties.Inlined));
             RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Ret && x.InliningProperties.Inlined));
@@ -167,10 +167,6 @@ namespace DoppleTry2
             {
                 firstNode.DataFlowBackRelated.AddTwoWay(nodeZero);
             }
-            //foreach(var firstFromRecursion in InstructionNodes.Where(x => BackSearcher.GetBackDataTree(x).Contains(x) && CodeGroups.LdArgCodes.Contains(x.Instruction.OpCode.Code)))
-            //{
-            //    firstFromRecursion.DataFlowBackRelated.AddWithNewIndex(nodeZero);
-            //}
             InstructionNodes[0].ProgramFlowBackRoutes.AddTwoWay(nodeZero);
             InstructionNodes.Add(nodeZero);
             SetInstructionIndexes();
@@ -200,7 +196,7 @@ namespace DoppleTry2
                                     .Where(x => x.Count() >1);
             foreach (var recursionGroup in recursionGroups)
             {
-                MergeInsts(recursionGroup.ToArray());
+                MergeNodes(recursionGroup.ToArray());
             }
         }
 
@@ -215,7 +211,7 @@ namespace DoppleTry2
                     .ToArray();
                 if (instsToMerge.Length > 0)
                 {
-                    MergeInsts(instsToMerge);
+                    MergeNodes(instsToMerge);
                 }
             }
             SetInstructionIndexes();
@@ -238,7 +234,7 @@ namespace DoppleTry2
                                     .Except(grouped).ToArray();
                     if (toMerge.Count() > 1 )
                     {
-                        MergeInsts(toMerge.ToArray());
+                        MergeNodes(toMerge.ToArray());
                         grouped.AddRange(toMerge);
                     }
                 }
@@ -263,7 +259,7 @@ namespace DoppleTry2
                                                     .ToList();
                 foreach (var ldArgSameBack in ldArgGroupedByBackRelated)
                 {
-                    MergeInsts(ldArgSameBack);
+                    MergeNodes(ldArgSameBack);
                 }
             }
             SetInstructionIndexes();
@@ -300,38 +296,48 @@ namespace DoppleTry2
             }
         }
 
-        public void MergeInsts(IEnumerable<InstructionNode> Wrappers)
+        public void MergeNodes(IEnumerable<InstructionNode> nodesToMerge)
         {
-            var instWrapperToKeep = Wrappers.ElementAt(0);
-            foreach (var wrapperToRemove in Wrappers.ToArray().Except(new[] { instWrapperToKeep }))
+            var nodeToKeep = nodesToMerge.ElementAt(0);
+            foreach (var nodeToRemove in nodesToMerge.ToArray().Except(new[] { nodeToKeep }))
             {
-                foreach (var backDataNode in wrapperToRemove.DataFlowBackRelated.ToList())
+                foreach (var backDataNode in nodeToRemove.DataFlowBackRelated.ToList())
                 {
-                    instWrapperToKeep.DataFlowBackRelated.AddTwoWay(backDataNode);
-                    wrapperToRemove.DataFlowBackRelated.RemoveTwoWay(backDataNode);
+                    nodeToKeep.DataFlowBackRelated.AddTwoWay(backDataNode);
+                    nodeToRemove.DataFlowBackRelated.RemoveTwoWay(backDataNode);
                 }
-                foreach (var forwardDataNode in wrapperToRemove.DataFlowForwardRelated.ToList())
+                foreach (var forwardDataNode in nodeToRemove.DataFlowForwardRelated.ToList())
                 {
-                    var forwardBackRelated = forwardDataNode.DataFlowBackRelated.First(x => x.Argument == wrapperToRemove);
-                    forwardDataNode.DataFlowBackRelated.AddTwoWay(instWrapperToKeep, forwardBackRelated.ArgIndex);
+                    var forwardBackRelated = forwardDataNode.DataFlowBackRelated.First(x => x.Argument == nodeToRemove);
+                    forwardDataNode.DataFlowBackRelated.AddTwoWay(nodeToKeep, forwardBackRelated.ArgIndex);
                     forwardDataNode.DataFlowBackRelated.RemoveTwoWay(forwardBackRelated);
                 }
-                instWrapperToKeep.DataFlowBackRelated.CheckNumberings();
-                foreach (var forwardFlowNode in wrapperToRemove.ProgramFlowForwardRoutes.ToList())
+                nodeToKeep.DataFlowBackRelated.CheckNumberings();
+                foreach (var forwardFlowNode in nodeToRemove.ProgramFlowForwardRoutes.ToList())
                 {
-                    forwardFlowNode.ProgramFlowBackRoutes.RemoveTwoWay(wrapperToRemove);
-                    forwardFlowNode.ProgramFlowBackRoutes.AddTwoWay(instWrapperToKeep);
+                    forwardFlowNode.ProgramFlowBackRoutes.RemoveTwoWay(nodeToRemove);
+                    forwardFlowNode.ProgramFlowBackRoutes.AddTwoWay(nodeToKeep);
                 }
-                foreach (var backFlowNode in wrapperToRemove.ProgramFlowBackRoutes.ToList())
+                foreach (var backFlowNode in nodeToRemove.ProgramFlowBackRoutes.ToList())
                 {
-                    wrapperToRemove.ProgramFlowBackRoutes.RemoveTwoWay(backFlowNode);
-                    instWrapperToKeep.ProgramFlowBackRoutes.AddTwoWay(backFlowNode);
+                    nodeToRemove.ProgramFlowBackRoutes.RemoveTwoWay(backFlowNode);
+                    nodeToKeep.ProgramFlowBackRoutes.AddTwoWay(backFlowNode);
                 }
-                InstructionNodes.Remove(wrapperToRemove);
-                if (InstructionNodes.Any(x => x.DataFlowBackRelated.Any(y => y.Argument == wrapperToRemove)
-                                              || x.DataFlowForwardRelated.Any(y => y == wrapperToRemove)
-                                              || x.ProgramFlowBackRoutes.Any(y => y == wrapperToRemove)
-                                              || x.ProgramFlowForwardRoutes.Any(y => y == wrapperToRemove)))
+                foreach(var forwardNode in nodeToRemove.ProgramFlowForwardAffecting.ToList())
+                {
+                    forwardNode.ProgramFlowBackAffected.AddTwoWay(nodeToKeep);
+                    forwardNode.ProgramFlowBackAffected.RemoveTwoWay(nodeToRemove);
+                }
+                foreach (var backNode in nodeToRemove.ProgramFlowBackAffected.ToList())
+                {
+                    nodeToRemove.ProgramFlowBackAffected.RemoveTwoWay(backNode);
+                    nodeToKeep.ProgramFlowBackAffected.AddTwoWay(backNode);
+                }
+                InstructionNodes.Remove(nodeToRemove);
+                if (InstructionNodes.Any(x => x.DataFlowBackRelated.Any(y => y.Argument == nodeToRemove)
+                                              || x.DataFlowForwardRelated.Any(y => y == nodeToRemove)
+                                              || x.ProgramFlowBackRoutes.Any(y => y == nodeToRemove)
+                                              || x.ProgramFlowForwardRoutes.Any(y => y == nodeToRemove)))
                 {
                     throw new Exception("there's someone still pointing to the rmoeved");
                 }

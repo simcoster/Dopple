@@ -24,14 +24,16 @@ namespace Utility
 
         static public int AddLoop(int[] arr, int toSearch, int startIndex)
         {
-            for (int i=startIndex; i < arr.Length; i++)
+            var i = 0;
+            for (i = startIndex; i < arr.Length; i++)
             {
-                if (arr[startIndex] == toSearch)
+                if (arr[i] == toSearch)
                 {
-                    return startIndex;
+                    return i;
+
                 }
             }
-            return startIndex;
+            return i;
         }
 
         //static public int AddLoop(int a, int b)

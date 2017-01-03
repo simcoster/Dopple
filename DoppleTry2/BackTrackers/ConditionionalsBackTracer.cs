@@ -15,7 +15,7 @@ namespace DoppleTry2.BackTrackers
         {
         }
 
-        private List<List<InstructionNode>> MapAllPossibleExecutionRoutes(InstructionNode startNode,  List<InstructionNode> startPath = null)
+        private List<List<InstructionNode>> MapAllPossibleExecutionRoutes(InstructionNode startNode, List<InstructionNode> startPath = null)
         {
             List<InstructionNode> currentPath;
             if (startPath == null)
@@ -35,7 +35,7 @@ namespace DoppleTry2.BackTrackers
                     currentPath.Add(currentNode);
                     return new List<List<InstructionNode>>() { currentPath };
                 }
-                else if (currentNode.ProgramFlowForwardRoutes.Count ==1)
+                else if (currentNode.ProgramFlowForwardRoutes.Count == 1)
                 {
                     currentPath.Add(currentNode);
                     currentNode = currentNode.ProgramFlowForwardRoutes[0];
@@ -43,7 +43,7 @@ namespace DoppleTry2.BackTrackers
                 else
                 {
                     currentPath.Add(currentNode);
-                    foreach(var path in currentNode.ProgramFlowForwardRoutes)
+                    foreach (var path in currentNode.ProgramFlowForwardRoutes)
                     {
                         possibleExecutionRoutes.AddRange(MapAllPossibleExecutionRoutes(path, currentPath));
                     }
@@ -62,6 +62,14 @@ namespace DoppleTry2.BackTrackers
 
         public override void AddBackDataflowConnections(InstructionNode currentNode)
         {
+            foreach (var node in GetNodesInCondition(currentNode))
+            {
+                node.ProgramFlowBackAffected.AddTwoWay(currentNode);
+            }
+        }
+
+        private IEnumerable<InstructionNode> GetNodesInCondition(InstructionNode currentNode)
+        {
             var relevantTracks = MapAllPossibleExecutionRoutes(currentNode).Select(x => x.Skip(1));
             List<InstructionNode> sharedNodes = relevantTracks.Aggregate((x, y) => x.Intersect(y).ToList()).ToList();
             IEnumerable<InstructionNode> nodesInCondition;
@@ -72,31 +80,21 @@ namespace DoppleTry2.BackTrackers
                                           .Select(x => x.TakeWhile(y => y != conditionEndNode))
                                           .Aggregate((x, y) => x.Concat(y))
                                           .Distinct();
+                return nodesInCondition;
+            }
+
+            List<IEnumerable<InstructionNode>> loopTracks = relevantTracks.Where(x => x.Contains(currentNode)).ToList();
+            if (loopTracks.Count > 1)
+            {
+                return loopTracks.Aggregate((x, y) => x.Concat(y)).Distinct();
+            }
+            else if (loopTracks.Count > 0)
+            {
+                return loopTracks[0];
             }
             else
             {
-                //TODO change this
-                try
-                {
-                    List<IEnumerable<InstructionNode>> loopTracks = relevantTracks.Where(x => x.Contains(currentNode)).ToList();
-                    if (loopTracks.Count > 1)
-                    {
-                        nodesInCondition = loopTracks.Aggregate((x, y) => x.Concat(y)).Distinct();
-                    }
-                    else
-                    {
-                        nodesInCondition = loopTracks[0];
-                    }
-                }
-                catch
-                {
-                    nodesInCondition = new List<InstructionNode>();
-                }
-            }
-          
-            foreach(var node in nodesInCondition)
-            {
-                node.ProgramFlowBackAffected.AddTwoWay(currentNode);
+                return relevantTracks.Aggregate((x, y) => x.Concat(y)).Distinct();
             }
         }
     }
