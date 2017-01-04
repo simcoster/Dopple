@@ -22,10 +22,12 @@ namespace DoppleTry2.InstructionNodes
             DataFlowBackRelated = new BackArgList(this);
             ProgramFlowBackRoutes = new ProgramFlowBackRoutes(this);
             ProgramFlowBackAffected = new ProgramFlowBackAffected(this);
+            ProgramFlowForwardRoutes = new ProgramFlowForwardRoutes(this);
+            MyGuid = Guid.NewGuid();
         }
 
         public ProgramFlowBackRoutes ProgramFlowBackRoutes { get; set; }
-        public List<InstructionNode> ProgramFlowForwardRoutes = new List<InstructionNode>();
+        public ProgramFlowForwardRoutes ProgramFlowForwardRoutes { get; set; }
         public List<InstructionNode> DataFlowForwardRelated = new List<InstructionNode>();
         public BackArgList DataFlowBackRelated { get; private set; }
         public List<InstructionNode> ProgramFlowForwardAffecting { get; internal set; } = new List<InstructionNode>();
@@ -41,7 +43,7 @@ namespace DoppleTry2.InstructionNodes
         public int StackPushCount { get; set; }
         public List<Type> DoneBackTracers = new List<Type>();
         public bool ProgramFlowResolveDone { get; set; } = false;
-        
+        public Guid MyGuid { get; private set; }
 
         public InliningProperties InliningProperties = new InliningProperties();
 

@@ -28,16 +28,16 @@ namespace DoppleGraph
             InitializeComponent();
         }
 
-        public Form2(List<InstructionNode> instructionWrappers)
+        public Form2(List<InstructionNode> instructionNodes)
         {
-            this.instructionWrappers = instructionWrappers;
+            InstructionNodes = instructionNodes;
             InitializeComponent();
         }
 
         private List<GoNode> NodesToShow = new List<GoNode>();
         private List<GoObject> ObjectsToHide = new List<GoObject>();
         private Random rnd = new Random();
-        private List<InstructionNode> instructionWrappers;
+        private List<InstructionNode> InstructionNodes;
 
         private void Node_UnSelected(object sender, EventArgs e)
         {
@@ -128,40 +128,6 @@ namespace DoppleGraph
             }
         }
 
-        private void AcomodateFlowForRemovedNodes()
-        {
-            foreach (var instWrapper in instructionWrappers)
-            {
-                instWrapper.ProgramFlowForwardRoutes = GetStillExistingNextFlowInstructions(instWrapper).ToList();
-            }
-        }
-
-        public IEnumerable<InstructionNode> GetStillExistingNextFlowInstructions(InstructionNode instruction, List<InstructionNode> visited =null)
-        {
-            if (visited == null)
-            {
-                visited = new List<InstructionNode>();
-            }
-            visited.Add(instruction);
-            List<InstructionNode> wrappersToReturn = new List<InstructionNode>();
-            foreach(var nextInst in instruction.ProgramFlowForwardRoutes)
-            {
-                if (visited.Contains(nextInst))
-                {
-                    continue;
-                }
-                else if (instructionWrappers.Contains(nextInst))
-                {
-                    wrappersToReturn.Add(nextInst);
-                }
-                else
-                {
-                    wrappersToReturn.AddRange(GetStillExistingNextFlowInstructions(nextInst,visited));
-                }
-            }
-            return wrappersToReturn;
-        }
-
         public void DrawDataLinks(GoNodeWrapper nodeWrapper, GoView myView)
         {
             foreach (var indexedArg in nodeWrapper.InstructionWrapper.DataFlowBackRelated)
@@ -173,15 +139,7 @@ namespace DoppleGraph
             }
             foreach (var flowAffectingNode in nodeWrapper.InstructionWrapper.ProgramFlowBackAffected)
             {
-                try
-                {
-                    DrawEdge(nodeWrapper, myView, flowAffectingNode, Color.LightPink);
-
-                }
-                catch
-                {
-
-                }
+                DrawEdge(nodeWrapper, myView, flowAffectingNode, Color.LightPink);
             }
             var allLinks = myView.Document.Where(x => x is GoLink).Cast<GoLink>().Select(y => y.PenColor);
         }
@@ -239,7 +197,7 @@ namespace DoppleGraph
             SetRowIndexes(nodeWrappers);
             FixDuplicateCoordinates(nodeWrappers);
             int totalHeight = 1000;
-            int totalWidth = 2000;
+            int totalWidth = 4000;
             float heightOffset = Convert.ToSingle(totalHeight / nodeWrappers.Select(x => x.DisplayRow).Max());
             float widthOffset = Convert.ToSingle(totalWidth / nodeWrappers.Select(x => x.DisplayCol).Max());
             foreach (var nodeWrapper in nodeWrappers)
@@ -281,7 +239,7 @@ namespace DoppleGraph
                 try
                 {
                     var nodesToUpdate = node.InstructionWrapper.DataFlowForwardRelated
-                    //var nodesToUpdate = node.InstructionWrapper.ProgramFlowForwardRoutes
+                   // var nodesToUpdate = node.InstructionWrapper.ProgramFlowForwardRoutes
                    .Select(x => GetNodeWrapper(x))
                    .Where(x => x.LongestPath.Count == 0 || !x.LongestPath.Intersect(node.LongestPath).SequenceEqual(x.LongestPath))
                    .Where(x => x.LongestPath.Count < node.LongestPath.Count + 1)
@@ -314,7 +272,7 @@ namespace DoppleGraph
 
         private void Form2_Load(object sender, EventArgs e)
         {
-            this.Text = instructionWrappers[0].Method.Name;
+            this.Text = InstructionNodes[0].Method.Name;
             // create a Go view (a Control) and add to the form
             myView = new GoView();
             myView.KeyPress += MyView_KeyPress;
@@ -326,7 +284,7 @@ namespace DoppleGraph
             myView.Show();
 
             nodeWrappers =
-                instructionWrappers
+                InstructionNodes
                 //.Where(x => x.ForwardDataFlowRelated.Count >0 || x.BackDataFlowRelated.Count >0)
                 .Select(x => new GoNodeWrapper(new GoTextNodeHoverable(), x))
                 .ToList();
@@ -361,6 +319,8 @@ namespace DoppleGraph
                 }
 
                 goNodeWrapper.Node.Text = goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code.ToString() + " index:" + goNodeWrapper.InstructionWrapper.InstructionIndex + " offset:" + goNodeWrapper.InstructionWrapper.Instruction.Offset + " ";
+                //TODO remove
+                //goNodeWrapper.Node.Text = goNodeWrapper.InstructionWrapper.MyGuid.ToString();
 
                 if (new[] { Code.Call, Code.Calli, Code.Callvirt }.Contains(
                         goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code))
@@ -396,7 +356,7 @@ namespace DoppleGraph
 
         private void MyView_KeyPress(object sender, KeyPressEventArgs e)
         {
-            var backTraceManager = new GraphBuilder(instructionWrappers);
+            var backTraceManager = new GraphBuilder(InstructionNodes);
             if (e.KeyChar == '/')
             {
                 PermanentlyHideSelection();
@@ -542,7 +502,7 @@ namespace DoppleGraph
             {
                 int minIndexInt = Convert.ToInt32(minIndex.Text);
                 int maxIndexInt = Convert.ToInt32(maxIndex.Text);
-                var nodesToShow = instructionWrappers
+                var nodesToShow = InstructionNodes
                                     .Where(x => x.InstructionIndex >= minIndexInt && x.InstructionIndex <= maxIndexInt)
                                     .Select(x => GetNodeWrapper(x).Node)
                                     .ToList();

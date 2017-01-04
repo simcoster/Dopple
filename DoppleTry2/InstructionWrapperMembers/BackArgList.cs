@@ -123,7 +123,8 @@ namespace DoppleTry2
             {
                 if (!this.Any(x => x.ArgIndex == i))
                 {
-                    throw new Exception("Index missing");
+                    //TODO remove
+                    //throw new Exception("Index missing");
                 }
             }
         }

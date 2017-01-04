@@ -21,7 +21,15 @@ namespace DoppleTry2.BackTrackers
             List<InstructionNode> foundBackInstructions = SafeSearchBackwardsForDataflowInstrcutions(predicate, startInstruction);
             if (foundBackInstructions.Count == 0)
             {
-                throw new Exception("Reached first instWrapper without correct one found");
+                //TODO remove
+                try
+                {
+                    throw new Exception("Reached first instWrapper without correct one found");
+                }
+                catch
+                {
+                    
+                }
             }
             return foundBackInstructions;
         }
@@ -32,7 +40,7 @@ namespace DoppleTry2.BackTrackers
             return startInstruction.ProgramFlowBackRoutes.SelectMany(x => SafeSearchBackwardsForDataflowInstrcutions(InstructionWrappers, predicate, x, new List<InstructionNode>())).ToList();
         }
 
-        public List<InstructionNode> SafeSearchBackwardsForDataflowInstrcutions(List<InstructionNode> InstructionNodes, Func<InstructionNode, bool> predicate,
+        public List<InstructionNode> SafeSearchBackwardsForDataflowInstrcutions(List<InstructionNode> instructionNodes, Func<InstructionNode, bool> predicate,
         InstructionNode startInstruction, List<InstructionNode> visitedInstructions)
         {
             if (visitedInstructions == null)
@@ -40,13 +48,13 @@ namespace DoppleTry2.BackTrackers
                 visitedInstructions = new List<InstructionNode>();
             }
             var foundInstructions = new List<InstructionNode>();
-            int index = InstructionNodes.IndexOf(startInstruction);
+            int index = instructionNodes.IndexOf(startInstruction);
             if (index < 0)
-                //TODO change
-                //throw new Exception("shouldn't get here");
-                return new List<InstructionNode>();
+            {
+                throw new Exception("shouldn't get here");
+            }
 
-            var currInstruction = InstructionNodes[index];
+            var currInstruction = instructionNodes[index];
             if (visitedInstructions.Contains(currInstruction))
             {
                 return new List<InstructionNode>();
@@ -66,7 +74,7 @@ namespace DoppleTry2.BackTrackers
                 foreach (var instructionWrapper in currInstruction.ProgramFlowBackRoutes)
                 {
                     IEnumerable<InstructionNode> branchindexes =
-                        SafeSearchBackwardsForDataflowInstrcutions(InstructionNodes, predicate, instructionWrapper, visitedInstructions);
+                        SafeSearchBackwardsForDataflowInstrcutions(instructionNodes, predicate, instructionWrapper, visitedInstructions);
                     foundInstructions.AddRange(branchindexes);
                 }
             }

@@ -44,6 +44,10 @@ namespace DoppleTry2.VerifierNs
             {
                 return true;
             }
+            if (CodeGroups.LdLocCodes.Contains(insturctionWrapper.Instruction.OpCode.Code))
+            {
+                return true;
+            }
             return false;
         }
         public bool IsProvidingNumber(InstructionNode instructionWrapper)

@@ -14,18 +14,7 @@ namespace DoppleTry2
 
         public override void Verify(InstructionNode instructionWrapper)
         {
-            if (instructionWrapper.DataFlowBackRelated.Count == 0)
-            {
-                return;
-            }
-            int maxIndex = instructionWrapper.DataFlowBackRelated.Max(x => x.ArgIndex);
-            for (int i =0; i <= maxIndex; i++)
-            {
-                if (!instructionWrapper.DataFlowBackRelated.Any(x => x.ArgIndex == i))
-                {
-                    throw new Exception("Index missing");
-                }
-            }
+            instructionWrapper.DataFlowBackRelated.CheckNumberings();
         }
     }
 }

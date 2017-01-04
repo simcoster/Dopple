@@ -19,6 +19,10 @@ namespace DoppleTry2.InstructionWrapperMembers
             base.Remove(backArgToRemove);
             var forwardArg = GetRelatedList(backArgToRemove).First(x => x == _ContainingNode);
             GetRelatedList(backArgToRemove).Remove(forwardArg);
+            if (GetRelatedList(backArgToRemove).Any(x => x == _ContainingNode))
+            {
+
+            }
         }
 
         internal abstract List<InstructionNode> GetRelatedList(InstructionNode backArgToRemove);
@@ -30,6 +34,11 @@ namespace DoppleTry2.InstructionWrapperMembers
                 RemoveTwoWay(toRemove);
             }
         }
+        public void RemoveAllTwoWay()
+        {
+            RemoveAllTwoWay(x => true);
+        }
+
         public void AddTwoWay(InstructionNode toAdd)
         {
             base.Add(toAdd);

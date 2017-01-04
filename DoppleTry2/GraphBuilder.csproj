@@ -69,6 +69,7 @@
     <Compile Include="BackTrackers\ConditionionalsBackTracer.cs" />
     <Compile Include="InstructionModifiers\SetStackPopPushForCalls.cs" />
     <Compile Include="InstructionNodes\RetInstructionNode.cs" />
+    <Compile Include="InstructionWrapperMembers\ProgramFlowForwardRoutes.cs" />
     <Compile Include="InstructionWrapperMembers\ProgramFlowBackAffected.cs" />
     <Compile Include="InstructionWrapperMembers\ProgramFlowBackRoutes.cs" />
     <Compile Include="InstructionWrapperMembers\RelatedList.cs" />
@@ -94,7 +95,6 @@
     <Compile Include="OpcodeProperties\CodeMemoryRefCount.cs" />
     <Compile Include="InstructionWrapperMembers\IndexedArgument.cs" />
     <Compile Include="InstructionModifiers\AddHelperRetsModifer.cs" />
-    <Compile Include="InstructionModifiers\StArgAddModifier.cs" />
     <Compile Include="InstructionNodes\ArgType.cs" />
     <Compile Include="InstructionNodes\InlineableCallNode.cs" />
     <Compile Include="InstructionNodes\InliningProperties.cs" />
