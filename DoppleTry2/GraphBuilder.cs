@@ -58,15 +58,15 @@ namespace DoppleTry2
             SetInstructionIndexes();
             _programFlowManager.AddFlowConnections(InstructionNodes);
             PreInlineBackTrace();
-            InlineFunctionCalls();
+           InlineFunctionCalls();
             SetInstructionIndexes();
             BackTrace();
-            RemoveHelperCodes();
+            //RemoveHelperCodes();
             AddZeroNode();
             //MergeSimilarInstructions();
-            PostMergeBackTrace();
+            //PostMergeBackTrace();
             SetInstructionIndexes();
-            Veirify();
+            //Veirify();
 
             return InstructionNodes;
         }
@@ -88,7 +88,7 @@ namespace DoppleTry2
         {
             MergeLdArgs();
             MergeImmediateValue();
-            MergeRecursionParalel();
+            //MergeRecursionParalel();
             //MergeEquivilentPairs();
         }
 
@@ -144,8 +144,8 @@ namespace DoppleTry2
             RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.StLocCodes.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.LdLocCodes.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(InstructionNodes.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code)));
-            //RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.LdArgCodes.Contains(x.Instruction.OpCode.Code) && x.InliningProperties.Inlined));
-            //RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.CallCodes.Contains(x.Instruction.OpCode.Code) && x.InliningProperties.Inlined));
+            RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.LdArgCodes.Contains(x.Instruction.OpCode.Code) && x.InliningProperties.Inlined));
+            RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.CallCodes.Contains(x.Instruction.OpCode.Code) && x.InliningProperties.Inlined));
             RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Ret && x.InliningProperties.Inlined));
             RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Dup));
         }
@@ -169,10 +169,6 @@ namespace DoppleTry2
             foreach (var instWrapper in InstructionNodes.OrderByDescending(x => x.InstructionIndex))
             {
                 var backTracers = _backTracers.Where(x => x.HandlesCodes.Contains(instWrapper.Instruction.OpCode.Code));
-                if (backTracers.Count() == 0)
-                {
-                    Console.WriteLine("Element with no backtracer!!!! " + instWrapper.Instruction.ToString());
-                }
                 foreach (var backTracer in backTracers)
                 {
                     backTracer.AddBackDataflowConnections(instWrapper);

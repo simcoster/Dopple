@@ -19,10 +19,6 @@ namespace DoppleTry2.InstructionWrapperMembers
             base.Remove(backArgToRemove);
             var forwardArg = GetRelatedList(backArgToRemove).First(x => x == _ContainingNode);
             GetRelatedList(backArgToRemove).Remove(forwardArg);
-            if (GetRelatedList(backArgToRemove).Any(x => x == _ContainingNode))
-            {
-
-            }
         }
 
         internal abstract List<InstructionNode> GetRelatedList(InstructionNode backArgToRemove);

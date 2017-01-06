@@ -67,6 +67,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BackTrackers\ConditionionalsBackTracer.cs" />
+    <Compile Include="ExtensionMethods.cs" />
     <Compile Include="InstructionModifiers\SetStackPopPushForCalls.cs" />
     <Compile Include="InstructionNodes\RetInstructionNode.cs" />
     <Compile Include="InstructionWrapperMembers\ProgramFlowForwardRoutes.cs" />

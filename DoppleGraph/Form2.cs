@@ -239,7 +239,7 @@ namespace DoppleGraph
                 try
                 {
                     var nodesToUpdate = node.InstructionWrapper.DataFlowForwardRelated
-                   // var nodesToUpdate = node.InstructionWrapper.ProgramFlowForwardRoutes
+                    //var nodesToUpdate = node.InstructionWrapper.ProgramFlowForwardRoutes
                    .Select(x => GetNodeWrapper(x))
                    .Where(x => x.LongestPath.Count == 0 || !x.LongestPath.Intersect(node.LongestPath).SequenceEqual(x.LongestPath))
                    .Where(x => x.LongestPath.Count < node.LongestPath.Count + 1)
@@ -265,7 +265,7 @@ namespace DoppleGraph
                     .OrderBy(x => x.InstructionWrapper.Instruction.OpCode.Code.ToString()).ToList();
                 foreach (var node in orderedNodes)
                 {
-                    node.DisplayRow = orderedNodes.IndexOf(node);
+                    node.DisplayRow = orderedNodes.IndexOf(node) +1;
                 }
             }
         }
@@ -319,8 +319,6 @@ namespace DoppleGraph
                 }
 
                 goNodeWrapper.Node.Text = goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code.ToString() + " index:" + goNodeWrapper.InstructionWrapper.InstructionIndex + " offset:" + goNodeWrapper.InstructionWrapper.Instruction.Offset + " ";
-                //TODO remove
-                //goNodeWrapper.Node.Text = goNodeWrapper.InstructionWrapper.MyGuid.ToString();
 
                 if (new[] { Code.Call, Code.Calli, Code.Callvirt }.Contains(
                         goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code))
@@ -339,13 +337,12 @@ namespace DoppleGraph
 
                 if (goNodeWrapper.InstructionWrapper.InliningProperties.Recursive)
                 {
-                    goNodeWrapper.Node.Text += " RecIndex:" + goNodeWrapper.InstructionWrapper.InliningProperties.RecursionInstanceIndex;
+                    goNodeWrapper.Node.Text += " RecIndex:" + goNodeWrapper.InstructionWrapper.InliningProperties.RecursionSameLevelIndex;
+                    goNodeWrapper.Node.Text += " Recursive:" + goNodeWrapper.InstructionWrapper.InliningProperties.RecursionLevel; 
                 }
                 frontLayer.Add(goNodeWrapper.Node);
             }
             SetCoordinates(nodeWrappers);
-
-
             foreach (var nodeWrapper in nodeWrappers)
             {
                 DrawDataLinks(nodeWrapper, myView);

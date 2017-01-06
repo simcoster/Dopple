@@ -25,45 +25,35 @@ namespace DoppleTry2.InstructionModifiers
             {
                 List<InstructionNode> oldCallForwardNodes = callNode.ProgramFlowForwardRoutes.ToList();
                 List<InstructionNode> inlinedInstNodes = GetDeepInlineRec(callNode, new List<MethodDefinition>() { instructionNodes[0].Method });
-                CheckRight();
-                if (inlinedInstNodes.Count == 0)
+               if (inlinedInstNodes.Count == 0)
                 {
                     continue;
                 }
-                foreach (var inst in inlinedInstNodes)
-                {
-                    inst.InliningProperties.Inlined = true;
-                }
-                CheckRight();
+                inlinedInstNodes.ForEach(x => x.InliningProperties.Inlined = true);
                 int instWrapperIndex = instructionNodes.IndexOf(callNode);
-                CheckRight();
-
                 instructionNodes.InsertRange(instWrapperIndex + 1, inlinedInstNodes);
-                CheckRight();
                 foreach (var inlinedEndNode in inlinedInstNodes.Where(x => x.ProgramFlowForwardRoutes.Count == 0))
                 {
                     StitchProgramFlow(inlinedEndNode, oldCallForwardNodes);
-                    CheckRight();
                 }
                 if (callNode.CalledFunction == callNode.Method)
                 {
                     foreach(var inst in inlinedInstNodes)
                     {
-                        inst.InliningProperties.RecursionInstanceIndex = recursionInstanceIndex;
+                        inst.InliningProperties.RecursionSameLevelIndex = recursionInstanceIndex;
                         inst.InliningProperties.Recursive = true;
-                        CheckRight();
                     }
                     recursionInstanceIndex++;
                 }
             }
+            RemoveOraphanedNodes(MyInstructionNodes);
         }
 
 
 
-        //TODO this is all messed up, needs to be changed
+        //TODO should merge this with the first function, duplicate code :P
         List<InstructionNode> GetDeepInlineRec(InlineableCallNode callNode, List<MethodDefinition> callSequence)
         {
-            CheckRight();
             List<InstructionNode> oldForwardNodes = callNode.ProgramFlowForwardRoutes.ToList();
             MethodDefinition calledFunc = callNode.CalledFunction;
             if (callSequence.Count(x => x == calledFunc) > 1)
@@ -75,14 +65,14 @@ namespace DoppleTry2.InstructionModifiers
                 var callSequenceClone = new List<MethodDefinition>(callSequence);
                 callSequenceClone.Add(calledFunc);
                 List<InstructionNode> calledFuncInstNodes = calledFunc.Body.Instructions.Select(x => InstructionNodeFactory.GetInstructionWrapper(x, calledFunc)).ToList();
-                CheckRight();
+                calledFuncInstNodes.ForEach(x => x.InliningProperties.Inlined = true);
                 programFlowHanlder.AddFlowConnections(calledFuncInstNodes);
-                CheckRight();
                 if (calledFuncInstNodes.Count > 0)
                 {
                     StitchProgramFlow(callNode, calledFuncInstNodes[0]);
                 }
-                foreach (var nestedCallNode in calledFuncInstNodes.Where(x => x is InlineableCallNode).Cast<InlineableCallNode>().ToArray())
+                var nestedCalls = calledFuncInstNodes.Where(x => x is InlineableCallNode).Cast<InlineableCallNode>().ToArray();
+                foreach (var nestedCallNode in nestedCalls.Where(x => calledFuncInstNodes.Contains(x)))
                 {
                     int instWrapperIndex = calledFuncInstNodes.IndexOf(callNode);
                     var inlinedInstNodes = GetDeepInlineRec(callNode, callSequenceClone);
@@ -92,31 +82,33 @@ namespace DoppleTry2.InstructionModifiers
                         foreach(var endNode in inlinedInstNodes.Where(x => x.ProgramFlowForwardRoutes.Count == 0))
                         {
                             StitchProgramFlow(endNode, oldForwardNodes);
-                            CheckRight();
                         }
                     }
                     else if (nestedCallNode.CalledFunction == callNode.CalledFunction)
                     {
-                        CheckRight();
                         var oldForwardPaths = nestedCallNode.ProgramFlowForwardRoutes.ToList();
-                        StitchProgramFlow(nestedCallNode, calledFuncInstNodes[0]);
-                        IEnumerable<InstructionNode> inaccessiblePaths = oldForwardPaths.Where(x => x.ProgramFlowBackRoutes.Count == 0).ToList();
-                        foreach (var inaccessbilePath in inaccessiblePaths)
+                        calledFuncInstNodes[0].ProgramFlowBackRoutes.AddTwoWay(nestedCallNode);
+                        if (callSequenceClone.Count(x => x == nestedCallNode.CalledFunction) > 1)
                         {
-                            // TODO check
-                            RemovePathUntilJunction(calledFuncInstNodes, inaccessbilePath);
-                            CheckRight();
+                            nestedCallNode.InliningProperties.RecursionLevel = 2;
+                        }
+                        else
+                        {
+                            nestedCallNode.InliningProperties.RecursionLevel = 1;
                         }
                     }
                 }
                 callNode.InliningProperties.Inlined = true;
-                CheckRight();
                 return calledFuncInstNodes;
             }
         }
 
-        private static void CheckRight()
+        private static void CheckRight(List<InstructionNode> inlinedNodes = null)
         {
+            if (inlinedNodes!=null && inlinedNodes.Where(x => x.ProgramFlowBackRoutes.Intersect(removedNodes).Count() > 0).ToList().Count > 0)
+            {
+                throw new Exception("bad bad bad");
+            }
             if (MyInstructionNodes.Where(x => x.ProgramFlowBackRoutes.Intersect(removedNodes).Count() > 0).ToList().Count > 0)
             {
                 throw new Exception("bad bad bad");
@@ -124,32 +116,14 @@ namespace DoppleTry2.InstructionModifiers
         }
 
         private static List<InstructionNode> removedNodes = new List<InstructionNode>();
-        private static void RemovePathUntilJunction(List<InstructionNode> calledFuncInstNodes, InstructionNode inaccessbileNode)
+        private static void RemoveOraphanedNodes(List<InstructionNode> instructionNodes)
         {
-            var currentNode = inaccessbileNode;
-            removedNodes.Add(inaccessbileNode);
-            if (inaccessbileNode.ProgramFlowBackRoutes.Count < 2)
+            var accessibleNodes =BackSearcher.GetForwardFlowTree(MyInstructionNodes[0]);
+            foreach(var inacessibleNode in MyInstructionNodes.Except(accessibleNodes).ToArray())
             {
-                calledFuncInstNodes.Remove(inaccessbileNode);
-                var forwardNodes = inaccessbileNode.ProgramFlowForwardRoutes.ToList();
-                inaccessbileNode.ProgramFlowForwardRoutes.RemoveAllTwoWay();
-                inaccessbileNode.ProgramFlowBackRoutes.RemoveAllTwoWay();
-                var stillReferenced1 = MyInstructionNodes.Where(x => x.ProgramFlowBackRoutes.Intersect(removedNodes).Count() > 0).ToList();
-                var stillReferenced2 = calledFuncInstNodes.Where(x => x.ProgramFlowBackRoutes.Intersect(removedNodes).Count() > 0).ToList();
-
-                if (stillReferenced1.Count > 0 || stillReferenced2.Count > 0)
-                {
-                    throw new Exception("bad bad bad");
-                }
-                else
-                {
-
-                }
-                foreach (var nextNode in forwardNodes)
-                {
-                    RemovePathUntilJunction(calledFuncInstNodes, nextNode);
-                }
-           
+                instructionNodes.Remove(inacessibleNode);
+                inacessibleNode.ProgramFlowForwardRoutes.RemoveAllTwoWay();
+                inacessibleNode.ProgramFlowBackRoutes.RemoveAllTwoWay();
             }
         }
 
