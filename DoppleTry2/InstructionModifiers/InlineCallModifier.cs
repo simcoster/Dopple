@@ -56,51 +56,35 @@ namespace DoppleTry2.InstructionModifiers
         {
             List<InstructionNode> oldForwardNodes = callNode.ProgramFlowForwardRoutes.ToList();
             MethodDefinition calledFunc = callNode.CalledFunction;
-            if (callSequence.Count(x => x == calledFunc) > 1)
+            var callSequenceClone = new List<MethodDefinition>(callSequence);
+            callSequenceClone.Add(calledFunc);
+            List<InstructionNode> calledFuncInstNodes = calledFunc.Body.Instructions.Select(x => InstructionNodeFactory.GetInstructionWrapper(x, calledFunc)).ToList();
+            calledFuncInstNodes.ForEach(x => x.InliningProperties.Inlined = true);
+            programFlowHanlder.AddFlowConnections(calledFuncInstNodes);
+            StitchProgramFlow(callNode, calledFuncInstNodes[0]);
+            List<InlineableCallNode> allCallNodes = calledFuncInstNodes.Where(x => x is InlineableCallNode).Cast<InlineableCallNode>().ToList();
+            var callsToExpand = allCallNodes.Where(x => !callSequence.Contains(x.CalledFunction)).ToList();
+            foreach (var nestedCallNode in callsToExpand)
             {
-                return new List<InstructionNode>();
-            }
-            else
-            {
-                var callSequenceClone = new List<MethodDefinition>(callSequence);
-                callSequenceClone.Add(calledFunc);
-                List<InstructionNode> calledFuncInstNodes = calledFunc.Body.Instructions.Select(x => InstructionNodeFactory.GetInstructionWrapper(x, calledFunc)).ToList();
-                calledFuncInstNodes.ForEach(x => x.InliningProperties.Inlined = true);
-                programFlowHanlder.AddFlowConnections(calledFuncInstNodes);
-                if (calledFuncInstNodes.Count > 0)
+                int nodeIndex = calledFuncInstNodes.IndexOf(nestedCallNode);
+                var inlinedInstNodes = GetDeepInlineRec(nestedCallNode, callSequenceClone);
+                if (inlinedInstNodes.Count > 0)
                 {
-                    StitchProgramFlow(callNode, calledFuncInstNodes[0]);
-                }
-                var nestedCalls = calledFuncInstNodes.Where(x => x is InlineableCallNode).Cast<InlineableCallNode>().ToArray();
-                foreach (var nestedCallNode in nestedCalls.Where(x => calledFuncInstNodes.Contains(x)))
-                {
-                    int instWrapperIndex = calledFuncInstNodes.IndexOf(callNode);
-                    var inlinedInstNodes = GetDeepInlineRec(callNode, callSequenceClone);
-                    if (inlinedInstNodes.Count > 0)
+                    calledFuncInstNodes.InsertRange(nodeIndex + 1, inlinedInstNodes);
+                    foreach (var endNode in inlinedInstNodes.Where(x => x.ProgramFlowForwardRoutes.Count == 0))
                     {
-                        calledFuncInstNodes.InsertRange(instWrapperIndex + 1, inlinedInstNodes);
-                        foreach(var endNode in inlinedInstNodes.Where(x => x.ProgramFlowForwardRoutes.Count == 0))
-                        {
-                            StitchProgramFlow(endNode, oldForwardNodes);
-                        }
-                    }
-                    else if (nestedCallNode.CalledFunction == callNode.CalledFunction)
-                    {
-                        var oldForwardPaths = nestedCallNode.ProgramFlowForwardRoutes.ToList();
-                        calledFuncInstNodes[0].ProgramFlowBackRoutes.AddTwoWay(nestedCallNode);
-                        if (callSequenceClone.Count(x => x == nestedCallNode.CalledFunction) > 1)
-                        {
-                            nestedCallNode.InliningProperties.RecursionLevel = 2;
-                        }
-                        else
-                        {
-                            nestedCallNode.InliningProperties.RecursionLevel = 1;
-                        }
+                        StitchProgramFlow(endNode, oldForwardNodes);
                     }
                 }
-                callNode.InliningProperties.Inlined = true;
-                return calledFuncInstNodes;
             }
+            foreach(var recursiveCalls in allCallNodes.Where(x => callSequence.Contains(x.CalledFunction)))
+            {
+                recursiveCalls.InliningProperties.Recursive = true;
+                var firstNodeOfThisMethod = calledFuncInstNodes.First(x => x.Method == recursiveCalls.CalledFunction);
+                firstNodeOfThisMethod.ProgramFlowBackRoutes.AddTwoWay(recursiveCalls);
+            }
+            callNode.InliningProperties.Inlined = true;
+            return calledFuncInstNodes;
         }
 
         private static void CheckRight(List<InstructionNode> inlinedNodes = null)
