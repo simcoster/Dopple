@@ -8,19 +8,19 @@ using Mono.Cecil;
 
 namespace DoppleTry2.InstructionNodes
 {
-    public class LocationStoreInstructionNode : TempLocationInstructionNode
+    public class LocationStoreInstructionNode : LocationInstructionNode
     {
         public LocationStoreInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method) {}
     }
     
-    public class LocationLoadInstructionNode : TempLocationInstructionNode
+    public class LocationLoadInstructionNode : LocationInstructionNode
     {
         public LocationLoadInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method) { }
     }
 
-    public abstract class TempLocationInstructionNode : InstructionNode
+    public abstract class LocationInstructionNode : InstructionNode
     {
-        public TempLocationInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
+        public LocationInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
             LocIndex = GetLocIndex(instruction);
         }

@@ -27,13 +27,11 @@ namespace DoppleGraph
         private void Form1_Load(object sender, EventArgs e)
         {
             AssemblyDefinition myLibrary = AssemblyDefinition.ReadAssembly(@"C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\Utility\bin\Release\Utility.dll");
-            //myLibrary = AssemblyDefinition.ReadAssembly(@"C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\Utility\bin\Debug\Utility.dll");
 
             TypeDefinition type = myLibrary.MainModule.Types[3];
 
             var Graphs = new List<List<InstructionNode>>();
             foreach (var method in type.Methods.Where(x => !x.IsConstructor))
-            //foreach (var method in type.Methods.Where(x => !x.IsConstructor))
             {
                 var backTraceManager = new GraphBuilder(method);
                 List<InstructionNode> instructionWrappers = backTraceManager.Run();

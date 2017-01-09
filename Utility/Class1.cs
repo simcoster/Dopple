@@ -10,62 +10,52 @@ namespace Utility
 {
     public class Class1
     {
-        static public void DoMerge(int[] numbers, int left, int mid, int right)
+
+        //public static bool BinarySearch(int first, int last, int[] mynumbers, int target)
+        //{
+        //    while (first <= last)
+        //    {
+        //        var mid = (first + last) / 2;
+
+        //        if (target < mynumbers[mid])
+        //        {
+        //            first = mid + 1;
+        //        }
+
+        //        if (target > mynumbers[mid])
+        //        {
+        //            last = mid - 1;
+        //        }
+
+        //        else
+        //        {
+        //            return true;
+        //        }
+        //    }
+        //    return false;
+        //}
+
+        public bool BinarySearchRec(int first, int last, int[] mynumbers, int target)
         {
-            int[] temp = new int[25];
-            int i, left_end, num_elements, tmp_pos;
-
-            left_end = (mid - 1);
-            tmp_pos = left;
-            num_elements = (right - left + 1);
-
-            while ((left <= left_end) && (mid <= right))
+            if (first == last)
             {
-                if (numbers[left] <= numbers[mid])
-                {
-                    temp[tmp_pos] = numbers[left];
-                    tmp_pos++;
-                    left++;
-                }
-                else
-                {
-                    temp[tmp_pos] = numbers[mid];
-                    tmp_pos++;
-                    mid++;
-                }
+                return mynumbers[first] == target;
             }
 
-            while (left <= left_end)
-                temp[tmp_pos++] = numbers[left++];
+            var mid = (first + last) / 2;
 
-            while (mid <= right)
-                temp[tmp_pos++] = numbers[mid++];
-
-            for (i = 0; i < num_elements; i++)
+            if (target < mynumbers[mid])
             {
-                numbers[right] = temp[right];
-                right--;
+                return BinarySearchRec(mid + 1, last, mynumbers, target);
+            }
+            if (target > mynumbers[mid])
+            {
+                return BinarySearchRec(first, mid - 1, mynumbers, target);
+            }
+            else
+            {
+                return true;
             }
         }
-
-
-        static public void MergeSortRec(int[] numbers, int left, int right)
-        {
-            int mid;
-
-            if (right > left)
-            {
-                mid = (right + left) / 2;
-                MergeSortRec(numbers, left, mid);
-
-                DoMerge(numbers, left, (mid + 1), right);
-            }
-        }
-
-        static public void MergeSort(int[] numbers)
-        {
-            MergeSortRec(numbers, numbers.Length, 0);
-        }
-
     }
 }

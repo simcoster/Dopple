@@ -9,16 +9,16 @@ namespace DoppleTry2.BackTrackers
 {
     public class LdLocBackTracer : SingeIndexBackTracer
     {
-        protected override IEnumerable<InstructionNode> GetDataflowBackRelatedArgGroup(InstructionNode instWrapper)
+        protected override IEnumerable<InstructionNode> GetDataflowBackRelatedArgGroup(InstructionNode instNode)
         {
-            LocationLoadInstructionNode ldInstWrapper = (LocationLoadInstructionNode)instWrapper;
+            LocationLoadInstructionNode ldInstWrapper = (LocationLoadInstructionNode)instNode;
             return _SingleIndexBackSearcher.SearchBackwardsForDataflowInstrcutions(x => x is LocationStoreInstructionNode && 
-                                    ((LocationStoreInstructionNode)x).LocIndex == ldInstWrapper.LocIndex, instWrapper);
+                                    ((LocationStoreInstructionNode)x).LocIndex == ldInstWrapper.LocIndex, instNode);
         }
 
         public override Code[] HandlesCodes => CodeGroups.LdLocCodes;
 
-        public LdLocBackTracer(List<InstructionNode> instructionsWrappers) : base(instructionsWrappers)
+        public LdLocBackTracer(List<InstructionNode> instructionNodes) : base(instructionNodes)
         {
         }
     }

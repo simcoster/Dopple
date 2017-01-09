@@ -14,28 +14,28 @@ namespace DoppleTry2
         {
         }
 
-        public override void Verify(InstructionNode instructionWrapper)
+        public override void Verify(InstructionNode instructionNode)
         {
-            if (!CodeGroups.LdElemCodes.Contains(instructionWrapper.Instruction.OpCode.Code))
+            if (!CodeGroups.LdElemCodes.Contains(instructionNode.Instruction.OpCode.Code))
             {
                 return;
             }
-            var stElemOptionalArgs = instructionWrapper.DataFlowBackRelated.Where(x => x.ArgIndex == 2);
+            var stElemOptionalArgs = instructionNode.DataFlowBackRelated.Where(x => x.ArgIndex == 2);
             if (!stElemOptionalArgs.All(x => CodeGroups.StElemCodes.Contains(x.Argument.Instruction.OpCode.Code)))
             {
                 throw new Exception("Bad Stelem argument");
             }
-            var arrayRefArgs = instructionWrapper.DataFlowBackRelated.Where(x => x.ArgIndex == 1);
+            var arrayRefArgs = instructionNode.DataFlowBackRelated.Where(x => x.ArgIndex == 1);
             if (!arrayRefArgs.All(x => IsProvidingArray(x.Argument)))
             {
                 throw new Exception("Bad array ref argument");
             }
-            var arrayIndexArgs = instructionWrapper.DataFlowBackRelated.Where(x => x.ArgIndex == 0);
+            var arrayIndexArgs = instructionNode.DataFlowBackRelated.Where(x => x.ArgIndex == 0);
             if (!arrayIndexArgs.All(x => IsProvidingNumber(x.Argument)))
             {
                 throw new Exception("Bad array index argument");
             }
-            if (instructionWrapper.DataFlowBackRelated.Max(x => x.ArgIndex) > 2)
+            if (instructionNode.DataFlowBackRelated.Max(x => x.ArgIndex) > 2)
             {
                 throw new Exception("too many arguments!");
             }

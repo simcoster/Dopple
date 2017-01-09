@@ -22,6 +22,9 @@ namespace DoppleGraph
         public Dictionary<int, Color> ColumnBaseColors = new Dictionary<int, Color>();
         public GoView myView;
         CodeColorHanlder colorCode = new CodeColorHanlder();
+        GoLayer flowRoutesLinksLayer;
+        GoLayer dataLinksLayer;
+        GoLayer flowAffectingLinksLayer;
 
         private Form2()
         {
@@ -34,83 +37,225 @@ namespace DoppleGraph
             InitializeComponent();
         }
 
-        private List<GoNode> NodesToShow = new List<GoNode>();
-        private List<GoObject> ObjectsToHide = new List<GoObject>();
+        const int NodeSelectedHideIndex = 1;
+        const int FlowRouteLinkHideIndex = 2;
+        const int FlowAffectingLinkHideIndex = 3;
+        const int DataLinkHideIndex = 4;
+        const int DataBackTreeHideIndex = 5;
+        const int FlowBackTreeHideIndex = 6;
+        const int HiddenNodesHideIndex = 7;
+        const int RightLinksHideIndex = 8;
+        const int LeftLinksHideIndex = 9;
+
+
+        private Dictionary<int, List<GoObject>> ObjectsToHide = new Dictionary<int, List<GoObject>>() {
+                                                                                    { NodeSelectedHideIndex,new List<GoObject>() },
+                                                                                    { FlowRouteLinkHideIndex,new List<GoObject>() },
+                                                                                    { FlowAffectingLinkHideIndex,new List<GoObject>() },
+                                                                                    { DataLinkHideIndex,new List<GoObject>() },
+                                                                                    { DataBackTreeHideIndex,new List<GoObject>() },
+                                                                                    { FlowBackTreeHideIndex,new List<GoObject>() },
+                                                                                    { HiddenNodesHideIndex,new List<GoObject>() } ,
+                                                                                    { RightLinksHideIndex,new List<GoObject>() },
+                                                                                    { LeftLinksHideIndex,new List<GoObject>() } };
         private Random rnd = new Random();
         private List<InstructionNode> InstructionNodes;
 
         private void Node_UnSelected(object sender, EventArgs e)
         {
-            lock (NodesToShow)
+            lock (ObjectsToHide)
             {
-                if (maxIndex.Text != "" || minIndex.Text != "")
-                {
-                    return;
-                }
                 if (myView.Selection.Count == 0)
                 {
-                    NodesToShow.Clear();
-                }
-                var node = (GoNode)sender;
-                NodesToShow.Remove(node);
+                    ObjectsToHide[NodeSelectedHideIndex].Clear();
+                }              
                 ReShow();
             }
 
         }
 
-        private void ReShow()
+        private void Node_Selected(object sender, EventArgs e)
         {
-            if (NodesToShow.Intersect(myView.Document).Count() == 0)
+            lock(ObjectsToHide)
             {
-                foreach (var goObject in myView.Document.Except(ObjectsToHide))
+                ObjectsToHide[NodeSelectedHideIndex].Clear();
+
+                if (myView.Selection.Count >1)
                 {
-                    goObject.Visible = true;
+                    ObjectsToHide[NodeSelectedHideIndex].AddRange(GetObjectsToHide(myView.Selection.Where(x => x is GoNode).Cast<GoNode>()));
                 }
-                ShowDataFlowLinks_CheckedChanged(null, null);
-                ShowFlowLinks_CheckedChanged(null, null);
-            }
-            else
-            {
-                foreach (var goObject in myView.Document)
+                else if (sender is GoNode)
                 {
-                    goObject.Visible = false;
+                    ObjectsToHide[NodeSelectedHideIndex].AddRange(GetObjectsToHide(new GoNode[] { (GoNode) sender }));
                 }
-                foreach (GoNode node in NodesToShow)
-                {
-                    var linksToShow = node.Links.Cast<GoLink>().ToList();
-                    if (!ShowProgramFlowLinks.Checked)
-                    {
-                        linksToShow = linksToShow.Cast<GoLink>().Where(x => x.Pen.DashStyle != DashStyle.Dash).ToList();
-                    }
-                    if (!ShowDataFlowLinks.Checked)
-                    {
-                        linksToShow = linksToShow.Cast<GoLink>().Where(x => x.Pen.DashStyle != DashStyle.Solid).ToList();
-                    }
-                    foreach (var link in linksToShow.Except(ObjectsToHide).Cast<GoLink>())
-                    {
-                        ((GoLink)link).Visible = true;
-                        ((GoNode)link.ToNode).Visible = true;
-                        ((GoNode)link.FromNode).Visible = true;
-                    }
-                }
+                ReShow();
             }
         }
 
-        private void Node_Selected(object sender, EventArgs e)
+        private void ReShow()
         {
-            var node = (GoNode)sender;
-            if (ModifierKeys.HasFlag(Keys.Shift))
+            IEnumerable<GoObject> objectsToHide = ObjectsToHide.SelectMany(x => x.Value);
+            var objectsToShow = myView.Document.Except(objectsToHide);
+            foreach (var goObject in objectsToHide)
             {
-                NodesToShow.AddRange(nodeWrappers.Where(x => x.InstructionWrapper.Method == GetNodeWrapper(node).InstructionWrapper.Method)
-                    .Select(x => x.Node));
+                goObject.Visible = false;
             }
-            NodesToShow.Add(sender as GoNode);
+            foreach (var goObject in objectsToShow)
+            {
+                goObject.Visible = true;
+            }
+        }
+
+
+        private void MyView_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            var backTraceManager = new GraphBuilder(InstructionNodes);
+            if (e.KeyChar == '/')
+            {
+                ObjectsToHide[HiddenNodesHideIndex].AddRange(myView.Selection);
+                ObjectsToHide[HiddenNodesHideIndex].AddRange(myView.Selection.Where(x => x is GoNode).Cast<GoNode>().SelectMany(x => x.Links).Cast<GoLink>());
+            }
+            else if (e.KeyChar == '.')
+            {
+                if (myView.Selection.Count > 0)
+                {
+                    var backTreeNodes = BackSearcher.GetBackDataTree(GetNodeWrapper(myView.Selection.First(x => x is GoNode) as GoNode).InstructionNode)
+                                                                                                          .Select(x => GetNodeWrapper(x).Node).ToList();
+                    ObjectsToHide[DataBackTreeHideIndex].AddRange(GetObjectsToHide(backTreeNodes));
+                }                
+            }
+            else if (e.KeyChar == '+')
+            {
+                if (myView.Selection.Count > 0)
+                {
+                    var backTreeNodes = BackSearcher.GetBackFlowTree(GetNodeWrapper(myView.Selection.First(x => x is GoNode) as GoNode).InstructionNode)
+                                                                                                          .Select(x => GetNodeWrapper(x).Node).ToList();
+                    ObjectsToHide[DataBackTreeHideIndex].AddRange(GetObjectsToHide(backTreeNodes));
+                }
+            }
+            else if (e.KeyChar == '*')
+            {
+                ObjectsToHide.ForEach(x => ObjectsToHide[x.Key].Clear());
+            }
+            ReShow();
+        }
+
+        IEnumerable<GoObject> GetObjectsToHide(IEnumerable<GoNode> nodesToShow)
+        {
+            var tempNodesToShow = new List<GoObject>(nodesToShow);
+            tempNodesToShow.AddRange(nodesToShow.SelectMany(x => x.Links.Select(y => y.FromNode)).Cast<GoNode>());
+            tempNodesToShow.AddRange(nodesToShow.SelectMany(x => x.Links.Select(y => y.ToNode)).Cast<GoNode>());
+            tempNodesToShow.AddRange(nodesToShow.SelectMany(x => x.Links).Cast<GoLink>());
+            tempNodesToShow = tempNodesToShow.Distinct().ToList();
+            return myView.Document.Except(tempNodesToShow);
+        }
+
+        private void ShowFlowLinks_CheckedChanged(object sender, EventArgs e)
+        {
+            if (ShowProgramFlowLinks.Checked)
+            {
+                ObjectsToHide[FlowRouteLinkHideIndex].Clear();
+            }
+            else
+            {
+                ObjectsToHide[FlowRouteLinkHideIndex].AddRange(flowRoutesLinksLayer);
+            }
+            ReShow();
+        }
+
+        private void ShowDataFlowLinks_CheckedChanged(object sender, EventArgs e)
+        {
+            if (ShowDataFlowLinks.Checked)
+            {
+                ObjectsToHide[DataLinkHideIndex].Clear();
+            }
+            else
+            {
+                ObjectsToHide[DataLinkHideIndex].AddRange(dataLinksLayer);
+            }
+            ReShow();
+
+        }
+
+
+        private void ShowFlowAffectingLinks_CheckedChanged(object sender, EventArgs e)
+        {
+            if (FlowAffectingChb.Checked)
+            {
+                ObjectsToHide[FlowAffectingLinkHideIndex].Clear();
+            }
+            else
+            {
+                ObjectsToHide[FlowAffectingLinkHideIndex].AddRange(flowAffectingLinksLayer);
+            }
+            ReShow();
+
+        }
+
+        private void ShowRightDataLinks_CheckedChanged(object sender, EventArgs e)
+        {
+            if (ShowRightDataLinks.Checked)
+            {
+                ObjectsToHide[RightLinksHideIndex].Clear();
+            }
+            else
+            {
+                IEnumerable<GoLink> leftLinksToHide = myView.Selection.Where(x => x is GoTextNode).Cast<GoTextNode>().SelectMany(x => x.LeftPort.Links).Cast<GoLink>();
+                ObjectsToHide[RightLinksHideIndex].AddRange(leftLinksToHide);
+            }
+            ReShow();
+
+        }
+
+        private void ShowLeftDataLinks_CheckedChanged(object sender, EventArgs e)
+        {
+            if (ShowLeftDataLinks.Checked)
+            {
+                ObjectsToHide[LeftLinksHideIndex].Clear();
+            }
+            else
+            {
+                IEnumerable<GoLink> rightLinksToHide = myView.Selection.Where(x => x is GoTextNode).Cast<GoTextNode>().SelectMany(x => x.RightPort.Links).Cast<GoLink>();
+                ObjectsToHide[LeftLinksHideIndex].AddRange(rightLinksToHide);
+            }
+            ReShow();
+
+        }
+
+        private void minIndex_TextChanged(object sender, EventArgs e)
+        {
+            if (maxIndex.Text == "" || minIndex.Text == "")
+            {
+                return;
+            }
+            ShowOnlyMinMax();
+        }
+
+        private void maxIndex_TextChanged(object sender, EventArgs e)
+        {
+            if (maxIndex.Text == "" || minIndex.Text == "")
+            {
+                return;
+            }
+            ShowOnlyMinMax();
+        }
+
+        private void ShowOnlyMinMax()
+        {
+
+            int minIndexInt = Convert.ToInt32(minIndex.Text);
+            int maxIndexInt = Convert.ToInt32(maxIndex.Text);
+            var nodesToShow = InstructionNodes
+                                .Where(x => x.InstructionIndex >= minIndexInt && x.InstructionIndex <= maxIndexInt)
+                                .Select(x => GetNodeWrapper(x).Node)
+                                .ToList();
+            ObjectsToHide[HiddenNodesHideIndex].AddRange(GetObjectsToHide(nodesToShow));
             ReShow();
         }
 
         private void DrawFlowLinks(GoNodeWrapper nodeWrapper, GoView myView)
         {
-            foreach (InstructionNode wrapper in nodeWrapper.InstructionWrapper.ProgramFlowForwardRoutes)
+            foreach (InstructionNode wrapper in nodeWrapper.InstructionNode.ProgramFlowForwardRoutes)
             {
                 Color randomColor;
                 GoLink link = new GoLink();
@@ -128,27 +273,35 @@ namespace DoppleGraph
             }
         }
 
-        public void DrawDataLinks(GoNodeWrapper nodeWrapper, GoView myView)
+        public void DrawLinks(GoView myView)
         {
-            foreach (var indexedArg in nodeWrapper.InstructionWrapper.DataFlowBackRelated)
+            dataLinksLayer = myView.Document.Layers.CreateNewLayerAfter(myView.Document.Layers.Default);
+            flowAffectingLinksLayer = myView.Document.Layers.CreateNewLayerAfter(myView.Document.Layers.Default);
+            flowRoutesLinksLayer = myView.Document.Layers.CreateNewLayerAfter(myView.Document.Layers.Default);
+            foreach (var nodeWrapper in nodeWrappers)
             {
-                Color linkColor = GetPredefinedColor(indexedArg.ArgIndex);
-                GoLink edge = DrawEdge(nodeWrapper, myView, indexedArg.Argument, linkColor);
-                edge.ToolTipText = indexedArg.ArgIndex.ToString() + " " + edge.PenColor.R;
-
+                foreach (var indexedArg in nodeWrapper.InstructionNode.DataFlowBackRelated)
+                {
+                    Color linkColor = GetPredefinedColor(indexedArg.ArgIndex);
+                    GoLink edge = DrawEdge(nodeWrapper, myView, indexedArg.Argument, dataLinksLayer, new Pen(linkColor));
+                    edge.ToolTipText = indexedArg.ArgIndex.ToString() + " " + edge.PenColor.R;
+                }
+                foreach (var flowAffectingNode in nodeWrapper.InstructionNode.ProgramFlowBackAffected)
+                {
+                    DrawEdge(nodeWrapper, myView, flowAffectingNode, flowAffectingLinksLayer, new Pen(Color.LightPink));
+                }
+                foreach (var backRouteNode in nodeWrapper.InstructionNode.ProgramFlowBackRoutes)
+                {
+                    DrawEdge(nodeWrapper, myView, backRouteNode, flowRoutesLinksLayer, new Pen(Color.Black) { DashStyle = DashStyle.Dash });
+                }
             }
-            foreach (var flowAffectingNode in nodeWrapper.InstructionWrapper.ProgramFlowBackAffected)
-            {
-                DrawEdge(nodeWrapper, myView, flowAffectingNode, Color.LightPink);
-            }
-            var allLinks = myView.Document.Where(x => x is GoLink).Cast<GoLink>().Select(y => y.PenColor);
         }
 
-        private GoLink DrawEdge(GoNodeWrapper nodeWrapper, GoView myView, InstructionNode backNode, Color linkColor)
+        private GoLink DrawEdge(GoNodeWrapper nodeWrapper, GoView myView, InstructionNode backNode, GoLayer layer, Pen pen)
         {
             GoLink link = new GoLink();
             var backNodeWrapper = GetNodeWrapper(backNode);
-            link.PenColor = linkColor;
+            link.Pen = pen;
             link.ToPort = nodeWrapper.Node.LeftPort;
             if (backNodeWrapper.Node == nodeWrapper.Node)
             {
@@ -165,7 +318,7 @@ namespace DoppleGraph
             {
                 link.FromPort = backNodeWrapper.Node.RightPort;
             }
-            myView.Document.Add(link);
+            layer.Add(link);
             link.PenWidth = 3;
             return link;
         }
@@ -192,7 +345,7 @@ namespace DoppleGraph
         private void SetCoordinates(List<GoNodeWrapper> nodeWrappers)
         {
             Dictionary<int, List<GoNodeWrapper>> nodeWrapperCols = new Dictionary<int, List<GoNodeWrapper>>();
-            var firstNode = nodeWrappers.Where(x => x.InstructionWrapper.DataFlowBackRelated.Count == 0).ToList();
+            var firstNode = nodeWrappers.Where(x => x.InstructionNode.DataFlowBackRelated.Count == 0).ToList();
             SetLongestPathRec(firstNode);
             SetRowIndexes(nodeWrappers);
             FixDuplicateCoordinates(nodeWrappers);
@@ -224,7 +377,7 @@ namespace DoppleGraph
 
         private GoNodeWrapper GetNodeWrapper(InstructionNode instWrapper)
         {
-            return nodeWrappers.FirstOrDefault(x => x.InstructionWrapper == instWrapper);
+            return nodeWrappers.FirstOrDefault(x => x.InstructionNode == instWrapper);
         }
 
         private GoNodeWrapper GetNodeWrapper(GoNode goNode)
@@ -238,8 +391,8 @@ namespace DoppleGraph
             {
                 try
                 {
-                    var nodesToUpdate = node.InstructionWrapper.DataFlowForwardRelated
-                    //var nodesToUpdate = node.InstructionWrapper.ProgramFlowForwardRoutes
+                    //var nodesToUpdate = node.InstructionNode.DataFlowForwardRelated
+                    var nodesToUpdate = node.InstructionNode.ProgramFlowForwardRoutes
                    .Select(x => GetNodeWrapper(x))
                    .Where(x => x.LongestPath.Count == 0 || !x.LongestPath.Intersect(node.LongestPath).SequenceEqual(x.LongestPath))
                    .Where(x => x.LongestPath.Count < node.LongestPath.Count + 1)
@@ -262,7 +415,7 @@ namespace DoppleGraph
             foreach (int col in allNodes.Select(x => x.DisplayCol).Distinct())
             {
                 var orderedNodes = allNodes.Where(x => x.DisplayCol == col)
-                    .OrderBy(x => x.InstructionWrapper.Instruction.OpCode.Code.ToString()).ToList();
+                    .OrderBy(x => x.InstructionNode.Instruction.OpCode.Code.ToString()).ToList();
                 foreach (var node in orderedNodes)
                 {
                     node.DisplayRow = orderedNodes.IndexOf(node) +1;
@@ -276,6 +429,7 @@ namespace DoppleGraph
             // create a Go view (a Control) and add to the form
             myView = new GoView();
             myView.KeyPress += MyView_KeyPress;
+            myView.SelectionFinished += Node_Selected;
             myView.AllowDelete = false;
             myView.AllowInsert = false;
             myView.AllowLink = false;
@@ -285,7 +439,6 @@ namespace DoppleGraph
 
             nodeWrappers =
                 InstructionNodes
-                //.Where(x => x.ForwardDataFlowRelated.Count >0 || x.BackDataFlowRelated.Count >0)
                 .Select(x => new GoNodeWrapper(new GoTextNodeHoverable(), x))
                 .ToList();
 
@@ -295,17 +448,17 @@ namespace DoppleGraph
                 goNodeWrapper.Node.Selected += Node_Selected;
                 goNodeWrapper.Node.UnSelected += Node_UnSelected;
                 goNodeWrapper.Index = nodeWrappers.IndexOf(goNodeWrapper);
-                var shape = ((GoShape)goNodeWrapper.Node.Background);
-                shape.BrushColor = colorCode.GetColor(goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code);
+                var shape = ((GoShape) goNodeWrapper.Node.Background);
+                shape.BrushColor = colorCode.GetColor(goNodeWrapper.InstructionNode.Instruction.OpCode.Code);
                 if (shape.BrushColor.GetBrightness() < 0.4)
                 {
                     goNodeWrapper.Node.Label.TextColor = Color.White;
                 }
                 shape.Size = new SizeF(400, 400);
 
-                if (goNodeWrapper.InstructionWrapper.InliningProperties.Inlined || goNodeWrapper.InstructionWrapper.MarkForDebugging)
+                if (goNodeWrapper.InstructionNode.InliningProperties.Inlined || goNodeWrapper.InstructionNode.MarkForDebugging)
                 {
-                    if (goNodeWrapper.InstructionWrapper.MarkForDebugging)
+                    if (goNodeWrapper.InstructionNode.MarkForDebugging)
                     {
                         goNodeWrapper.Node.Shape.PenColor = Color.Red;
                     }
@@ -315,203 +468,35 @@ namespace DoppleGraph
                     }
                     goNodeWrapper.Node.Shape.PenWidth = 3;
                     goNodeWrapper.Node.Shadowed = true;
-                    goNodeWrapper.Node.ToolTipText = goNodeWrapper.InstructionWrapper.Method.Name + "*************";
+                    goNodeWrapper.Node.ToolTipText = goNodeWrapper.InstructionNode.Method.Name + "*************";
                 }
 
-                goNodeWrapper.Node.Text = goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code.ToString() + " index:" + goNodeWrapper.InstructionWrapper.InstructionIndex + " offset:" + goNodeWrapper.InstructionWrapper.Instruction.Offset + " ";
+                goNodeWrapper.Node.Text = goNodeWrapper.InstructionNode.Instruction.OpCode.Code.ToString() + " index:" + goNodeWrapper.InstructionNode.InstructionIndex + " offset:" + goNodeWrapper.InstructionNode.Instruction.Offset + " ";
 
                 if (new[] { Code.Call, Code.Calli, Code.Callvirt }.Contains(
-                        goNodeWrapper.InstructionWrapper.Instruction.OpCode.Code))
+                        goNodeWrapper.InstructionNode.Instruction.OpCode.Code))
                 {
-                    goNodeWrapper.Node.Text += ((MethodReference)goNodeWrapper.InstructionWrapper.Instruction.Operand).Name ?? " ";
+                    goNodeWrapper.Node.Text += ((MethodReference) goNodeWrapper.InstructionNode.Instruction.Operand).Name ?? " ";
                 }
-                else if (goNodeWrapper.InstructionWrapper is FunctionArgInstNode)
+                else if (goNodeWrapper.InstructionNode is FunctionArgInstNode)
                 {
-                    var ArgInstWrapper = (FunctionArgInstNode)goNodeWrapper.InstructionWrapper;
+                    var ArgInstWrapper = (FunctionArgInstNode) goNodeWrapper.InstructionNode;
                     goNodeWrapper.Node.Text += " " + ArgInstWrapper.ArgName + " " + ArgInstWrapper.ArgIndex;
                 }
-                else if (goNodeWrapper.InstructionWrapper.Instruction.Operand != null)
+                else if (goNodeWrapper.InstructionNode.Instruction.Operand != null)
                 {
-                    goNodeWrapper.Node.Text += goNodeWrapper.InstructionWrapper.Instruction.Operand.ToString();
+                    goNodeWrapper.Node.Text += goNodeWrapper.InstructionNode.Instruction.Operand.ToString();
                 }
 
-                if (goNodeWrapper.InstructionWrapper.InliningProperties.Recursive)
+                if (goNodeWrapper.InstructionNode.InliningProperties.Recursive)
                 {
-                    goNodeWrapper.Node.Text += " RecIndex:" + goNodeWrapper.InstructionWrapper.InliningProperties.RecursionSameLevelIndex;
-                    goNodeWrapper.Node.Text += " Recursive:" + goNodeWrapper.InstructionWrapper.InliningProperties.RecursionLevel; 
+                    goNodeWrapper.Node.Text += " RecIndex:" + goNodeWrapper.InstructionNode.InliningProperties.SameMethodCallIndex;
+                    goNodeWrapper.Node.Text += " Recursive:" + goNodeWrapper.InstructionNode.InliningProperties.RecursionLevel;
                 }
                 frontLayer.Add(goNodeWrapper.Node);
             }
             SetCoordinates(nodeWrappers);
-            foreach (var nodeWrapper in nodeWrappers)
-            {
-                DrawDataLinks(nodeWrapper, myView);
-                DrawFlowLinks(nodeWrapper, myView);
-            }
-        }
-
-
-        private void MyView_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            var backTraceManager = new GraphBuilder(InstructionNodes);
-            if (e.KeyChar == '/')
-            {
-                PermanentlyHideSelection();
-            }
-            else if (e.KeyChar == '.')
-            {
-                foreach(var node in myView.Selection.Where(x => x is GoNode).Cast<GoNode>().ToArray())
-                {
-                    var nodeBackTree = BackSearcher.GetBackDataTree(GetNodeWrapper(node).InstructionWrapper).Select(x => GetNodeWrapper(x).Node).ToList();
-                    var nodesToHide = myView.Document.Where(x => x is GoNode).Except(nodeBackTree).ToList();
-                    foreach(var notABackNode in nodesToHide)
-                    {
-                        myView.Selection.Add(notABackNode);
-                    }
-                    myView.Selection.Remove(node);
-                }
-                PermanentlyHideSelection();
-            }
-            else if (e.KeyChar == '+')
-            {
-                foreach (var node in myView.Selection.Where(x => x is GoNode).Cast<GoNode>().ToArray())
-                {
-                    var nodeBackTree = BackSearcher.GetBackFlowTree(GetNodeWrapper(node).InstructionWrapper).Select(x => GetNodeWrapper(x).Node).ToList();
-                    var nodesToHide = myView.Document.Where(x => x is GoNode).Except(nodeBackTree).ToList();
-                    foreach (var notABackNode in nodesToHide)
-                    {
-                        myView.Selection.Add(notABackNode);
-                    }
-                    myView.Selection.Remove(node);
-                }
-                PermanentlyHideSelection();
-            }
-            else if (e.KeyChar == '*')
-            {
-                ObjectsToHide.Clear();
-                NodesToShow.Clear();
-                ReShow();
-            }
-        }
-
-        private void PermanentlyHideSelection()
-        {
-            var nodesToHide = myView.Selection
-                                .Where(x => x is GoNode)
-                                .Cast<GoNode>();
-            foreach (var node in nodesToHide)
-            {
-                foreach (GoLink link in node.Links)
-                {
-                    link.Visible = false;
-                    ObjectsToHide.Add(link);
-                }
-                node.Visible = false;
-                ObjectsToHide.Add(node);
-            }
-        }
-
-        private void ShowFlowLinks_CheckedChanged(object sender, EventArgs e)
-        {
-            var flowLinks = myView.Document.Where(x => x is GoLink).Cast<GoLink>().Where(x => x.Pen.DashStyle == DashStyle.Dash);
-            foreach (var flowLink in flowLinks)
-            {
-                if (ShowProgramFlowLinks.Checked)
-                {
-                    flowLink.Visible = true;
-                }
-                else
-                {
-                    flowLink.Visible = false;
-                }
-            }
-        }
-
-        private void ShowDataFlowLinks_CheckedChanged(object sender, EventArgs e)
-        {
-            var flowLinks = myView.Document.Except(ObjectsToHide).Where(x => x is GoLink).Cast<GoLink>().Where(x => x.Pen.DashStyle != DashStyle.Dash);
-            foreach (var flowLink in flowLinks)
-            {
-                if (ShowDataFlowLinks.Checked)
-                {
-                    flowLink.Visible = true;
-                }
-                else
-                {
-                    flowLink.Visible = false;
-                }
-            }
-        }
-
-        private void ShowRightDataLinks_CheckedChanged(object sender, EventArgs e)
-        {
-            var linksToHide = myView.Selection.Except(ObjectsToHide).Where(x => x is GoTextNode).Cast<GoTextNode>().SelectMany(x => x.LeftPort.Links).Cast<GoLink>();
-            foreach (var flowLink in linksToHide)
-            {
-                if (ShowRightDataLinks.Checked)
-                {
-                    flowLink.Visible = true;
-                }
-                else
-                {
-                    flowLink.Visible = false;
-                }
-            }
-        }
-
-        private void ShowLeftDataLinks_CheckedChanged(object sender, EventArgs e)
-        {
-            var linksToHide = myView.Selection.Where(x => x is GoTextNode).Cast<GoTextNode>().SelectMany(x => x.RightPort.Links).Cast<GoLink>();
-            foreach (var flowLink in linksToHide)
-            {
-                if (ShowLeftDataLinks.Checked)
-                {
-                    flowLink.Visible = true;
-                }
-                else
-                {
-                    flowLink.Visible = false;
-                }
-            }
-        }
-
-        private void minIndex_TextChanged(object sender, EventArgs e)
-        {
-            if (maxIndex.Text == "" || minIndex.Text == "")
-            {
-                return;
-            }
-            ShowOnlyMinMax();
-        }
-
-        private void maxIndex_TextChanged(object sender, EventArgs e)
-        {
-            if (maxIndex.Text == "" || minIndex.Text == "")
-            {
-                return;
-            }
-            ShowOnlyMinMax();
-        }
-
-        private void ShowOnlyMinMax()
-        {
-            try
-            {
-                int minIndexInt = Convert.ToInt32(minIndex.Text);
-                int maxIndexInt = Convert.ToInt32(maxIndex.Text);
-                var nodesToShow = InstructionNodes
-                                    .Where(x => x.InstructionIndex >= minIndexInt && x.InstructionIndex <= maxIndexInt)
-                                    .Select(x => GetNodeWrapper(x).Node)
-                                    .ToList();
-                NodesToShow.Clear();
-                NodesToShow.AddRange(nodesToShow);
-                ReShow();
-            }
-            catch
-            {
-                NodesToShow.Clear();
-                ReShow();
-            }
+            DrawLinks(myView);
         }
     }
 }

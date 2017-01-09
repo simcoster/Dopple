@@ -8,11 +8,11 @@ namespace DoppleTry2.VerifierNs
 {
     public abstract class Verifier
     {
-        public Verifier(List<InstructionNode> instructionWrappers)
+        public Verifier(List<InstructionNode> instructionNodes)
         {
-            _instructionWrappers = instructionWrappers;
+            _instructionNodes = instructionNodes;
         }
-        protected List<InstructionNode> _instructionWrappers;
+        protected List<InstructionNode> _instructionNodes;
         public abstract void Verify(InstructionNode instructionWrapper);
 
         public static bool IsNumberType(Type value)

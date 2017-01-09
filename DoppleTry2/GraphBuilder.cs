@@ -20,10 +20,14 @@ namespace DoppleTry2
         private readonly ProgramFlowManager _programFlowManager = new ProgramFlowManager();
         private MethodDefinition metDef;
         public List<InstructionNode> InstructionNodes;
+        Verifier[] verifiers;
 
         public GraphBuilder(IEnumerable<InstructionNode> instNodes)
         {
             InstructionNodes = instNodes.ToList();
+            verifiers = new Verifier[] {new StElemVerifier(InstructionNodes), new StackPopPushVerfier(InstructionNodes),
+                                            new TwoWayVerifier(InstructionNodes), new ArithmeticsVerifier(InstructionNodes),
+                                            new ArgIndexVerifier(InstructionNodes), new LdElemVerifier(InstructionNodes) };
         }
         public GraphBuilder(MethodDefinition methodDefinition)
         {
@@ -48,8 +52,12 @@ namespace DoppleTry2
                     new LoadFieldByStackBackTracer(InstructionNodes),
                     new LoadMemoryByOperandBackTracer(InstructionNodes),
                     new TypedReferenceBackTracer(InstructionNodes),
-                    new ConditionionalsBackTracer(InstructionNodes)
+                    new ConditionionalsBackTracer(InstructionNodes),
                 };
+
+            verifiers = new Verifier[] {new StElemVerifier(InstructionNodes), new StackPopPushVerfier(InstructionNodes),
+                                            new TwoWayVerifier(InstructionNodes), new ArithmeticsVerifier(InstructionNodes),
+                                            new ArgIndexVerifier(InstructionNodes), new LdElemVerifier(InstructionNodes) };
         }
 
 
@@ -58,29 +66,34 @@ namespace DoppleTry2
             SetInstructionIndexes();
             _programFlowManager.AddFlowConnections(InstructionNodes);
             PreInlineBackTrace();
-           InlineFunctionCalls();
+            InlineFunctionCalls();
             SetInstructionIndexes();
             BackTrace();
-            RemoveHelperCodes();
-            AddZeroNode();
+           // RemoveHelperCodes();
             //MergeSimilarInstructions();
-            //PostMergeBackTrace();
+            PostMergeLdElemBackTrace();
             SetInstructionIndexes();
+            AddZeroNode();
             //Veirify();
 
             return InstructionNodes;
         }
 
-        private void PostMergeBackTrace()
+        private void PostMergeLdElemBackTrace()
         {
             LdElemBacktracer ldElemBacktracer = new LdElemBacktracer(InstructionNodes);
-            foreach(var instWrapper in InstructionNodes)
+            foreach(var ldElemNode in InstructionNodes)
             {
-                if (!ldElemBacktracer.HandlesCodes.Contains(instWrapper.Instruction.OpCode.Code))
+                if (!ldElemBacktracer.HandlesCodes.Contains(ldElemNode.Instruction.OpCode.Code))
                 {
                     continue;
                 }
-                ldElemBacktracer.AddBackDataflowConnections(instWrapper);
+                ldElemBacktracer.AddBackDataflowConnections(ldElemNode);
+                foreach (var verifier in verifiers)
+                {
+                    //TODO remove
+                    //verifier.Verify(ldElemNode);
+                }
             }
         }
 
@@ -101,20 +114,23 @@ namespace DoppleTry2
                 for (int i =0;  i < InstructionNodes.Count; i++)
                 {
                     var firstInst = InstructionNodes[i];
-                    var secondInst = InstructionNodes
+                    var secondInstOptions = InstructionNodes
                                         .Where(x => x != firstInst)
                                         .Where(x => x.Instruction.OpCode.Code == firstInst.Instruction.OpCode.Code)
                                         .Where(x => typeof(OpCodes).GetFields().Select(y => y.GetValue(null))
                                                     .Cast<OpCode>().Where(y => y.StackBehaviourPop != StackBehaviour.Pop0).Select(y => y.Code)
                                                     .Contains(x.Instruction.OpCode.Code))
-                                        .Where(x => !new[] { Code.Ret }.Concat(CodeGroups.CallCodes).Contains(x.Instruction.OpCode.Code))
-                                        .Where(x => x.DataFlowBackRelated.Equals(firstInst.DataFlowBackRelated))
-                                        .Where(x => !x.DataFlowBackRelated.SelfFeeding)
-                                        .FirstOrDefault();
-                    if (secondInst != null)
+                                        .Where(x => !new[] { Code.Ret }.Concat(CodeGroups.CallCodes).Contains(x.Instruction.OpCode.Code));
+                    var firstInstBackRelated = firstInst.DataFlowBackRelated.Where(x => x.Argument != firstInst);
+                    foreach (var secondInstOption in secondInstOptions.ToArray())
                     {
-                        MergeNodes(new[] { firstInst, secondInst });
-                        mergesWereDone = true;
+                        var secondInstBackRelated = secondInstOption.DataFlowBackRelated.Where(x => x.Argument != secondInstOption);
+                        if (secondInstBackRelated.SequenceEqual(firstInstBackRelated) && firstInst.DataFlowBackRelated.SelfFeeding == secondInstOption.DataFlowBackRelated.SelfFeeding)
+                        {
+                            MergeNodes(new[] { firstInst, secondInstOption });
+                            mergesWereDone = true;
+                            break;
+                        }
                     }
                 }
             } while (mergesWereDone);
@@ -145,7 +161,7 @@ namespace DoppleTry2
             RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.LdLocCodes.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(InstructionNodes.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.LdArgCodes.Contains(x.Instruction.OpCode.Code) && x.InliningProperties.Inlined));
-            RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.CallCodes.Contains(x.Instruction.OpCode.Code) && x.InliningProperties.Recursive));
+            //RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.CallCodes.Contains(x.Instruction.OpCode.Code) && x.InliningProperties.Recursive));
             RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Ret && x.InliningProperties.Inlined));
             RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Dup));
         }
@@ -166,12 +182,16 @@ namespace DoppleTry2
 
         private void BackTrace()
         {
-            foreach (var instWrapper in InstructionNodes.OrderByDescending(x => x.InstructionIndex))
+            foreach (var node in InstructionNodes.OrderByDescending(x => x.InstructionIndex))
             {
-                var backTracers = _backTracers.Where(x => x.HandlesCodes.Contains(instWrapper.Instruction.OpCode.Code));
+                var backTracers = _backTracers.Where(x => x.HandlesCodes.Contains(node.Instruction.OpCode.Code));
                 foreach (var backTracer in backTracers)
                 {
-                    backTracer.AddBackDataflowConnections(instWrapper);
+                    backTracer.AddBackDataflowConnections(node);
+                }
+                foreach (var verifier in verifiers)
+                {
+                    verifier.Verify(node);
                 }
             }
         }
@@ -180,7 +200,7 @@ namespace DoppleTry2
         {
             var recursionGroups = InstructionNodes
                                     .Where(x => !CodeGroups.StArgCodes.Contains(x.Instruction.OpCode.Code))
-                                    .GroupBy(x => new { x.Method.FullName, x.Instruction.Offset, x.Instruction.OpCode })
+                                    .GroupBy(x => new { x.Method, x.Instruction.Offset, x.Instruction.OpCode })
                                     .Where(x => x.Count() >1);
             foreach (var recursionGroup in recursionGroups)
             {
