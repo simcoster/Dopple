@@ -22,6 +22,15 @@ namespace DoppleTry2
             return base.Equals(obj);
         }
 
+        public static bool SequenceEqualsDeep(IEnumerable<IndexedArgument> firstList, IEnumerable<IndexedArgument> secondList)
+        {
+            if (firstList.GetType() != secondList.GetType())
+            {
+                return false;
+            }
+            return firstList.All(x => secondList.Any(y => y.ArgIndex == x.ArgIndex && x.Argument == y.Argument));
+        }
+
         readonly InstructionNode containingWrapper;
         public int MaxArgIndex = -1;
 

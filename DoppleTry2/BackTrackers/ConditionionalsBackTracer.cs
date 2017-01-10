@@ -67,7 +67,7 @@ namespace DoppleTry2.BackTrackers
                 foreach(var node in executionTrack.Nodes)
                 {
                     IndexedArgument trackArg = new IndexedArgument((int) executionTrack.TrackType, currentNode);
-                    if (!node.ProgramFlowBackAffected.Contains(trackArg))
+                    if (!node.ProgramFlowBackAffected.Any(x => x.Argument == trackArg.Argument && x.ArgIndex <= trackArg.ArgIndex ))
                     {
                         node.ProgramFlowBackAffected.AddTwoWay(trackArg); 
                     }

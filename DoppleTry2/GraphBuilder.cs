@@ -60,7 +60,7 @@ namespace DoppleTry2
             SetInstructionIndexes();
             BackTrace();
             RemoveHelperCodes();
-            //MergeSimilarInstructions();
+            MergeSimilarInstructions();
             LdElemBackTrace();
             RecursionFix();
             SetInstructionIndexes();
@@ -98,7 +98,7 @@ namespace DoppleTry2
             MergeLdArgs();
             MergeImmediateValue();
             //MergeRecursionParalel();
-            //MergeEquivilentPairs();
+            MergeEquivilentPairs();
         }
 
         private void MergeEquivilentPairs()
@@ -121,7 +121,7 @@ namespace DoppleTry2
                     foreach (var secondInstOption in secondInstOptions.ToArray())
                     {
                         var secondInstBackRelated = secondInstOption.DataFlowBackRelated.Where(x => x.Argument != secondInstOption);
-                        if (secondInstBackRelated.SequenceEqual(firstInstBackRelated) && firstInst.DataFlowBackRelated.SelfFeeding == secondInstOption.DataFlowBackRelated.SelfFeeding)
+                        if (BackArgList.SequenceEqualsDeep(secondInstBackRelated,firstInstBackRelated) && firstInst.DataFlowBackRelated.SelfFeeding == secondInstOption.DataFlowBackRelated.SelfFeeding)
                         {
                             MergeNodes(new[] { firstInst, secondInstOption });
                             mergesWereDone = true;

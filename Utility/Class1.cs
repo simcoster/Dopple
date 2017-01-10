@@ -10,50 +10,25 @@ namespace Utility
 {
     public class Class1
     {
-        public static bool BinarySearch(int first, int last, int[] mynumbers, int target)
+        static void BubbleSort(int[] number)
         {
-            while (first <= last)
+            bool flag = true;
+            int temp;
+            int numLength = number.Length;
+            //sorting an array
+            for (int i = 1; (i <= (numLength - 1)) && flag; i++)
             {
-                var mid = (first + last) / 2;
-
-                if (target < mynumbers[mid])
+                flag = false;
+                for (int j = 0; j < (numLength - 1); j++)
                 {
-                    first = mid + 1;
+                    if (number[j + 1] > number[j])
+                    {
+                        temp = number[j];
+                        number[j] = number[j + 1];
+                        number[j + 1] = temp;
+                        flag = true;
+                    }
                 }
-
-                if (target > mynumbers[mid])
-                {
-                    last = mid - 1;
-                }
-
-                else
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public bool BinarySearchRec(int first, int last, int[] mynumbers, int target)
-        {
-            if (first == last)
-            {
-                return mynumbers[first] == target;
-            }
-
-            var mid = (first + last) / 2;
-
-            if (target < mynumbers[mid])
-            {
-                return BinarySearchRec(mid + 1, last, mynumbers, target);
-            }
-            if (target > mynumbers[mid])
-            {
-                return BinarySearchRec(first, mid - 1, mynumbers, target);
-            }
-            else
-            {
-                return true;
             }
         }
     }

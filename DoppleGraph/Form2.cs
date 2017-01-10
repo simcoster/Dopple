@@ -352,7 +352,7 @@ namespace DoppleGraph
                 case 1:
                     return Color.Pink;
                 case 2:
-                    return Color.LightYellow;
+                    return Color.Yellow;
                 case 3:
                     return Color.LightSeaGreen;
 
