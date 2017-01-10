@@ -7,7 +7,7 @@ using DoppleTry2.InstructionNodes;
 
 namespace DoppleTry2.BackTrackers
 {
-    public class StackPopBackTracer : BackTracer
+    public class StackPopBackTracer : RecursiveBacktracer
     {
         /// <summary>
         /// This function uses both recursion And mutual recursion with AddBackDataflowConnections
@@ -42,7 +42,7 @@ namespace DoppleTry2.BackTrackers
                 bool mustRecurseFirst = backNode.StackPopCount != 0;
                 if (mustRecurseFirst)
                 {
-                    AddBackDataflowConnections(backNode);
+                    InnerAddBackDataflowConnections(backNode);
                 }
                 if (backNode.StackPushCount >0 )
                 {
@@ -56,7 +56,7 @@ namespace DoppleTry2.BackTrackers
             return foundInstructions;
         }
 
-        public override void AddBackDataflowConnections(InstructionNode currentInst)
+        protected override void InnerAddBackDataflowConnections(InstructionNode currentInst)
         {
             for (int i = 0; i < currentInst.StackPopCount; i++)
             {
@@ -104,9 +104,10 @@ namespace DoppleTry2.BackTrackers
                     .Cast<OpCode>()
                     .Where(x => x.StackBehaviourPop != StackBehaviour.Pop0)
                     .Select(x => x.Code)
+                    .Except(CodeGroups.CallCodes)
                     .ToArray();
 
-        public StackPopBackTracer(List<InstructionNode> instructionNodes) : base(instructionNodes)
+        public StackPopBackTracer(List<InstructionNode> instructionNodes, BackTraceManager backtraceManager) : base(instructionNodes, backtraceManager)
         {
         }
     }

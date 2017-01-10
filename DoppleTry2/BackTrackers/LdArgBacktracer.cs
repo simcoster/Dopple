@@ -10,11 +10,11 @@ namespace DoppleTry2.BackTrackers
 {
     class LdArgBacktracer : SingeIndexBackTracer
     {
-        public LdArgBacktracer(List<InstructionNode> instructionNodes) : base(instructionNodes)
+        public LdArgBacktracer(List<InstructionNode> instructionNodes, BackTraceManager backtraceManager) : base(instructionNodes)
         {
-            stackPopBacktracer = new StackPopBackTracer(instructionNodes);
+            this.backtraceManager = backtraceManager;
         }
-        private readonly StackPopBackTracer stackPopBacktracer;
+        private readonly BackTraceManager backtraceManager;
         protected override IEnumerable<InstructionNode> GetDataflowBackRelatedArgGroup(InstructionNode instNode)
         {
             if (instNode.InliningProperties.Inlined)
@@ -25,7 +25,7 @@ namespace DoppleTry2.BackTrackers
                 {
                     if (inlinedCall.StackPopCount > 0)
                     {
-                        stackPopBacktracer.AddBackDataflowConnections(inlinedCall);
+                        backtraceManager.BackTrace(inlinedCall);
                     }
                     argSuppliers.AddRange(inlinedCall.DataFlowBackRelated.Where(x => x.ArgIndex == ((LdArgInstructionNode) instNode).ArgIndex).Select(x => x.Argument));
                 }

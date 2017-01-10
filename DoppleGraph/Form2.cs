@@ -119,6 +119,7 @@ namespace DoppleGraph
             {
                 if (myView.Selection.Count > 0)
                 {
+                    ObjectsToHide[DataBackTreeHideIndex].Clear();
                     var backTreeNodes = BackSearcher.GetBackDataTree(GetNodeWrapper(myView.Selection.First(x => x is GoNode) as GoNode).InstructionNode)
                                                                                                           .Select(x => GetNodeWrapper(x).Node).ToList();
                     ObjectsToHide[DataBackTreeHideIndex].AddRange(GetObjectsToHide(backTreeNodes));
@@ -128,6 +129,7 @@ namespace DoppleGraph
             {
                 if (myView.Selection.Count > 0)
                 {
+                    ObjectsToHide[DataBackTreeHideIndex].Clear();
                     var backTreeNodes = BackSearcher.GetBackFlowTree(GetNodeWrapper(myView.Selection.First(x => x is GoNode) as GoNode).InstructionNode)
                                                                                                           .Select(x => GetNodeWrapper(x).Node).ToList();
                     ObjectsToHide[DataBackTreeHideIndex].AddRange(GetObjectsToHide(backTreeNodes));
@@ -350,7 +352,7 @@ namespace DoppleGraph
             SetRowIndexes(nodeWrappers);
             FixDuplicateCoordinates(nodeWrappers);
             int totalHeight = 1000;
-            int totalWidth = 4000;
+            int totalWidth = 2000;
             float heightOffset = Convert.ToSingle(totalHeight / nodeWrappers.Select(x => x.DisplayRow).Max());
             float widthOffset = Convert.ToSingle(totalWidth / nodeWrappers.Select(x => x.DisplayCol).Max());
             foreach (var nodeWrapper in nodeWrappers)
@@ -391,8 +393,8 @@ namespace DoppleGraph
             {
                 try
                 {
-                    //var nodesToUpdate = node.InstructionNode.DataFlowForwardRelated
-                    var nodesToUpdate = node.InstructionNode.ProgramFlowForwardRoutes
+                    var nodesToUpdate = node.InstructionNode.DataFlowForwardRelated
+                    //var nodesToUpdate = node.InstructionNode.ProgramFlowForwardRoutes
                    .Select(x => GetNodeWrapper(x))
                    .Where(x => x.LongestPath.Count == 0 || !x.LongestPath.Intersect(node.LongestPath).SequenceEqual(x.LongestPath))
                    .Where(x => x.LongestPath.Count < node.LongestPath.Count + 1)

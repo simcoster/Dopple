@@ -17,12 +17,22 @@ namespace DoppleTry2.BackTrackers
         protected readonly IEnumerable<OpCode> AllOpCodes =
             typeof(OpCodes).GetFields().Select(x => x.GetValue(null)).Cast<OpCode>();
 
-        protected BackTracer(List<InstructionNode> instructionsWrappers)
+        protected BackTracer(List<InstructionNode> instructionNodes)
         {
-            InstructionNodes = instructionsWrappers;
+            InstructionNodes = instructionNodes;
         }
-        public abstract void AddBackDataflowConnections(InstructionNode currentInst);
-       
+        protected abstract void InnerAddBackDataflowConnections(InstructionNode currentInst);
+        public void AddBackDataflowConnections(InstructionNode currentInst)
+        {
+            if (currentInst.DoneBackTracers.Contains(GetType()))
+            {
+                return;
+            }
+            InnerAddBackDataflowConnections(currentInst);
+            currentInst.DoneBackTracers.Add(GetType());
+        }
+
+
         protected virtual bool HasBackDataflowNodes { get; } = true;
 
         public abstract Code[] HandlesCodes { get; }

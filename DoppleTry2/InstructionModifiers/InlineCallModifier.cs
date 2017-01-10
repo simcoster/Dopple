@@ -8,6 +8,7 @@ using Mono.Cecil.Cil;
 using DoppleTry2.BackTrackers;
 using DoppleTry2.ProgramFlowHanlder;
 using DoppleTry2.InstructionNodes;
+using System.Diagnostics;
 
 namespace DoppleTry2.InstructionModifiers
 {
@@ -36,7 +37,7 @@ namespace DoppleTry2.InstructionModifiers
             {
                 List<InstructionNode> oldCallForwardNodes = callNode.ProgramFlowForwardRoutes.ToList();
                 List<InstructionNode> inlinedInstNodes = GetDeepInlineRec(callNode, startCallSequence);
-               if (inlinedInstNodes.Count == 0)
+                if (inlinedInstNodes.Count == 0)
                 {
                     continue;
                 }
@@ -46,11 +47,9 @@ namespace DoppleTry2.InstructionModifiers
                 {
                     StitchProgramFlow(inlinedEndNode, oldCallForwardNodes);
                 }
-            }       
+            }
             //RemoveOraphanedNodes(MyInstructionNodes);
         }
-
-
 
         //TODO should merge this with the first function, duplicate code :P
         List<InstructionNode> GetDeepInlineRec(InlineableCallNode callNode, List<MethodDefinition> callSequence)
@@ -119,7 +118,7 @@ namespace DoppleTry2.InstructionModifiers
 
         private static void CheckRight(List<InstructionNode> inlinedNodes = null)
         {
-            if (inlinedNodes!=null && inlinedNodes.Where(x => x.ProgramFlowBackRoutes.Intersect(removedNodes).Count() > 0).ToList().Count > 0)
+            if (inlinedNodes != null && inlinedNodes.Where(x => x.ProgramFlowBackRoutes.Intersect(removedNodes).Count() > 0).ToList().Count > 0)
             {
                 throw new Exception("bad bad bad");
             }
@@ -132,8 +131,8 @@ namespace DoppleTry2.InstructionModifiers
         private static List<InstructionNode> removedNodes = new List<InstructionNode>();
         private static void RemoveOraphanedNodes(List<InstructionNode> instructionNodes)
         {
-            var accessibleNodes =BackSearcher.GetForwardFlowTree(MyInstructionNodes[0]);
-            foreach(var inacessibleNode in MyInstructionNodes.Except(accessibleNodes).ToArray())
+            var accessibleNodes = BackSearcher.GetForwardFlowTree(MyInstructionNodes[0]);
+            foreach (var inacessibleNode in MyInstructionNodes.Except(accessibleNodes).ToArray())
             {
                 instructionNodes.Remove(inacessibleNode);
                 inacessibleNode.ProgramFlowForwardRoutes.RemoveAllTwoWay();
@@ -152,9 +151,34 @@ namespace DoppleTry2.InstructionModifiers
             {
                 forwardFlowInst.ProgramFlowBackRoutes.RemoveTwoWay(backNode);
             }
-            foreach(var newForwardNode in forwardNodes)
+            foreach (var newForwardNode in forwardNodes)
             {
                 newForwardNode.ProgramFlowBackRoutes.AddTwoWay(backNode);
+            }
+        }
+
+        public static void PostBacktraceRecursionStitch(List<InstructionNode> instructionNodes)
+        {
+            foreach (var recursiveCall in instructionNodes.Where(x => x is InlineableCallNode && x.InliningProperties.Recursive).Cast<InlineableCallNode>().ToList())
+            {
+                var allRets = instructionNodes.Where(x => x is RetInstructionNode && x.Method == recursiveCall.CalledFunction);
+                foreach (var dataForwardNode in recursiveCall.DataFlowForwardRelated.ToArray())
+                {
+                    var indexedArgs = dataForwardNode.DataFlowBackRelated.Where(x => x.Argument == recursiveCall);
+                    foreach (var indexedArg in indexedArgs.ToArray())
+                    {
+                        dataForwardNode.DataFlowBackRelated.RemoveTwoWay(indexedArg);
+                        dataForwardNode.DataFlowBackRelated.AddTwoWay(allRets, indexedArg.ArgIndex);
+                    }
+                }
+                foreach (var forwardRoute in recursiveCall.ProgramFlowForwardRoutes.ToArray())
+                {
+                    forwardRoute.ProgramFlowBackRoutes.AddTwoWay(recursiveCall.ProgramFlowBackRoutes);
+                }
+                recursiveCall.ProgramFlowForwardRoutes.RemoveAllTwoWay();
+                recursiveCall.ProgramFlowBackRoutes.RemoveAllTwoWay();
+                recursiveCall.ProgramFlowBackAffected.RemoveAllTwoWay();
+                instructionNodes.Remove(recursiveCall);
             }
         }
     }

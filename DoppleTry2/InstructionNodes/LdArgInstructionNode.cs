@@ -58,6 +58,10 @@ namespace DoppleTry2.InstructionNodes
             GetArgNameAndType(ArgIndex, method, out argNameTemp, out argTypeTemp);
             ArgName = argNameTemp;
             ArgType = argTypeTemp;
+            if (ArgName == "this")
+            {
+               // StackPushCount = 0;
+            }
         }
 
         private static void GetArgNameAndType(int argIndex, MethodDefinition method, out string argName, out TypeReference argType)

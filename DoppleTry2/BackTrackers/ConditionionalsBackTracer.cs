@@ -60,7 +60,7 @@ namespace DoppleTry2.BackTrackers
             }
         }
 
-        public override void AddBackDataflowConnections(InstructionNode currentNode)
+        protected override void InnerAddBackDataflowConnections(InstructionNode currentNode)
         {
             foreach (var node in GetNodesInCondition(currentNode))
             {

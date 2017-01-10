@@ -19,19 +19,14 @@ namespace DoppleTry2.BackTrackers
         {
             return new List<List<InstructionNode>>() { { GetDataflowBackRelatedArgGroup(instWrapper).ToList() } };
         }
-        public override void AddBackDataflowConnections(InstructionNode currentInst)
-        {
-            if (currentInst.DoneBackTracers.Contains(GetType()))
-            {
-                return;
-            }
+        protected override void InnerAddBackDataflowConnections(InstructionNode currentInst)
+        {        
             IEnumerable<IEnumerable<InstructionNode>> backRelatedGroups = GetDataflowBackRelated(currentInst);
 
             foreach (var backRelatedGroup in backRelatedGroups)
             {
                 currentInst.DataFlowBackRelated.AddTwoWaySingleIndex(backRelatedGroup);
             }
-            currentInst.DoneBackTracers.Add(GetType());
         }
 
         protected abstract IEnumerable<InstructionNode> GetDataflowBackRelatedArgGroup(InstructionNode instWrapper);

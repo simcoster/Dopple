@@ -4,13 +4,11 @@ using Mono.Cecil.Cil;
 
 namespace DoppleTry2.InstructionNodes
 {
-    internal class NonInlineableCallInstructionNode : InstructionNode
+    internal class NonInlineableCallInstructionNode : CallNode
     {
         public NonInlineableCallInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
-            var targetMethod = (MethodReference) instruction.Operand;
-            StackPopCount = targetMethod.Parameters.Count;
-            if (targetMethod.FullName == "System.Void")
+            if (TargetMethod.ReturnType.FullName == "System.Void")
             {
                 StackPushCount = 0;
             }

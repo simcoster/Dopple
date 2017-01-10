@@ -66,9 +66,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BackTrackers\BackTraceManager.cs" />
+    <Compile Include="BackTrackers\CallBacktracer.cs" />
     <Compile Include="BackTrackers\ConditionionalsBackTracer.cs" />
+    <Compile Include="BackTrackers\RecursiveBacktracer.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="InstructionModifiers\SetStackPopPushForCalls.cs" />
+    <Compile Include="InstructionNodes\CallNode.cs" />
     <Compile Include="InstructionNodes\RetInstructionNode.cs" />
     <Compile Include="InstructionWrapperMembers\ProgramFlowForwardRoutes.cs" />
     <Compile Include="InstructionWrapperMembers\ProgramFlowBackAffected.cs" />
