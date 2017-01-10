@@ -1,5 +1,6 @@
 ﻿using DoppleTry2.BackTrackers;
 using DoppleTry2.InstructionNodes;
+using DoppleTry2.VerifierNs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,7 @@ namespace DoppleTry2.BackTrackers
     public class BackTraceManager
     {
         private readonly BackTracer[] backTracers;
+        private readonly Verifier[] verifiers;
 
         public BackTraceManager(List<InstructionNode> instructionNodes)
         {
@@ -26,12 +28,21 @@ namespace DoppleTry2.BackTrackers
                             new ConditionionalsBackTracer(instructionNodes),
                             new CallBacktracer(instructionNodes, this)
                            };
+            verifiers = new Verifier[] {new StElemVerifier(instructionNodes), new StackPopPushVerfier(instructionNodes),
+                                            new TwoWayVerifier(instructionNodes), new ArithmeticsVerifier(instructionNodes),
+                                            new ArgIndexVerifier(instructionNodes), new LdElemVerifier(instructionNodes) };
         }
 
         public void BackTrace(InstructionNode instructionNode)
         {
-            backTracers.Where(x => x.HandlesCodes.Contains(instructionNode.Instruction.OpCode.Code))
-                        .ForEach(x => x.AddBackDataflowConnections(instructionNode));
+            foreach (var backTracer in backTracers.Where(x => x.HandlesCodes.Contains(instructionNode.Instruction.OpCode.Code)))
+            {
+                backTracer.AddBackDataflowConnections(instructionNode);
+                foreach (var verifier in verifiers)
+                {
+                    verifier.Verify(instructionNode);
+                }
+            }
         }
         public IEnumerable<BackTracer> GetRelevantBackTracers(InstructionNode instructionNode)
         {

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DoppleTry2
 {
-    public class BackArgList : List<IndexedArgument>
+    public abstract class BackArgList : List<IndexedArgument>
     {
         public BackArgList(InstructionNode instructionWrapper)
         {
@@ -41,24 +41,28 @@ namespace DoppleTry2
         public void RemoveTwoWay(IndexedArgument backArgToRemove)
         {
             Remove(backArgToRemove);
-            InstructionNode forwardArg = backArgToRemove.Argument.DataFlowForwardRelated.First(x => x == containingWrapper);
-            backArgToRemove.Argument.DataFlowForwardRelated.Remove(forwardArg);
-            if (this.Any(x => !x.Argument.DataFlowForwardRelated.Contains(containingWrapper)))
+            InstructionNode forwardArg = GetForwardList(backArgToRemove.Argument).First(x => x == containingWrapper);
+            GetForwardList(backArgToRemove.Argument).Remove(forwardArg);
+            if (this.Any(x => !GetForwardList(x.Argument).Contains(containingWrapper)))
             {
                 throw new Exception("Validation Failed");
             }
         }
         public void RemoveAllTwoWay(Predicate<IndexedArgument> predicate)
         {
-            foreach (var toRemove in this.Where(x => predicate(x)))
+            foreach (var toRemove in this.Where(x => predicate(x)).ToList())
             {
                 RemoveTwoWay(toRemove);
             }
         }
+        public void RemoveAllTwoWay()
+        {
+            RemoveAllTwoWay(x => true);
+        }
         public void AddTwoWay(IndexedArgument toAdd)
         {
             Add(toAdd);
-            toAdd.Argument.DataFlowForwardRelated.Add(containingWrapper);
+            GetForwardList(toAdd.Argument).Add(containingWrapper);
         }
         public void AddTwoWay(InstructionNode toAdd)
         {
@@ -127,6 +131,32 @@ namespace DoppleTry2
                     //throw new Exception("Index missing");
                 }
             }
+        }
+
+        protected abstract List<InstructionNode> GetForwardList(InstructionNode node);
+    }
+
+    public class DataFlowBackArgList : BackArgList
+    {
+        public DataFlowBackArgList(InstructionNode instructionWrapper) : base(instructionWrapper)
+        {
+        }
+
+        protected override List<InstructionNode> GetForwardList(InstructionNode node)
+        {
+            return node.DataFlowForwardRelated;
+        }
+    }
+
+    public class ProgramFlowAffectedBackArgList : BackArgList
+    {
+        public ProgramFlowAffectedBackArgList(InstructionNode instructionWrapper) : base(instructionWrapper)
+        {
+        }
+
+        protected override List<InstructionNode> GetForwardList(InstructionNode node)
+        {
+            return node.ProgramFlowForwardAffecting;
         }
     }
 }

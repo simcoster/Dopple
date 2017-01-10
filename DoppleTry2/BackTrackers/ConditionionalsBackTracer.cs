@@ -62,17 +62,25 @@ namespace DoppleTry2.BackTrackers
 
         protected override void InnerAddBackDataflowConnections(InstructionNode currentNode)
         {
-            foreach (var node in GetNodesInCondition(currentNode))
+            foreach (var executionTrack in GetNodesInClosedCondition(currentNode))
             {
-                node.ProgramFlowBackAffected.AddTwoWay(currentNode);
+                foreach(var node in executionTrack.Nodes)
+                {
+                    IndexedArgument trackArg = new IndexedArgument((int) executionTrack.TrackType, currentNode);
+                    if (!node.ProgramFlowBackAffected.Contains(trackArg))
+                    {
+                        node.ProgramFlowBackAffected.AddTwoWay(trackArg); 
+                    }
+                }
             }
         }
 
-        private IEnumerable<InstructionNode> GetNodesInCondition(InstructionNode currentNode)
+        private List<ExecutionTrack> GetNodesInClosedCondition(InstructionNode currentNode)
         {
-            var relevantTracks = MapAllPossibleExecutionRoutes(currentNode).Select(x => x.Skip(1));
+            var relevantTracks = MapAllPossibleExecutionRoutes(currentNode).Select(x => x.Skip(1).ToList());
             List<InstructionNode> sharedNodes = relevantTracks.Aggregate((x, y) => x.Intersect(y).ToList()).ToList();
             IEnumerable<InstructionNode> nodesInCondition;
+            List<ExecutionTrack> executionTracks = new List<ExecutionTrack>();
             if (sharedNodes.Count > 0)
             {
                 InstructionNode conditionEndNode = sharedNodes.First();
@@ -80,22 +88,36 @@ namespace DoppleTry2.BackTrackers
                                           .Select(x => x.TakeWhile(y => y != conditionEndNode))
                                           .Aggregate((x, y) => x.Concat(y))
                                           .Distinct();
-                return nodesInCondition;
+                executionTracks.Add(new ExecutionTrack(nodesInCondition.ToList(),TrackType.ClosedBranch));
+                return executionTracks;
             }
 
-            List<IEnumerable<InstructionNode>> loopTracks = relevantTracks.Where(x => x.Contains(currentNode)).ToList();
-            if (loopTracks.Count > 1)
+            var loopTracks = relevantTracks.Where(x => x.Contains(currentNode)).ToList();
+            if (loopTracks.Count >0)
             {
-                return loopTracks.Aggregate((x, y) => x.Concat(y)).Distinct();
+                executionTracks.AddRange(loopTracks.Select(x => new ExecutionTrack(x, TrackType.Loop)));
             }
-            else if (loopTracks.Count > 0)
-            {
-                return loopTracks[0];
-            }
-            else
-            {
-                return relevantTracks.Aggregate((x, y) => x.Concat(y)).Distinct();
-            }
+            var retTracks = relevantTracks.Where(x => x.Any(y => y is RetInstructionNode));
+            executionTracks.AddRange(retTracks.Select(x => new ExecutionTrack(x, TrackType.RetBranch)));
+            return executionTracks;
         }
+    }
+
+    internal class ExecutionTrack
+    {
+        internal ExecutionTrack(List<InstructionNode> nodes, TrackType trackType)
+        {
+            Nodes = nodes;
+            TrackType = trackType;
+        }
+        internal List<InstructionNode> Nodes { get; private set; }
+        internal TrackType TrackType { get; private set; }
+    }
+
+    internal enum TrackType
+    {
+        Loop =1,
+        ClosedBranch=2,
+        RetBranch=3
     }
 }

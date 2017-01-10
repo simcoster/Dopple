@@ -60,7 +60,7 @@ namespace DoppleTry2
             SetInstructionIndexes();
             BackTrace();
             RemoveHelperCodes();
-            MergeSimilarInstructions();
+            //MergeSimilarInstructions();
             LdElemBackTrace();
             RecursionFix();
             SetInstructionIndexes();
@@ -192,10 +192,6 @@ namespace DoppleTry2
             foreach (var node in InstructionNodes.OrderByDescending(x => x.InstructionIndex))
             {
                 _backTraceManager.BackTrace(node);
-                foreach (var verifier in verifiers)
-                {
-                    verifier.Verify(node);
-                }
             }
         }
 
@@ -336,8 +332,9 @@ namespace DoppleTry2
                 }
                 foreach(var forwardNode in nodeToRemove.ProgramFlowForwardAffecting.ToList())
                 {
-                    forwardNode.ProgramFlowBackAffected.AddTwoWay(nodeToKeep);
-                    forwardNode.ProgramFlowBackAffected.RemoveTwoWay(nodeToRemove);
+                    var forwardBackRelated = forwardNode.DataFlowBackRelated.First(x => x.Argument == nodeToRemove);
+                    forwardNode.ProgramFlowBackAffected.AddTwoWay(nodeToKeep,forwardBackRelated.ArgIndex);
+                    forwardNode.ProgramFlowBackAffected.RemoveTwoWay(forwardBackRelated);
                 }
                 foreach (var backNode in nodeToRemove.ProgramFlowBackAffected.ToList())
                 {

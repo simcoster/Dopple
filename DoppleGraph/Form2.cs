@@ -284,13 +284,15 @@ namespace DoppleGraph
             {
                 foreach (var indexedArg in nodeWrapper.InstructionNode.DataFlowBackRelated)
                 {
-                    Color linkColor = GetPredefinedColor(indexedArg.ArgIndex);
+                    Color linkColor = GetPredefinedDataLinkColor(indexedArg.ArgIndex);
                     GoLink edge = DrawEdge(nodeWrapper, myView, indexedArg.Argument, dataLinksLayer, new Pen(linkColor));
                     edge.ToolTipText = indexedArg.ArgIndex.ToString() + " " + edge.PenColor.R;
                 }
-                foreach (var flowAffectingNode in nodeWrapper.InstructionNode.ProgramFlowBackAffected)
+                foreach (var indexedArg in nodeWrapper.InstructionNode.ProgramFlowBackAffected)
                 {
-                    DrawEdge(nodeWrapper, myView, flowAffectingNode, flowAffectingLinksLayer, new Pen(Color.LightPink));
+                    Color linkColor = GetPredefinedFlowAffectLinkColor(indexedArg.ArgIndex);
+                    GoLink edge = DrawEdge(nodeWrapper, myView, indexedArg.Argument, flowAffectingLinksLayer, new Pen(linkColor));
+                    edge.ToolTipText = indexedArg.ArgIndex.ToString() + " " + edge.PenColor.R;
                 }
                 foreach (var backRouteNode in nodeWrapper.InstructionNode.ProgramFlowBackRoutes)
                 {
@@ -307,7 +309,6 @@ namespace DoppleGraph
             link.ToPort = nodeWrapper.Node.LeftPort;
             if (backNodeWrapper.Node == nodeWrapper.Node)
             {
-                //link.Curviness = 200;
                 link.FromPort = backNodeWrapper.Node.RightPort;
                 link.Style = GoStrokeStyle.Bezier;
                 link.CalculateRoute();
@@ -325,7 +326,7 @@ namespace DoppleGraph
             return link;
         }
 
-        private Color GetPredefinedColor(int argIndex)
+        private Color GetPredefinedDataLinkColor(int argIndex)
         {
             switch (argIndex)
             {
@@ -341,6 +342,22 @@ namespace DoppleGraph
                     return Color.Brown;
                 default:
                     return Color.Red;
+            }
+        }
+
+        private Color GetPredefinedFlowAffectLinkColor(int argIndex)
+        {
+            switch (argIndex)
+            {
+                case 1:
+                    return Color.Pink;
+                case 2:
+                    return Color.LightYellow;
+                case 3:
+                    return Color.LightSeaGreen;
+
+                default:
+                    throw new Exception("no one here");
             }
         }
 

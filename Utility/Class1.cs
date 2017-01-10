@@ -10,7 +10,6 @@ namespace Utility
 {
     public class Class1
     {
-
         public static bool BinarySearch(int first, int last, int[] mynumbers, int target)
         {
             while (first <= last)
