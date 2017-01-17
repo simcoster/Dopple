@@ -48,7 +48,6 @@ namespace DoppleTry2.InstructionModifiers
                     StitchProgramFlow(inlinedEndNode, oldCallForwardNodes);
                 }
             }
-            //RemoveOraphanedNodes(MyInstructionNodes);
         }
 
         //TODO should merge this with the first function, duplicate code :P
@@ -128,17 +127,7 @@ namespace DoppleTry2.InstructionModifiers
             }
         }
 
-        private static List<InstructionNode> removedNodes = new List<InstructionNode>();
-        private static void RemoveOraphanedNodes(List<InstructionNode> instructionNodes)
-        {
-            var accessibleNodes = BackSearcher.GetForwardFlowTree(MyInstructionNodes[0]);
-            foreach (var inacessibleNode in MyInstructionNodes.Except(accessibleNodes).ToArray())
-            {
-                instructionNodes.Remove(inacessibleNode);
-                inacessibleNode.ProgramFlowForwardRoutes.RemoveAllTwoWay();
-                inacessibleNode.ProgramFlowBackRoutes.RemoveAllTwoWay();
-            }
-        }
+        private static readonly List<InstructionNode> removedNodes = new List<InstructionNode>();
 
         private static void StitchProgramFlow(InstructionNode backNode, InstructionNode forwardNode)
         {

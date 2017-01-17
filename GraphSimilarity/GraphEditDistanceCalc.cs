@@ -1,4 +1,5 @@
 ﻿using C5;
+using DoppleTry2;
 using DoppleTry2.InstructionNodes;
 using GraphSimilarity.EditOperations;
 using Mono.Cecil.Cil;
@@ -75,7 +76,12 @@ namespace GraphSimilarity
             var calculatedOperations = new ConcurrentBag<CalculatedOperation>();
             Parallel.ForEach(currentPath.SourceNodesLeftToResolve, (sourceNode) =>
             {
-
+                var codeGroup = codeGroups.FirstOrDefault(x => x.Contains(sourceNode.Instruction.OpCode.Code));
+                if (codeGroup == null)
+                {
+                    codeGroup = new Code[] { sourceNode.Instruction.OpCode.Code };
+                }
+                var possibleSubs = currentPath.TargetNodesLeftToResolve.Where(x => codeGroup.Contains(x.Instruction.OpCode.Code));
                 Parallel.ForEach(currentPath.TargetNodesLeftToResolve, (targetNode) =>
                 {
                     var nodeSubstitution = new NodeSubstitution(currentPath.Graph, currentPath.EdgeAdditionsPending, sourceNode, targetNode);
@@ -86,5 +92,8 @@ namespace GraphSimilarity
             });
             return calculatedOperations.ToList();
         }
+
+        static readonly List<Code[]> codeGroups = typeof(CodeGroups).GetFields().Select(x => x.GetValue(null)).Cast<Code[]>().ToList();
+
     }
 }

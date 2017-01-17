@@ -59,10 +59,10 @@ namespace DoppleTry2
             InlineFunctionCalls();
             SetInstructionIndexes();
             BackTrace();
+            RecursionFix();
             RemoveHelperCodes();
             MergeSimilarInstructions();
             LdElemBackTrace();
-            RecursionFix();
             SetInstructionIndexes();
             AddZeroNode();
             //Veirify();
@@ -97,7 +97,6 @@ namespace DoppleTry2
         {
             MergeLdArgs();
             MergeImmediateValue();
-            //MergeRecursionParalel();
             MergeEquivilentPairs();
         }
 
@@ -192,18 +191,6 @@ namespace DoppleTry2
             foreach (var node in InstructionNodes.OrderByDescending(x => x.InstructionIndex))
             {
                 _backTraceManager.BackTrace(node);
-            }
-        }
-
-        void MergeRecursionParalel()
-        {
-            var recursionGroups = InstructionNodes
-                                    .Where(x => !CodeGroups.StArgCodes.Contains(x.Instruction.OpCode.Code))
-                                    .GroupBy(x => new { x.Method, x.Instruction.Offset, x.Instruction.OpCode })
-                                    .Where(x => x.Count() >1);
-            foreach (var recursionGroup in recursionGroups)
-            {
-                MergeNodes(recursionGroup.ToArray());
             }
         }
 
@@ -332,7 +319,7 @@ namespace DoppleTry2
                 }
                 foreach(var forwardNode in nodeToRemove.ProgramFlowForwardAffecting.ToList())
                 {
-                    var forwardBackRelated = forwardNode.DataFlowBackRelated.First(x => x.Argument == nodeToRemove);
+                    var forwardBackRelated = forwardNode.ProgramFlowBackAffected.First(x => x.Argument == nodeToRemove);
                     forwardNode.ProgramFlowBackAffected.AddTwoWay(nodeToKeep,forwardBackRelated.ArgIndex);
                     forwardNode.ProgramFlowBackAffected.RemoveTwoWay(forwardBackRelated);
                 }
@@ -351,6 +338,7 @@ namespace DoppleTry2
                 }
             }
             SetInstructionIndexes();
+            Veirify();
         }
 
         public void RemoveInstWrappers(IEnumerable<InstructionNode> instsToRemove)

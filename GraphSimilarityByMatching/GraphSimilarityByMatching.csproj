@@ -4,17 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{BCA16D37-4D5B-43D3-AF84-2FEB636580BB}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{CE4AA61A-CFE3-4C9B-8671-58C058C8E40C}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GraphSimilarity</RootNamespace>
-    <AssemblyName>GraphSimilarity</AssemblyName>
+    <RootNamespace>GraphSimilarityByMatching</RootNamespace>
+    <AssemblyName>GraphSimilarityByMatching</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -33,10 +30,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="C5, Version=2.4.5947.17248, Culture=neutral, PublicKeyToken=282361b99ded7e8e, processorArchitecture=MSIL">
-      <HintPath>..\packages\C5.2.4.5947.17249\lib\net45\C5.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Mono.Cecil, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
       <HintPath>..\packages\Mono.Cecil.0.9.6.4\lib\net45\Mono.Cecil.dll</HintPath>
       <Private>True</Private>
@@ -63,34 +56,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DuplicateKeySortedDictionary.cs" />
-    <Compile Include="EditOperations\EdgeAddition.cs" />
-    <Compile Include="EditOperations\EdgeEditOperation.cs" />
-    <Compile Include="EditOperations\EdgeSubstitution.cs" />
-    <Compile Include="EditOperations\GraphEdge.cs" />
-    <Compile Include="EditOperations\NodeEditOperation.cs" />
-    <Compile Include="EditOperations\CalculatedOperation.cs" />
-    <Compile Include="EditOperations\EdgeDeletion.cs" />
-    <Compile Include="EditOperations\EditOperation.cs" />
-    <Compile Include="EditOperations\NodeDeletion.cs" />
-    <Compile Include="EditOperations\NodeAddition.cs" />
-    <Compile Include="EditOperations\NodeSubstitution.cs" />
-    <Compile Include="EditPath.cs" />
-    <Compile Include="GraphEditDistanceCalc.cs" />
-    <Compile Include="HeuristicDistanceCalc.cs" />
-    <Compile Include="NodeTypes.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Class1.cs" />
+    <Compile Include="EdgeType.cs" />
+    <Compile Include="LabeledVertex.cs" />
+    <Compile Include="LabledEdge.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DoppleTry2\GraphBuilder.csproj">
       <Project>{77C5971E-3C37-4932-911D-9C6050E67FFA}</Project>
       <Name>GraphBuilder</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

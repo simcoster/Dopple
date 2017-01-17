@@ -1,6 +1,7 @@
 ﻿using DoppleTry2.InstructionNodes;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -70,6 +71,11 @@ namespace DoppleTry2
         }
         public void AddTwoWay(IndexedArgument toAdd)
         {
+            if (this.Any(x => x.ArgIndex==toAdd.ArgIndex && x.Argument == toAdd.Argument))
+            {
+                Debug.WriteLine("skipped adding argIndex {0} with inst {1}, duplicate exists", toAdd.ArgIndex, toAdd.Argument);
+                return;
+            }
             Add(toAdd);
             GetForwardList(toAdd.Argument).Add(containingWrapper);
         }
