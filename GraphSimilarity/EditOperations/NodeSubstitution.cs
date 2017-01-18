@@ -87,7 +87,7 @@ namespace GraphSimilarity.EditOperations
         {
             Edges edges = new Edges();
             edges.NodeIsDestinationEdges =  node.DataFlowBackRelated.Select(x => new GraphEdge(x.Argument, node, x.ArgIndex)).ToList();
-            edges.NodeIsSourceEdges = node.DataFlowForwardRelated.Select(x => new GraphEdge(node, x, x.DataFlowBackRelated.First(y => y.Argument == node).ArgIndex)).ToList();
+            edges.NodeIsSourceEdges = node.DataFlowForwardRelated.Select(x => new GraphEdge(node, x.Argument, x.ArgIndex)).ToList();
             return edges;
         }
 

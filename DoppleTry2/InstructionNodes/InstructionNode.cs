@@ -21,17 +21,19 @@ namespace DoppleTry2.InstructionNodes
             MemoryStoreCount = MemoryProperties.GetMemStoreCount(instruction.OpCode.Code);
             DataFlowBackRelated = new DataFlowBackArgList(this);
             ProgramFlowBackRoutes = new ProgramFlowBackRoutes(this);
-            ProgramFlowBackAffected = new ProgramFlowAffectedBackArgList(this);
+            ProgramFlowBackAffected = new ProgramFlowBackAffectedArgList(this);
             ProgramFlowForwardRoutes = new ProgramFlowForwardRoutes(this);
+            DataFlowForwardRelated = new DataFlowForwardArgList(this);
+            ProgramFlowForwardAffecting = new ProgramFlowForwardAffectingArgList(this);
             MyGuid = Guid.NewGuid();
         }
 
         public ProgramFlowBackRoutes ProgramFlowBackRoutes { get; set; }
         public ProgramFlowForwardRoutes ProgramFlowForwardRoutes { get; set; }
-        public List<InstructionNode> DataFlowForwardRelated = new List<InstructionNode>();
-        public BackArgList DataFlowBackRelated { get; private set; }
-        public List<InstructionNode> ProgramFlowForwardAffecting { get; internal set; } = new List<InstructionNode>();
-        public BackArgList ProgramFlowBackAffected { get; set; }
+        public DataFlowForwardArgList DataFlowForwardRelated { get; private set; }
+        public DataFlowBackArgList DataFlowBackRelated { get; private set; }
+        public ProgramFlowForwardAffectingArgList ProgramFlowForwardAffecting { get; internal set; }
+        public ProgramFlowBackAffectedArgList ProgramFlowBackAffected { get; set; }
 
         public Instruction Instruction { get; set; }
         public int InstructionIndex { get; internal set; }

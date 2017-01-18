@@ -11,7 +11,7 @@ namespace GraphSimilarityByMatching
     {
         public Code Opcode { get; set; }
         public object Operand { get; set; }
-        public List<LabledEdge> BackEdges { get; set; }
-        public List<LabledEdge> ForwardEdges { get; set; }
+        public List<LabledEdge> BackEdges { get; set; } = new List<LabledEdge>();
+        public List<LabledEdge> ForwardEdges { get; set; } = new List<LabledEdge>();
     }
 }

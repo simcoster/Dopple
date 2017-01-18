@@ -70,13 +70,13 @@ namespace GraphSimilarity.EditOperations
         internal override List<EdgeEditOperation> GetEdgeOperations()
         {
             var addedEdges = new List<EdgeEditOperation>();
-            var problematics = Node.DataFlowForwardRelated.Where(x => !x.DataFlowBackRelated.Any(y => y.Argument == Node)).ToList();
+            var problematics = Node.DataFlowForwardRelated.Where(x => !x.Argument.DataFlowBackRelated.Any(y => y.Argument == Node)).ToList();
             if (problematics.Count > 0)
             {
                 Debugger.Break();
             }
             List<GraphEdge> relatedEdgesToAdd = Node.DataFlowBackRelated.Select(x => new GraphEdge(x.Argument, Node, x.ArgIndex))
-                                                 .Concat(Node.DataFlowForwardRelated.Select(x => new GraphEdge(x, Node, x.DataFlowBackRelated.First(y => y.Argument ==Node).ArgIndex)))
+                                                 .Concat(Node.DataFlowForwardRelated.Select(x => new GraphEdge(x.Argument, Node, x.ArgIndex)))
                                                  .ToList();
             triggeredEdgeAdds = edgeAdditionsPending.Where(x => x.DestinationNode == Node || x.SourceNode == Node);
             edgeAddsToBeTriggered = relatedEdgesToAdd.Except(triggeredEdgeAdds).ToList();

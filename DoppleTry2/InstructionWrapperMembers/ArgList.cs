@@ -8,17 +8,17 @@ using System.Threading.Tasks;
 
 namespace DoppleTry2
 {
-    public abstract class BackArgList : List<IndexedArgument>
+    public abstract class ArgList : List<IndexedArgument>
     {
-        public BackArgList(InstructionNode instructionWrapper)
+        public ArgList(InstructionNode instructionWrapper)
         {
             containingWrapper = instructionWrapper;
         }
         public override bool Equals(object obj)
         {
-            if (obj is BackArgList)
+            if (obj is ArgList)
             {
-                return this.All(x => ((BackArgList)obj).Any(y => y.ArgIndex == x.ArgIndex && y.Argument == x.Argument));
+                return this.All(x => ((ArgList)obj).Any(y => y.ArgIndex == x.ArgIndex && y.Argument == x.Argument));
             }
             return base.Equals(obj);
         }
@@ -51,12 +51,8 @@ namespace DoppleTry2
         public void RemoveTwoWay(IndexedArgument backArgToRemove)
         {
             Remove(backArgToRemove);
-            InstructionNode forwardArg = GetForwardList(backArgToRemove.Argument).First(x => x == containingWrapper);
-            GetForwardList(backArgToRemove.Argument).Remove(forwardArg);
-            if (this.Any(x => !GetForwardList(x.Argument).Contains(containingWrapper)))
-            {
-                throw new Exception("Validation Failed");
-            }
+            var forwardArg = backArgToRemove.MirrorArg;
+            GetMirrorList(backArgToRemove.Argument).Remove(forwardArg);
         }
         public void RemoveAllTwoWay(Predicate<IndexedArgument> predicate)
         {
@@ -77,11 +73,15 @@ namespace DoppleTry2
                 return;
             }
             Add(toAdd);
-            GetForwardList(toAdd.Argument).Add(containingWrapper);
+            var mirrorList = GetMirrorList(toAdd.Argument);
+            var mirrorArg = new IndexedArgument(toAdd.ArgIndex, containingWrapper, mirrorList);
+            mirrorArg.MirrorArg = toAdd;
+            toAdd.MirrorArg = mirrorArg;
+            mirrorList.Add(mirrorArg);
         }
         public void AddTwoWay(InstructionNode toAdd)
         {
-            var indexedToAdd = new IndexedArgument(GetNewIndex(), toAdd);
+            var indexedToAdd = new IndexedArgument(GetNewIndex(), toAdd ,this);
             AddTwoWay(indexedToAdd);
         }
         public void AddTwoWay(IEnumerable<IndexedArgument> rangeToAdd)
@@ -95,7 +95,7 @@ namespace DoppleTry2
         public void AddTwoWaySingleIndex(IEnumerable<InstructionNode> backInstructions)
         {
             int index = GetNewIndex();
-            AddTwoWay(backInstructions.Select(x => new IndexedArgument(index, x)));
+            AddTwoWay(backInstructions.Select(x => new IndexedArgument(index, x,this)));
         }
         public void AddTwoWay(InstructionNode backInstruction , int index)
         {
@@ -104,7 +104,7 @@ namespace DoppleTry2
                 //TODO to prevent clones
                 return;
             }
-            AddTwoWay(new IndexedArgument(index, backInstruction));
+            AddTwoWay(new IndexedArgument(index, backInstruction,this));
         }
 
         public void AddTwoWay(IEnumerable<InstructionNode> instructionNodes, int index)
@@ -148,30 +148,54 @@ namespace DoppleTry2
             }
         }
 
-        protected abstract List<InstructionNode> GetForwardList(InstructionNode node);
+        protected abstract ArgList GetMirrorList(InstructionNode node);
     }
 
-    public class DataFlowBackArgList : BackArgList
+    public class DataFlowBackArgList : ArgList
     {
         public DataFlowBackArgList(InstructionNode instructionWrapper) : base(instructionWrapper)
         {
         }
 
-        protected override List<InstructionNode> GetForwardList(InstructionNode node)
+        protected override ArgList GetMirrorList(InstructionNode node)
         {
             return node.DataFlowForwardRelated;
         }
     }
 
-    public class ProgramFlowAffectedBackArgList : BackArgList
+    public class DataFlowForwardArgList : ArgList
     {
-        public ProgramFlowAffectedBackArgList(InstructionNode instructionWrapper) : base(instructionWrapper)
+        public DataFlowForwardArgList(InstructionNode instructionWrapper) : base(instructionWrapper)
         {
         }
 
-        protected override List<InstructionNode> GetForwardList(InstructionNode node)
+        protected override ArgList GetMirrorList(InstructionNode node)
+        {
+            return node.DataFlowBackRelated;
+        }
+    }
+
+    public class ProgramFlowBackAffectedArgList : ArgList
+    {
+        public ProgramFlowBackAffectedArgList(InstructionNode instructionWrapper) : base(instructionWrapper)
+        {
+        }
+
+        protected override ArgList GetMirrorList(InstructionNode node)
         {
             return node.ProgramFlowForwardAffecting;
+        }
+    }
+
+    public class ProgramFlowForwardAffectingArgList : ArgList
+    {
+        public ProgramFlowForwardAffectingArgList(InstructionNode instructionWrapper) : base(instructionWrapper)
+        {
+        }
+
+        protected override ArgList GetMirrorList(InstructionNode node)
+        {
+            return node.ProgramFlowBackAffected;
         }
     }
 }

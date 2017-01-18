@@ -412,7 +412,7 @@ namespace DoppleGraph
                 {
                     var nodesToUpdate = node.InstructionNode.DataFlowForwardRelated
                     //var nodesToUpdate = node.InstructionNode.ProgramFlowForwardRoutes
-                   .Select(x => GetNodeWrapper(x))
+                   .Select(x => GetNodeWrapper(x.Argument))
                    .Where(x => x.LongestPath.Count == 0 || !x.LongestPath.Intersect(node.LongestPath).SequenceEqual(x.LongestPath))
                    .Where(x => x.LongestPath.Count < node.LongestPath.Count + 1)
                    .ToList();

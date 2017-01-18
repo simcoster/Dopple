@@ -40,7 +40,7 @@ namespace GraphSimilarity.EditOperations
 
         public override void Commit()
         {
-            BackArgList backNodes = Edge.DestinationNode.DataFlowBackRelated;
+            ArgList backNodes = Edge.DestinationNode.DataFlowBackRelated;
             backNodes.RemoveTwoWay(backNodes.First(x => x.Argument == Edge.SourceNode));
         }
     }

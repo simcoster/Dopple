@@ -125,9 +125,9 @@
       <Project>{77c5971e-3c37-4932-911d-9c6050e67ffa}</Project>
       <Name>GraphBuilder</Name>
     </ProjectReference>
-    <ProjectReference Include="..\GraphSimilarity\GraphSimilarity.csproj">
-      <Project>{bca16d37-4d5b-43d3-af84-2feb636580bb}</Project>
-      <Name>GraphSimilarity</Name>
+    <ProjectReference Include="..\GraphSimilarityByMatching\GraphSimilarityByMatching.csproj">
+      <Project>{ce4aa61a-cfe3-4c9b-8671-58c058c8e40c}</Project>
+      <Name>GraphSimilarityByMatching</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

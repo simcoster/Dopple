@@ -9,12 +9,15 @@ namespace DoppleTry2
 {
     public class IndexedArgument
     {
-        public IndexedArgument(int argIndex, InstructionNode argument)
+        public IndexedArgument(int argIndex, InstructionNode argument, ArgList containingList)
         {
             ArgIndex = argIndex;
             Argument = argument;
+            ContainingList = containingList;
         }
         public int ArgIndex { get; set; }
         public InstructionNode Argument { get; set; }
+        public ArgList ContainingList { get; set; }
+        public IndexedArgument MirrorArg { get; set; }
     }
 }

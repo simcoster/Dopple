@@ -1,4 +1,5 @@
-﻿using DoppleTry2.InstructionNodes;
+﻿using DoppleTry2;
+using DoppleTry2.InstructionNodes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,17 +8,26 @@ using System.Threading.Tasks;
 
 namespace GraphSimilarityByMatching
 {
-    public class Class1
+    public class GraphSimilarityCalc
     {
-        public int GetDistance(List<InstructionNode> firstGraph, List<InstructionNode> secondGraph)
+        public static int GetDistance(List<InstructionNode> firstGraph, List<InstructionNode> secondGraph)
         {
-            var sourceGraph = firstGraph.Count >= secondGraph.Count ? firstGraph : secondGraph;
-            var destGraph = sourceGraph == firstGraph ? secondGraph : firstGraph;
+            var pairings = new Dictionary<LabeledVertex, List<LabeledVertex>>();
+            var biggerGraph = firstGraph.Count >= secondGraph.Count ? firstGraph : secondGraph;
+            var smallerGraph = biggerGraph == firstGraph ? secondGraph : firstGraph;
 
-            List<LabeledVertex> sourceGraphLabeled = GetLabeled(sourceGraph);
+            List<LabeledVertex> biggerGraphLabeled = GetLabeled(biggerGraph);
+            List<LabeledVertex> smallerGraphLabeled = GetLabeled(smallerGraph);
+            
+            foreach(var sourceVertex in biggerGraphLabeled)
+            {
+                var candidates = biggerGraphLabeled.Where(x => CodeGroups.AreSameGroup(x.Opcode, sourceVertex.Opcode));
+
+            }
+            return 0;
         }
 
-        private List<LabeledVertex> GetLabeled(List<InstructionNode> graph)
+        private static List<LabeledVertex> GetLabeled(List<InstructionNode> graph)
         {
             var labeledVertexes = new List<LabeledVertex>();
             foreach (var instructionNode in graph)
@@ -25,37 +35,49 @@ namespace GraphSimilarityByMatching
                 LabeledVertex vertex = new LabeledVertex();
                 vertex.Opcode = instructionNode.Instruction.OpCode.Code;
                 vertex.Operand = instructionNode.Instruction.Operand;
-                foreach (var dataFlowEdge in instructionNode.DataFlowBackRelated)
+                foreach (var dataFlowBackVertex in instructionNode.DataFlowBackRelated)
                 {
                     vertex.BackEdges.Add(new LabledEdge()
                     {
                         EdgeType = EdgeType.DataFlow,
-                        Index = dataFlowEdge.ArgIndex,
-                        SourceVertexOpcode = dataFlowEdge.Argument.Instruction.OpCode.Code,
+                        Index = dataFlowBackVertex.ArgIndex,
+                        SourceVertexOpcode = dataFlowBackVertex.Argument.Instruction.OpCode.Code,
                         DestVertexOpcode = vertex.Opcode
                     });
                 }
-                foreach (var programFlowBackAffected in instructionNode.ProgramFlowBackAffected)
+                foreach (var programFlowBackVertex in instructionNode.ProgramFlowBackAffected)
                 {
                     vertex.BackEdges.Add(new LabledEdge()
                     {
                         EdgeType = EdgeType.ProgramFlow,
-                        Index = programFlowBackAffected.ArgIndex,
-                        SourceVertexOpcode = programFlowBackAffected.Argument.Instruction.OpCode.Code,
+                        Index = programFlowBackVertex.ArgIndex,
+                        SourceVertexOpcode = programFlowBackVertex.Argument.Instruction.OpCode.Code,
                         DestVertexOpcode = vertex.Opcode
                     });
                 }
-                foreach (var dataFlowEdge in instructionNode.DataFlowForwardRelated)
+                foreach (var dataFlowBackVertex in instructionNode.DataFlowForwardRelated)
                 {
-                    vertex.BackEdges.Add(new LabledEdge()
+                    vertex.ForwardEdges.Add(new LabledEdge()
                     {
                         EdgeType = EdgeType.DataFlow,
-                        Index = dataFlowEdge.ArgIndex,
-                        SourceVertexOpcode = dataFlowEdge.Argument.Instruction.OpCode.Code,
+                        Index = dataFlowBackVertex.ArgIndex,
+                        SourceVertexOpcode = dataFlowBackVertex.Argument.Instruction.OpCode.Code,
                         DestVertexOpcode = vertex.Opcode
                     });
                 }
+                foreach (var programFlowForwardVertex in instructionNode.ProgramFlowForwardAffecting)
+                {
+                    vertex.ForwardEdges.Add(new LabledEdge()
+                    {
+                        EdgeType = EdgeType.ProgramFlow,
+                        Index = programFlowForwardVertex.ArgIndex,
+                        SourceVertexOpcode = vertex.Opcode,
+                        DestVertexOpcode = programFlowForwardVertex.Argument.Instruction.OpCode.Code
+                    });
+                }
+                labeledVertexes.Add(vertex);
             }
+            return labeledVertexes;
         }
     }
 }

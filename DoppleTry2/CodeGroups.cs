@@ -27,5 +27,15 @@ namespace DoppleTry2
                                                Code.Bne_Un_S, Code.Brfalse , Code.Brfalse_S, Code.Brtrue, Code.Brtrue_S };
         public static Code[] ArithmeticCodes = {Code.Add, Code.Add_Ovf, Code.Add_Ovf_Un, Code.Sub, Code.Sub_Ovf, Code.Sub_Ovf_Un, Code.Mul, Code.Mul_Ovf, Code.Mul_Ovf_Un,
                                                 Code.Div, Code.Div_Un};
+
+        private static Code[][] CodeGroupLists = null;
+        public static bool AreSameGroup (Code firstCode, Code secondCode)
+        {
+            if (CodeGroupLists == null)
+            {
+                CodeGroupLists = typeof(CodeGroups).GetFields().Select(x => x.GetValue(null)).Cast<Code[]>().ToArray();
+            }
+            return CodeGroupLists.First(x => x.Contains(firstCode)).Contains(secondCode);
+        }
     }
 }

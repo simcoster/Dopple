@@ -64,7 +64,7 @@ namespace GraphSimilarity.EditOperations
             }
             foreach (var forwardNode in nodeToRemove.DataFlowForwardRelated.ToArray())
             {
-                var tempEdgeDeletion = new EdgeDeletion(graph, new GraphEdge(forwardNode, nodeToRemove, forwardNode.DataFlowBackRelated.First(x => x.Argument == nodeToRemove).ArgIndex));
+                var tempEdgeDeletion = new EdgeDeletion(graph, new GraphEdge(forwardNode.Argument, nodeToRemove, forwardNode.ArgIndex));
                 relatedEdgeOperations.Add(tempEdgeDeletion);
             }
             return relatedEdgeOperations;

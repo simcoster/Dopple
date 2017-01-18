@@ -14,24 +14,24 @@ namespace DoppleTry2.VerifierNs
 
         }
 
-        public override void Verify(InstructionNode instructionWrapper)
+        public override void Verify(InstructionNode instructionNode)
         {
-            var problematics = instructionWrapper.DataFlowForwardRelated.Where(x => !x.DataFlowBackRelated.Any(y => y.Argument == x)).ToList();
+            var problematics = instructionNode.DataFlowForwardRelated.Where(x => !x.Argument.DataFlowBackRelated.Any(y => y.Argument == x.Argument)).ToList();
             if (problematics.Count > 0)
             {
                // throw new Exception();
             }
 
-            foreach (var backInst in instructionWrapper.DataFlowBackRelated)
+            foreach (var backInst in instructionNode.DataFlowBackRelated)
             {
-                if (!backInst.Argument.DataFlowForwardRelated.Contains(instructionWrapper))
+                if (!backInst.Argument.DataFlowForwardRelated.Any(x => x.Argument ==instructionNode))
                 {
                     throw new Exception();
                 }
             }
-            foreach (var forInst in instructionWrapper.DataFlowForwardRelated)
+            foreach (var forInst in instructionNode.DataFlowForwardRelated)
             {
-                if (!forInst.DataFlowBackRelated.Select(x => x.Argument).Contains(instructionWrapper))
+                if (!forInst.Argument.DataFlowBackRelated.Select(x => x.Argument).Contains(instructionNode))
                 {
                     throw new Exception();
                 }

@@ -40,7 +40,7 @@ namespace GraphSimilarity.EditOperations
 
         public override void Commit()
         {
-            Edge.DestinationNode.DataFlowBackRelated.AddTwoWay(new IndexedArgument(Edge.Index, Edge.SourceNode));
+            Edge.DestinationNode.DataFlowBackRelated.AddTwoWay(new IndexedArgument(Edge.Index, Edge.SourceNode,Edge.DestinationNode.DataFlowBackRelated));
         }
     }
 }

@@ -151,15 +151,11 @@ namespace DoppleTry2.InstructionModifiers
             foreach (var recursiveCall in instructionNodes.Where(x => x is InlineableCallNode && x.InliningProperties.Recursive).Cast<InlineableCallNode>().ToList())
             {
                 var allRets = instructionNodes.Where(x => x is RetInstructionNode && x.Method == recursiveCall.CalledFunction);
-                foreach (var dataForwardNode in recursiveCall.DataFlowForwardRelated.ToArray())
+                foreach(var retCall in allRets)
                 {
-                    var indexedArgs = dataForwardNode.DataFlowBackRelated.Where(x => x.Argument == recursiveCall);
-                    foreach (var indexedArg in indexedArgs.ToArray())
-                    {
-                        dataForwardNode.DataFlowBackRelated.RemoveTwoWay(indexedArg);
-                        dataForwardNode.DataFlowBackRelated.AddTwoWay(allRets, indexedArg.ArgIndex);
-                    }
+                    retCall.DataFlowForwardRelated.AddTwoWay(recursiveCall.DataFlowForwardRelated);
                 }
+                recursiveCall.DataFlowForwardRelated.RemoveAllTwoWay();
                 foreach (var forwardRoute in recursiveCall.ProgramFlowForwardRoutes.ToArray())
                 {
                     forwardRoute.ProgramFlowBackRoutes.AddTwoWay(recursiveCall.ProgramFlowBackRoutes);

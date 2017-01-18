@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace DoppleTry2.InstructionWrapperMembers
 {
-    public class ProgramFlowBackAffected : RelatedList
+    public class ProgramFlowBackAffected : ArgList
     {
         public ProgramFlowBackAffected(InstructionNode containingWrapper) : base(containingWrapper)
         {
         }
 
-        internal override List<InstructionNode> GetRelatedList(InstructionNode node)
+        protected override ArgList GetMirrorList(InstructionNode node)
         {
             return node.ProgramFlowForwardAffecting;
         }

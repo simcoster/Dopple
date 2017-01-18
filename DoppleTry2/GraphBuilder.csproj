@@ -81,7 +81,7 @@
     <Compile Include="InstructionNodes\NonInlineableCallInstructionNode.cs" />
     <Compile Include="InstructionNodes\LdElemInstructionNode.cs" />
     <Compile Include="Verifier\ArgIndexVerifier.cs" />
-    <Compile Include="InstructionWrapperMembers\BackArgList.cs" />
+    <Compile Include="InstructionWrapperMembers\ArgList.cs" />
     <Compile Include="BackSearcher.cs" />
     <Compile Include="BackTrackers\BackTracer.cs" />
     <Compile Include="BackTrackers\LdElemBacktracer.cs" />
