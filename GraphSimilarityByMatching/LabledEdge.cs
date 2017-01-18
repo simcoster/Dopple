@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace GraphSimilarityByMatching
 {
-    public class LabledEdge
+    public class LabeledEdge
     {
         public Code SourceVertexOpcode { get; set; }
         public Code DestVertexOpcode { get; set; }

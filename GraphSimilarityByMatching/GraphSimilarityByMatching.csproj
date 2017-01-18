@@ -56,7 +56,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="EdgeIndexInfo.cs" />
+    <Compile Include="GraphSimilarityCalc.cs" />
     <Compile Include="EdgeType.cs" />
     <Compile Include="LabeledVertex.cs" />
     <Compile Include="LabledEdge.cs" />
