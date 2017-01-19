@@ -35,7 +35,8 @@ namespace DoppleGraph
                 newForm.Show();
             }
 
-            var editDistance = (double)GraphSimilarityCalc.GetDistance(Graphs[0], Graphs[1]) / (double) GraphSimilarityCalc.GetDistance(Graphs[0], Graphs[0]);
+            var biggerGraph = Graphs.GetRange(0,2).OrderByDescending(x => x.Count).First();
+            var editDistance = (double)GraphSimilarityCalc.GetDistance(Graphs[0], Graphs[1]) / (double) GraphSimilarityCalc.GetDistance(biggerGraph, biggerGraph);
             Console.WriteLine(editDistance);
         }
     }

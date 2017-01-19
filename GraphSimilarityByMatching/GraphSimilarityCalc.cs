@@ -39,17 +39,17 @@ namespace GraphSimilarityByMatching
             int graphPairingScore = 0;
             foreach (var bigGraphVertex in biggerGraphLabeled)
             {
-                var vertexPossiblePairings = new Dictionary<int, LabeledVertex>();
+                var vertexPossiblePairings = new Dictionary<LabeledVertex, int>();
                 var smallGraphCandidates = smallerGraphLabeled.Where(x => CodeGroups.AreSameGroup(x.Opcode, bigGraphVertex.Opcode)).ToList();
                 foreach(var smallGraphCandidate in smallGraphCandidates)
                 {
-                    vertexPossiblePairings.Add(GetScore(smallGraphCandidate, bigGraphVertex, pairings), smallGraphCandidate);
+                    vertexPossiblePairings.Add( smallGraphCandidate, GetScore(smallGraphCandidate, bigGraphVertex, pairings));
                 }
-                var winningPair = vertexPossiblePairings.OrderByDescending(x => x.Key).FirstOrDefault();
-                if (winningPair.Value != null)
+                var winningPair = vertexPossiblePairings.OrderByDescending(x => x.Value).FirstOrDefault();
+                if (winningPair.Key != null)
                 {
-                    graphPairingScore += winningPair.Key;
-                    pairings[winningPair.Value].Add(bigGraphVertex);
+                    graphPairingScore += winningPair.Value;
+                    pairings[winningPair.Key].Add(bigGraphVertex);
                 }
                 else
                 {

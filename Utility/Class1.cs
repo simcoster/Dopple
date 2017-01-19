@@ -10,22 +10,74 @@ namespace Utility
 {
     public class Class1
     {
-        static int SumPles(int[] number)
+        public static void insertionSort(int[] array)
         {
-            int sum = 0;
-            foreach (var b in number)
+            for (int i = 0; i < array.Length - 1; i++)
             {
-                sum += b;
+                int nextMin = int.MaxValue;
+                int nextMinIndex = -1;
+                for (int j = i; j < array.Length; j++)
+                {
+                    if (array[j] < nextMin)
+                    {
+                        nextMin = array[j];
+                        nextMinIndex = j;
+                    }
+                }
+                if (nextMin < array[i])
+                {
+                    int temp = array[i];
+                    array[i] = array[nextMinIndex];
+                    array[nextMinIndex] = temp;
+                }
             }
-            return sum;
         }
 
-        static void Minus(int[] number)
+        public static void insertionSortWithHelpers(int[] array)
         {
-            foreach (var b in number)
+            for (int i = 0; i < array.Length - 1; i++)
             {
-                Console.WriteLine("boogaboo");
+                //int min;
+                //int minIndex;
+                //findMinAndIndex(array, i, out min, out minIndex);
+                int min = int.MaxValue;
+                int minIndex = -1;
+                for (int j = i; j < array.Length; j++)
+                {
+                    if (array[j] < min)
+                    {
+                        min = array[j];
+                        minIndex = j;
+                    }
+                }
+                if (min < array[i])
+                {
+                    swapTwo(array, i, minIndex);
+                }
             }
+        }
+
+        public static void swapTwo(int[] array, int i, int j)
+        {
+            int temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+        }
+
+        public static void findMinAndIndex(int[] array, int startIndex, out int minValue, out int minIndex)
+        {
+            int currentMin = int.MaxValue;
+            int currentMinIndex = -1;
+            for (int i = startIndex; i < array.Length; i++)
+            {
+                if (array[i] < currentMin)
+                {
+                    currentMin = array[i];
+                    currentMinIndex = i;
+                }
+            }
+            minValue = currentMin;
+            minIndex = currentMinIndex;
         }
     }
 }
