@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 
 namespace GraphSimilarityByMatching
 {
-    class LabeledVertex
+    public class LabeledVertex
     {
         public Code Opcode { get; set; }
         public object Operand { get; set; }
+        public int Index { get; set; }
         public List<LabeledEdge> BackEdges { get; set; } = new List<LabeledEdge>();
         public List<LabeledEdge> ForwardEdges { get; set; } = new List<LabeledEdge>();
     }

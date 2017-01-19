@@ -9,9 +9,8 @@ namespace DoppleTry2.VerifierNs
 {
     class TwoWayVerifier : Verifier
     {
-        public TwoWayVerifier(List<InstructionNode> instructionWrappers) : base(instructionWrappers)
+        public TwoWayVerifier(List<InstructionNode> instructionNodes) : base(instructionNodes)
         {
-
         }
 
         public override void Verify(InstructionNode instructionNode)

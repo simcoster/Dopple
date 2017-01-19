@@ -5,8 +5,8 @@ namespace GraphSimilarityByMatching
 {
     public class LabeledEdge
     {
-        public Code SourceVertexOpcode { get; set; }
-        public Code DestVertexOpcode { get; set; }
+        public LabeledVertex SourceVertex { get; set; }
+        public LabeledVertex DestinationVertex { get; set; }
         public int Index { get; set; }
         public EdgeType EdgeType { get; set; }
     }

@@ -13,10 +13,6 @@ namespace DoppleTry2.BackTrackers
     {
         protected InstructionNode Instruction;
         protected readonly List<InstructionNode> InstructionNodes;
-
-        protected readonly IEnumerable<OpCode> AllOpCodes =
-            typeof(OpCodes).GetFields().Select(x => x.GetValue(null)).Cast<OpCode>();
-
         protected BackTracer(List<InstructionNode> instructionNodes)
         {
             InstructionNodes = instructionNodes;

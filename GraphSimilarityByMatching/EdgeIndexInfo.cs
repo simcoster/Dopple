@@ -16,13 +16,17 @@ namespace GraphSimilarityByMatching
                                                 .Concat(CodeGroups.StElemCodes)
                                                 .Concat(CodeGroups.StLocCodes));
         readonly HashSet<Code> ImportantCodes = new HashSet<Code>(new Code[] { Code.Sub, Code.Sub_Ovf, Code.Sub_Ovf_Un, Code.Div, Code.Div_Un }
-                                                                                .Concat(CodeGroups.CallCodes).Concat(CodeGroups.CondJumpCodes)
+                                                                                .Concat(CodeGroups.CallCodes)
+                                                                                .Concat(CodeGroups.CondJumpCodes)
+                                                                                .Concat(CodeGroups.LdLocCodes)
+                                                                                .Concat(CodeGroups.LdArgCodes)
                                                                                 .ToArray());
         readonly HashSet<Code> UnimportantCodes;
         readonly Dictionary<HashSet<Code>, IndexImportance> CodeIndexImportance;
         public CodeInfo ()
-        {               
-            UnimportantCodes = new HashSet<Code>(CodeGroups.CodeGroupLists.SelectMany(x => x).Except(CriticalCodes).Except(ImportantCodes).ToArray());
+        {
+            var blah = CodeGroups.CodeGroupLists.SelectMany(x => x);
+            UnimportantCodes = new HashSet<Code>(typeof(OpCodes).GetFields().Select(x => x.GetValue(null)).Cast<OpCode>().Select(x => x.Code).Except(CriticalCodes).Except(ImportantCodes).ToArray());
             CodeIndexImportance = new Dictionary<HashSet<Code>, IndexImportance>() { { CriticalCodes, IndexImportance.Critical }, { ImportantCodes, IndexImportance.Important }, { UnimportantCodes, IndexImportance.NotImportant } };
         }
 

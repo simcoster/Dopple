@@ -123,6 +123,7 @@
     <Compile Include="ProgramFlowHanlder\SimpleProgramFlowHandler.cs" />
     <Compile Include="ProgramFlowHanlder\SwitchHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Verifier\ArgRemovedVerifier.cs" />
     <Compile Include="Verifier\ArithmeticsVerifier.cs" />
     <Compile Include="Verifier\LdElemVerifier.cs" />
     <Compile Include="Verifier\Verifier.cs" />

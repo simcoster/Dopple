@@ -19,15 +19,11 @@ namespace DoppleTry2
         private readonly ProgramFlowManager _programFlowManager = new ProgramFlowManager();
         private MethodDefinition metDef;
         public List<InstructionNode> InstructionNodes;
-        Verifier[] verifiers;
         private readonly BackTraceManager _backTraceManager;
 
         public GraphBuilder(IEnumerable<InstructionNode> instNodes)
         {
             InstructionNodes = instNodes.ToList();
-            verifiers = new Verifier[] {new StElemVerifier(InstructionNodes), new StackPopPushVerfier(InstructionNodes),
-                                            new TwoWayVerifier(InstructionNodes), new ArithmeticsVerifier(InstructionNodes),
-                                            new ArgIndexVerifier(InstructionNodes), new LdElemVerifier(InstructionNodes) };
         }
         public GraphBuilder(MethodDefinition methodDefinition)
         {
@@ -44,10 +40,6 @@ namespace DoppleTry2
             _postBacktraceModifiers = new IPostBackTraceModifier[] { };
 
             _backTraceManager = new BackTraceManager(InstructionNodes);
-
-            verifiers = new Verifier[] {new StElemVerifier(InstructionNodes), new StackPopPushVerfier(InstructionNodes),
-                                            new TwoWayVerifier(InstructionNodes), new ArithmeticsVerifier(InstructionNodes),
-                                            new ArgIndexVerifier(InstructionNodes), new LdElemVerifier(InstructionNodes) };
         }
 
 
@@ -63,9 +55,9 @@ namespace DoppleTry2
             RemoveHelperCodes();
             MergeSimilarInstructions();
             LdElemBackTrace();
-            SetInstructionIndexes();
             AddZeroNode();
-            //Veirify();
+            SetInstructionIndexes();
+            Veirify();
 
             return InstructionNodes;
         }
@@ -85,11 +77,6 @@ namespace DoppleTry2
                     continue;
                 }
                 ldElemBacktracer.AddBackDataflowConnections(ldElemNode);
-                foreach (var verifier in verifiers)
-                {
-                    //TODO remove
-                    //verifier.Verify(ldElemNode);
-                }
             }
         }
 
@@ -261,7 +248,8 @@ namespace DoppleTry2
         {
             var verifiers = new Verifier[] {new StElemVerifier(InstructionNodes), new StackPopPushVerfier(InstructionNodes),
                                             new TwoWayVerifier(InstructionNodes), new ArithmeticsVerifier(InstructionNodes),
-                                            new ArgIndexVerifier(InstructionNodes), new LdElemVerifier(InstructionNodes) };
+                                            new ArgIndexVerifier(InstructionNodes), new LdElemVerifier(InstructionNodes),
+                                            new ArgRemovedVerifier(InstructionNodes)};
             foreach (var instWrapper in InstructionNodes.OrderByDescending(x => x.InstructionIndex))
             {
                 foreach(var verifier in verifiers)
@@ -273,7 +261,7 @@ namespace DoppleTry2
 
         public void MergeNodes(IEnumerable<InstructionNode> nodesToMerge)
         {
-            var nodeToKeep = nodesToMerge.ElementAt(0);
+            var nodeToKeep = nodesToMerge.First();
             foreach (var nodeToRemove in nodesToMerge.ToArray().Except(new[] { nodeToKeep }))
             {
                 foreach (var backDataNode in nodeToRemove.DataFlowBackRelated.ToList())
@@ -299,7 +287,7 @@ namespace DoppleTry2
                 }
                 foreach(var forwardNode in nodeToRemove.ProgramFlowForwardAffecting.ToList())
                 {
-                    forwardNode.Argument.ProgramFlowBackAffected.AddTwoWay(nodeToKeep, forwardNode.ArgIndex);
+                    nodeToKeep.ProgramFlowForwardAffecting.AddTwoWay(forwardNode.Argument, forwardNode.ArgIndex);
                     nodeToRemove.ProgramFlowForwardAffecting.RemoveTwoWay(forwardNode);
                 }
                 foreach (var backNode in nodeToRemove.ProgramFlowBackAffected.ToList())
@@ -341,6 +329,14 @@ namespace DoppleTry2
                 foreach(var backFlowInst in nodeToRemove.ProgramFlowBackRoutes.ToList())
                 {
                     nodeToRemove.ProgramFlowBackRoutes.RemoveTwoWay(backFlowInst);
+                }
+                foreach (var backAffectedInst in nodeToRemove.ProgramFlowBackAffected.ToList())
+                {
+                    nodeToRemove.ProgramFlowBackAffected.RemoveTwoWay(backAffectedInst);
+                }
+                foreach (var forwardAffecting in nodeToRemove.ProgramFlowForwardAffecting.ToList())
+                {
+                    nodeToRemove.ProgramFlowForwardAffecting.RemoveTwoWay(forwardAffecting);
                 }
                 InstructionNodes.Remove(nodeToRemove);
                 if (InstructionNodes.Any(x => x.DataFlowBackRelated.Any(y => y.Argument == nodeToRemove)

@@ -10,46 +10,97 @@ namespace GraphSimilarityByMatching
 {
     public class GraphSimilarityCalc
     {
+        private const int EdgeIndexMatchScore = 2;
+        private const int DestinationVertexesAreMappedScore = 3;
         private static readonly CodeInfo opCodeInfo = new CodeInfo();
+        private const int UnmachedVertexCost = 5;
+
         public static int GetDistance(List<InstructionNode> firstGraph, List<InstructionNode> secondGraph)
         {
             var pairings = new Dictionary<LabeledVertex, List<LabeledVertex>>();
-            var biggerGraph = firstGraph.Count >= secondGraph.Count ? firstGraph : secondGraph;
-            var smallerGraph = biggerGraph == firstGraph ? secondGraph : firstGraph;
 
+            List<InstructionNode> biggerGraph;
+            List<InstructionNode> smallerGraph;
+            if (firstGraph.Count > secondGraph.Count)
+            {
+                biggerGraph = firstGraph;
+                smallerGraph = secondGraph;
+            }
+            else
+            {
+                biggerGraph = secondGraph;
+                smallerGraph = firstGraph;
+            }
             List<LabeledVertex> biggerGraphLabeled = GetLabeled(biggerGraph);
             List<LabeledVertex> smallerGraphLabeled = GetLabeled(smallerGraph);
-            
-            foreach(var sourceVertex in biggerGraphLabeled)
+
+            smallerGraphLabeled.ForEach(x => pairings.Add(x, new List<LabeledVertex>()));
+
+            int graphPairingScore = 0;
+            foreach (var bigGraphVertex in biggerGraphLabeled)
             {
-                var candidates = biggerGraphLabeled.Where(x => CodeGroups.AreSameGroup(x.Opcode, sourceVertex.Opcode));
-                foreach(var candidate in candidates)
+                var vertexPossiblePairings = new Dictionary<int, LabeledVertex>();
+                var smallGraphCandidates = smallerGraphLabeled.Where(x => CodeGroups.AreSameGroup(x.Opcode, bigGraphVertex.Opcode)).ToList();
+                foreach(var smallGraphCandidate in smallGraphCandidates)
                 {
-                    GetScore(candidate, sourceVertex, pairings);
+                    vertexPossiblePairings.Add(GetScore(smallGraphCandidate, bigGraphVertex, pairings), smallGraphCandidate);
+                }
+                var winningPair = vertexPossiblePairings.OrderByDescending(x => x.Key).FirstOrDefault();
+                if (winningPair.Value != null)
+                {
+                    graphPairingScore += winningPair.Key;
+                    pairings[winningPair.Value].Add(bigGraphVertex);
+                }
+                else
+                {
+                    graphPairingScore -= UnmachedVertexCost;
                 }
             }
-            return 0;
+            return graphPairingScore;
         }
 
-        private static int GetScore(LabeledVertex firstVertex, LabeledVertex secondVertex, Dictionary<LabeledVertex, List<LabeledVertex>> pairings)
+        private static int GetScore(LabeledVertex smallGraphVertex, LabeledVertex bigGraphVertex, Dictionary<LabeledVertex, List<LabeledVertex>> pairings)
         {
             int score = 1;
-            if (firstVertex.Opcode == secondVertex.Opcode)
+            if (smallGraphVertex.Opcode == bigGraphVertex.Opcode)
             {
-                score += 2;
+                score += 1;
             }
-            if (opCodeInfo.GetIndexImportance()
+            var backEdgeScore = ScoreEdges(smallGraphVertex.BackEdges, bigGraphVertex.BackEdges, pairings, SharedSourceOrDest.Dest);
+            var forwardEdgeScore = ScoreEdges(smallGraphVertex.ForwardEdges, bigGraphVertex.ForwardEdges, pairings, SharedSourceOrDest.Source);
+            score += backEdgeScore + forwardEdgeScore;
+            score -= pairings[smallGraphVertex].Count;
+            return score;
         }
 
-        private static Dictionary<LabeledEdge,LabeledEdge> PairEdges(List<LabeledEdge> firstEdges, List<LabeledEdge> secondEdges, Dictionary<LabeledVertex, List<LabeledVertex>> pairings)
+        private static int ScoreEdges(List<LabeledEdge> firstEdges, List<LabeledEdge> secondEdges, Dictionary<LabeledVertex, List<LabeledVertex>> pairings, SharedSourceOrDest sharedSourceOrDest)
         {
+            int totalScore = 0;
             var edgePairings = new Dictionary<LabeledEdge, LabeledEdge>();
             var unmachedSecondEdges = new List<LabeledEdge>(secondEdges);
             foreach(var firstEdge in firstEdges)
             {
                 var pairingScores = new Dictionary<LabeledEdge, int>();
+                LabeledVertex vertexToMatch;
+                if (sharedSourceOrDest == SharedSourceOrDest.Source)
+                {
+                    vertexToMatch = firstEdge.DestinationVertex;
+                }
+                else
+                {
+                    vertexToMatch = firstEdge.SourceVertex;
+                }
                 Func<LabeledEdge,bool> predicate = x => x.EdgeType == firstEdge.EdgeType;
-                if (opCodeInfo.GetIndexImportance(firstEdge.SourceVertexOpcode) == IndexImportance.Critical)
+                IndexImportance indexImportance;
+                if (firstEdge.EdgeType == EdgeType.ProgramFlowAffecting)
+                {
+                    indexImportance = IndexImportance.Important;
+                }
+                else
+                {
+                    indexImportance = opCodeInfo.GetIndexImportance(firstEdge.DestinationVertex.Opcode);
+                }
+                if (indexImportance == IndexImportance.Critical)
                 {
                     predicate = x => x.EdgeType == firstEdge.EdgeType && x.Index == firstEdge.Index;
                 }
@@ -57,9 +108,54 @@ namespace GraphSimilarityByMatching
                 {
                     predicate = x => x.EdgeType == firstEdge.EdgeType;
                 }
-                var relevantSecond = secondEdges.Where(predicate);
-                if (relevantSecond)
+                var relevantSecondEdges = unmachedSecondEdges.Where(predicate);
+                relevantSecondEdges.ForEach(x => pairingScores.Add(x, GetEdgeMatchScore(pairings, sharedSourceOrDest, firstEdge, vertexToMatch, indexImportance, x)));
+                KeyValuePair<LabeledEdge, int> winningPairing = pairingScores.OrderByDescending(x => x.Value).FirstOrDefault();
+                if (winningPairing.Key == null)
+                {
+                    edgePairings.Add(firstEdge, null);
+                }
+                else
+                {
+                    edgePairings.Add(firstEdge, winningPairing.Key);
+                    unmachedSecondEdges.Remove(winningPairing.Key);
+                }
+                totalScore += winningPairing.Value;
             }
+            return totalScore;
+        }
+
+        private static int GetEdgeMatchScore(Dictionary<LabeledVertex, List<LabeledVertex>> pairings, SharedSourceOrDest sourceOrDest, LabeledEdge firstEdge, LabeledVertex firstEdgeVertex, IndexImportance indexImportance, LabeledEdge secondEdge)
+        {
+            int edgeMatchScore = 0;
+          
+            LabeledVertex secondEdgeVertex;
+            if (sourceOrDest == SharedSourceOrDest.Source)
+            {
+                secondEdgeVertex = secondEdge.DestinationVertex;
+            }
+            else
+            {
+                secondEdgeVertex = secondEdge.SourceVertex;
+            }
+
+            if (indexImportance == IndexImportance.Important && secondEdge.Index == firstEdge.Index)
+            {
+                edgeMatchScore += EdgeIndexMatchScore;
+            }
+            if (pairings[firstEdgeVertex].Contains(secondEdgeVertex))
+            {
+                edgeMatchScore += DestinationVertexesAreMappedScore;
+            }
+            else if (firstEdgeVertex.Opcode == secondEdgeVertex.Opcode)
+            {
+                edgeMatchScore += 2;
+            }
+            else if (CodeGroups.AreSameGroup(firstEdgeVertex.Opcode, secondEdgeVertex.Opcode))
+            {
+                edgeMatchScore += 1;
+            }
+            return edgeMatchScore;
         }
 
         private static List<LabeledVertex> GetLabeled(List<InstructionNode> graph)
@@ -70,24 +166,30 @@ namespace GraphSimilarityByMatching
                 LabeledVertex vertex = new LabeledVertex();
                 vertex.Opcode = instructionNode.Instruction.OpCode.Code;
                 vertex.Operand = instructionNode.Instruction.Operand;
+                vertex.Index = instructionNode.InstructionIndex;
+                labeledVertexes.Add(vertex);
+            }
+            foreach (var instructionNode in graph)
+            {
+                LabeledVertex vertex = labeledVertexes[instructionNode.InstructionIndex];
                 foreach (var dataFlowBackVertex in instructionNode.DataFlowBackRelated)
                 {
                     vertex.BackEdges.Add(new LabeledEdge()
                     {
                         EdgeType = EdgeType.DataFlow,
                         Index = dataFlowBackVertex.ArgIndex,
-                        SourceVertexOpcode = dataFlowBackVertex.Argument.Instruction.OpCode.Code,
-                        DestVertexOpcode = vertex.Opcode
+                        SourceVertex = labeledVertexes[dataFlowBackVertex.Argument.InstructionIndex],
+                        DestinationVertex = vertex
                     });
                 }
                 foreach (var programFlowBackVertex in instructionNode.ProgramFlowBackAffected)
                 {
                     vertex.BackEdges.Add(new LabeledEdge()
                     {
-                        EdgeType = EdgeType.ProgramFlow,
+                        EdgeType = EdgeType.ProgramFlowAffecting,
                         Index = programFlowBackVertex.ArgIndex,
-                        SourceVertexOpcode = programFlowBackVertex.Argument.Instruction.OpCode.Code,
-                        DestVertexOpcode = vertex.Opcode
+                        SourceVertex = labeledVertexes[programFlowBackVertex.Argument.InstructionIndex],
+                        DestinationVertex = vertex
                     });
                 }
                 foreach (var dataFlowBackVertex in instructionNode.DataFlowForwardRelated)
@@ -96,23 +198,28 @@ namespace GraphSimilarityByMatching
                     {
                         EdgeType = EdgeType.DataFlow,
                         Index = dataFlowBackVertex.ArgIndex,
-                        SourceVertexOpcode = dataFlowBackVertex.Argument.Instruction.OpCode.Code,
-                        DestVertexOpcode = vertex.Opcode
+                        SourceVertex = vertex,
+                        DestinationVertex = labeledVertexes[dataFlowBackVertex.Argument.InstructionIndex]
                     });
                 }
                 foreach (var programFlowForwardVertex in instructionNode.ProgramFlowForwardAffecting)
                 {
                     vertex.ForwardEdges.Add(new LabeledEdge()
                     {
-                        EdgeType = EdgeType.ProgramFlow,
+                        EdgeType = EdgeType.ProgramFlowAffecting,
                         Index = programFlowForwardVertex.ArgIndex,
-                        SourceVertexOpcode = vertex.Opcode,
-                        DestVertexOpcode = programFlowForwardVertex.Argument.Instruction.OpCode.Code
+                        SourceVertex = vertex,
+                        DestinationVertex = labeledVertexes[programFlowForwardVertex.Argument.InstructionIndex]
                     });
                 }
-                labeledVertexes.Add(vertex);
             }
             return labeledVertexes;
         }
+    }
+
+    internal enum SharedSourceOrDest
+    {
+        Source,
+        Dest
     }
 }

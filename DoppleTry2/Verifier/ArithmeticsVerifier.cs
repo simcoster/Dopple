@@ -10,7 +10,9 @@ namespace DoppleTry2.VerifierNs
 {
     class ArithmeticsVerifier : Verifier
     {
-        public ArithmeticsVerifier(List<InstructionNode> instructionWrappers) : base(instructionWrappers) {}
+        public ArithmeticsVerifier(List<InstructionNode> instructionNodes) : base(instructionNodes)
+        {
+        }
 
         public override void Verify(InstructionNode instructionWrapper)
         {

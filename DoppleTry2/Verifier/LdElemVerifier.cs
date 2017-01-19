@@ -10,7 +10,7 @@ namespace DoppleTry2
 {
     class LdElemVerifier : Verifier
     {
-        public LdElemVerifier(List<InstructionNode> instructionWrappers) : base(instructionWrappers)
+        public LdElemVerifier(List<InstructionNode> instructionNodes) : base(instructionNodes)
         {
         }
 

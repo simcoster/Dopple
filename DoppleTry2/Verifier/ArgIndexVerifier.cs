@@ -8,7 +8,7 @@ namespace DoppleTry2
 {
     internal class ArgIndexVerifier : Verifier
     {
-        public ArgIndexVerifier(List<InstructionNode> instructionWrappers) : base(instructionWrappers)
+        public ArgIndexVerifier(List<InstructionNode> instructionNodes) : base(instructionNodes)
         {
         }
 

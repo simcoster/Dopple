@@ -7,9 +7,8 @@ namespace DoppleTry2.VerifierNs
 {
     class StackPopPushVerfier : Verifier
     {
-        public StackPopPushVerfier(List<InstructionNode> instructionWrappers) : base(instructionWrappers)
+        public StackPopPushVerfier(List<InstructionNode> instructionNodes) : base(instructionNodes)
         {
-
         }
 
         public override void Verify(InstructionNode instructionWrapper)

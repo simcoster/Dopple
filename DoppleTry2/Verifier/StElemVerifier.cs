@@ -13,7 +13,7 @@ namespace DoppleTry2.VerifierNs
 {
     class StElemVerifier : Verifier
     {
-        public StElemVerifier(List<InstructionNode> instructionWrappers) : base(instructionWrappers)
+        public StElemVerifier(List<InstructionNode> instructionNodes) : base(instructionNodes)
         {
         }
 

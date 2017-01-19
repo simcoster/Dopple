@@ -10,7 +10,7 @@ namespace Utility
 {
     public class Class1
     {
-        static int BubbleSort(int[] number)
+        static int SumPles(int[] number)
         {
             int sum = 0;
             foreach (var b in number)
@@ -20,5 +20,12 @@ namespace Utility
             return sum;
         }
 
+        static void Minus(int[] number)
+        {
+            foreach (var b in number)
+            {
+                Console.WriteLine("boogaboo");
+            }
+        }
     }
 }
