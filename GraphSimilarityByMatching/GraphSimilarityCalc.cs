@@ -13,9 +13,10 @@ namespace GraphSimilarityByMatching
         private const int EdgeIndexMatchScore = 2;
         private const int DestinationVertexesAreMappedScore = 3;
         private static readonly CodeInfo opCodeInfo = new CodeInfo();
-        private const int UnmachedVertexCost = 5;
+        private const int UnmachedVertexPenalty = 5;
 
-        public static int GetDistance(List<InstructionNode> firstGraph, List<InstructionNode> secondGraph)
+      
+        public static int GetDistance(List<InstructionNode> firstGraph, List<InstructionNode> secondGraph, out Dictionary<LabeledVertex, List<LabeledVertex>> pairingsOut)
         {
             var pairings = new Dictionary<LabeledVertex, List<LabeledVertex>>();
 
@@ -37,29 +38,32 @@ namespace GraphSimilarityByMatching
             smallerGraphLabeled.ForEach(x => pairings.Add(x, new List<LabeledVertex>()));
 
             int graphPairingScore = 0;
-            foreach (var bigGraphVertex in biggerGraphLabeled)
+            Random rnd = new Random();
+            foreach (var bigGraphVertex in biggerGraphLabeled.OrderBy(x => rnd.Next()))
             {
                 var vertexPossiblePairings = new Dictionary<LabeledVertex, int>();
                 var smallGraphCandidates = smallerGraphLabeled.Where(x => CodeGroups.AreSameGroup(x.Opcode, bigGraphVertex.Opcode)).ToList();
-                foreach(var smallGraphCandidate in smallGraphCandidates)
+                foreach(var smallGraphCandidate in smallGraphCandidates.OrderBy(x => rnd.Next()))
                 {
-                    vertexPossiblePairings.Add( smallGraphCandidate, GetScore(smallGraphCandidate, bigGraphVertex, pairings));
+                    vertexPossiblePairings.Add(smallGraphCandidate, GetScore(smallGraphCandidate, bigGraphVertex, pairings, false));
                 }
-                var winningPair = vertexPossiblePairings.OrderByDescending(x => x.Value).FirstOrDefault();
-                if (winningPair.Key != null)
+                var winningPairs = vertexPossiblePairings.GroupBy(x => x.Value).OrderByDescending(x => x.Key).FirstOrDefault();
+                if (winningPairs == null)
                 {
-                    graphPairingScore += winningPair.Value;
-                    pairings[winningPair.Key].Add(bigGraphVertex);
+                    graphPairingScore -= UnmachedVertexPenalty;
                 }
                 else
                 {
-                    graphPairingScore -= UnmachedVertexCost;
+                    KeyValuePair<LabeledVertex, int> winningPair = winningPairs.ElementAt(rnd.Next(0, winningPairs.Count()));
+                    graphPairingScore += winningPair.Value;
+                    pairings[winningPair.Key].Add(bigGraphVertex);
                 }
             }
+            pairingsOut = pairings;
             return graphPairingScore;
         }
 
-        private static int GetScore(LabeledVertex smallGraphVertex, LabeledVertex bigGraphVertex, Dictionary<LabeledVertex, List<LabeledVertex>> pairings)
+        private static int GetScore(LabeledVertex smallGraphVertex, LabeledVertex bigGraphVertex, Dictionary<LabeledVertex, List<LabeledVertex>> pairings, bool userPairings)
         {
             int score = 1;
             if (smallGraphVertex.Opcode == bigGraphVertex.Opcode)
@@ -78,7 +82,8 @@ namespace GraphSimilarityByMatching
             int totalScore = 0;
             var edgePairings = new Dictionary<LabeledEdge, LabeledEdge>();
             var unmachedSecondEdges = new List<LabeledEdge>(secondEdges);
-            foreach(var firstEdge in firstEdges)
+            Random rnd = new Random();
+            foreach(var firstEdge in firstEdges.OrderBy(x => rnd.Next()))
             {
                 var pairingScores = new Dictionary<LabeledEdge, int>();
                 LabeledVertex vertexToMatch;
@@ -110,17 +115,18 @@ namespace GraphSimilarityByMatching
                 }
                 var relevantSecondEdges = unmachedSecondEdges.Where(predicate);
                 relevantSecondEdges.ForEach(x => pairingScores.Add(x, GetEdgeMatchScore(pairings, sharedSourceOrDest, firstEdge, vertexToMatch, indexImportance, x)));
-                KeyValuePair<LabeledEdge, int> winningPairing = pairingScores.OrderByDescending(x => x.Value).FirstOrDefault();
-                if (winningPairing.Key == null)
+                var winningPairs = pairingScores.GroupBy(x => x.Value).OrderByDescending(x => x.Key).FirstOrDefault();
+                if (winningPairs == null)
                 {
                     edgePairings.Add(firstEdge, null);
-                }
+                }               
                 else
                 {
-                    edgePairings.Add(firstEdge, winningPairing.Key);
-                    unmachedSecondEdges.Remove(winningPairing.Key);
+                    var winningPair = winningPairs.ElementAt(rnd.Next(0, winningPairs.Count()));
+                    edgePairings.Add(firstEdge, winningPair.Key);
+                    unmachedSecondEdges.Remove(winningPair.Key);
+                    totalScore += winningPair.Value;
                 }
-                totalScore += winningPairing.Value;
             }
             return totalScore;
         }
