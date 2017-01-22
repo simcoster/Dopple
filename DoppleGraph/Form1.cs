@@ -34,19 +34,31 @@ namespace DoppleGraph
                 var newForm = new Form2(instructionWrappers);
                 newForm.Show();
             }
-
             var biggerGraph = Graphs.GetRange(0,2).OrderByDescending(x => x.Count).First();
-            var editDistance = new List<double>();
+            Dictionary<LabeledVertex, List<LabeledVertex>> bestMatch = null;
+            Dictionary<LabeledVertex, List<LabeledVertex>> pairingsOut;
+            double bestScore = 0;
             for (int i=0; i<50; i++)
             {
-                editDistance.Add((double) GraphSimilarityCalc.GetDistance(Graphs[0], Graphs[1]));
+                GraphSimilarityCalc.GetDistance(Graphs[0], Graphs[1], out pairingsOut);
+                var score = PairingValidator.ScorePairings(pairingsOut);
+                if (score > bestScore)
+                {
+                    bestScore = score;
+                    bestMatch = pairingsOut;
+                }
             }
-            var selfEditDistance = new List<double>();
             for (int i = 0; i < 50; i++)
             {
-                selfEditDistance.Add((double) GraphSimilarityCalc.GetDistance(Graphs[0], Graphs[0]));
+                GraphSimilarityCalc.GetDistance(Graphs[0], Graphs[0], out pairingsOut);
+                var score = PairingValidator.ScorePairings(pairingsOut);
+                if (score > bestScore)
+                {
+                    bestScore = score;
+                    bestMatch = pairingsOut;
+                }
             }
-            Console.WriteLine(editDistance);
+            Console.WriteLine(bestScore);
         }
     }
 }

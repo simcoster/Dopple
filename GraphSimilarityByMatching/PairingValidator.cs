@@ -7,22 +7,20 @@ using System.Threading.Tasks;
 
 namespace GraphSimilarityByMatching
 {
-    class PairingValidator
+    public class PairingValidator
     {
         const int VertexFullCodeMatchPoints = 2;
-        const int VertexCodeGroupMatchPoints = 1;
-        const int EdgeRightVertexPoints = 1;
-        const int EdgeRightIndexPoints = 1;
-        const int EdgeFullMatchPoints = EdgeRightIndexPoints + EdgeRightVertexPoints;
+        const int VertexCodeGroupMatchOnlyPenalty = 1;
+        const int EdgeWrongVertexCodePenalty = 1;
+        const int EdgeWrongIndexPenalty = 1;
+        const int EdgeMisMatchPenalty = EdgeWrongIndexPenalty + EdgeWrongVertexCodePenalty;
         const int MultiMatchPenalty = 1;
 
-        public static int ScorePairings( Dictionary<LabeledVertex, List<LabeledVertex>> pairings)
+        public static double ScorePairings(Dictionary<LabeledVertex, List<LabeledVertex>> pairings)
         {
-            // Self pairing should recieve full score
-            // Multi pairing should recieve penalty as to never contribute to the score, it is always a deduction, which is determined on how well is the pairing
             int fullScore = 0;
             List<LabeledVertex> smallGraphVertexes = pairings.Keys.ToList();
-            fullScore = smallGraphVertexes.Count * VertexFullCodeMatchPoints + EdgeFullMatchPoints * (smallGraphVertexes.Sum(x => x.BackEdges.Count + x.ForwardEdges.Count));
+            fullScore = smallGraphVertexes.Count * VertexFullCodeMatchPoints + EdgeMisMatchPenalty * (smallGraphVertexes.Sum(x => x.BackEdges.Count + x.ForwardEdges.Count));
 
             int matchScore = fullScore;
             foreach (var smallGraphVertex in pairings.Keys)
@@ -32,46 +30,55 @@ namespace GraphSimilarityByMatching
                     matchScore -= MultiMatchPenalty * pairings[smallGraphVertex].Count - 1;
                 }
 
-
                 foreach (var bigGraphVertex in pairings[smallGraphVertex])
                 {
-                    if (bigGraphVertex.Opcode == smallGraphVertex.Opcode)
+                    if (bigGraphVertex.Opcode != smallGraphVertex.Opcode)
                     {
-                        matchScore += VertexFullCodeMatchPoints;
-                    }
-                    else if (CodeGroups.AreSameGroup(bigGraphVertex.Opcode,smallGraphVertex.Opcode))
-                    {
-                        matchScore += VertexCodeGroupMatchPoints;
-                    }
-                    fullScore += VertexFullCodeMatchPoints;
-
-                    foreach (var smallGraphBackEdge in smallGraphVertex.BackEdges)
-                    {
-                        var matchingSmallGraphEdge = bigGraphVertex.BackEdges.FirstOrDefault(x => x.SourceVertex.Opcode == smallGraphBackEdge.SourceVertex.Opcode && 
-                                                                                                                       x.Index == smallGraphBackEdge.Index && 
-                                                                                                                       x.EdgeType == smallGraphBackEdge.EdgeType);
-                        if (matchingSmallGraphEdge != null)
+                        if (CodeGroups.AreSameGroup(bigGraphVertex.Opcode, smallGraphVertex.Opcode))
                         {
-                            matchScore += EdgeRightVertexPoints + EdgeRightIndexPoints;
-                            bigGraphVertex.BackEdges.Remove(matchingSmallGraphEdge);
-                            smallGraphVertex.BackEdges.Remove(smallGraphBackEdge);
+                            matchScore -= VertexCodeGroupMatchOnlyPenalty;
                         }
-                    }
-                    foreach (var smallGraphBackEdge in smallGraphVertex.BackEdges)
-                    {
-                        var matchingSmallGraphEdge = bigGraphVertex.BackEdges.FirstOrDefault(x => x.SourceVertex.Opcode == smallGraphBackEdge.SourceVertex.Opcode &&
-                                                                                                                       x.EdgeType == smallGraphBackEdge.EdgeType);
-                        if (matchingSmallGraphEdge != null)
+                        else
                         {
-                            matchScore += EdgeRightVertexPoints;
-                            bigGraphVertex.BackEdges.Remove(matchingSmallGraphEdge);
-                            smallGraphVertex.BackEdges.Remove(smallGraphBackEdge);
+                            matchScore -= VertexFullCodeMatchPoints;
                         }
                     }
 
+                    matchScore -= MatchEdgesPenalty(smallGraphVertex.BackEdges.ToList(), bigGraphVertex.BackEdges.ToList());
+                    matchScore -= MatchEdgesPenalty(smallGraphVertex.ForwardEdges.ToList(), bigGraphVertex.ForwardEdges.ToList());
                 }
             }
-            return 0;
+            return (double)matchScore / (double) fullScore;
+        }
+
+        private static int MatchEdgesPenalty(List<LabeledEdge> smallVertexEdges, List<LabeledEdge> bigVertexEdges)
+        {
+            int misMatchPenalty = 0;
+            foreach (var smallGraphBackEdge in smallVertexEdges.ToArray())
+            {
+                var matchingSmallGraphEdge = bigVertexEdges.FirstOrDefault(x => x.SourceVertex.Opcode == smallGraphBackEdge.SourceVertex.Opcode &&
+                                                                                                               x.Index == smallGraphBackEdge.Index &&
+                                                                                                               x.EdgeType == smallGraphBackEdge.EdgeType);
+                if (matchingSmallGraphEdge != null)
+                {
+                    bigVertexEdges.Remove(matchingSmallGraphEdge);
+                    smallVertexEdges.Remove(smallGraphBackEdge);
+                }
+            }
+            foreach (var smallGraphBackEdge in smallVertexEdges.ToArray())
+            {
+                var matchingSmallGraphEdge = bigVertexEdges.FirstOrDefault(x => x.SourceVertex.Opcode == smallGraphBackEdge.SourceVertex.Opcode &&
+                                                                                                               x.EdgeType == smallGraphBackEdge.EdgeType);
+                if (matchingSmallGraphEdge != null)
+                {
+                    misMatchPenalty += EdgeWrongIndexPenalty;
+                    bigVertexEdges.Remove(matchingSmallGraphEdge);
+                    smallVertexEdges.Remove(smallGraphBackEdge);
+                }
+            }
+            var unmatchedCount = smallVertexEdges.Count + bigVertexEdges.Count;
+            misMatchPenalty += unmatchedCount * EdgeMisMatchPenalty;
+            return misMatchPenalty;
         }
     }
 }
