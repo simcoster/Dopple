@@ -173,6 +173,7 @@ namespace GraphSimilarityByMatching
                 vertex.Opcode = instructionNode.Instruction.OpCode.Code;
                 vertex.Operand = instructionNode.Instruction.Operand;
                 vertex.Index = instructionNode.InstructionIndex;
+                vertex.Method = instructionNode.Method;
                 labeledVertexes.Add(vertex);
             }
             foreach (var instructionNode in graph)

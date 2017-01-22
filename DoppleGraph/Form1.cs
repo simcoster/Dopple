@@ -48,6 +48,8 @@ namespace DoppleGraph
                     bestMatch = pairingsOut;
                 }
             }
+            var newFormmm = new NodePairingGraph(bestMatch);
+            newFormmm.Show();
             for (int i = 0; i < 50; i++)
             {
                 GraphSimilarityCalc.GetDistance(Graphs[0], Graphs[0], out pairingsOut);
@@ -58,7 +60,8 @@ namespace DoppleGraph
                     bestMatch = pairingsOut;
                 }
             }
-            Console.WriteLine(bestScore);
+            var newFormm = new NodePairingGraph(bestMatch);
+            newFormm.Show();
         }
     }
 }

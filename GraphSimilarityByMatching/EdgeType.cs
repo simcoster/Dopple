@@ -3,6 +3,7 @@
     public enum EdgeType
     {
         DataFlow,
-        ProgramFlowAffecting
+        ProgramFlowAffecting,
+        Pairing
     }
 }
