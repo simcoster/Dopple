@@ -16,9 +16,10 @@ namespace GraphSimilarityByMatching
         private const int UnmachedVertexPenalty = 5;
 
       
-        public static int GetDistance(List<InstructionNode> firstGraph, List<InstructionNode> secondGraph, out Dictionary<LabeledVertex, List<LabeledVertex>> pairingsOut)
+        public static NodePairing GetDistance(List<InstructionNode> firstGraph, List<InstructionNode> secondGraph)
         {
-            var pairings = new Dictionary<LabeledVertex, List<LabeledVertex>>();
+            NodePairing nodePairing = new NodePairing();
+            var pairings = nodePairing.Pairings;
 
             List<InstructionNode> biggerGraph;
             List<InstructionNode> smallerGraph;
@@ -34,6 +35,8 @@ namespace GraphSimilarityByMatching
             }
             List<LabeledVertex> biggerGraphLabeled = GetLabeled(biggerGraph);
             List<LabeledVertex> smallerGraphLabeled = GetLabeled(smallerGraph);
+            nodePairing.BigGraph = biggerGraphLabeled;
+            nodePairing.SmallGraph = smallerGraphLabeled;
 
             smallerGraphLabeled.ForEach(x => pairings.Add(x, new List<LabeledVertex>()));
 
@@ -59,8 +62,7 @@ namespace GraphSimilarityByMatching
                     pairings[winningPair.Key].Add(bigGraphVertex);
                 }
             }
-            pairingsOut = pairings;
-            return graphPairingScore;
+            return nodePairing;
         }
 
         private static int GetScore(LabeledVertex smallGraphVertex, LabeledVertex bigGraphVertex, Dictionary<LabeledVertex, List<LabeledVertex>> pairings, bool userPairings)

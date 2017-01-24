@@ -61,6 +61,8 @@
     <Compile Include="EdgeType.cs" />
     <Compile Include="LabeledVertex.cs" />
     <Compile Include="LabledEdge.cs" />
+    <Compile Include="NodePairing.cs" />
+    <Compile Include="PairingPenalty.cs" />
     <Compile Include="PairingValidator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

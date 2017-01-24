@@ -156,6 +156,7 @@ namespace DoppleTry2.InstructionModifiers
                     retCall.DataFlowForwardRelated.AddTwoWay(recursiveCall.DataFlowForwardRelated);
                 }
                 recursiveCall.DataFlowForwardRelated.RemoveAllTwoWay();
+                recursiveCall.DataFlowBackRelated.RemoveAllTwoWay();
                 foreach (var forwardRoute in recursiveCall.ProgramFlowForwardRoutes.ToArray())
                 {
                     forwardRoute.ProgramFlowBackRoutes.AddTwoWay(recursiveCall.ProgramFlowBackRoutes);

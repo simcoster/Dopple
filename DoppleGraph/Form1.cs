@@ -35,33 +35,32 @@ namespace DoppleGraph
                 newForm.Show();
             }
             var biggerGraph = Graphs.GetRange(0,2).OrderByDescending(x => x.Count).First();
-            Dictionary<LabeledVertex, List<LabeledVertex>> bestMatch = null;
-            Dictionary<LabeledVertex, List<LabeledVertex>> pairingsOut;
-            double bestScore = 0;
+            NodePairing bestMatch = null;
+            double bestScore = int.MinValue;
             for (int i=0; i<50; i++)
             {
-                GraphSimilarityCalc.GetDistance(Graphs[0], Graphs[1], out pairingsOut);
-                var score = PairingValidator.ScorePairings(pairingsOut);
+                NodePairing pairing = GraphSimilarityCalc.GetDistance(Graphs[0], Graphs[1]);
+                var score = PairingValidator.ScorePairings(pairing);
                 if (score > bestScore)
                 {
                     bestScore = score;
-                    bestMatch = pairingsOut;
+                    bestMatch = pairing;
                 }
             }
-            var newFormmm = new NodePairingGraph(bestMatch);
+            var newFormmm = new NodePairingGraph(bestMatch, bestScore);
             newFormmm.Show();
-            for (int i = 0; i < 50; i++)
-            {
-                GraphSimilarityCalc.GetDistance(Graphs[0], Graphs[0], out pairingsOut);
-                var score = PairingValidator.ScorePairings(pairingsOut);
-                if (score > bestScore)
-                {
-                    bestScore = score;
-                    bestMatch = pairingsOut;
-                }
-            }
-            var newFormm = new NodePairingGraph(bestMatch);
-            newFormm.Show();
+            //for (int i = 0; i < 50; i++)
+            //{
+            //    GraphSimilarityCalc.GetDistance(Graphs[0], Graphs[0], out pairingsOut);
+            //    var score = PairingValidator.ScorePairings(pairingsOut);
+            //    if (score > bestScore)
+            //    {
+            //        bestScore = score;
+            //        bestMatch = pairingsOut;
+            //    }
+            //}
+            //var newFormm = new NodePairingGraph(bestMatch, bestScore);
+            //newFormm.Show();
         }
     }
 }

@@ -33,51 +33,26 @@ namespace Utility
             }
         }
 
-        public static void insertionSortWithHelpers(int[] array)
+        static void BubbleSort(int[] number)
         {
-            for (int i = 0; i < array.Length - 1; i++)
+            bool flag = true;
+            int temp;
+            int numLength = number.Length;
+            //sorting an array
+            for (int i = 1; (i <= (numLength - 1)) && flag; i++)
             {
-                //int min;
-                //int minIndex;
-                //findMinAndIndex(array, i, out min, out minIndex);
-                int min = int.MaxValue;
-                int minIndex = -1;
-                for (int j = i; j < array.Length; j++)
+                flag = false;
+                for (int j = 0; j < (numLength - 1); j++)
                 {
-                    if (array[j] < min)
+                    if (number[j + 1] > number[j])
                     {
-                        min = array[j];
-                        minIndex = j;
+                        temp = number[j];
+                        number[j] = number[j + 1];
+                        number[j + 1] = temp;
+                        flag = true;
                     }
                 }
-                if (min < array[i])
-                {
-                    swapTwo(array, i, minIndex);
-                }
             }
-        }
-
-        public static void swapTwo(int[] array, int i, int j)
-        {
-            int temp = array[i];
-            array[i] = array[j];
-            array[j] = temp;
-        }
-
-        public static void findMinAndIndex(int[] array, int startIndex, out int minValue, out int minIndex)
-        {
-            int currentMin = int.MaxValue;
-            int currentMinIndex = -1;
-            for (int i = startIndex; i < array.Length; i++)
-            {
-                if (array[i] < currentMin)
-                {
-                    currentMin = array[i];
-                    currentMinIndex = i;
-                }
-            }
-            minValue = currentMin;
-            minIndex = currentMinIndex;
         }
     }
 }
