@@ -10,29 +10,6 @@ namespace Utility
 {
     public class Class1
     {
-        public static void insertionSort(int[] array)
-        {
-            for (int i = 0; i < array.Length - 1; i++)
-            {
-                int nextMin = int.MaxValue;
-                int nextMinIndex = -1;
-                for (int j = i; j < array.Length; j++)
-                {
-                    if (array[j] < nextMin)
-                    {
-                        nextMin = array[j];
-                        nextMinIndex = j;
-                    }
-                }
-                if (nextMin < array[i])
-                {
-                    int temp = array[i];
-                    array[i] = array[nextMinIndex];
-                    array[nextMinIndex] = temp;
-                }
-            }
-        }
-
         static void BubbleSort(int[] number)
         {
             bool flag = true;
@@ -54,5 +31,45 @@ namespace Utility
                 }
             }
         }
+        static void QuickSortLeftPivot(int[] a)
+        {
+            QuickSortLeftPivotRec(a, 0, a.Length - 1);
+        }
+
+
+        static void QuickSortLeftPivotRec(int[] a, int start, int end)
+        {
+            if (start >= end)
+            {
+                return;
+            }
+
+            int num = a[start];
+
+            int i = start, j = end;
+
+            while (i < j)
+            {
+                while (i < j && a[j] > num)
+                {
+                    j--;
+                }
+
+                a[i] = a[j];
+
+                while (i < j && a[i] < num)
+                {
+                    i++;
+                }
+
+                a[j] = a[i];
+            }
+
+            a[i] = num;
+            QuickSortLeftPivotRec(a, start, i - 1);
+            QuickSortLeftPivotRec(a, i + 1, end);
+        }
+
+       
     }
 }

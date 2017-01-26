@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DoppleTry2.InstructionWrapperMembers
 {
-    public abstract class RelatedList : List<InstructionNode>
+    public abstract class RelatedList : List<InstructionNode>, IMergable
     {
         public RelatedList(InstructionNode containingNode)
         {
@@ -73,5 +73,15 @@ namespace DoppleTry2.InstructionWrapperMembers
             base.RemoveAll(predicate);
         }
 
+        public void MergeInto(InstructionNode nodeToMergeInto)
+        {
+            foreach (var arg in this.ToArray())
+            {
+                this.RemoveTwoWay(arg);
+                GetSameList(nodeToMergeInto).AddTwoWay(arg);
+            }
+        }
+
+        internal abstract RelatedList GetSameList(InstructionNode nodeToMergeInto);
     }
 }

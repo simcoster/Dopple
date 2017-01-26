@@ -18,7 +18,10 @@ namespace DoppleTry2.InstructionWrapperMembers
             return backArgToRemove.ProgramFlowBackRoutes;
         }
 
-       
+        internal override RelatedList GetSameList(InstructionNode nodeToMergeInto)
+        {
+            return nodeToMergeInto.ProgramFlowForwardRoutes;
+        }
     }
 
 }

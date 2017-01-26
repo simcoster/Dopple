@@ -298,6 +298,10 @@ namespace DoppleGraph
                 {
                     DrawEdge(nodeWrapper, myView, backRouteNode, flowRoutesLinksLayer, new Pen(Color.Black) { DashStyle = DashStyle.Dash });
                 }
+                foreach (var backRelatedNode in nodeWrapper.InstructionNode.SingleUnitBackRelated)
+                {
+                    DrawEdge(nodeWrapper, myView, backRelatedNode, flowRoutesLinksLayer, new Pen(Color.Blue) { DashStyle = DashStyle.Dot });
+                }
             }
         }
 

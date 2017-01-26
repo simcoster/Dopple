@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DoppleTry2
 {
-    public abstract class ArgList : List<IndexedArgument>
+    public abstract class ArgList : List<IndexedArgument>, IMergable
     {
         public ArgList(InstructionNode instructionWrapper)
         {
@@ -48,11 +48,11 @@ namespace DoppleTry2
         {
             return base.Remove(item);
         }
-        public void RemoveTwoWay(IndexedArgument backArgToRemove)
+        public void RemoveTwoWay(IndexedArgument argToRemove)
         {
-            Remove(backArgToRemove);
-            var forwardArg = backArgToRemove.MirrorArg;
-            GetMirrorList(backArgToRemove.Argument).Remove(forwardArg);
+            Remove(argToRemove);
+            var forwardArg = argToRemove.MirrorArg;
+            GetMirrorList(argToRemove.Argument).Remove(forwardArg);
         }
         public void RemoveAllTwoWay(Predicate<IndexedArgument> predicate)
         {
@@ -72,11 +72,12 @@ namespace DoppleTry2
                 Debug.WriteLine("skipped adding argIndex {0} with inst {1}, duplicate exists", toAdd.ArgIndex, toAdd.Argument);
                 return;
             }
-            Add(toAdd);
-            var mirrorList = GetMirrorList(toAdd.Argument);
-            var mirrorArg = new IndexedArgument(toAdd.ArgIndex, containingWrapper, mirrorList);
-            mirrorArg.MirrorArg = toAdd;
-            toAdd.MirrorArg = mirrorArg;
+            var toAddClone = new IndexedArgument(toAdd.ArgIndex, toAdd.Argument, toAdd.ContainingList);
+            Add(toAddClone);
+            var mirrorList = GetMirrorList(toAddClone.Argument);
+            var mirrorArg = new IndexedArgument(toAddClone.ArgIndex, containingWrapper, mirrorList);
+            mirrorArg.MirrorArg = toAddClone;
+            toAddClone.MirrorArg = mirrorArg;
             mirrorList.Add(mirrorArg);
         }
         public void AddTwoWay(InstructionNode toAdd)
@@ -147,8 +148,18 @@ namespace DoppleTry2
                 }
             }
         }
-
+        internal abstract ArgList GetSameList(InstructionNode nodeToMergeInto);
         protected abstract ArgList GetMirrorList(InstructionNode node);
+
+        void IMergable.MergeInto(InstructionNode nodeToMergeInto)
+        {
+            ArgList mergedNodeSameArgList = GetSameList(nodeToMergeInto);
+            foreach (var arg in this.ToArray())
+            {
+                mergedNodeSameArgList.AddTwoWay(arg);
+                RemoveTwoWay(arg);
+            }
+        }
     }
 
     public class DataFlowBackArgList : ArgList
@@ -160,6 +171,11 @@ namespace DoppleTry2
         protected override ArgList GetMirrorList(InstructionNode node)
         {
             return node.DataFlowForwardRelated;
+        }
+
+        internal override ArgList GetSameList(InstructionNode nodeToMergeInto)
+        {
+            return nodeToMergeInto.DataFlowBackRelated;
         }
     }
 
@@ -173,6 +189,11 @@ namespace DoppleTry2
         {
             return node.DataFlowBackRelated;
         }
+
+        internal override ArgList GetSameList(InstructionNode nodeToMergeInto)
+        {
+            return nodeToMergeInto.DataFlowForwardRelated;
+        }
     }
 
     public class ProgramFlowBackAffectedArgList : ArgList
@@ -185,6 +206,11 @@ namespace DoppleTry2
         {
             return node.ProgramFlowForwardAffecting;
         }
+
+        internal override ArgList GetSameList(InstructionNode nodeToMergeInto)
+        {
+            return nodeToMergeInto.ProgramFlowBackAffected;
+        }
     }
 
     public class ProgramFlowForwardAffectingArgList : ArgList
@@ -196,6 +222,11 @@ namespace DoppleTry2
         protected override ArgList GetMirrorList(InstructionNode node)
         {
             return node.ProgramFlowBackAffected;
+        }
+
+        internal override ArgList GetSameList(InstructionNode nodeToMergeInto)
+        {
+            return nodeToMergeInto.ProgramFlowForwardAffecting;
         }
     }
 }

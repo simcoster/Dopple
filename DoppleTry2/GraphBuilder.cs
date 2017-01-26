@@ -269,43 +269,13 @@ namespace DoppleTry2
             var nodeToKeep = nodesToMerge.First();
             foreach (var nodeToRemove in nodesToMerge.ToArray().Except(new[] { nodeToKeep }))
             {
-                foreach (var backDataNode in nodeToRemove.DataFlowBackRelated.Where(x => x.Argument != nodeToRemove).ToList())
-                {
-                    nodeToKeep.DataFlowBackRelated.AddTwoWay(backDataNode);
-                    nodeToRemove.DataFlowBackRelated.RemoveTwoWay(backDataNode);
-                }
-                foreach (var forwardDataNode in nodeToRemove.DataFlowForwardRelated.Where(x => x.Argument != nodeToRemove).ToList())
-                {
-                    forwardDataNode.Argument.DataFlowBackRelated.AddTwoWay(nodeToKeep, forwardDataNode.ArgIndex);
-                    nodeToRemove.DataFlowForwardRelated.RemoveTwoWay(forwardDataNode);
-                }
-                nodeToKeep.DataFlowBackRelated.CheckNumberings();
-                foreach (var forwardFlowNode in nodeToRemove.ProgramFlowForwardRoutes.Where(x => x != nodeToRemove).ToList())
-                {
-                    forwardFlowNode.ProgramFlowBackRoutes.RemoveTwoWay(nodeToRemove);
-                    forwardFlowNode.ProgramFlowBackRoutes.AddTwoWay(nodeToKeep);
-                }
-                foreach (var backFlowNode in nodeToRemove.ProgramFlowBackRoutes.Where(x => x != nodeToRemove).ToList())
-                {
-                    nodeToRemove.ProgramFlowBackRoutes.RemoveTwoWay(backFlowNode);
-                    nodeToKeep.ProgramFlowBackRoutes.AddTwoWay(backFlowNode);
-                }
-                foreach(var forwardNode in nodeToRemove.ProgramFlowForwardAffecting.Where(x => x.Argument != nodeToRemove).ToList())
-                {
-                    nodeToKeep.ProgramFlowForwardAffecting.AddTwoWay(forwardNode.Argument, forwardNode.ArgIndex);
-                    nodeToRemove.ProgramFlowForwardAffecting.RemoveTwoWay(forwardNode);
-                }
-                foreach (var backNode in nodeToRemove.ProgramFlowBackAffected.Where(x => x.Argument != nodeToRemove).ToList())
-                {
-                    nodeToRemove.ProgramFlowBackAffected.RemoveTwoWay(backNode);
-                    nodeToKeep.ProgramFlowBackAffected.AddTwoWay(backNode);
-                }
+                nodeToRemove.MergeInto(nodeToKeep);
                 InstructionNodes.Remove(nodeToRemove);
                 var stillPointingToRemoved = InstructionNodes.Where(x => x.DataFlowBackRelated.Any(y => y.Argument == nodeToRemove)
                                               || x.DataFlowForwardRelated.Any(y => y.Argument == nodeToRemove)
                                               || x.ProgramFlowBackRoutes.Any(y => y == nodeToRemove)
                                               || x.ProgramFlowForwardRoutes.Any(y => y == nodeToRemove)).ToList();
-                if (stillPointingToRemoved.Count >0)
+                if (stillPointingToRemoved.Count > 0)
                 {
                     throw new Exception("there's someone still pointing to the rmoeved");
                 }
@@ -318,42 +288,13 @@ namespace DoppleTry2
         {
             foreach (var nodeToRemove in instsToRemove.ToArray())
             {
-                foreach (var forInst in nodeToRemove.DataFlowForwardRelated.ToArray())
-                {
-                    forInst.Argument.DataFlowBackRelated.AddTwoWay(nodeToRemove.DataFlowBackRelated.Select(x => x.Argument), forInst.ArgIndex);
-                    nodeToRemove.DataFlowForwardRelated.RemoveTwoWay(forInst);
-                }
-                foreach(var backInst in nodeToRemove.DataFlowBackRelated.ToArray())
-                {
-                    nodeToRemove.DataFlowBackRelated.RemoveTwoWay(backInst);
-                }
-                var stillThere = InstructionNodes.Where(x => x.DataFlowForwardRelated.Any(y => y.Argument == nodeToRemove)).ToList();
-                if (stillThere.Count >0)
-                {
-
-                }
-                foreach (var forwardBackFlowInst in nodeToRemove.ProgramFlowForwardRoutes.ToList())
-                {
-                    forwardBackFlowInst.ProgramFlowBackRoutes.RemoveAllTwoWay(x => x == nodeToRemove);
-                    forwardBackFlowInst.ProgramFlowBackRoutes.AddTwoWay(nodeToRemove.ProgramFlowBackRoutes);
-                }
-                foreach(var backFlowInst in nodeToRemove.ProgramFlowBackRoutes.ToList())
-                {
-                    nodeToRemove.ProgramFlowBackRoutes.RemoveTwoWay(backFlowInst);
-                }
-                foreach (var backAffectedInst in nodeToRemove.ProgramFlowBackAffected.ToList())
-                {
-                    nodeToRemove.ProgramFlowBackAffected.RemoveTwoWay(backAffectedInst);
-                }
-                foreach (var forwardAffecting in nodeToRemove.ProgramFlowForwardAffecting.ToList())
-                {
-                    nodeToRemove.ProgramFlowForwardAffecting.RemoveTwoWay(forwardAffecting);
-                }
+                nodeToRemove.SelfRemove();
                 InstructionNodes.Remove(nodeToRemove);
-                if (InstructionNodes.Any(x => x.DataFlowBackRelated.Any(y => y.Argument == nodeToRemove)
+                var stillPointingToRemoved = InstructionNodes.Where(x => x.DataFlowBackRelated.Any(y => y.Argument == nodeToRemove)
                                                || x.DataFlowForwardRelated.Any(y => y.Argument == nodeToRemove)
                                                || x.ProgramFlowBackRoutes.Any(y => y == nodeToRemove)
-                                               || x.ProgramFlowForwardRoutes.Any(y => y == nodeToRemove)))
+                                               || x.ProgramFlowForwardRoutes.Any(y => y == nodeToRemove)).ToList();
+                if (stillPointingToRemoved.Count() >0)
                 {
                     throw new Exception("there's someone still pointing to the removed");
                 }

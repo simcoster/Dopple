@@ -26,7 +26,8 @@ namespace DoppleTry2.BackTrackers
                             new LoadMemoryByOperandBackTracer(instructionNodes),
                             new TypedReferenceBackTracer(instructionNodes),
                             new ConditionionalsBackTracer(instructionNodes),
-                            new CallBacktracer(instructionNodes, this)
+                            new CallBacktracer(instructionNodes, this),
+                            new SingleOperationUnitBackTracer(instructionNodes)
                            };
             verifiers = new Verifier[] {new StElemVerifier(instructionNodes), new StackPopPushVerfier(instructionNodes),
                                             new TwoWayVerifier(instructionNodes), new ArithmeticsVerifier(instructionNodes),

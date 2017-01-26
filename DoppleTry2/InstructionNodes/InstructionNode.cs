@@ -24,6 +24,8 @@ namespace DoppleTry2.InstructionNodes
             ProgramFlowBackAffected = new ProgramFlowBackAffectedArgList(this);
             ProgramFlowForwardRoutes = new ProgramFlowForwardRoutes(this);
             DataFlowForwardRelated = new DataFlowForwardArgList(this);
+            SingleUnitBackRelated = new SingleUnitBackRelated(this);
+            SingleUnitForwardRelated= new SingleUnitForwardRelated(this);
             ProgramFlowForwardAffecting = new ProgramFlowForwardAffectingArgList(this);
             MyGuid = Guid.NewGuid();
         }
@@ -34,6 +36,8 @@ namespace DoppleTry2.InstructionNodes
         public DataFlowBackArgList DataFlowBackRelated { get; private set; }
         public ProgramFlowForwardAffectingArgList ProgramFlowForwardAffecting { get; internal set; }
         public ProgramFlowBackAffectedArgList ProgramFlowBackAffected { get; set; }
+        public SingleUnitBackRelated SingleUnitBackRelated { get; set; }
+        public SingleUnitForwardRelated SingleUnitForwardRelated { get; internal set; }
 
         public Instruction Instruction { get; set; }
         public int InstructionIndex { get; internal set; }
@@ -102,6 +106,38 @@ namespace DoppleTry2.InstructionNodes
                     return 2;
                 default:
                     return 1;
+            }
+        }
+
+        public void MergeInto(InstructionNode nodeToMergeInto)
+        {
+            foreach (IMergable args in new IMergable[] { DataFlowBackRelated, DataFlowForwardRelated, ProgramFlowBackAffected, ProgramFlowForwardAffecting, ProgramFlowBackRoutes, ProgramFlowForwardRoutes, SingleUnitBackRelated, SingleUnitForwardRelated })
+            {
+                args.MergeInto(nodeToMergeInto);
+            }
+        }
+
+
+        internal void SelfRemove()
+        {
+            foreach (var forwardInst in DataFlowForwardRelated.ToArray())
+            {
+                int index = forwardInst.ArgIndex;
+                forwardInst.MirrorArg.ContainingList.AddTwoWay(DataFlowBackRelated.Select(x => x.Argument), index);
+                forwardInst.ContainingList.RemoveTwoWay(forwardInst);
+            }
+            foreach (var forwardPath in ProgramFlowForwardRoutes.ToArray())
+            {
+                forwardPath.ProgramFlowBackRoutes.AddTwoWay(ProgramFlowBackRoutes);
+                ProgramFlowForwardRoutes.RemoveTwoWay(forwardPath);
+            }
+            foreach (ArgList args in new ArgList[]{ DataFlowBackRelated, ProgramFlowBackAffected, ProgramFlowForwardAffecting})
+            {
+                args.RemoveAllTwoWay();
+            }
+            foreach (RelatedList related in new RelatedList[] { ProgramFlowBackRoutes, SingleUnitBackRelated, SingleUnitForwardRelated})
+            {
+                related.RemoveAllTwoWay();
             }
         }
     }

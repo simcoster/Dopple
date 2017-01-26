@@ -66,10 +66,8 @@ namespace DoppleGraph
                 goNodeWrapper.Node.UnSelected += Node_UnSelected;
                 frontLayer.Add(goNodeWrapper.Node);
             }
-            
-            SetCoordinates(SmallGraphNodes, 0);
-            SetCoordinates(BigGraphNodes, 1);
             DrawLinks(myView);
+            SetCoordinates();
         }
 
         private void Node_UnSelected(object sender, EventArgs e)
@@ -82,33 +80,48 @@ namespace DoppleGraph
             //throw new NotImplementedException();
         }
 
-        private void SetCoordinates(IEnumerable<GoLabeledVertexWrapper> nodeWrappers, int graphIndex)
+        private void SetCoordinates()
         {
-            SetLongestPath(nodeWrappers);
-            foreach (var nodewrapper in nodeWrappers)
+            var smallNodeWrappersClone = new List<GoLabeledVertexWrapper>(SmallGraphNodes);
+            var bigNodeWrappersClone = new List<GoLabeledVertexWrapper>(BigGraphNodes);
+            int displayCol = 0;
+            while (smallNodeWrappersClone.Count > 0)
             {
-                nodewrapper.DisplayCol = nodewrapper.LongestPath.Count;
-            }
-            Dictionary<int, List<GoNodeWrapper>> nodeWrapperCols = new Dictionary<int, List<GoNodeWrapper>>();
-            foreach(var nodeColumn in nodeWrappers.GroupBy(x => x.LongestPath.Count))
-            {
-                int i = 0;
-                foreach( var node in nodeColumn)
+                for (int i =0;i<20 && smallNodeWrappersClone.Count > i ; i++)
                 {
-                    node.DisplayRow = i;
-                    node.DisplayColumn = nodeColumn.Key;
-                    i++;
+                    var currSmallNode = smallNodeWrappersClone[i];
+                    currSmallNode.DisplayCol = displayCol;
+                    currSmallNode.DisplayRow = i;
+                    var pairedVertices = currSmallNode.LabledVertex.ForwardEdges.Where(x => x.EdgeType == EdgeType.Pairing).Select(x => x.DestinationVertex).ToList();
+                    foreach (var bigGraphNode in pairedVertices)
+                    {
+                        var bigGraphNodeWrapper = BigGraphNodes.First(x => x.LabledVertex == bigGraphNode);
+                        bigGraphNodeWrapper.DisplayRow = i + 1/((float)pairedVertices.IndexOf(bigGraphNode) +1);
+                        bigGraphNodeWrapper.DisplayCol = displayCol + 1;
+                        bigNodeWrappersClone.Remove(bigGraphNodeWrapper);
+                    }
+                    smallNodeWrappersClone.Remove(currSmallNode);
                 }
+                displayCol += 2;
+            }
+            while (bigNodeWrappersClone.Count > 0)
+            {
+                for (int i = 0; i < 20 && bigNodeWrappersClone.Count > i ; i++)
+                {
+                    var currBigNode = bigNodeWrappersClone[i];
+                    currBigNode.DisplayCol = displayCol;
+                    currBigNode.DisplayRow = i;
+                    bigNodeWrappersClone.Remove(currBigNode);
+                }
+                displayCol += 1;
             }
             int totalHeight = 1000;
-            int totalWidth = 1000;
-            int widthGraphOffset = totalWidth * graphIndex;
-            int heightGraphOffset = 50 * graphIndex;
-            float heightOffset = Convert.ToSingle(totalHeight / nodeWrappers.Select(x => x.DisplayRow).Max());
-            float widthOffset = Convert.ToSingle(totalWidth / nodeWrappers.Select(x => x.DisplayCol).Max()) ;
-            foreach (var nodeWrapper in nodeWrappers)
+            int totalWidth = 2000;
+            float heightOffset = Convert.ToSingle(totalHeight / AllNodeWrappers.Select(x => x.DisplayRow).Max());
+            float widthOffset = Convert.ToSingle(totalWidth / AllNodeWrappers.Select(x => x.DisplayCol).Max()) ;
+            foreach (var nodeWrapper in AllNodeWrappers)
             {
-                nodeWrapper.Node.Location = new PointF(nodeWrapper.DisplayCol * widthOffset + widthGraphOffset, (nodeWrapper.DisplayRow - 0.7f) * heightOffset + heightGraphOffset);
+                nodeWrapper.Node.Location = new PointF(nodeWrapper.DisplayCol * widthOffset , (nodeWrapper.DisplayRow - 0.7f) * heightOffset );
             }
         }
 
@@ -122,8 +135,8 @@ namespace DoppleGraph
                 foreach(var source in pair.Value)
                 {
                     LabeledEdge pairingEdge = new LabeledEdge();
-                    pairingEdge.SourceVertex = source;
-                    pairingEdge.DestinationVertex = pair.Key;
+                    pairingEdge.DestinationVertex = source;
+                    pairingEdge.SourceVertex = pair.Key;
                     pairingEdge.EdgeType = EdgeType.Pairing;
                     pair.Key.ForwardEdges.Add(pairingEdge);
                     source.BackEdges.Add(pairingEdge);
@@ -143,7 +156,7 @@ namespace DoppleGraph
             GoLink link = new GoLink();
             if (edge.EdgeType == EdgeType.Pairing)
             {
-                var pairingPenalty = _pairings.penalties.First(x => x.BigGraphVertex == edge.SourceVertex && x.SmallGraphVertex == edge.DestinationVertex).Penalty;
+                var pairingPenalty = _pairings.penalties.First(x => x.BigGraphVertex == edge.DestinationVertex && x.SmallGraphVertex == edge.SourceVertex).Penalty;
                 if (pairingPenalty == 0)
                 {
                     edgeColor = Color.Blue;
@@ -151,11 +164,11 @@ namespace DoppleGraph
                 else
                 {
                     edgeColor = Color.Red;
-                    edgeColor = Color.FromArgb(Convert.ToInt32(pairingPenalty),0, 255- Convert.ToInt32(pairingPenalty));
+                    edgeColor = Color.FromArgb(Convert.ToInt32(pairingPenalty *5),0, 255- Convert.ToInt32(pairingPenalty*5));
                     link.ToolTipText = pairingPenalty.ToString();
                 }
-                sourceVertexWrapper = SmallGraphNodes.First(x => x.LabledVertex == edge.DestinationVertex);
-                destinationVertexWrapper= BigGraphNodes.First(x => x.LabledVertex == edge.SourceVertex);
+                sourceVertexWrapper = SmallGraphNodes.First(x => x.LabledVertex == edge.SourceVertex);
+                destinationVertexWrapper= BigGraphNodes.First(x => x.LabledVertex == edge.DestinationVertex);
             }
             else
             {
@@ -184,40 +197,40 @@ namespace DoppleGraph
             link.PenWidth = 3;
         }
 
-        private void SetLongestPath(IEnumerable<GoLabeledVertexWrapper> vertexesToSet)
-        {
-            var firstVertex = vertexesToSet.First(x => x.LabledVertex.BackEdges.Count == 0);
-            Queue<GoLabeledVertexWrapper> vertexesToResolve = new Queue<GoLabeledVertexWrapper>();
-            vertexesToResolve.Enqueue(firstVertex);
-            firstVertex.LongestPath.Add(firstVertex);
-            var visited = new List<GoLabeledVertexWrapper>();
-            while (vertexesToResolve.Count != 0)
-            {
-                GoLabeledVertexWrapper currentVertex = vertexesToResolve.Dequeue();
-                foreach(var forwardVertex in currentVertex.LabledVertex.ForwardEdges.Where(x => x.EdgeType == EdgeType.DataFlow))
-                {
-                    var forwardVertexWrapper = GetWrapper(forwardVertex.DestinationVertex);
-                    if (forwardVertexWrapper == null)
-                    {
-                        continue;
-                    }
-                    if (visited.Contains(forwardVertexWrapper))
-                    {
+        //private void SetLongestPath(IEnumerable<GoLabeledVertexWrapper> vertexesToSet)
+        //{
+        //    var firstVertex = vertexesToSet.First(x => x.LabledVertex.BackEdges.Count == 0);
+        //    Queue<GoLabeledVertexWrapper> vertexesToResolve = new Queue<GoLabeledVertexWrapper>();
+        //    vertexesToResolve.Enqueue(firstVertex);
+        //    firstVertex.LongestPath.Add(firstVertex);
+        //    var visited = new List<GoLabeledVertexWrapper>();
+        //    while (vertexesToResolve.Count != 0)
+        //    {
+        //        GoLabeledVertexWrapper currentVertex = vertexesToResolve.Dequeue();
+        //        foreach(var forwardVertex in currentVertex.LabledVertex.ForwardEdges.Where(x => x.EdgeType == EdgeType.DataFlow))
+        //        {
+        //            var forwardVertexWrapper = GetWrapper(forwardVertex.DestinationVertex);
+        //            if (forwardVertexWrapper == null)
+        //            {
+        //                continue;
+        //            }
+        //            if (visited.Contains(forwardVertexWrapper))
+        //            {
 
-                    }
-                    else
-                    {
-                        visited.Add(forwardVertexWrapper);
-                    }
-                    if (!currentVertex.LongestPath.Contains(forwardVertexWrapper) && !forwardVertexWrapper.LongestPath.Contains(currentVertex) && currentVertex.LongestPath.Count + 1 > forwardVertexWrapper.LongestPath.Count)
-                    {
-                        forwardVertexWrapper.LongestPath = new List<GoLabeledVertexWrapper>(currentVertex.LongestPath);
-                        forwardVertexWrapper.LongestPath.Add(forwardVertexWrapper);
-                        vertexesToResolve.Enqueue(forwardVertexWrapper);
-                    } 
-                }
-            }
-        }
+        //            }
+        //            else
+        //            {
+        //                visited.Add(forwardVertexWrapper);
+        //            }
+        //            if (!currentVertex.LongestPath.Contains(forwardVertexWrapper) && !forwardVertexWrapper.LongestPath.Contains(currentVertex) && currentVertex.LongestPath.Count + 1 > forwardVertexWrapper.LongestPath.Count)
+        //            {
+        //                forwardVertexWrapper.LongestPath = new List<GoLabeledVertexWrapper>(currentVertex.LongestPath);
+        //                forwardVertexWrapper.LongestPath.Add(forwardVertexWrapper);
+        //                vertexesToResolve.Enqueue(forwardVertexWrapper);
+        //            } 
+        //        }
+        //    }
+        //}
 
         private GoLabeledVertexWrapper GetWrapper(LabeledVertex vertex)
         {

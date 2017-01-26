@@ -17,5 +17,10 @@ namespace DoppleTry2.InstructionWrapperMembers
         {
             return node.ProgramFlowForwardAffecting;
         }
+
+        internal override ArgList GetSameList(InstructionNode nodeToMergeInto)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
