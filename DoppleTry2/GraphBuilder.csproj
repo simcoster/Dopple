@@ -67,14 +67,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BackTrackers\BackTraceManager.cs" />
-    <Compile Include="BackTrackers\CallBacktracer.cs" />
     <Compile Include="BackTrackers\ConditionionalsBackTracer.cs" />
     <Compile Include="BackTrackers\RecursiveBacktracer.cs" />
     <Compile Include="BackTrackers\SingleOperationUnitBackTracer.cs" />
+    <Compile Include="BackTrackers\StackForwardTracer.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="InstructionModifiers\SetStackPopPushForCalls.cs" />
     <Compile Include="InstructionNodes\CallNode.cs" />
+    <Compile Include="InstructionNodes\ConditionalJumpNode.cs" />
     <Compile Include="InstructionNodes\IMergable.cs" />
+    <Compile Include="InstructionNodes\NewObjInstructionNode.cs" />
     <Compile Include="InstructionNodes\RetInstructionNode.cs" />
     <Compile Include="InstructionWrapperMembers\SingleUnitForwardRelated.cs" />
     <Compile Include="InstructionWrapperMembers\SingleUnitBackRelated.cs" />
@@ -97,7 +99,6 @@
     <Compile Include="BackTrackers\LoadMemoryByOperandBackTracer.cs" />
     <Compile Include="BackTrackers\LoadFieldByStackBackTracer.cs" />
     <Compile Include="BackTrackers\SingleIndexBackTracer.cs" />
-    <Compile Include="BackTrackers\StackPopBackTracer.cs" />
     <Compile Include="BackTrackers\LdLocBackTracer.cs" />
     <Compile Include="BackTrackers\TypedReferenceBackTracer.cs" />
     <Compile Include="CodeGroups.cs" />

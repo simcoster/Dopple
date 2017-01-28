@@ -10,10 +10,20 @@ namespace DoppleTry2.InstructionNodes
 {
     public abstract class CallNode : InstructionNode
     {
+        private CallDataFlowBackArgList _CallDataFlowBackArgList;
         public CallNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
             TargetMethod = (MethodReference) instruction.Operand;
             StackPopCount = TargetMethod.Parameters.Count;
+            _CallDataFlowBackArgList = new CallDataFlowBackArgList(this);
+
+        }
+        public override DataFlowBackArgList DataFlowBackRelated
+        {
+            get
+            {
+                return _CallDataFlowBackArgList;
+            }
         }
 
         public MethodReference TargetMethod { get; private set; }

@@ -10,7 +10,8 @@ namespace DoppleTry2.InstructionNodes
     {
         public static InstructionNode GetInstructionWrapper(Instruction instruction, MethodDefinition method)
         {
-            if (CodeGroups.CallCodes.Contains(instruction.OpCode.Code))
+            Code nodeCode = instruction.OpCode.Code;
+            if (CodeGroups.CallCodes.Contains(nodeCode))
             {
                 if (instruction.Operand is MethodDefinition)
                 {
@@ -21,33 +22,41 @@ namespace DoppleTry2.InstructionNodes
                     return new NonInlineableCallInstructionNode(instruction, method);
                 }
             }
-            else if (CodeGroups.LdArgCodes.Contains(instruction.OpCode.Code))
+            else if (CodeGroups.LdArgCodes.Contains(nodeCode))
             {
                 return new LdArgInstructionNode(instruction, method);
             }
-            else if (CodeGroups.StArgCodes.Contains(instruction.OpCode.Code))
+            else if (CodeGroups.StArgCodes.Contains(nodeCode))
             {
                 return new StArgInstructionNode(instruction, method);
             }
-            else if (CodeGroups.LdLocCodes.Contains(instruction.OpCode.Code))
+            else if (CodeGroups.LdLocCodes.Contains(nodeCode))
             {
                 return new LocationLoadInstructionNode(instruction, method);
             }
-            else if (CodeGroups.StLocCodes.Contains(instruction.OpCode.Code))
+            else if (CodeGroups.StLocCodes.Contains(nodeCode))
             {
                 return new LocationStoreInstructionNode(instruction, method);
             }
-            else if (CodeGroups.LdImmediateFromOperandCodes.Concat(CodeGroups.LdImmediateValueCodes).Contains(instruction.OpCode.Code))
+            else if (CodeGroups.LdImmediateFromOperandCodes.Concat(CodeGroups.LdImmediateValueCodes).Contains(nodeCode))
             {
                 return new LdImmediateInstNode(instruction, method);
             }
-            else if (CodeGroups.LdElemCodes.Contains(instruction.OpCode.Code))
+            else if (CodeGroups.LdElemCodes.Contains(nodeCode))
             {
                 return new LdElemInstructionNode(instruction, method);
             }
-            else if (instruction.OpCode.Code == Code.Ret)
+            else if (nodeCode == Code.Ret)
             {
                 return new RetInstructionNode(instruction, method);
+            }
+            else if (nodeCode == Code.Newobj)
+            {
+                return new NewObjInstructionNode(instruction, method);
+            }
+            else if (CodeGroups.CondJumpCodes.Contains(nodeCode))
+            {
+                return new ConditionalJumpNode(instruction, method);
             }
             else
             {

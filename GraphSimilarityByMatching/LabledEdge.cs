@@ -10,4 +10,6 @@ namespace GraphSimilarityByMatching
         public int Index { get; set; }
         public EdgeType EdgeType { get; set; }
     }
+
+    
 }

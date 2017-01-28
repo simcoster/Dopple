@@ -373,7 +373,7 @@ namespace DoppleGraph
             SetRowIndexes(nodeWrappers);
             FixDuplicateCoordinates(nodeWrappers);
             int totalHeight = 1000;
-            int totalWidth = 2000;
+            int totalWidth = 3000;
             float heightOffset = Convert.ToSingle(totalHeight / nodeWrappers.Select(x => x.DisplayRow).Max());
             float widthOffset = Convert.ToSingle(totalWidth / nodeWrappers.Select(x => x.DisplayCol).Max());
             foreach (var nodeWrapper in nodeWrappers)
@@ -412,24 +412,19 @@ namespace DoppleGraph
         {
             foreach (var node in colNodes)
             {
-                try
+                 var nodesToUpdate = node.InstructionNode.DataFlowForwardRelated
+                //var nodesToUpdate = node.InstructionNode.ProgramFlowForwardRoutes
+               .Select(x => GetNodeWrapper(x.Argument))
+               //.Select(x => GetNodeWrapper(x))
+               .Where(x => x.LongestPath.Count == 0 || !x.LongestPath.Intersect(node.LongestPath).SequenceEqual(x.LongestPath))
+               .Where(x => x.LongestPath.Count < node.LongestPath.Count + 1)
+               .ToList();
+                foreach (var nodeToUpdate in nodesToUpdate)
                 {
-                    var nodesToUpdate = node.InstructionNode.DataFlowForwardRelated
-                    //var nodesToUpdate = node.InstructionNode.ProgramFlowForwardRoutes
-                   .Select(x => GetNodeWrapper(x.Argument))
-                   .Where(x => x.LongestPath.Count == 0 || !x.LongestPath.Intersect(node.LongestPath).SequenceEqual(x.LongestPath))
-                   .Where(x => x.LongestPath.Count < node.LongestPath.Count + 1)
-                   .ToList();
-                    foreach (var nodeToUpdate in nodesToUpdate)
-                    {
-                        nodeToUpdate.LongestPath = node.LongestPath.Concat(new[] { node }).ToList();
-                        nodeToUpdate.DisplayCol = nodeToUpdate.LongestPath.Count;
-                    }
-                    SetLongestPathRec(nodesToUpdate);
+                    nodeToUpdate.LongestPath = node.LongestPath.Concat(new[] { node }).ToList();
+                    nodeToUpdate.DisplayCol = nodeToUpdate.LongestPath.Count;
                 }
-               catch
-                {
-                }
+                SetLongestPathRec(nodesToUpdate);
             }
         }
 

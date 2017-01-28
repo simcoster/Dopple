@@ -34,21 +34,22 @@ namespace DoppleGraph
                 var newForm = new Form2(instructionWrappers);
                 newForm.Show();
             }
-            var biggerGraph = Graphs.GetRange(0,2).OrderByDescending(x => x.Count).First();
-            NodePairing bestMatch = null;
-            double bestScore = int.MinValue;
-            for (int i=0; i<50; i++)
-            {
-                NodePairing pairing = GraphSimilarityCalc.GetDistance(Graphs[0], Graphs[1]);
-                var score = PairingValidator.ScorePairings(pairing);
-                if (score > bestScore)
-                {
-                    bestScore = score;
-                    bestMatch = pairing;
-                }
-            }
-            var newFormmm = new NodePairingGraph(bestMatch, bestScore);
-            newFormmm.Show();
+            //TODO remove
+            //var biggerGraph = Graphs.GetRange(0,2).OrderByDescending(x => x.Count).First();
+            //NodePairing bestMatch = null;
+            //double bestScore = int.MinValue;
+            //for (int i=0; i<50; i++)
+            //{
+            //    NodePairing pairing = GraphSimilarityCalc.GetDistance(Graphs[0], Graphs[1]);
+            //    var score = PairingValidator.ScorePairings(pairing);
+            //    if (score > bestScore)
+            //    {
+            //        bestScore = score;
+            //        bestMatch = pairing;
+            //    }
+            //}
+            //var newFormmm = new NodePairingGraph(bestMatch, bestScore);
+            //newFormmm.Show();
             //for (int i = 0; i < 50; i++)
             //{
             //    GraphSimilarityCalc.GetDistance(Graphs[0], Graphs[0], out pairingsOut);

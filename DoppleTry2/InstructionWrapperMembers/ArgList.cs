@@ -10,6 +10,7 @@ namespace DoppleTry2
 {
     public abstract class ArgList : List<IndexedArgument>, IMergable
     {
+        protected int LargestIndex = -1;
         public ArgList(InstructionNode instructionWrapper)
         {
             containingWrapper = instructionWrapper;
@@ -32,7 +33,7 @@ namespace DoppleTry2
             return firstList.All(x => secondList.Any(y => y.ArgIndex == x.ArgIndex && x.Argument == y.Argument));
         }
 
-        readonly InstructionNode containingWrapper;
+        protected readonly InstructionNode containingWrapper;
         public int MaxArgIndex = -1;
 
         public bool SelfFeeding
@@ -65,7 +66,7 @@ namespace DoppleTry2
         {
             RemoveAllTwoWay(x => true);
         }
-        public void AddTwoWay(IndexedArgument toAdd)
+        virtual public void AddTwoWay(IndexedArgument toAdd)
         {
             if (this.Any(x => x.ArgIndex==toAdd.ArgIndex && x.Argument == toAdd.Argument))
             {
@@ -82,8 +83,9 @@ namespace DoppleTry2
         }
         public void AddTwoWay(InstructionNode toAdd)
         {
-            var indexedToAdd = new IndexedArgument(GetNewIndex(), toAdd ,this);
+            var indexedToAdd = new IndexedArgument(LargestIndex +1, toAdd ,this);
             AddTwoWay(indexedToAdd);
+            LargestIndex++;
         }
         public void AddTwoWay(IEnumerable<IndexedArgument> rangeToAdd)
         {
@@ -95,16 +97,11 @@ namespace DoppleTry2
 
         public void AddTwoWaySingleIndex(IEnumerable<InstructionNode> backInstructions)
         {
-            int index = GetNewIndex();
+            int index = LargestIndex + 1 ;
             AddTwoWay(backInstructions.Select(x => new IndexedArgument(index, x,this)));
         }
         public void AddTwoWay(InstructionNode backInstruction , int index)
         {
-            if (this.Any(x => x.ArgIndex == index && x.Argument == backInstruction))
-            {
-                //TODO to prevent clones
-                return;
-            }
             AddTwoWay(new IndexedArgument(index, backInstruction,this));
         }
 
@@ -115,18 +112,6 @@ namespace DoppleTry2
                 AddTwoWay(instWrapper, index);
             }
         }       
-
-        private int GetNewIndex()
-        {
-            if (this.Count == 0)
-            {
-                return 0;
-            }
-            else
-            {
-                return this.Max(x => x.ArgIndex) + 1;
-            }
-        }
 
         public void CheckNumberings()
         {
@@ -143,8 +128,7 @@ namespace DoppleTry2
             {
                 if (!this.Any(x => x.ArgIndex == i))
                 {
-                    //TODO remove
-                    //throw new Exception("Index missing");
+                    throw new Exception("Index missing");
                 }
             }
         }
@@ -176,6 +160,41 @@ namespace DoppleTry2
         internal override ArgList GetSameList(InstructionNode nodeToMergeInto)
         {
             return nodeToMergeInto.DataFlowBackRelated;
+        }
+
+        internal void ResetIndex()
+        {
+            LargestIndex = -1;
+        }
+
+        internal void UpdateLargestIndex()
+        {
+            if (this.Count > 0)
+            {
+                LargestIndex = this.Max(x => x.ArgIndex);
+            }
+        }
+    }
+
+    public class CallDataFlowBackArgList : DataFlowBackArgList
+    {
+        public CallDataFlowBackArgList(CallNode instructionWrapper) : base(instructionWrapper)
+        {
+        }
+
+        public override void AddTwoWay(IndexedArgument toAdd)
+        {
+            int argIndex;
+            if (((CallNode)containingWrapper).TargetMethod.HasThis)
+            {
+                argIndex = toAdd.ArgIndex + 1;
+            }
+            else
+            {
+                argIndex = toAdd.ArgIndex;
+            }
+            var newIndexedArg = new IndexedArgument(argIndex, toAdd.Argument, this);
+            base.AddTwoWay(newIndexedArg);
         }
     }
 

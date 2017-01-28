@@ -12,7 +12,6 @@ namespace DoppleTry2
     {
         public static IEnumerable<InstructionNode> GetStackPushAncestor(InstructionNode startInst, List<InstructionNode> visited = null)
         {
-            var nonModifyingCodes = new Code[0].Concat(CodeGroups.LdLocCodes).Concat(CodeGroups.StLocCodes);
             if (visited == null)
             {
                 visited = new List<InstructionNode>();

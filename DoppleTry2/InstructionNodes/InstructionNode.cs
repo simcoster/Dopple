@@ -33,7 +33,7 @@ namespace DoppleTry2.InstructionNodes
         public ProgramFlowBackRoutes ProgramFlowBackRoutes { get; set; }
         public ProgramFlowForwardRoutes ProgramFlowForwardRoutes { get; set; }
         public DataFlowForwardArgList DataFlowForwardRelated { get; private set; }
-        public DataFlowBackArgList DataFlowBackRelated { get; private set; }
+        virtual public DataFlowBackArgList DataFlowBackRelated { get; private set; }
         public ProgramFlowForwardAffectingArgList ProgramFlowForwardAffecting { get; internal set; }
         public ProgramFlowBackAffectedArgList ProgramFlowBackAffected { get; set; }
         public SingleUnitBackRelated SingleUnitBackRelated { get; set; }
@@ -50,7 +50,6 @@ namespace DoppleTry2.InstructionNodes
         public List<Type> DoneBackTracers = new List<Type>();
         public bool ProgramFlowResolveDone { get; set; } = false;
         public Guid MyGuid { get; private set; }
-
         public InliningProperties InliningProperties = new InliningProperties();
 
         private int GetStackPopCount(Instruction instruction)

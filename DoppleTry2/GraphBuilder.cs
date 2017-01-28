@@ -161,6 +161,7 @@ namespace DoppleTry2
 
         private void BackTrace()
         {
+            new StackForwardTracer(InstructionNodes).TraceForward(InstructionNodes[0]);
             foreach (var node in InstructionNodes.OrderByDescending(x => x.InstructionIndex))
             {
                 _backTraceManager.BackTrace(node);

@@ -15,6 +15,7 @@ namespace GraphSimilarityByMatching
         public int Index { get; set; }
         public List<LabeledEdge> BackEdges { get; set; } = new List<LabeledEdge>();
         public List<LabeledEdge> ForwardEdges { get; set; } = new List<LabeledEdge>();
+        public List<SmallBigLinkEdge> PairingEdges { get; set; } = new List<SmallBigLinkEdge>(); 
         public MethodDefinition Method { get; set; }
     }
 }

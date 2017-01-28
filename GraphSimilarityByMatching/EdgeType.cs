@@ -4,6 +4,5 @@
     {
         DataFlow,
         ProgramFlowAffecting,
-        Pairing
     }
 }

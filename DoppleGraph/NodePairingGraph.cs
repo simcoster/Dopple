@@ -92,7 +92,7 @@ namespace DoppleGraph
                     var currSmallNode = smallNodeWrappersClone[i];
                     currSmallNode.DisplayCol = displayCol;
                     currSmallNode.DisplayRow = i;
-                    var pairedVertices = currSmallNode.LabledVertex.ForwardEdges.Where(x => x.EdgeType == EdgeType.Pairing).Select(x => x.DestinationVertex).ToList();
+                    var pairedVertices = currSmallNode.LabledVertex.PairingEdges.Select(x => x.BigGraphVertex).ToList();
                     foreach (var bigGraphNode in pairedVertices)
                     {
                         var bigGraphNodeWrapper = BigGraphNodes.First(x => x.LabledVertex == bigGraphNode);
@@ -132,70 +132,41 @@ namespace DoppleGraph
             flowRoutesLinksLayer = myView.Document.Layers.CreateNewLayerAfter(myView.Document.Layers.Default);
             foreach(var pair in _pairings.Pairings)
             {
-                foreach(var source in pair.Value)
+                foreach(var bigGraphVertex in pair.Value)
                 {
-                    LabeledEdge pairingEdge = new LabeledEdge();
-                    pairingEdge.DestinationVertex = source;
-                    pairingEdge.SourceVertex = pair.Key;
-                    pairingEdge.EdgeType = EdgeType.Pairing;
-                    pair.Key.ForwardEdges.Add(pairingEdge);
-                    source.BackEdges.Add(pairingEdge);
+                    SmallBigLinkEdge pairingEdge = new SmallBigLinkEdge();
+                    pairingEdge.BigGraphVertex = bigGraphVertex;
+                    pairingEdge.SmallGraphVertex = pair.Key;
+                    pairingEdge.Score = _pairings.penalties.First(x => x.BigGraphVertex == pairingEdge.BigGraphVertex && x.SmallGraphVertex == pairingEdge.SmallGraphVertex).Penalty;
+                    pair.Key.PairingEdges.Add(pairingEdge);
+                    bigGraphVertex.PairingEdges.Add(pairingEdge);
                 }
             }
-            foreach (var edge in AllNodeWrappers.SelectMany(x => x.LabledVertex.BackEdges.Concat(x.LabledVertex.ForwardEdges)))
+            foreach(var pairinigEdge in SmallGraphNodes.SelectMany(x => x.LabledVertex.PairingEdges))
             {
-                DrawEdge(edge);
+                DrawPairingEdge(pairinigEdge);
             }
         }
 
-        private void DrawEdge(LabeledEdge edge)
+        private void DrawPairingEdge(SmallBigLinkEdge pairinigEdge)
         {
-            GoLabeledVertexWrapper destinationVertexWrapper;
-            GoLabeledVertexWrapper sourceVertexWrapper;
-            Color edgeColor;
             GoLink link = new GoLink();
-            if (edge.EdgeType == EdgeType.Pairing)
-            {
-                var pairingPenalty = _pairings.penalties.First(x => x.BigGraphVertex == edge.DestinationVertex && x.SmallGraphVertex == edge.SourceVertex).Penalty;
-                if (pairingPenalty == 0)
-                {
-                    edgeColor = Color.Blue;
-                }
-                else
-                {
-                    edgeColor = Color.Red;
-                    edgeColor = Color.FromArgb(Convert.ToInt32(pairingPenalty *5),0, 255- Convert.ToInt32(pairingPenalty*5));
-                    link.ToolTipText = pairingPenalty.ToString();
-                }
-                sourceVertexWrapper = SmallGraphNodes.First(x => x.LabledVertex == edge.SourceVertex);
-                destinationVertexWrapper= BigGraphNodes.First(x => x.LabledVertex == edge.DestinationVertex);
-            }
-            else
-            {
-                return;
-                destinationVertexWrapper = GetWrapper(edge.DestinationVertex);
-                sourceVertexWrapper = GetWrapper(edge.SourceVertex);
-                edgeColor = Color.White;
-            }
+            Color edgeColor = Color.FromArgb(Convert.ToInt32(pairinigEdge.Score * 2), 0, 255 - Convert.ToInt32(pairinigEdge.Score * 2));
+            link.ToolTipText = pairinigEdge.Score.ToString();
+            var smallVertexWrapper = SmallGraphNodes.First(x => x.LabledVertex == pairinigEdge.SmallGraphVertex);
+            var bigVertexWrapper = BigGraphNodes.First(x => x.LabledVertex == pairinigEdge.BigGraphVertex);
             link.Pen = new Pen(edgeColor);
-            if (destinationVertexWrapper == null || sourceVertexWrapper == null)
+            if (bigVertexWrapper == null || smallVertexWrapper == null)
             {
                 return;
             }
-            link.ToPort = GetWrapper(edge.DestinationVertex).Node.LeftPort;
-            link.FromPort = GetWrapper(edge.SourceVertex).Node.RightPort;
-            if (edge.DestinationVertex == edge.SourceVertex)
-            {
-                link.Style = GoStrokeStyle.Bezier;
-                link.CalculateRoute();
-                foreach (int index in new[] { 1, 2 })
-                {
-                    link.SetPoint(index, new PointF(link.GetPoint(index).X, link.GetPoint(index).Y - 40));
-                }
-            }
+            link.ToPort = bigVertexWrapper.Node.LeftPort;
+            link.FromPort = smallVertexWrapper.Node.RightPort;
             dataLinksLayer.Add(link);
             link.PenWidth = 3;
         }
+
+        
 
         //private void SetLongestPath(IEnumerable<GoLabeledVertexWrapper> vertexesToSet)
         //{

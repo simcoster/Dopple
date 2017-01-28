@@ -10,66 +10,43 @@ namespace Utility
 {
     public class Class1
     {
-        static void BubbleSort(int[] number)
+        public static void insertionSort(int[] array)
         {
-            bool flag = true;
-            int temp;
-            int numLength = number.Length;
-            //sorting an array
-            for (int i = 1; (i <= (numLength - 1)) && flag; i++)
+            for (int i = 0; i < array.Length - 1; i++)
             {
-                flag = false;
-                for (int j = 0; j < (numLength - 1); j++)
+                int nextMin = int.MaxValue;
+                int nextMinIndex = -1;
+                for (int j = i; j < array.Length; j++)
                 {
-                    if (number[j + 1] > number[j])
+                    if (array[j] < nextMin)
                     {
-                        temp = number[j];
-                        number[j] = number[j + 1];
-                        number[j + 1] = temp;
-                        flag = true;
+                        nextMin = array[j];
+                        nextMinIndex = j;
                     }
                 }
-            }
-        }
-        static void QuickSortLeftPivot(int[] a)
-        {
-            QuickSortLeftPivotRec(a, 0, a.Length - 1);
-        }
-
-
-        static void QuickSortLeftPivotRec(int[] a, int start, int end)
-        {
-            if (start >= end)
-            {
-                return;
-            }
-
-            int num = a[start];
-
-            int i = start, j = end;
-
-            while (i < j)
-            {
-                while (i < j && a[j] > num)
+                if (nextMin < array[i])
                 {
-                    j--;
+                    int temp = array[i];
+                    array[i] = array[nextMinIndex];
+                    array[nextMinIndex] = temp;
                 }
-
-                a[i] = a[j];
-
-                while (i < j && a[i] < num)
-                {
-                    i++;
-                }
-
-                a[j] = a[i];
             }
-
-            a[i] = num;
-            QuickSortLeftPivotRec(a, start, i - 1);
-            QuickSortLeftPivotRec(a, i + 1, end);
         }
+        public static int LinqMethod(int[] arr)
+        {
+            return arr.Sum(x => x);
+        }
+        //static int foreachMethod(int[] a)
+        //{
+        //    int sum = 0;
+        //    foreach(var ba in a)
+        //    {
+        //        sum += ba;
+        //    }
+        //    return sum;
+        //}
 
-       
+
+
     }
 }
