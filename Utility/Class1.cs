@@ -10,122 +10,53 @@ namespace Utility
 {
     public class Class1
     {
-        static void QuickSortRec(int[] numbers)
+        public int plus3(int a, int b, int c)
         {
-            QuickSort_Recursive(numbers, 0, numbers.Length - 1);
+            return a + b + c;
+        }
+        public static void QuickSortMiddle(int[] arr)
+        {
+            QuicksortMiddleRec(arr, 0, arr.Length);
         }
 
-        static void QuickSortIt(int[] numbers)
+        public static void QuicksortMiddleRec(int[] elements, int left, int right)
         {
-            QuickSort_Iterative(numbers, 0, numbers.Length - 1);
-        }
+            int i = left, j = right;
+            int pivot = elements[(left + right) / 2];
 
-        static public int Partition(int[] numbers, int left, int right)
-        {
-            int pivot = numbers[left];
-            while (true)
+            while (i <= j)
             {
-                while (numbers[left] < pivot)
-                    left++;
-
-                while (numbers[right] > pivot)
-                    right--;
-
-                if (left < right)
+                while (elements[i] < pivot)
                 {
-                    int temp = numbers[right];
-                    numbers[right] = numbers[left];
-                    numbers[left] = temp;
+                    i++;
                 }
-                else
+
+                while (elements[j] > pivot)
                 {
-                    return right;
+                    j--;
+                }
+
+                if (i <= j)
+                {
+                    // Swap
+                    int tmp = elements[i];
+                    elements[i] = elements[j];
+                    elements[j] = tmp;
+
+                    i++;
+                    j--;
                 }
             }
-        }
 
-        struct QuickPosInfo
-        {
-            public int left;
-            public int right;
-        };
-
-        static public void QuickSort_Iterative(int[] numbers, int left, int right)
-        {
-
-            if (left >= right)
-                return; // Invalid index range
-
-            List<QuickPosInfo> list = new List<QuickPosInfo>();
-
-            QuickPosInfo info;
-            info.left = left;
-            info.right = right;
-            list.Insert(list.Count, info);
-
-            while (true)
+            // Recursive calls
+            if (left < j)
             {
-                if (list.Count == 0)
-                    break;
-
-                left = list[0].left;
-                right = list[0].right;
-                list.RemoveAt(0);
-
-                int pivot = Partition(numbers, left, right);
-
-                if (pivot > 1)
-                {
-                    info.left = left;
-                    info.right = pivot - 1;
-                    list.Insert(list.Count, info);
-                }
-
-                if (pivot + 1 < right)
-                {
-                    info.left = pivot + 1;
-                    info.right = right;
-                    list.Insert(list.Count, info);
-                }
+                QuicksortMiddleRec(elements, left, j);
             }
-        }
 
-        static public int PartitionForRec(int[] numbers, int left, int right)
-        {
-            int pivot = numbers[left];
-            while (true)
+            if (i < right)
             {
-                while (numbers[left] < pivot)
-                    left++;
-
-                while (numbers[right] > pivot)
-                    right--;
-
-                if (left < right)
-                {
-                    int temp = numbers[right];
-                    numbers[right] = numbers[left];
-                    numbers[left] = temp;
-                }
-                else
-                {
-                    return right;
-                }
-            }
-        }
-
-        static public void QuickSort_Recursive(int[] arr, int left, int right)
-        {
-            // For Recusrion
-            if (left < right)
-            {
-                int pivot = PartitionForRec(arr, left, right);
-
-                if (pivot > 1)
-                    QuickSort_Recursive(arr, left, pivot - 1);
-
-                if (pivot + 1 < right)
-                    QuickSort_Recursive(arr, pivot + 1, right);
+                QuicksortMiddleRec(elements, i, right);
             }
         }
     }
