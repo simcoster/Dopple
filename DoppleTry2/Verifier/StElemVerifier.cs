@@ -23,7 +23,7 @@ namespace DoppleTry2.VerifierNs
             {
                 return;
             }
-            var ldArgGroup = instructionWrapper.DataFlowBackRelated.Where(x => x.ArgIndex == 2);
+            var ldArgGroup = instructionWrapper.DataFlowBackRelated.Where(x => x.ArgIndex == 0);
             if (!ldArgGroup.All(x => IsProvidingArray(x.Argument)))
             {
                 throw new Exception("Bad array reference argument");
@@ -33,7 +33,7 @@ namespace DoppleTry2.VerifierNs
             {
                 throw new Exception("Bad array location argument");
             }
-            var valueArgGroup = instructionWrapper.DataFlowBackRelated.Where(x => x.ArgIndex == 0);
+            var valueArgGroup = instructionWrapper.DataFlowBackRelated.Where(x => x.ArgIndex == 2);
             if (!locationArgGroup.All(x => IsProvidingNumber(x.Argument)))
             {
                 throw new Exception("Bad value argument");

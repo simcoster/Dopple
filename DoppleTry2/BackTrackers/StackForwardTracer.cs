@@ -34,7 +34,7 @@ namespace DoppleTry2.BackTrackers
             }            
             for (int i=0; i < currentNode.StackPopCount; i++)
             {
-                currentNode.DataFlowBackRelated.AddTwoWay(stackedNodes.Pop());
+                currentNode.DataFlowBackRelated.AddTwoWay(stackedNodes.Pop(), currentNode.StackPopCount - i - 1);
             }
             for (int i = 0; i < currentNode.StackPushCount; i++)
             {

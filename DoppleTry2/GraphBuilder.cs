@@ -51,13 +51,13 @@ namespace DoppleTry2
             InlineFunctionCalls();
             SetInstructionIndexes();
             BackTrace();
-            RecursionFix();
+            //RecursionFix();
             RemoveHelperCodes();
             MergeSimilarInstructions();
             LdElemBackTrace();
             AddZeroNode();
             SetInstructionIndexes();
-            //Veirify();
+            Verify();
 
             return InstructionNodes;
         }
@@ -123,7 +123,7 @@ namespace DoppleTry2
             RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.StLocCodes.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.LdLocCodes.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(InstructionNodes.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code)));
-            RemoveInstWrappers(InstructionNodes.Where(x => x is LdArgInstructionNode && !GetFirstOrderLdArgs().Contains(x)));
+            RemoveInstWrappers(InstructionNodes.Where(x => x is LdArgInstructionNode && x.Method != InstructionNodes[0].Method));
             RemoveInstWrappers(InstructionNodes.Where(x => x is InlineableCallNode));
             //RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Ret && x.InliningProperties.Inlined));
             RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Dup));
@@ -250,7 +250,7 @@ namespace DoppleTry2
             }
         }
 
-        private void Veirify()
+        private void Verify()
         {
             var verifiers = new Verifier[] {new StElemVerifier(InstructionNodes), new StackPopPushVerfier(InstructionNodes),
                                             new TwoWayVerifier(InstructionNodes), new ArithmeticsVerifier(InstructionNodes),
@@ -282,7 +282,7 @@ namespace DoppleTry2
                 }
             }
             SetInstructionIndexes();
-            Veirify();
+            //Veirify();
         }
 
         public void RemoveInstWrappers(IEnumerable<InstructionNode> instsToRemove)
@@ -290,6 +290,7 @@ namespace DoppleTry2
             foreach (var nodeToRemove in instsToRemove.ToArray())
             {
                 nodeToRemove.SelfRemove();
+                Verify();
                 InstructionNodes.Remove(nodeToRemove);
                 var stillPointingToRemoved = InstructionNodes.Where(x => x.DataFlowBackRelated.Any(y => y.Argument == nodeToRemove)
                                                || x.DataFlowForwardRelated.Any(y => y.Argument == nodeToRemove)

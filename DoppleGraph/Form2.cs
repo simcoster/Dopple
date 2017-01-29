@@ -286,7 +286,7 @@ namespace DoppleGraph
                 {
                     Color linkColor = GetPredefinedDataLinkColor(indexedArg.ArgIndex);
                     GoLink edge = DrawEdge(nodeWrapper, myView, indexedArg.Argument, dataLinksLayer, new Pen(linkColor));
-                    edge.ToolTipText = indexedArg.ArgIndex.ToString() + " " + edge.PenColor.R;
+                    edge.ToolTipText = indexedArg.ArgIndex.ToString();
                 }
                 foreach (var indexedArg in nodeWrapper.InstructionNode.ProgramFlowBackAffected)
                 {

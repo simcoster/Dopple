@@ -78,6 +78,7 @@
     <Compile Include="InstructionNodes\IMergable.cs" />
     <Compile Include="InstructionNodes\NewObjInstructionNode.cs" />
     <Compile Include="InstructionNodes\RetInstructionNode.cs" />
+    <Compile Include="InstructionNodes\StElemInstructionNode.cs" />
     <Compile Include="InstructionWrapperMembers\SingleUnitForwardRelated.cs" />
     <Compile Include="InstructionWrapperMembers\SingleUnitBackRelated.cs" />
     <Compile Include="InstructionWrapperMembers\ProgramFlowForwardRoutes.cs" />
