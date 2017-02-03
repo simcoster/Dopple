@@ -21,12 +21,30 @@ namespace DoppleGraph
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            AssemblyDefinition myLibrary = AssemblyDefinition.ReadAssembly(@"C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\Utility\bin\Release\Utility.dll");
+            AssemblyDefinition myLibrary = AssemblyDefinition.ReadAssembly(@"C:\Windows\assembly\GAC_32\mscorlib\2.0.0.0__b77a5c561934e089\mscorlib.dll");
 
-            TypeDefinition type = myLibrary.MainModule.Types[3];
+
+            TypeDefinition type = myLibrary.MainModule.Types.First(x => x.FullName == "System.Array");
 
             var Graphs = new List<List<InstructionNode>>();
-            foreach (var method in type.Methods.Where(x => !x.IsConstructor))
+            //foreach (var method in type.Methods.Where(x => !x.IsConstructor))
+            foreach (var method in type.Methods.Where(x => x.Name.Contains("Reverse")).Take(1))
+            {
+                var backTraceManager = new GraphBuilder(method);
+                List<InstructionNode> instructionWrappers = backTraceManager.Run();
+                Graphs.Add(instructionWrappers);
+                var newForm = new Form2(instructionWrappers);
+                newForm.Show();
+            }
+
+            AssemblyDefinition mysecondLibrary = AssemblyDefinition.ReadAssembly(@"C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\Utility\bin\release\Utility.dll");
+
+
+            TypeDefinition typee = mysecondLibrary.MainModule.Types.First(x => x.Name == "Class1");
+
+            var Graphss = new List<List<InstructionNode>>();
+            //foreach (var method in type.Methods.Where(x => !x.IsConstructor))
+            foreach (var method in typee.Methods.Where(x => !x.IsConstructor))
             {
                 var backTraceManager = new GraphBuilder(method);
                 List<InstructionNode> instructionWrappers = backTraceManager.Run();
@@ -35,7 +53,7 @@ namespace DoppleGraph
                 newForm.Show();
             }
             NewMethod(Graphs.GetRange(0, 2));
-            NewMethod(Graphs.GetRange(1, 2));
+            //NewMethod(Graphs.GetRange(1, 2));
 
 
             //for (int i = 0; i < 50; i++)
@@ -55,18 +73,18 @@ namespace DoppleGraph
         private static void NewMethod(List<List<InstructionNode>> Graphs)
         {
             var biggerGraph = Graphs.OrderByDescending(x => x.Count).First();
-            NodePairing bestMatch = null;
-            var bestScore = double.MinValue;
+            NodePairings bestMatch = null;
+            var bestScore = 0;
             for (int i = 0; i < 50; i++)
             {
-                NodePairing pairing = GraphSimilarityCalc.GetDistance(Graphs[0], Graphs[1]);
-                var score = PairingValidator.ScorePairings(pairing);
-                if (score > bestScore)
+                NodePairings pairing = GraphSimilarityCalc.GetDistance(Graphs[0], Graphs[0]);
+                if (pairing.Score > bestScore)
                 {
-                    bestScore = score;
+                    bestScore = pairing.Score;
                     bestMatch = pairing;
                 }
             }
+            var fullSelfScore =  GraphSimilarityCalc.GetSelfScore(Graphs[0]);
             var newFormmm = new NodePairingGraph(bestMatch, bestScore);
             newFormmm.Show();
         }

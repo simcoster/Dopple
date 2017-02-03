@@ -10,54 +10,78 @@ namespace Utility
 {
     public class Class1
     {
-        public int plus3(int a, int b, int c)
+        public int Conditions(int a)
         {
-            return a + b + c;
+           if (a ==3)
+            {
+                return 1;
+            }
+           if (a==2)
+            {
+                return 4;
+            }
+            return 0;
         }
-        public static void QuickSortMiddle(int[] arr)
+        public int Conditionss(int a)
         {
-            QuicksortMiddleRec(arr, 0, arr.Length);
+            if (a == 3)
+            {
+                return 4;
+            }
+            if (a == 2)
+            {
+                return 1;
+            }
+            return 0;
         }
+        //public int plus3(int a, int b, int c)
+        //{
+        //    return a + b + c;
+        //}
+        //public static void QuickSortMiddle(int[] arr)
+        //{
+        //    QuicksortMiddleRec(arr, 0, arr.Length);
+        //}
 
-        public static void QuicksortMiddleRec(int[] elements, int left, int right)
-        {
-            int i = left, j = right;
-            int pivot = elements[(left + right) / 2];
+        //public static void QuicksortMiddleRec(int[] elements, int left, int right)
+        //{
+        //    int i = left, j = right;
+        //    int pivot = elements[(left + right) / 2];
 
-            while (i <= j)
-            {
-                while (elements[i] < pivot)
-                {
-                    i++;
-                }
+        //    while (i <= j)
+        //    {
+        //        while (elements[i] < pivot)
+        //        {
+        //            i++;
+        //        }
 
-                while (elements[j] > pivot)
-                {
-                    j--;
-                }
+        //        while (elements[j] > pivot)
+        //        {
+        //            j--;
+        //        }
 
-                if (i <= j)
-                {
-                    // Swap
-                    int tmp = elements[i];
-                    elements[i] = elements[j];
-                    elements[j] = tmp;
+        //        if (i <= j)
+        //        {
+        //            // Swap
+        //            int tmp = elements[i];
+        //            elements[i] = elements[j];
+        //            elements[j] = tmp;
 
-                    i++;
-                    j--;
-                }
-            }
+        //            i++;
+        //            j--;
+        //        }
+        //    }
 
-            // Recursive calls
-            if (left < j)
-            {
-                QuicksortMiddleRec(elements, left, j);
-            }
+        //    // Recursive calls
+        //    if (left < j)
+        //    {
+        //        QuicksortMiddleRec(elements, left, j);
+        //    }
 
-            if (i < right)
-            {
-                QuicksortMiddleRec(elements, i, right);
-            }
-        }
+        //    if (i < right)
+        //    {
+        //        QuicksortMiddleRec(elements, i, right);
+        //    }
+        //}
     }
 }

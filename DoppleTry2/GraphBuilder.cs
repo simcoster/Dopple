@@ -53,11 +53,11 @@ namespace DoppleTry2
             BackTrace();
             //RecursionFix();
             RemoveHelperCodes();
-            MergeSimilarInstructions();
+            //MergeSimilarInstructions();
             LdElemBackTrace();
             AddZeroNode();
             SetInstructionIndexes();
-            Verify();
+            //Verify();
 
             return InstructionNodes;
         }
@@ -290,7 +290,8 @@ namespace DoppleTry2
             foreach (var nodeToRemove in instsToRemove.ToArray())
             {
                 nodeToRemove.SelfRemove();
-                Verify();
+                //TODO remove
+                //Verify();
                 InstructionNodes.Remove(nodeToRemove);
                 var stillPointingToRemoved = InstructionNodes.Where(x => x.DataFlowBackRelated.Any(y => y.Argument == nodeToRemove)
                                                || x.DataFlowForwardRelated.Any(y => y.Argument == nodeToRemove)

@@ -15,7 +15,7 @@ namespace DoppleGraph
     public partial class NodePairingGraph : Form
     {
         private GoView myView;
-        private NodePairing _pairings;
+        private NodePairings _pairings;
         CodeColorHanlder colorCode = new CodeColorHanlder();
         private GoLayer dataLinksLayer;
         private GoLayer flowAffectingLinksLayer;
@@ -25,11 +25,11 @@ namespace DoppleGraph
 
         public IEnumerable<GoLabeledVertexWrapper> AllNodeWrappers { get; private set; }
 
-        public NodePairingGraph(NodePairing pairings, double score)
+        public NodePairingGraph(NodePairings pairings, double score)
         {
             _pairings = pairings ;
-            SmallGraphNodes = pairings.SmallGraph.Select(x => new GoLabeledVertexWrapper(new GoTextNodeHoverable(), x)).ToList();
-            BigGraphNodes = pairings.BigGraph.Select(x => new GoLabeledVertexWrapper(new GoTextNodeHoverable(), x)).ToList();
+            SmallGraphNodes = pairings.SecondGraph.Select(x => new GoLabeledVertexWrapper(new GoTextNodeHoverable(), x)).ToList();
+            BigGraphNodes = pairings.FirstGraph.Select(x => new GoLabeledVertexWrapper(new GoTextNodeHoverable(), x)).ToList();
             AllNodeWrappers = BigGraphNodes.Concat(SmallGraphNodes).ToList();
             InitializeComponent();
             ScoreLbl.Text = score.ToString();
@@ -135,11 +135,11 @@ namespace DoppleGraph
                 foreach(var bigGraphVertex in pair.Value)
                 {
                     SmallBigLinkEdge pairingEdge = new SmallBigLinkEdge();
-                    pairingEdge.BigGraphVertex = bigGraphVertex;
-                    pairingEdge.SmallGraphVertex = pair.Key;
-                    pairingEdge.Score = _pairings.penalties.First(x => x.BigGraphVertex == pairingEdge.BigGraphVertex && x.SmallGraphVertex == pairingEdge.SmallGraphVertex).Penalty;
+                    pairingEdge.BigGraphVertex = pair.Key;
+                    pairingEdge.SmallGraphVertex = bigGraphVertex.PairedVertex;
+                    pairingEdge.Score = bigGraphVertex.PairingScore;
                     pair.Key.PairingEdges.Add(pairingEdge);
-                    bigGraphVertex.PairingEdges.Add(pairingEdge);
+                    bigGraphVertex.PairedVertex.PairingEdges.Add(pairingEdge);
                 }
             }
             foreach(var pairinigEdge in SmallGraphNodes.SelectMany(x => x.LabledVertex.PairingEdges))

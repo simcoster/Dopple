@@ -58,6 +58,10 @@ namespace DoppleTry2.InstructionModifiers
             var callSequenceClone = new List<MethodDefinition>(callSequence);
             SetCallNodeProps(callNode, callSequenceClone);
             callSequenceClone.Add(calledFunc);
+            if (calledFunc.Body == null)
+            {
+                return new List<InstructionNode>();
+            }
             List<InstructionNode> inlinedNodes = calledFunc.Body.Instructions.Select(x => InstructionNodeFactory.GetInstructionWrapper(x, calledFunc)).ToList();
             programFlowHanlder.AddFlowConnections(inlinedNodes);
             InFuncBackTrace(inlinedNodes);

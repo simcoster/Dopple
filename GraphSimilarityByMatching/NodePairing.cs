@@ -3,11 +3,17 @@ using System.Collections.Generic;
 
 namespace GraphSimilarityByMatching
 {
-    public class NodePairing
+    public class NodePairings
     {
-        public List<LabeledVertex> BigGraph { get; set; }
-        public List<LabeledVertex> SmallGraph { get; set; }
-        public Dictionary<LabeledVertex, List<LabeledVertex>> Pairings { get; set; } = new Dictionary<LabeledVertex, List<LabeledVertex>>();
-        public List<PairingPenalty> penalties = new List<PairingPenalty>();
+        public NodePairings(List<LabeledVertex> firstGraph, List<LabeledVertex> secondGraph)
+        {
+            FirstGraph = firstGraph;
+            SecondGraph = secondGraph;
+            secondGraph.ForEach(x => Pairings.Add(x, new List<SingleNodePairing>()));
+        }
+        public List<LabeledVertex> FirstGraph { get; set; }
+        public List<LabeledVertex> SecondGraph { get; set; }
+        public Dictionary<LabeledVertex, List<SingleNodePairing>> Pairings { get; set; } = new Dictionary<LabeledVertex, List<SingleNodePairing>>();
+        public int Score { get; set; } = 0;
     }
 }

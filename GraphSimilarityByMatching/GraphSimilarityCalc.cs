@@ -11,74 +11,54 @@ namespace GraphSimilarityByMatching
     public class GraphSimilarityCalc
     {
         private static readonly CodeInfo opCodeInfo = new CodeInfo();
-        private const int UnmachedVertexPenalty = 5;
-
       
-        public static NodePairing GetDistance(List<InstructionNode> firstGraph, List<InstructionNode> secondGraph)
+        public static NodePairings GetDistance(List<InstructionNode> firstGraph, List<InstructionNode> secondGraph)
         {
-            NodePairing nodePairing = new NodePairing();
+            List<LabeledVertex> firstGraphLabeled = GetLabeled(firstGraph);
+            List<LabeledVertex> secondGraphLabeled = GetLabeled(secondGraph);
+            NodePairings nodePairing = new NodePairings(firstGraphLabeled, secondGraphLabeled);
             var pairings = nodePairing.Pairings;
+            nodePairing.FirstGraph = firstGraphLabeled;
+            nodePairing.SecondGraph = secondGraphLabeled;
 
-            List<InstructionNode> biggerGraph;
-            List<InstructionNode> smallerGraph;
-            if (firstGraph.Count > secondGraph.Count)
-            {
-                biggerGraph = firstGraph;
-                smallerGraph = secondGraph;
-            }
-            else
-            {
-                biggerGraph = secondGraph;
-                smallerGraph = firstGraph;
-            }
-            List<LabeledVertex> biggerGraphLabeled = GetLabeled(biggerGraph);
-            List<LabeledVertex> smallerGraphLabeled = GetLabeled(smallerGraph);
-            nodePairing.BigGraph = biggerGraphLabeled;
-            nodePairing.SmallGraph = smallerGraphLabeled;
-
-            smallerGraphLabeled.ForEach(x => pairings.Add(x, new List<LabeledVertex>()));
-
-            int graphPairingScore = 0;
             Random rnd = new Random();
-            foreach (var bigGraphVertex in biggerGraphLabeled.OrderBy(x => rnd.Next()))
+            foreach (var firstGraphVertex in firstGraphLabeled.OrderBy(x => rnd.Next()))
             {
                 var vertexPossiblePairings = new Dictionary<LabeledVertex, int>();
-                var smallGraphCandidates = smallerGraphLabeled.Where(x => CodeGroups.AreSameGroup(x.Opcode, bigGraphVertex.Opcode)).ToList();
-                foreach(var smallGraphCandidate in smallGraphCandidates.OrderBy(x => rnd.Next()))
+                var secondGraphCandidates = secondGraphLabeled.Where(x => CodeGroups.AreSameGroup(x.Opcode, firstGraphVertex.Opcode)).ToList();
+                foreach(var secondGraphCandidate in secondGraphCandidates.OrderBy(x => rnd.Next()))
                 {
-                    vertexPossiblePairings.Add(smallGraphCandidate, GetScore(smallGraphCandidate, bigGraphVertex, pairings, false));
+                    vertexPossiblePairings.Add(secondGraphCandidate, GetScore(firstGraphVertex,secondGraphCandidate, nodePairing));
                 }
                 var winningPairs = vertexPossiblePairings.GroupBy(x => x.Value).OrderByDescending(x => x.Key).FirstOrDefault();
-                if (winningPairs == null)
-                {
-                    graphPairingScore -= UnmachedVertexPenalty;
-                }
-                else
+                if (winningPairs != null)
                 {
                     KeyValuePair<LabeledVertex, int> winningPair = winningPairs.ElementAt(rnd.Next(0, winningPairs.Count()));
-                    graphPairingScore += winningPair.Value;
-                    pairings[winningPair.Key].Add(bigGraphVertex);
+                    nodePairing.Score += winningPair.Value;
+                    pairings[winningPair.Key].Add(new SingleNodePairing(firstGraphVertex, winningPair.Value));
                 }
             }
             return nodePairing;
         }
 
-        private static int GetScore(LabeledVertex smallGraphVertex, LabeledVertex bigGraphVertex, Dictionary<LabeledVertex, List<LabeledVertex>> pairings, bool userPairings)
+        private static int GetScore(LabeledVertex firstGraphVertex, LabeledVertex secondGraphVertex, NodePairings pairings)
         {
-            int score = 1;
-            if (smallGraphVertex.Opcode == bigGraphVertex.Opcode)
+            int score = 0;
+            if (secondGraphVertex.Opcode == firstGraphVertex.Opcode)
             {
-                score += 1;
+                score += VertexScorePoints.VertexExactMatch;
             }
-            var backEdgeScore = EdgeScorer.ScoreEdges(smallGraphVertex.BackEdges, bigGraphVertex.BackEdges, pairings, SharedSourceOrDest.Dest);
-            var forwardEdgeScore = EdgeScorer.ScoreEdges(smallGraphVertex.ForwardEdges, bigGraphVertex.ForwardEdges, pairings, SharedSourceOrDest.Source);
+            else
+            {
+                score += VertexScorePoints.VertexCodeFamilyMatch;
+            }
+            var backEdgeScore = EdgeScorer.ScoreEdges(firstGraphVertex.BackEdges, secondGraphVertex.BackEdges, pairings, SharedSourceOrDest.Dest);
+            var forwardEdgeScore = EdgeScorer.ScoreEdges(firstGraphVertex.ForwardEdges, secondGraphVertex.ForwardEdges, pairings, SharedSourceOrDest.Source);
             score += backEdgeScore + forwardEdgeScore;
-            score -= pairings[smallGraphVertex].Count;
+            int mutilpleMatchPenalty = pairings.Pairings[secondGraphVertex].Count -1 * VertexScorePoints.SingleToMultipleVertexMatchPenalty;
+            score -= mutilpleMatchPenalty;
             return score;
         }
-
-      
-
         private static List<LabeledVertex> GetLabeled(List<InstructionNode> graph)
         {
             var labeledVertexes = new List<LabeledVertex>();
@@ -136,6 +116,13 @@ namespace GraphSimilarityByMatching
                 }
             }
             return labeledVertexes;
+        }
+        public static int GetSelfScore(List<InstructionNode> graph)
+        {
+            var labeledGraph = GetLabeled(graph);
+            int vertexScore = labeledGraph.Sum(x => VertexScorePoints.VertexExactMatch);
+            int edgeScore = labeledGraph.SelectMany(x => x.BackEdges.Concat(x.ForwardEdges)).Sum(x => EdgeScorePoints.ExactMatch);
+            return vertexScore + edgeScore;
         }
     }
 
