@@ -55,8 +55,10 @@ namespace GraphSimilarityByMatching
             var backEdgeScore = EdgeScorer.ScoreEdges(firstGraphVertex.BackEdges, secondGraphVertex.BackEdges, pairings, SharedSourceOrDest.Dest);
             var forwardEdgeScore = EdgeScorer.ScoreEdges(firstGraphVertex.ForwardEdges, secondGraphVertex.ForwardEdges, pairings, SharedSourceOrDest.Source);
             score += backEdgeScore + forwardEdgeScore;
-            int mutilpleMatchPenalty = pairings.Pairings[secondGraphVertex].Count -1 * VertexScorePoints.SingleToMultipleVertexMatchPenalty;
-            score -= mutilpleMatchPenalty;
+            if (pairings.Pairings[secondGraphVertex].Count > 0)
+            {
+                score -= VertexScorePoints.SingleToMultipleVertexMatchPenalty;
+            }
             return score;
         }
         private static List<LabeledVertex> GetLabeled(List<InstructionNode> graph)

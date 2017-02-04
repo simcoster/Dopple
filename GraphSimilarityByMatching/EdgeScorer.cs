@@ -59,9 +59,11 @@ namespace GraphSimilarityByMatching
                     KeyValuePair<LabeledEdge,int> winningPair = winningPairs.ElementAt(rnd.Next(0, winningPairs.Count()));
                     edgePairings.Add(firstEdge, winningPair.Key);
                     unmachedSecondEdges.Remove(winningPair.Key);
-                    totalScore += GetEdgeMatchScore(firstEdge, winningPair.Key, sharedSourceOrDest, pairings, false);
+                    var winningMatchScore = GetEdgeMatchScore(firstEdge, winningPair.Key, sharedSourceOrDest, pairings, false);
+                    totalScore += winningMatchScore;
                 }
             }
+            totalScore -= unmachedSecondEdges.Count * EdgeScorePoints.ExactMatch;
             return totalScore;
         }
 

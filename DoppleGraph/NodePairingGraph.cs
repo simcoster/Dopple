@@ -20,17 +20,17 @@ namespace DoppleGraph
         private GoLayer dataLinksLayer;
         private GoLayer flowAffectingLinksLayer;
         private GoLayer flowRoutesLinksLayer;
-        private IEnumerable<GoLabeledVertexWrapper> SmallGraphNodes;
-        private IEnumerable<GoLabeledVertexWrapper> BigGraphNodes;
+        private IEnumerable<GoLabeledVertexWrapper> FirstGraphNodes;
+        private IEnumerable<GoLabeledVertexWrapper> SecondGraphNodes;
 
         public IEnumerable<GoLabeledVertexWrapper> AllNodeWrappers { get; private set; }
 
         public NodePairingGraph(NodePairings pairings, double score)
         {
             _pairings = pairings ;
-            SmallGraphNodes = pairings.SecondGraph.Select(x => new GoLabeledVertexWrapper(new GoTextNodeHoverable(), x)).ToList();
-            BigGraphNodes = pairings.FirstGraph.Select(x => new GoLabeledVertexWrapper(new GoTextNodeHoverable(), x)).ToList();
-            AllNodeWrappers = BigGraphNodes.Concat(SmallGraphNodes).ToList();
+            FirstGraphNodes = pairings.SecondGraph.Select(x => new GoLabeledVertexWrapper(new GoTextNodeHoverable(), x)).ToList();
+            SecondGraphNodes = pairings.FirstGraph.Select(x => new GoLabeledVertexWrapper(new GoTextNodeHoverable(), x)).ToList();
+            AllNodeWrappers = SecondGraphNodes.Concat(FirstGraphNodes).ToList();
             InitializeComponent();
             ScoreLbl.Text = score.ToString();
         }
@@ -45,8 +45,8 @@ namespace DoppleGraph
             myView.Dock = DockStyle.Fill;
             this.Controls.Add(myView);
             myView.Show();
-            BigGraphMethodLbl.Text = BigGraphNodes.First().LabledVertex.Method.Name;
-            SmallGraphMethodlbl.Text = SmallGraphNodes.First().LabledVertex.Method.Name;
+            SecondGraphMethodLbl.Text = SecondGraphNodes.First().LabledVertex.Method.Name;
+            FirstGraphMethodlbl.Text = FirstGraphNodes.First().LabledVertex.Method.Name;
 
             var frontLayer = myView.Document.Layers.CreateNewLayerAfter(myView.Document.LinksLayer);
             foreach (var goNodeWrapper in AllNodeWrappers)
@@ -54,7 +54,7 @@ namespace DoppleGraph
                 var shape = ((GoShape) goNodeWrapper.Node.Background);
                 shape.BrushColor = colorCode.GetColor(goNodeWrapper.LabledVertex.Opcode);
                 shape.PenWidth = 3;
-                shape.PenColor = SmallGraphNodes.Contains(goNodeWrapper) ? Color.Green : Color.Orange;
+                shape.PenColor = FirstGraphNodes.Contains(goNodeWrapper) ? Color.Green : Color.Orange;
                 if (shape.BrushColor.GetBrightness() < 0.4)
                 {
                     goNodeWrapper.Node.Label.TextColor = Color.White;
@@ -82,36 +82,36 @@ namespace DoppleGraph
 
         private void SetCoordinates()
         {
-            var smallNodeWrappersClone = new List<GoLabeledVertexWrapper>(SmallGraphNodes);
-            var bigNodeWrappersClone = new List<GoLabeledVertexWrapper>(BigGraphNodes);
+            var firstNodeWrappersClone = new List<GoLabeledVertexWrapper>(FirstGraphNodes);
+            var secondNodeWrappersClone = new List<GoLabeledVertexWrapper>(SecondGraphNodes);
             int displayCol = 0;
-            while (smallNodeWrappersClone.Count > 0)
+            while (firstNodeWrappersClone.Count > 0)
             {
-                for (int i =0;i<20 && smallNodeWrappersClone.Count > i ; i++)
+                for (int i =0;i<20 && firstNodeWrappersClone.Count > i ; i++)
                 {
-                    var currSmallNode = smallNodeWrappersClone[i];
+                    var currSmallNode = firstNodeWrappersClone[i];
                     currSmallNode.DisplayCol = displayCol;
                     currSmallNode.DisplayRow = i;
-                    var pairedVertices = currSmallNode.LabledVertex.PairingEdges.Select(x => x.BigGraphVertex).ToList();
+                    var pairedVertices = currSmallNode.LabledVertex.PairingEdges.Select(x => x.SecondGraphVertex).ToList();
                     foreach (var bigGraphNode in pairedVertices)
                     {
-                        var bigGraphNodeWrapper = BigGraphNodes.First(x => x.LabledVertex == bigGraphNode);
+                        var bigGraphNodeWrapper = SecondGraphNodes.First(x => x.LabledVertex == bigGraphNode);
                         bigGraphNodeWrapper.DisplayRow = i + 1/((float)pairedVertices.IndexOf(bigGraphNode) +1);
                         bigGraphNodeWrapper.DisplayCol = displayCol + 1;
-                        bigNodeWrappersClone.Remove(bigGraphNodeWrapper);
+                        secondNodeWrappersClone.Remove(bigGraphNodeWrapper);
                     }
-                    smallNodeWrappersClone.Remove(currSmallNode);
+                    firstNodeWrappersClone.Remove(currSmallNode);
                 }
                 displayCol += 2;
             }
-            while (bigNodeWrappersClone.Count > 0)
+            while (secondNodeWrappersClone.Count > 0)
             {
-                for (int i = 0; i < 20 && bigNodeWrappersClone.Count > i ; i++)
+                for (int i = 0; i < 20 && secondNodeWrappersClone.Count > i ; i++)
                 {
-                    var currBigNode = bigNodeWrappersClone[i];
+                    var currBigNode = secondNodeWrappersClone[i];
                     currBigNode.DisplayCol = displayCol;
                     currBigNode.DisplayRow = i;
-                    bigNodeWrappersClone.Remove(currBigNode);
+                    secondNodeWrappersClone.Remove(currBigNode);
                 }
                 displayCol += 1;
             }
@@ -130,21 +130,21 @@ namespace DoppleGraph
             dataLinksLayer = myView.Document.Layers.CreateNewLayerAfter(myView.Document.Layers.Default);
             flowAffectingLinksLayer = myView.Document.Layers.CreateNewLayerAfter(myView.Document.Layers.Default);
             flowRoutesLinksLayer = myView.Document.Layers.CreateNewLayerAfter(myView.Document.Layers.Default);
-            foreach(var pair in _pairings.Pairings)
+            foreach(var firstGraphNodePairing in _pairings.Pairings)
             {
-                foreach(var bigGraphVertex in pair.Value)
+                foreach(var secondGraphNode in firstGraphNodePairing.Value)
                 {
                     SmallBigLinkEdge pairingEdge = new SmallBigLinkEdge();
-                    pairingEdge.BigGraphVertex = pair.Key;
-                    pairingEdge.SmallGraphVertex = bigGraphVertex.PairedVertex;
-                    pairingEdge.Score = bigGraphVertex.PairingScore;
-                    pair.Key.PairingEdges.Add(pairingEdge);
-                    bigGraphVertex.PairedVertex.PairingEdges.Add(pairingEdge);
+                    pairingEdge.SecondGraphVertex = secondGraphNode.PairedVertex;
+                    pairingEdge.FirstGraphVertex = firstGraphNodePairing.Key;
+                    pairingEdge.Score = secondGraphNode.PairingScore;
+                    firstGraphNodePairing.Key.PairingEdges.Add(pairingEdge);
+                    secondGraphNode.PairedVertex.PairingEdges.Add(pairingEdge);
                 }
             }
-            foreach(var pairinigEdge in SmallGraphNodes.SelectMany(x => x.LabledVertex.PairingEdges))
+            foreach(var pairingEdge in FirstGraphNodes.SelectMany(x => x.LabledVertex.PairingEdges))
             {
-                DrawPairingEdge(pairinigEdge);
+                DrawPairingEdge(pairingEdge);
             }
         }
 
@@ -153,15 +153,15 @@ namespace DoppleGraph
             GoLink link = new GoLink();
             Color edgeColor = Color.FromArgb(Convert.ToInt32(pairinigEdge.Score * 2), 0, 255 - Convert.ToInt32(pairinigEdge.Score * 2));
             link.ToolTipText = pairinigEdge.Score.ToString();
-            var smallVertexWrapper = SmallGraphNodes.First(x => x.LabledVertex == pairinigEdge.SmallGraphVertex);
-            var bigVertexWrapper = BigGraphNodes.First(x => x.LabledVertex == pairinigEdge.BigGraphVertex);
+            var firstVertexWrapper = FirstGraphNodes.First(x => x.LabledVertex == pairinigEdge.FirstGraphVertex);
+            var secondVertexWrapper = SecondGraphNodes.First(x => x.LabledVertex == pairinigEdge.SecondGraphVertex);
             link.Pen = new Pen(edgeColor);
-            if (bigVertexWrapper == null || smallVertexWrapper == null)
+            if (secondVertexWrapper == null || firstVertexWrapper == null)
             {
                 return;
             }
-            link.ToPort = bigVertexWrapper.Node.LeftPort;
-            link.FromPort = smallVertexWrapper.Node.RightPort;
+            link.ToPort = secondVertexWrapper.Node.LeftPort;
+            link.FromPort = firstVertexWrapper.Node.RightPort;
             dataLinksLayer.Add(link);
             link.PenWidth = 3;
         }

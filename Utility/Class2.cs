@@ -45,19 +45,9 @@ namespace Utility
         {
             for (int i = 0; i < array.Length - 1; i++)
             {
-                //int min;
-                //int minIndex;
-                //findMinAndIndex(array, i, out min, out minIndex);
-                int min = int.MaxValue;
-                int minIndex = -1;
-                for (int j = i; j < array.Length; j++)
-                {
-                    if (array[j] < min)
-                    {
-                        min = array[j];
-                        minIndex = j;
-                    }
-                }
+                int min;
+                int minIndex;
+                findMinAndIndex(array, i, out min, out minIndex);
                 if (min < array[i])
                 {
                     swapTwo(array, i, minIndex);

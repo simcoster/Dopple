@@ -9,8 +9,8 @@ namespace GraphSimilarityByMatching
 {
     public class SmallBigLinkEdge
     {
-        public LabeledVertex SmallGraphVertex { get; set; }
-        public LabeledVertex BigGraphVertex { get; set; }
+        public LabeledVertex FirstGraphVertex { get; set; }
+        public LabeledVertex SecondGraphVertex { get; set; }
         public double Score { get; set; }
     }
 }

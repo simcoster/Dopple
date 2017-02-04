@@ -10,78 +10,64 @@ namespace Utility
 {
     public class Class1
     {
-        public int Conditions(int a)
+        public static void insertionSort(int[] array)
         {
-           if (a ==3)
+            for (int i = 0; i < array.Length - 1; i++)
             {
-                return 1;
+                int nextMin = int.MaxValue;
+                int nextMinIndex = -1;
+                for (int j = i; j < array.Length; j++)
+                {
+                    if (array[j] < nextMin)
+                    {
+                        nextMin = array[j];
+                        nextMinIndex = j;
+                    }
+                }
+                if (nextMin < array[i])
+                {
+                    int temp = array[i];
+                    array[i] = array[nextMinIndex];
+                    array[nextMinIndex] = temp;
+                }
             }
-           if (a==2)
-            {
-                return 4;
-            }
-            return 0;
         }
-        public int Conditionss(int a)
+        public static void insertionSortWithHelpers(int[] array)
         {
-            if (a == 3)
+            for (int i = 0; i < array.Length - 1; i++)
             {
-                return 4;
+                int min;
+                int minIndex;
+                findMinAndIndex(array, i, out min, out minIndex);
+                if (min < array[i])
+                {
+                    swapTwo(array, i, minIndex);
+                }
             }
-            if (a == 2)
-            {
-                return 1;
-            }
-            return 0;
         }
-        //public int plus3(int a, int b, int c)
-        //{
-        //    return a + b + c;
-        //}
-        //public static void QuickSortMiddle(int[] arr)
-        //{
-        //    QuicksortMiddleRec(arr, 0, arr.Length);
-        //}
 
-        //public static void QuicksortMiddleRec(int[] elements, int left, int right)
-        //{
-        //    int i = left, j = right;
-        //    int pivot = elements[(left + right) / 2];
+        public static void swapTwo(int[] array, int i, int j)
+        {
+            int temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+        }
 
-        //    while (i <= j)
-        //    {
-        //        while (elements[i] < pivot)
-        //        {
-        //            i++;
-        //        }
+        public static void findMinAndIndex(int[] array, int startIndex, out int minValue, out int minIndex)
+        {
+            int currentMin = int.MaxValue;
+            int currentMinIndex = -1;
+            for (int i = startIndex; i < array.Length; i++)
+            {
+                if (array[i] < currentMin)
+                {
+                    currentMin = array[i];
+                    currentMinIndex = i;
+                }
+            }
+            minValue = currentMin;
+            minIndex = currentMinIndex;
+        }
 
-        //        while (elements[j] > pivot)
-        //        {
-        //            j--;
-        //        }
-
-        //        if (i <= j)
-        //        {
-        //            // Swap
-        //            int tmp = elements[i];
-        //            elements[i] = elements[j];
-        //            elements[j] = tmp;
-
-        //            i++;
-        //            j--;
-        //        }
-        //    }
-
-        //    // Recursive calls
-        //    if (left < j)
-        //    {
-        //        QuicksortMiddleRec(elements, left, j);
-        //    }
-
-        //    if (i < right)
-        //    {
-        //        QuicksortMiddleRec(elements, i, right);
-        //    }
-        //}
     }
 }

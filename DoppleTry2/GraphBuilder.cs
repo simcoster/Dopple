@@ -53,11 +53,11 @@ namespace DoppleTry2
             BackTrace();
             //RecursionFix();
             RemoveHelperCodes();
-            //MergeSimilarInstructions();
+            MergeSimilarInstructions();
             LdElemBackTrace();
             AddZeroNode();
             SetInstructionIndexes();
-            //Verify();
+            Verify();
 
             return InstructionNodes;
         }
