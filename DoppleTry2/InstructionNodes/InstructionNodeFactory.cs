@@ -58,6 +58,10 @@ namespace DoppleTry2.InstructionNodes
             {
                 return new ConditionalJumpNode(instruction, method);
             }
+            else if (CodeGroups.StIndCodes.Contains(nodeCode))
+            {
+                return new StIndInstructionNode(instruction, method);
+            }
             else
             {
                 return new InstructionNode(instruction, method);

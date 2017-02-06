@@ -64,7 +64,7 @@ namespace DoppleTry2.InstructionModifiers
             }
             List<InstructionNode> inlinedNodes = calledFunc.Body.Instructions.Select(x => InstructionNodeFactory.GetInstructionWrapper(x, calledFunc)).ToList();
             programFlowHanlder.AddFlowConnections(inlinedNodes);
-            InFuncBackTrace(inlinedNodes);
+            //InFuncBackTrace(inlinedNodes);
             StitchProgramFlow(callNode, inlinedNodes[0]);
             List<InlineableCallNode> inlinedCallNodes = inlinedNodes.Where(x => x is InlineableCallNode).Cast<InlineableCallNode>().ToList();
             inlinedNodes.Except(inlinedCallNodes).ForEach(x => x.InliningProperties = callNode.InliningProperties);
@@ -95,6 +95,9 @@ namespace DoppleTry2.InstructionModifiers
 
         private void InFuncBackTrace(List<InstructionNode> inlinedNodes)
         {
+            new StackForwardTracer(inlinedNodes).TraceForward(inlinedNodes[0]);
+            StIndAddressBackTracer stindBackTracer = new StIndAddressBackTracer(inlinedNodes);
+            inlinedNodes.Where(x => x is StIndInstructionNode).ForEach(x => stindBackTracer.AddBackDataflowConnections(x));
             LdLocBackTracer locationLoadBackTracer = new LdLocBackTracer(inlinedNodes);
             inlinedNodes.Where(x => x is LocationLoadInstructionNode).ForEach(x => locationLoadBackTracer.AddBackDataflowConnections(x));
         }

@@ -16,9 +16,8 @@ namespace DoppleTry2
         private static readonly CodeMemoryRefCount[] CodeMemoryReadCounts = {OneMemRead};
 
         private static readonly CodeMemoryRefCount OneMemStore = new CodeMemoryRefCount(
-            codes: new[] { Code.Cpobj,  Code.Stind_I, Code.Stind_I1, Code.Stind_I2
-                , Code.Stind_I4, Code.Stind_I8, Code.Stind_R4, Code.Stind_R8, Code.Newobj, Code.Box,
-                Code.Localloc, Code.Initobj, Code.Cpblk,    },
+            codes: new[] { Code.Cpobj, Code.Newobj, Code.Box, Code.Localloc, Code.Initobj, Code.Cpblk, }
+                         .Concat(CodeGroups.StIndCodes).ToArray(),
             refCount: 1);
 
         private static readonly CodeMemoryRefCount[] CodeMemoryStoreCounts = { OneMemStore };

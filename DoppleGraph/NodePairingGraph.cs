@@ -151,7 +151,7 @@ namespace DoppleGraph
         private void DrawPairingEdge(SmallBigLinkEdge pairinigEdge)
         {
             GoLink link = new GoLink();
-            Color edgeColor = Color.FromArgb(Convert.ToInt32(pairinigEdge.Score * 2), 0, 255 - Convert.ToInt32(pairinigEdge.Score * 2));
+            Color edgeColor = Color.FromArgb(Convert.ToInt32(pairinigEdge.Score), 0, 255 - Convert.ToInt32(pairinigEdge.Score));
             link.ToolTipText = pairinigEdge.Score.ToString();
             var firstVertexWrapper = FirstGraphNodes.First(x => x.LabledVertex == pairinigEdge.FirstGraphVertex);
             var secondVertexWrapper = SecondGraphNodes.First(x => x.LabledVertex == pairinigEdge.SecondGraphVertex);

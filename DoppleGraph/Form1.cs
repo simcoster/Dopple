@@ -34,7 +34,7 @@ namespace DoppleGraph
                 var newForm = new Form2(instructionWrappers);
                 newForm.Show();
             }
-            NewMethod(Graphs.GetRange(0, 2));
+            //NewMethod(Graphs.GetRange(0, 2));
         }
 
         private static void NewMethod(List<List<InstructionNode>> Graphs)

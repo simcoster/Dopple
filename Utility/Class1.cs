@@ -10,49 +10,6 @@ namespace Utility
 {
     public class Class1
     {
-        public static void insertionSort(int[] array)
-        {
-            for (int i = 0; i < array.Length - 1; i++)
-            {
-                int nextMin = int.MaxValue;
-                int nextMinIndex = -1;
-                for (int j = i; j < array.Length; j++)
-                {
-                    if (array[j] < nextMin)
-                    {
-                        nextMin = array[j];
-                        nextMinIndex = j;
-                    }
-                }
-                if (nextMin < array[i])
-                {
-                    int temp = array[i];
-                    array[i] = array[nextMinIndex];
-                    array[nextMinIndex] = temp;
-                }
-            }
-        }
-        public static void insertionSortWithHelpers(int[] array)
-        {
-            for (int i = 0; i < array.Length - 1; i++)
-            {
-                int min;
-                int minIndex;
-                findMinAndIndex(array, i, out min, out minIndex);
-                if (min < array[i])
-                {
-                    swapTwo(array, i, minIndex);
-                }
-            }
-        }
-
-        public static void swapTwo(int[] array, int i, int j)
-        {
-            int temp = array[i];
-            array[i] = array[j];
-            array[j] = temp;
-        }
-
         public static void findMinAndIndex(int[] array, int startIndex, out int minValue, out int minIndex)
         {
             int currentMin = int.MaxValue;
@@ -65,9 +22,27 @@ namespace Utility
                     currentMinIndex = i;
                 }
             }
-            minValue = currentMin;
-            minIndex = currentMinIndex;
+            if (startIndex > 5)
+            {
+                minValue = currentMin;
+                minIndex = currentMinIndex;
+            }
+            else
+            {
+                minIndex = 3;
+                minValue = 4;
+            }
         }
 
+        public static void insertionSortWithHelpers(int[] array)
+        {
+            int min;
+            int minIndex;
+            findMinAndIndex(array, 0, out min, out minIndex);
+            Console.WriteLine(minIndex);
+            Console.WriteLine(min);
+        }
+
+        
     }
 }

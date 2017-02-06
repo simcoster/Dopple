@@ -47,13 +47,13 @@ namespace DoppleTry2
         {
             SetInstructionIndexes();
             _programFlowManager.AddFlowConnections(InstructionNodes);
-            PreInlineBackTrace();
+            //PreInlineBackTrace();
             InlineFunctionCalls();
             SetInstructionIndexes();
             BackTrace();
             //RecursionFix();
-            RemoveHelperCodes();
-            MergeSimilarInstructions();
+            //RemoveHelperCodes();
+            //MergeSimilarInstructions();
             LdElemBackTrace();
             AddZeroNode();
             SetInstructionIndexes();
@@ -162,6 +162,15 @@ namespace DoppleTry2
         private void BackTrace()
         {
             new StackForwardTracer(InstructionNodes).TraceForward(InstructionNodes[0]);
+            foreach (var instWrapper in InstructionNodes.Where(x => x is LdArgInstructionNode).OrderByDescending(x => x.InstructionIndex))
+            {
+                _backTraceManager.BackTrace(instWrapper);
+            }
+            var stIndAddressBackTracer = new StIndAddressBackTracer(InstructionNodes);
+            foreach (var instWrapper in InstructionNodes.Where(x => stIndAddressBackTracer.HandlesCodes.Contains(x.Instruction.OpCode.Code)).OrderByDescending(x => x.InstructionIndex))
+            {
+                stIndAddressBackTracer.AddBackDataflowConnections(instWrapper);
+            }
             foreach (var node in InstructionNodes.OrderByDescending(x => x.InstructionIndex))
             {
                 _backTraceManager.BackTrace(node);
@@ -307,6 +316,12 @@ namespace DoppleTry2
 
         void PreInlineBackTrace()
         {
+            new StackForwardTracer(InstructionNodes).TraceForward(InstructionNodes[0]);
+            var stIndAddressBackTracer = new StIndAddressBackTracer(InstructionNodes);
+            foreach(var instWrapper in InstructionNodes.Where(x => stIndAddressBackTracer.HandlesCodes.Contains(x.Instruction.OpCode.Code)).OrderByDescending(x => x.InstructionIndex))
+            {
+                stIndAddressBackTracer.AddBackDataflowConnections(instWrapper);
+            }
             LdLocBackTracer ldLocBackTracer = new LdLocBackTracer(InstructionNodes);
             foreach(var instWrapper in InstructionNodes.Where(x => ldLocBackTracer.HandlesCodes.Contains(x.Instruction.OpCode.Code)).OrderByDescending(x => x.InstructionIndex))
             {

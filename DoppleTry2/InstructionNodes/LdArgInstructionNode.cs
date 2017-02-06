@@ -55,16 +55,16 @@ namespace DoppleTry2.InstructionNodes
             ArgIndex = GetArgIndex(instruction, method);
             string argNameTemp;
             TypeReference argTypeTemp;
-            GetArgNameAndType(ArgIndex, method, out argNameTemp, out argTypeTemp);
+            ParamDefinition = GetArgNameAndType(ArgIndex, method, out argNameTemp, out argTypeTemp);
             ArgName = argNameTemp;
             ArgType = argTypeTemp;
             if (ArgName == "this")
             {
-               // StackPushCount = 0;
+                StackPushCount = 0;
             }
         }
 
-        private static void GetArgNameAndType(int argIndex, MethodDefinition method, out string argName, out TypeReference argType)
+        private static ParameterDefinition GetArgNameAndType(int argIndex, MethodDefinition method, out string argName, out TypeReference argType)
         {
             int parameterArrayIndex;
             if (method.IsStatic)
@@ -78,16 +78,19 @@ namespace DoppleTry2.InstructionNodes
                 {
                     argName = "this";
                     argType = method.DeclaringType;
-                    return;
+                    return null;
                 }
             }
             argName = method.Parameters[parameterArrayIndex].Name;
             argType = method.Parameters[parameterArrayIndex].ParameterType;
+            return method.Parameters[parameterArrayIndex];
         }
 
         public int ArgIndex { get; set; }
         public TypeReference ArgType { get; set; }
         public string ArgName { get; set; }
+        public ParameterDefinition ParamDefinition { get; private set; }
+
         private int GetArgIndex(Instruction instruction, MethodDefinition method)
         {
             int indexByCode = 0;

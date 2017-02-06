@@ -71,6 +71,7 @@
     <Compile Include="BackTrackers\RecursiveBacktracer.cs" />
     <Compile Include="BackTrackers\SingleOperationUnitBackTracer.cs" />
     <Compile Include="BackTrackers\StackForwardTracer.cs" />
+    <Compile Include="BackTrackers\StIndBackTracer.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="InstructionModifiers\SetStackPopPushForCalls.cs" />
     <Compile Include="InstructionNodes\CallNode.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="InstructionNodes\NewObjInstructionNode.cs" />
     <Compile Include="InstructionNodes\RetInstructionNode.cs" />
     <Compile Include="InstructionNodes\StElemInstructionNode.cs" />
+    <Compile Include="InstructionNodes\StIndInstructionNode.cs" />
     <Compile Include="InstructionWrapperMembers\SingleUnitForwardRelated.cs" />
     <Compile Include="InstructionWrapperMembers\SingleUnitBackRelated.cs" />
     <Compile Include="InstructionWrapperMembers\ProgramFlowForwardRoutes.cs" />

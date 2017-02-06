@@ -9,15 +9,15 @@ namespace DoppleTry2.BackTrackers
 {
     public abstract class SingeIndexBackTracer : BackTracer
     {
-        public SingeIndexBackTracer(List<InstructionNode> instructionsWrappers) : base(instructionsWrappers)
+        public SingeIndexBackTracer(List<InstructionNode> instructionNodes) : base(instructionNodes)
         {
-            _SingleIndexBackSearcher = new SingleIndexBackSearcher(instructionsWrappers);
+            _SingleIndexBackSearcher = new SingleIndexBackSearcher(instructionNodes);
         }
         protected SingleIndexBackSearcher _SingleIndexBackSearcher;
 
-        protected IEnumerable<IEnumerable<InstructionNode>> GetDataflowBackRelated(InstructionNode instWrapper)
+        protected IEnumerable<IEnumerable<InstructionNode>> GetDataflowBackRelated(InstructionNode instNode)
         {
-            return new List<List<InstructionNode>>() { { GetDataflowBackRelatedArgGroup(instWrapper).ToList() } };
+            return new List<List<InstructionNode>>() { { GetDataflowBackRelatedArgGroup(instNode).ToList() } };
         }
         protected override void InnerAddBackDataflowConnections(InstructionNode currentInst)
         {        
