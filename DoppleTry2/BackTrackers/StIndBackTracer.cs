@@ -73,6 +73,10 @@ namespace DoppleTry2.BackTrackers
             {
                 return AddressType.GeneralData;
             }
+            if (CodeGroups.LdArgCodes.Contains(addressBackArg.Instruction.OpCode.Code) && addressBackArg.DataFlowBackRelated.Count ==0)
+            {
+                return AddressType.GeneralData;
+            }
             return null;
         }
     }
