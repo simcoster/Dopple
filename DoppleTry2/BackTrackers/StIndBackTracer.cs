@@ -26,10 +26,11 @@ namespace DoppleTry2.BackTrackers
             StIndInstructionNode stIndInst = (StIndInstructionNode) currentInst;
             var addressNodes = currentInst.DataFlowBackRelated.Where(x => x.ArgIndex == 0)
                                 .SelectMany(x => TraceBackwardsLdStLocs(x.Argument));
-            if (addressNodes.Any(x => !IsProvidingAddress(x)))
+            if (addressNodes.Any(x => !GetAddressType(x).HasValue))
             {
                 throw new Exception("some args don't provide address");
             }
+            stIndInst.AddressType = GetAddressType(addressNodes.First()).Value;
             stIndInst.AddressProvidingArgs = addressNodes.ToList();
         }
 
@@ -50,19 +51,29 @@ namespace DoppleTry2.BackTrackers
         }
 
 
-        private bool IsProvidingAddress(InstructionNode addressBackArg)
+        private AddressType? GetAddressType(InstructionNode addressBackArg)
         {
-            var addressProvidingCodes = new[] {Code.Ldarga_S, Code.Ldarga, Code.Ldelema, Code.Ldflda, Code.Ldloca, Code.Ldloca_S,
-                          Code.Ldsflda, Code.Localloc,Code.Refanyval };
-            if ( addressProvidingCodes.Contains(addressBackArg.Instruction.OpCode.Code))
+            if ( new[] { Code.Ldarga_S, Code.Ldarga}.Contains(addressBackArg.Instruction.OpCode.Code))
             {
-                return true;
+                return AddressType.Argument;
             }
-            if (addressBackArg is LdArgInstructionNode && ((LdArgInstructionNode)addressBackArg).ParamDefinition.IsOut)
+            if (new[] { Code.Ldelema }.Contains(addressBackArg.Instruction.OpCode.Code))
             {
-                return true;
+                return AddressType.ArrayElem;
             }
-            return false;
+            if (new[] { Code.Ldflda, Code.Ldsflda }.Contains(addressBackArg.Instruction.OpCode.Code))
+            {
+                return AddressType.Field;
+            }
+            if (new[] { Code.Ldloca, Code.Ldloca_S }.Contains(addressBackArg.Instruction.OpCode.Code))
+            {
+                return AddressType.LocalVar;
+            }
+            if (new[] { Code.Localloc, Code.Refanyval }.Contains(addressBackArg.Instruction.OpCode.Code))
+            {
+                return AddressType.GeneralData;
+            }
+            return null;
         }
     }
 }

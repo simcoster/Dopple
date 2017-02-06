@@ -19,5 +19,16 @@ namespace DoppleTry2.InstructionNodes
             DataFlowBackRelated.RemoveAllTwoWay(x => x.ArgIndex == 0);
             base.SelfRemove();
         }
+
+        public AddressType AddressType { get; set; }
+    }
+
+    public enum AddressType
+    {
+        LocalVar,
+        Argument,
+        ArrayElem,
+        Field,
+        GeneralData
     }
 }

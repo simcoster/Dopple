@@ -125,7 +125,7 @@ namespace DoppleTry2
             RemoveInstWrappers(InstructionNodes.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(InstructionNodes.Where(x => x is LdArgInstructionNode && x.Method != InstructionNodes[0].Method && !x.DataFlowBackRelated.SelfFeeding));
             RemoveInstWrappers(InstructionNodes.Where(x => x is InlineableCallNode));
-            RemoveInstWrappers(InstructionNodes.Where(x => x is StIndInstructionNode));
+            RemoveInstWrappers(InstructionNodes.Where(x => x is StIndInstructionNode && ((StIndInstructionNode)x).AddressType == AddressType.LocalVar));
             //RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Ret && x.InliningProperties.Inlined));
             RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Dup));
         }
