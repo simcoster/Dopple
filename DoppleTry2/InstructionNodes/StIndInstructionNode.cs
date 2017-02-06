@@ -14,5 +14,10 @@ namespace DoppleTry2.InstructionNodes
         public StIndInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
         }
+        internal override void SelfRemove()
+        {
+            DataFlowBackRelated.RemoveAllTwoWay(x => x.ArgIndex == 0);
+            base.SelfRemove();
+        }
     }
 }

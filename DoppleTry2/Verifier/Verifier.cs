@@ -61,6 +61,10 @@ namespace DoppleTry2.VerifierNs
             {
                 return true;
             }
+            if (instructionWrapper is StIndInstructionNode)
+            {
+                return true;
+            }
             if (new[] { StackBehaviour.Pushref, StackBehaviour.Push0 }.Contains(instructionWrapper.Instruction.OpCode.StackBehaviourPush))
             {
                 return false;

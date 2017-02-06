@@ -34,7 +34,7 @@ namespace DoppleGraph
                 var newForm = new Form2(instructionWrappers);
                 newForm.Show();
             }
-            //NewMethod(Graphs.GetRange(0, 2));
+            NewMethod(Graphs.GetRange(0, 2));
         }
 
         private static void NewMethod(List<List<InstructionNode>> Graphs)
@@ -52,7 +52,7 @@ namespace DoppleGraph
                 }
             }
             var fullSelfScore =  GraphSimilarityCalc.GetSelfScore(Graphs[0]);
-            var newFormmm = new NodePairingGraph(bestMatch, (double)bestScore/ (double) fullSelfScore);
+            var newFormmm = new NodePairingGraph(bestMatch, ((double)bestScore/ (double) fullSelfScore)*100);
             newFormmm.Show();
         }
     }

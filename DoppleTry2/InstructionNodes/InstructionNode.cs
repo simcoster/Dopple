@@ -117,7 +117,7 @@ namespace DoppleTry2.InstructionNodes
         }
 
 
-        internal void SelfRemove()
+        internal virtual void SelfRemove()
         {
             foreach (var forwardInst in DataFlowForwardRelated.ToArray())
             {
