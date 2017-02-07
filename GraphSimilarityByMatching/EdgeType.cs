@@ -4,5 +4,6 @@
     {
         DataFlow,
         ProgramFlowAffecting,
+        SingleUnit
     }
 }

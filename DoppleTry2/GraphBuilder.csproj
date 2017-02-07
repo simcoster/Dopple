@@ -69,7 +69,8 @@
     <Compile Include="BackTrackers\BackTraceManager.cs" />
     <Compile Include="BackTrackers\ConditionionalsBackTracer.cs" />
     <Compile Include="BackTrackers\RecursiveBacktracer.cs" />
-    <Compile Include="BackTrackers\SingleOperationUnitBackTracer.cs" />
+    <Compile Include="BackTrackers\SingleArithmeticWithConstantBacktracer.cs" />
+    <Compile Include="BackTrackers\SingleConditionOperationUnitBackTracer.cs" />
     <Compile Include="BackTrackers\StackForwardTracer.cs" />
     <Compile Include="BackTrackers\StIndBackTracer.cs" />
     <Compile Include="ExtensionMethods.cs" />

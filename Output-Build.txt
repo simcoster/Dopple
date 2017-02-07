@@ -1,0 +1,23 @@
+﻿1>------ Rebuild All started: Project: Utility, Configuration: Mixed Any CPU ------
+1>C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\Utility\Class2.cs(173,17,173,21): warning CS0168: The variable 'temp' is declared but never used
+1>  Utility -> C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\Utility\bin\Release\Utility.dll
+2>------ Rebuild All started: Project: GraphBuilder, Configuration: Debug Any CPU ------
+2>C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\DoppleTry2\InstructionWrapperMembers\ArgList.cs(11,27,11,34): warning CS0659: 'ArgList' overrides Object.Equals(object o) but does not override Object.GetHashCode()
+2>C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\DoppleTry2\BackTrackers\SingleArithmeticWithConstantBacktracer.cs(27,113,27,137): warning CS0184: The given expression is never of the provided ('LdImmediateInstNode') type
+2>C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\DoppleTry2\InstructionWrapperMembers\ArgList.cs(54,13,54,32): warning CS0618: 'ArgList.Remove(IndexedArgument)' is obsolete: 'Use remove 2 way instead'
+2>C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\DoppleTry2\InstructionWrapperMembers\ArgList.cs(56,13,56,67): warning CS0618: 'ArgList.Remove(IndexedArgument)' is obsolete: 'Use remove 2 way instead'
+2>C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\DoppleTry2\GraphBuilder.cs(16,58,16,71): warning CS0169: The field 'GraphBuilder._flowHandlers' is never used
+2>  GraphBuilder -> C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\DoppleTry2\bin\Debug\DoppleTry2.exe
+3>------ Rebuild All started: Project: GraphSimilarityByMatching, Configuration: Debug Any CPU ------
+4>------ Rebuild All started: Project: ForceBasedDiagram, Configuration: Debug Any CPU ------
+5>------ Rebuild All started: Project: GraphSimilarity, Configuration: Debug Any CPU ------
+3>  GraphSimilarityByMatching -> C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\GraphSimilarityByMatching\bin\Debug\GraphSimilarityByMatching.dll
+6>------ Rebuild All started: Project: GraphWinform, Configuration: Mixed Any CPU ------
+6>  GraphWinform -> C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\DoppleGraph\bin\Mixed\DoppleGraph.exe
+4>C:\Program Files (x86)\MSBuild\14.0\bin\Microsoft.Common.CurrentVersion.targets(1820,5): warning MSB3274: The primary reference "Northwoods.Go" could not be resolved because it was built against the ".NETFramework,Version=v4.6" framework. This is a higher version than the currently targeted framework ".NETFramework,Version=v4.5.2".
+4>  ForceBasedDiagram -> C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\ForceBasedDiagram\bin\Debug\ForceBasedDiagram.exe
+5>C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\GraphSimilarity\EditOperations\GraphEdge.cs(10,18,10,27): warning CS0659: 'GraphEdge' overrides Object.Equals(object o) but does not override Object.GetHashCode()
+5>C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\GraphSimilarity\GraphEditDistanceCalc.cs(24,13,24,17): warning CS0164: This label has not been referenced
+5>C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\GraphSimilarity\GraphEditDistanceCalc.cs(33,17,33,22): warning CS0219: The variable 'index' is assigned but its value is never used
+5>  GraphSimilarity -> C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\GraphSimilarity\bin\Debug\GraphSimilarity.exe
+========== Rebuild All: 6 succeeded, 0 failed, 0 skipped ==========

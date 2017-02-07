@@ -17,7 +17,7 @@ namespace DoppleTry2.InstructionNodes
 
         internal override RelatedList GetSameList(InstructionNode nodeToMergeInto)
         {
-            throw new NotImplementedException();
+            return nodeToMergeInto.SingleUnitBackRelated;
         }
     }
 }

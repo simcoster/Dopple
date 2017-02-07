@@ -8,9 +8,9 @@ using Mono.Cecil.Cil;
 
 namespace DoppleTry2.BackTrackers
 {
-    class SingleOperationUnitBackTracer : BackTracer
+    class SingleConditionOperationUnitBackTracer : BackTracer
     {
-        public SingleOperationUnitBackTracer(List<InstructionNode> instructionNodes) : base(instructionNodes)
+        public SingleConditionOperationUnitBackTracer(List<InstructionNode> instructionNodes) : base(instructionNodes)
         {
         }
 

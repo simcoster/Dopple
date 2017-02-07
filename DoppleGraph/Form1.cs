@@ -34,6 +34,18 @@ namespace DoppleGraph
                 var newForm = new Form2(instructionWrappers);
                 newForm.Show();
             }
+            AssemblyDefinition myrLibrary = AssemblyDefinition.ReadAssembly(@"C:\Windows\assembly\GAC_MSIL\System.Core\3.5.0.0__b77a5c561934e089\system.core.dll");
+            TypeDefinition type = myrLibrary.MainModule.Types.First(x => x.FullName == "System.Linq.Enumerable");
+
+            //foreach (var method in type.Methods.Where(x => !x.IsConstructor))
+            foreach (var method in type.Methods.Where(x => x.Name.Contains("Sum")).Take(1))
+            {
+                var backTraceManager = new GraphBuilder(method);
+                List<InstructionNode> instructionWrappers = backTraceManager.Run();
+                //Graphs.Add(instructionWrappers);
+                var newForm = new Form2(instructionWrappers);
+                newForm.Show();
+            }
             NewMethod(Graphs.GetRange(0, 2));
         }
 
@@ -42,7 +54,8 @@ namespace DoppleGraph
             var biggerGraph = Graphs.OrderByDescending(x => x.Count).First();
             NodePairings bestMatch = null;
             var bestScore = 0;
-            for (int i = 0; i < 5; i++)
+            var fullSelfScore = GraphSimilarityCalc.GetSelfScore(Graphs[0]);
+            for (int i = 0; i < 50; i++)
             {
                 NodePairings pairing = GraphSimilarityCalc.GetDistance(Graphs[0], Graphs[1]);
                 if (pairing.Score > bestScore)
@@ -51,8 +64,7 @@ namespace DoppleGraph
                     bestMatch = pairing;
                 }
             }
-            var fullSelfScore =  GraphSimilarityCalc.GetSelfScore(Graphs[0]);
-            var newFormmm = new NodePairingGraph(bestMatch, ((double)bestScore/ (double) fullSelfScore)*100);
+            var newFormmm = new NodePairingGraph(bestMatch, (double)bestScore/ (double) fullSelfScore);
             newFormmm.Show();
         }
     }

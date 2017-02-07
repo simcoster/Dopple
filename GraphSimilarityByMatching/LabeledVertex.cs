@@ -18,4 +18,8 @@ namespace GraphSimilarityByMatching
         public List<SmallBigLinkEdge> PairingEdges { get; set; } = new List<SmallBigLinkEdge>(); 
         public MethodDefinition Method { get; set; }
     }
+    public class MultiNodeLabeledVertex : LabeledVertex
+    {
+        public List<LabeledVertex> AdditionalVertexes = new List<LabeledVertex>();
+    }
 }

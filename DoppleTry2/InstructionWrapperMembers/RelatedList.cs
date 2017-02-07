@@ -48,6 +48,11 @@ namespace DoppleTry2.InstructionWrapperMembers
             }
         }
 
+        public IEnumerable<InstructionNode> GetBackTree()
+        {
+            return this.SelectMany(x => GetSameList(x).GetBackTree().Concat(new[] { x }));
+        }
+
         [Obsolete ("Please use AddTwoWay instead")]
         public new void Add(InstructionNode instructionWrapper)
         {

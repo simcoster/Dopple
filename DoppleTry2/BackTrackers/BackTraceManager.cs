@@ -24,7 +24,8 @@ namespace DoppleTry2.BackTrackers
                             new LoadFieldByStackBackTracer(instructionNodes),
                             new LoadMemoryByOperandBackTracer(instructionNodes),
                             new TypedReferenceBackTracer(instructionNodes),
-                            new SingleOperationUnitBackTracer(instructionNodes),
+                            new SingleConditionOperationUnitBackTracer(instructionNodes),
+                            new SingleArithmeticWithConstantBacktracer(instructionNodes),
                             new ConditionionalsBackTracer(instructionNodes),
                             new LdLocBackTracer(instructionNodes)
                            };

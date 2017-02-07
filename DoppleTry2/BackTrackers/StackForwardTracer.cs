@@ -45,7 +45,8 @@ namespace DoppleTry2.BackTrackers
             {
                 if (stackedNodes.Count > 1)
                 {
-                    throw new Exception("someone didn't get everything");
+                    //TODO remove
+                    //throw new Exception("someone didn't get everything");
                 }
                 return;
             }
