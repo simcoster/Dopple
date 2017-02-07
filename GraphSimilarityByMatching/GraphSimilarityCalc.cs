@@ -16,6 +16,20 @@ namespace GraphSimilarityByMatching
         {
             List<LabeledVertex> firstGraphLabeled = GetLabeled(firstGraph);
             List<LabeledVertex> secondGraphLabeled = GetLabeled(secondGraph);
+            NodePairings bestMatch = GetPairings(firstGraphLabeled, secondGraphLabeled);
+            for (int i = 0; i < 10; i++)
+            {
+                NodePairings pairing = GetPairings(firstGraphLabeled, secondGraphLabeled);
+                if (pairing.Score > bestMatch.Score)
+                {
+                    bestMatch = pairing;
+                }
+            }
+            return bestMatch ;
+        }
+
+        private static NodePairings GetPairings(List<LabeledVertex> firstGraphLabeled, List<LabeledVertex> secondGraphLabeled)
+        {
             NodePairings nodePairing = new NodePairings(firstGraphLabeled, secondGraphLabeled);
             var pairings = nodePairing.Pairings;
             nodePairing.FirstGraph = firstGraphLabeled;
@@ -26,9 +40,9 @@ namespace GraphSimilarityByMatching
             {
                 var vertexPossiblePairings = new Dictionary<LabeledVertex, int>();
                 var secondGraphCandidates = secondGraphLabeled.Where(x => CodeGroups.AreSameGroup(x.Opcode, firstGraphVertex.Opcode)).ToList();
-                foreach(var secondGraphCandidate in secondGraphCandidates.OrderBy(x => rnd.Next()))
+                foreach (var secondGraphCandidate in secondGraphCandidates.OrderBy(x => rnd.Next()))
                 {
-                    vertexPossiblePairings.Add(secondGraphCandidate, GetScore(firstGraphVertex,secondGraphCandidate, nodePairing));
+                    vertexPossiblePairings.Add(secondGraphCandidate, GetScore(firstGraphVertex, secondGraphCandidate, nodePairing));
                 }
                 var winningPairs = vertexPossiblePairings.GroupBy(x => x.Value).OrderByDescending(x => x.Key).FirstOrDefault();
                 if (winningPairs != null)
@@ -73,6 +87,51 @@ namespace GraphSimilarityByMatching
                 vertex.Method = instructionNode.Method;
                 labeledVertexes.Add(vertex);
             }
+            AddEdges(graph, labeledVertexes);
+            //GroupSingleUnits(labeledVertexes);
+            return labeledVertexes;
+        }
+
+        private static void GroupSingleUnits(List<LabeledVertex> labeledVertexes)
+        {
+            var frontMostInSingleUnits = labeledVertexes
+                                            .Where(x => 
+                                                x.BackEdges.Count(y => y.EdgeType == EdgeType.SingleUnit) > 0 && 
+                                                x.ForwardEdges.Count(y => y.EdgeType == EdgeType.SingleUnit) == 0)
+                                                .ToList();
+            foreach(var frontMostInSingleUnit in frontMostInSingleUnits.ToArray())
+            {
+                CompoundedLabeledVertex multiNode = new CompoundedLabeledVertex(frontMostInSingleUnit);
+                var backSingleUnitTree = GetBackSingleUnitTree(frontMostInSingleUnit);
+                multiNode.AddBackInnerVertexes(backSingleUnitTree);
+                labeledVertexes.RemoveAll(x => backSingleUnitTree.Contains(x));
+                labeledVertexes.Remove(frontMostInSingleUnit);
+                labeledVertexes.Add(multiNode);
+            }
+        }
+
+        private static List<LabeledVertex> GetBackSingleUnitTree(LabeledVertex frontMostInSingleUnit)
+        {
+            List<LabeledVertex> backTree = new List<LabeledVertex>();
+            Queue<LabeledVertex> backRelated = new Queue<LabeledVertex>();
+            foreach (var backSingleUnit in frontMostInSingleUnit.BackEdges.Where(x => x.EdgeType == EdgeType.SingleUnit))
+            {
+                backRelated.Enqueue(backSingleUnit.SourceVertex);
+            }
+            while (backRelated.Count > 0)
+            {
+                var currNode = backRelated.Dequeue();
+                backTree.Add(currNode);
+                foreach(var backSingleUnit in currNode.BackEdges.Where(x => x.EdgeType == EdgeType.SingleUnit))
+                {
+                    backRelated.Enqueue(backSingleUnit.SourceVertex);
+                }
+            }
+            return backTree;
+        }
+
+        private static void AddEdges(List<InstructionNode> graph, List<LabeledVertex> labeledVertexes)
+        {
             foreach (var instructionNode in graph)
             {
                 LabeledVertex vertex = labeledVertexes[instructionNode.InstructionIndex];
@@ -116,9 +175,29 @@ namespace GraphSimilarityByMatching
                         DestinationVertex = labeledVertexes[programFlowForwardVertex.Argument.InstructionIndex]
                     });
                 }
+                foreach (var singleUnitBack in instructionNode.SingleUnitBackRelated)
+                {
+                    vertex.BackEdges.Add(new LabeledEdge()
+                    {
+                        EdgeType = EdgeType.SingleUnit,
+                        Index = 0,
+                        SourceVertex = labeledVertexes[singleUnitBack.InstructionIndex],
+                        DestinationVertex = vertex
+                    });
+                }
+                foreach (var singleUnitForward in instructionNode.SingleUnitForwardRelated)
+                {
+                    vertex.ForwardEdges.Add(new LabeledEdge()
+                    {
+                        EdgeType = EdgeType.SingleUnit,
+                        Index = 0,
+                        SourceVertex = vertex,
+                        DestinationVertex = labeledVertexes[singleUnitForward.InstructionIndex]
+                    });
+                }
             }
-            return labeledVertexes;
         }
+
         public static int GetSelfScore(List<InstructionNode> graph)
         {
             var labeledGraph = GetLabeled(graph);

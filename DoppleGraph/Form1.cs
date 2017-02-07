@@ -52,19 +52,8 @@ namespace DoppleGraph
         private static void NewMethod(List<List<InstructionNode>> Graphs)
         {
             var biggerGraph = Graphs.OrderByDescending(x => x.Count).First();
-            NodePairings bestMatch = null;
-            var bestScore = 0;
-            var fullSelfScore = GraphSimilarityCalc.GetSelfScore(Graphs[0]);
-            for (int i = 0; i < 50; i++)
-            {
-                NodePairings pairing = GraphSimilarityCalc.GetDistance(Graphs[0], Graphs[1]);
-                if (pairing.Score > bestScore)
-                {
-                    bestScore = pairing.Score;
-                    bestMatch = pairing;
-                }
-            }
-            var newFormmm = new NodePairingGraph(bestMatch, (double)bestScore/ (double) fullSelfScore);
+            NodePairings pairing = GraphSimilarityCalc.GetDistance(Graphs[0], Graphs[1]);
+            var newFormmm = new NodePairingGraph(pairing, (double) pairing .Score/ (double) GraphSimilarityCalc.GetSelfScore(biggerGraph));
             newFormmm.Show();
         }
     }

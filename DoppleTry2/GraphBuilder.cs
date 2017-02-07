@@ -69,14 +69,20 @@ namespace DoppleTry2
 
         private void LdElemBackTrace()
         {
-            LdElemBacktracer ldElemBacktracer = new LdElemBacktracer(InstructionNodes);
-            foreach(var ldElemNode in InstructionNodes)
+            var postMergeBackTracers = new BackTracer[] {
+                                                        new LdElemBacktracer(InstructionNodes),
+                                                        new SingleConditionOperationUnitBackTracer(InstructionNodes),
+                                                        new SingleArithmeticWithConstantBacktracer(InstructionNodes)
+                                                        };
+            foreach (var node in InstructionNodes.OrderByDescending(x => x.InstructionIndex))
             {
-                if (!ldElemBacktracer.HandlesCodes.Contains(ldElemNode.Instruction.OpCode.Code))
+                foreach (var backTracer in postMergeBackTracers)
                 {
-                    continue;
+                    if (backTracer.HandlesCodes.Contains(node.Instruction.OpCode.Code))
+                    {
+                        backTracer.AddBackDataflowConnections(node);
+                    }
                 }
-                ldElemBacktracer.AddBackDataflowConnections(ldElemNode);
             }
         }
 

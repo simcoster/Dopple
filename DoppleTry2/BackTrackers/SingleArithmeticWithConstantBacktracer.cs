@@ -24,6 +24,10 @@ namespace DoppleTry2.BackTrackers
 
         protected override void InnerAddBackDataflowConnections(InstructionNode currentInst)
         {
+            if (currentInst.DataFlowBackRelated.SelfFeeding)
+            {
+                return;
+            }
             var constValueArgGroups = currentInst.DataFlowBackRelated.GroupBy(x => x.ArgIndex).Where(x => x.All(y => y.Argument is LdImmediateInstNode)).ToList();
             if (constValueArgGroups.Count != 1)
             {

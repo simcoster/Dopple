@@ -62,7 +62,7 @@ namespace DoppleGraph
                 shape.Size = new SizeF(400, 400);
 
                 goNodeWrapper.Node.Text = goNodeWrapper.LabledVertex.Opcode.ToString() + " index:" + goNodeWrapper.LabledVertex.Index;
-                if (goNodeWrapper.LabledVertex is MultiNodeLabeledVertex)
+                if (goNodeWrapper.LabledVertex is CompoundedLabeledVertex)
                 {
                     goNodeWrapper.Node.Text += "multi";
                 }
@@ -170,43 +170,6 @@ namespace DoppleGraph
             dataLinksLayer.Add(link);
             link.PenWidth = 3;
         }
-
-        
-
-        //private void SetLongestPath(IEnumerable<GoLabeledVertexWrapper> vertexesToSet)
-        //{
-        //    var firstVertex = vertexesToSet.First(x => x.LabledVertex.BackEdges.Count == 0);
-        //    Queue<GoLabeledVertexWrapper> vertexesToResolve = new Queue<GoLabeledVertexWrapper>();
-        //    vertexesToResolve.Enqueue(firstVertex);
-        //    firstVertex.LongestPath.Add(firstVertex);
-        //    var visited = new List<GoLabeledVertexWrapper>();
-        //    while (vertexesToResolve.Count != 0)
-        //    {
-        //        GoLabeledVertexWrapper currentVertex = vertexesToResolve.Dequeue();
-        //        foreach(var forwardVertex in currentVertex.LabledVertex.ForwardEdges.Where(x => x.EdgeType == EdgeType.DataFlow))
-        //        {
-        //            var forwardVertexWrapper = GetWrapper(forwardVertex.DestinationVertex);
-        //            if (forwardVertexWrapper == null)
-        //            {
-        //                continue;
-        //            }
-        //            if (visited.Contains(forwardVertexWrapper))
-        //            {
-
-        //            }
-        //            else
-        //            {
-        //                visited.Add(forwardVertexWrapper);
-        //            }
-        //            if (!currentVertex.LongestPath.Contains(forwardVertexWrapper) && !forwardVertexWrapper.LongestPath.Contains(currentVertex) && currentVertex.LongestPath.Count + 1 > forwardVertexWrapper.LongestPath.Count)
-        //            {
-        //                forwardVertexWrapper.LongestPath = new List<GoLabeledVertexWrapper>(currentVertex.LongestPath);
-        //                forwardVertexWrapper.LongestPath.Add(forwardVertexWrapper);
-        //                vertexesToResolve.Enqueue(forwardVertexWrapper);
-        //            } 
-        //        }
-        //    }
-        //}
 
         private GoLabeledVertexWrapper GetWrapper(LabeledVertex vertex)
         {
