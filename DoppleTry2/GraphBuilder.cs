@@ -47,7 +47,6 @@ namespace DoppleTry2
         {
             SetInstructionIndexes();
             _programFlowManager.AddFlowConnections(InstructionNodes);
-            //PreInlineBackTrace();
             InlineFunctionCalls();
             SetInstructionIndexes();
             BackTrace();
@@ -353,21 +352,7 @@ namespace DoppleTry2
             }
             SetInstructionIndexes();
         }
-
-        void PreInlineBackTrace()
-        {
-            new StackForwardTracer(InstructionNodes).TraceForward(InstructionNodes[0]);
-            var stIndAddressBackTracer = new StIndAddressBackTracer(InstructionNodes);
-            foreach(var instWrapper in InstructionNodes.Where(x => stIndAddressBackTracer.HandlesCodes.Contains(x.Instruction.OpCode.Code)).OrderByDescending(x => x.InstructionIndex))
-            {
-                stIndAddressBackTracer.AddBackDataflowConnections(instWrapper);
-            }
-            LdLocBackTracer ldLocBackTracer = new LdLocBackTracer(InstructionNodes);
-            foreach(var instWrapper in InstructionNodes.Where(x => ldLocBackTracer.HandlesCodes.Contains(x.Instruction.OpCode.Code)).OrderByDescending(x => x.InstructionIndex))
-            {
-                ldLocBackTracer.AddBackDataflowConnections(instWrapper);
-            }
-        }
+        
 
         private void AddHelperRetInstructions()
         {

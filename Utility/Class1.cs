@@ -9,47 +9,51 @@ namespace Utility
 {
     public class Class1
     {
-        public static void insertionSort(int[] array)
+        public bool BinarySearchRec(int first, int last, int[] mynumbers, int target)
         {
-            for (int i = 0; i < array.Length - 1; i++)
+            if (first == last)
             {
-                int nextMin = int.MaxValue;
-                int nextMinIndex = -1;
-                for (int j = i; j < array.Length; j++)
-                {
-                    if (array[j] < nextMin)
-                    {
-                        nextMin = array[j];
-                        nextMinIndex = j;
-                    }
-                }
-                if (nextMin < array[i])
-                {
-                    int temp = array[i];
-                    array[i] = array[nextMinIndex];
-                    array[nextMinIndex] = temp;
-                }
+                return mynumbers[first] == target;
+            }
+
+            var mid = (first + last) / 2;
+
+            if (target < mynumbers[mid])
+            {
+                return BinarySearchRec(mid + 1, last, mynumbers, target);
+            }
+            if (target > mynumbers[mid])
+            {
+                return BinarySearchRec(first, mid - 1, mynumbers, target);
+            }
+            else
+            {
+                return true;
             }
         }
-        public int[] SelectionSort(int[] arr)
+
+        public static bool BinarySearch(int first, int last, int[] mynumbers, int target)
         {
-            //1. Find min
-            //2. Swap it with first element
-            //3. Repeat starting from secong position onwards.
-            int _min = 0;
-            for (int i = 0; i < arr.Length; i++)
+            while (first <= last)
             {
-                _min = i;
-                for (int j = i; j < arr.Length; j++)
+                var mid = (first + last) / 2;
+
+                if (target < mynumbers[mid])
                 {
-                    if (arr[j] < arr[_min])
-                        _min = j;
+                    first = mid + 1;
                 }
-                int _temp = arr[i];
-                arr[i] = arr[_min];
-                arr[_min] = _temp;
+
+                if (target > mynumbers[mid])
+                {
+                    last = mid - 1;
+                }
+
+                else
+                {
+                    return true;
+                }
             }
-            return arr;
+            return false;
         }
     }
 }
