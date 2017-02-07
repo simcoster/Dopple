@@ -27,6 +27,7 @@ namespace DoppleTry2.InstructionNodes
             SingleUnitBackRelated = new SingleUnitBackRelated(this);
             SingleUnitForwardRelated= new SingleUnitForwardRelated(this);
             ProgramFlowForwardAffecting = new ProgramFlowForwardAffectingArgList(this);
+            SingleUnitNodes = new List<InstructionNode>();
             MyGuid = Guid.NewGuid();
         }
 
@@ -50,6 +51,8 @@ namespace DoppleTry2.InstructionNodes
         public List<Type> DoneBackTracers = new List<Type>();
         public bool ProgramFlowResolveDone { get; set; } = false;
         public Guid MyGuid { get; private set; }
+        public List<InstructionNode> SingleUnitNodes { get; private set; }
+
         public InliningProperties InliningProperties = new InliningProperties();
 
         private int GetStackPopCount(Instruction instruction)
@@ -110,7 +113,7 @@ namespace DoppleTry2.InstructionNodes
 
         public void MergeInto(InstructionNode nodeToMergeInto)
         {
-            foreach (IMergable args in new IMergable[] { DataFlowBackRelated, DataFlowForwardRelated, ProgramFlowBackAffected, ProgramFlowForwardAffecting, ProgramFlowBackRoutes, ProgramFlowForwardRoutes, SingleUnitBackRelated, SingleUnitForwardRelated })
+            foreach (IMergable args in new IMergable[] { DataFlowBackRelated, DataFlowForwardRelated, ProgramFlowBackAffected, ProgramFlowForwardAffecting, ProgramFlowBackRoutes, ProgramFlowForwardRoutes})
             {
                 args.MergeInto(nodeToMergeInto);
             }

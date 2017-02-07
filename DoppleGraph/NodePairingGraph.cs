@@ -16,6 +16,7 @@ namespace DoppleGraph
     {
         private GoView myView;
         private NodePairings _pairings;
+        private NodePairings _selfPairings;
         CodeColorHanlder colorCode = new CodeColorHanlder();
         private GoLayer dataLinksLayer;
         private GoLayer flowAffectingLinksLayer;
@@ -25,14 +26,15 @@ namespace DoppleGraph
 
         public IEnumerable<GoLabeledVertexWrapper> AllNodeWrappers { get; private set; }
 
-        public NodePairingGraph(NodePairings pairings, double score)
+        public NodePairingGraph(NodePairings pairings, NodePairings selfPairing)
         {
-            _pairings = pairings ;
+            _selfPairings = selfPairing;
+            _pairings = pairings;
             FirstGraphNodes = pairings.SecondGraph.Select(x => new GoLabeledVertexWrapper(new GoTextNodeHoverable(), x)).ToList();
             SecondGraphNodes = pairings.FirstGraph.Select(x => new GoLabeledVertexWrapper(new GoTextNodeHoverable(), x)).ToList();
             AllNodeWrappers = SecondGraphNodes.Concat(FirstGraphNodes).ToList();
             InitializeComponent();
-            ScoreLbl.Text = score.ToString();
+            ScoreLbl.Text = ((double)pairings.Score / (double)selfPairing.Score).ToString();
         }
 
         private void NodePairingGraph_Load(object sender, EventArgs e)
@@ -155,11 +157,16 @@ namespace DoppleGraph
         private void DrawPairingEdge(SmallBigLinkEdge pairinigEdge)
         {
             GoLink link = new GoLink();
-            //Color edgeColor = Color.FromArgb(Convert.ToInt32(pairinigEdge.Score), 0, 255 - Convert.ToInt32(pairinigEdge.Score));
-            Color edgeColor = Color.Blue;
-            link.ToolTipText = pairinigEdge.Score.ToString();
+            
             var firstVertexWrapper = FirstGraphNodes.First(x => x.LabledVertex == pairinigEdge.FirstGraphVertex);
             var secondVertexWrapper = SecondGraphNodes.First(x => x.LabledVertex == pairinigEdge.SecondGraphVertex);
+            double pairingScore = (double) pairinigEdge.Score / (double) _selfPairings.Pairings[pairinigEdge.SecondGraphVertex].First().PairingScore;
+            if (pairingScore < 0)
+            {
+                pairingScore = 0;
+            }
+            Color edgeColor = Color.FromArgb(Convert.ToInt32(255 - 255 * pairingScore), Convert.ToInt32(255 * pairingScore), 0);
+            link.ToolTipText = (pairingScore.ToString());
             link.Pen = new Pen(edgeColor);
             if (secondVertexWrapper == null || firstVertexWrapper == null)
             {

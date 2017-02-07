@@ -300,7 +300,12 @@ namespace DoppleGraph
                 }
                 foreach (var backRelatedNode in nodeWrapper.InstructionNode.SingleUnitBackRelated)
                 {
-                    DrawEdge(nodeWrapper, myView, backRelatedNode, flowRoutesLinksLayer, new Pen(Color.Blue) { DashStyle = DashStyle.Dot });
+                    try
+                    {
+                        DrawEdge(nodeWrapper, myView, backRelatedNode, flowRoutesLinksLayer, new Pen(Color.Blue) { DashStyle = DashStyle.Dot });
+                    }
+                    catch
+                    { }
                 }
             }
         }

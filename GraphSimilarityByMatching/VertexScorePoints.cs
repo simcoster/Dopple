@@ -8,8 +8,8 @@ namespace GraphSimilarityByMatching
 {
     public static class VertexScorePoints
     {
-        public const int VertexCodeFamilyMatch = 2;
-        public const int VertexExactMatch = VertexCodeFamilyMatch + 1;
+        public const int VertexCodeFamilyMatch = 4;
+        public const int VertexExactMatch = VertexCodeFamilyMatch + 2;
         public const int SingleToMultipleVertexMatchPenalty = 1;
     }
 }

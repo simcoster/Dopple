@@ -53,13 +53,48 @@ namespace DoppleTry2
             BackTrace();
             RecursionFix();
             RemoveHelperCodes();
-            MergeSimilarInstructions();
+            //MergeSingleOperationNodes();
+            //MergeSimilarInstructions();
             LdElemBackTrace();
             AddZeroNode();
             SetInstructionIndexes();
             Verify();
 
             return InstructionNodes;
+        }
+
+        private void MergeSingleOperationNodes()
+        {
+            var postMergeBackTracers = new BackTracer[] {
+                                                        new SingleConditionOperationUnitBackTracer(InstructionNodes),
+                                                        new SingleArithmeticWithConstantBacktracer(InstructionNodes)
+                                                        };
+            foreach (var node in InstructionNodes.OrderByDescending(x => x.InstructionIndex))
+            {
+                foreach (var backTracer in postMergeBackTracers)
+                {
+                    if (backTracer.HandlesCodes.Contains(node.Instruction.OpCode.Code))
+                    {
+                        backTracer.AddBackDataflowConnections(node);
+                    }
+                }
+            }
+
+            var blah = InstructionNodes.Where(x => x.SingleUnitBackRelated.Count > 0);
+            var frontMostNodes = InstructionNodes.Where(x => x.SingleUnitBackRelated.Count > 0 && x.SingleUnitForwardRelated.Count == 0);
+            foreach (var frontMostNode in frontMostNodes.ToArray())
+            {
+                Queue<InstructionNode> singleUnitBackNodes = new Queue<InstructionNode>();
+                frontMostNode.SingleUnitBackRelated.ForEach(x => singleUnitBackNodes.Enqueue(x));
+                while(singleUnitBackNodes.Count >0)
+                {
+                    var currNode = singleUnitBackNodes.Dequeue();
+                    currNode.SingleUnitBackRelated.ForEach(x => singleUnitBackNodes.Enqueue(x));
+                    currNode.MergeInto(frontMostNode);
+                    InstructionNodes.Remove(currNode);
+                    frontMostNode.SingleUnitNodes.Add(currNode);
+                }
+            }
         }
 
         private void RecursionFix()
@@ -71,8 +106,6 @@ namespace DoppleTry2
         {
             var postMergeBackTracers = new BackTracer[] {
                                                         new LdElemBacktracer(InstructionNodes),
-                                                        new SingleConditionOperationUnitBackTracer(InstructionNodes),
-                                                        new SingleArithmeticWithConstantBacktracer(InstructionNodes)
                                                         };
             foreach (var node in InstructionNodes.OrderByDescending(x => x.InstructionIndex))
             {

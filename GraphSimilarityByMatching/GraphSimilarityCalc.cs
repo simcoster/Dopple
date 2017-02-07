@@ -88,26 +88,7 @@ namespace GraphSimilarityByMatching
                 labeledVertexes.Add(vertex);
             }
             AddEdges(graph, labeledVertexes);
-            //GroupSingleUnits(labeledVertexes);
             return labeledVertexes;
-        }
-
-        private static void GroupSingleUnits(List<LabeledVertex> labeledVertexes)
-        {
-            var frontMostInSingleUnits = labeledVertexes
-                                            .Where(x => 
-                                                x.BackEdges.Count(y => y.EdgeType == EdgeType.SingleUnit) > 0 && 
-                                                x.ForwardEdges.Count(y => y.EdgeType == EdgeType.SingleUnit) == 0)
-                                                .ToList();
-            foreach(var frontMostInSingleUnit in frontMostInSingleUnits.ToArray())
-            {
-                CompoundedLabeledVertex multiNode = new CompoundedLabeledVertex(frontMostInSingleUnit);
-                var backSingleUnitTree = GetBackSingleUnitTree(frontMostInSingleUnit);
-                multiNode.AddBackInnerVertexes(backSingleUnitTree);
-                labeledVertexes.RemoveAll(x => backSingleUnitTree.Contains(x));
-                labeledVertexes.Remove(frontMostInSingleUnit);
-                labeledVertexes.Add(multiNode);
-            }
         }
 
         private static List<LabeledVertex> GetBackSingleUnitTree(LabeledVertex frontMostInSingleUnit)
@@ -175,35 +156,39 @@ namespace GraphSimilarityByMatching
                         DestinationVertex = labeledVertexes[programFlowForwardVertex.Argument.InstructionIndex]
                     });
                 }
-                foreach (var singleUnitBack in instructionNode.SingleUnitBackRelated)
-                {
-                    vertex.BackEdges.Add(new LabeledEdge()
-                    {
-                        EdgeType = EdgeType.SingleUnit,
-                        Index = 0,
-                        SourceVertex = labeledVertexes[singleUnitBack.InstructionIndex],
-                        DestinationVertex = vertex
-                    });
-                }
-                foreach (var singleUnitForward in instructionNode.SingleUnitForwardRelated)
-                {
-                    vertex.ForwardEdges.Add(new LabeledEdge()
-                    {
-                        EdgeType = EdgeType.SingleUnit,
-                        Index = 0,
-                        SourceVertex = vertex,
-                        DestinationVertex = labeledVertexes[singleUnitForward.InstructionIndex]
-                    });
-                }
+                //foreach (var singleUnitBack in instructionNode.SingleUnitBackRelated)
+                //{
+                //    vertex.BackEdges.Add(new LabeledEdge()
+                //    {
+                //        EdgeType = EdgeType.SingleUnit,
+                //        Index = 0,
+                //        SourceVertex = labeledVertexes[singleUnitBack.InstructionIndex],
+                //        DestinationVertex = vertex
+                //    });
+                //}
+                //foreach (var singleUnitForward in instructionNode.SingleUnitForwardRelated)
+                //{
+                //    vertex.ForwardEdges.Add(new LabeledEdge()
+                //    {
+                //        EdgeType = EdgeType.SingleUnit,
+                //        Index = 0,
+                //        SourceVertex = vertex,
+                //        DestinationVertex = labeledVertexes[singleUnitForward.InstructionIndex]
+                //    });
+                //}
             }
         }
 
-        public static int GetSelfScore(List<InstructionNode> graph)
+        public static NodePairings GetSelfScore(List<LabeledVertex> labeledGraph)
         {
-            var labeledGraph = GetLabeled(graph);
-            int vertexScore = labeledGraph.Sum(x => VertexScorePoints.VertexExactMatch);
-            int edgeScore = labeledGraph.SelectMany(x => x.BackEdges.Concat(x.ForwardEdges)).Sum(x => EdgeScorePoints.ExactMatch);
-            return vertexScore + edgeScore;
+            NodePairings nodePairings = new NodePairings(labeledGraph, labeledGraph);
+            foreach(var node in labeledGraph)
+            {
+                int score = VertexScorePoints.VertexExactMatch + node.BackEdges.Concat(node.ForwardEdges).Sum(x => EdgeScorePoints.ExactMatch);
+                nodePairings.Pairings[node].Add(new SingleNodePairing(node,score));
+                nodePairings.Score += score;
+            }
+            return nodePairings;
         }
     }
 
