@@ -8,14 +8,20 @@ namespace DoppleTry2.InstructionNodes
 {
     public class InstructionNodeFactory
     {
+        static SystemMethodsLoader systemMethodsLoader = new SystemMethodsLoader();
         public static InstructionNode GetInstructionWrapper(Instruction instruction, MethodDefinition method)
         {
             Code nodeCode = instruction.OpCode.Code;
             if (CodeGroups.CallCodes.Contains(nodeCode))
             {
+                MethodDefinition systemMethodDef = null;
                 if (instruction.Operand is MethodDefinition)
                 {
                     return new InlineableCallNode(instruction, method);
+                }
+                else if (systemMethodsLoader.TryGetSystemMethod(instruction, out systemMethodDef))
+                {
+                    return new InlineableCallNode(instruction, systemMethodDef,method);
                 }
                 else
                 {
@@ -66,6 +72,11 @@ namespace DoppleTry2.InstructionNodes
             {
                 return new InstructionNode(instruction, method);
             }
+        }
+
+        private static bool TryGetSystemMethod(Instruction instruction, out MethodDefinition systemMethodDef)
+        {
+            throw new NotImplementedException();
         }
     }
 }

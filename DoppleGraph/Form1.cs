@@ -36,8 +36,11 @@ namespace DoppleGraph
                 var newForm = new Form2(instructionWrappers);
                 newForm.Show();
             }
-            AssemblyDefinition myrLibrary = AssemblyDefinition.ReadAssembly(@"C:\Windows\assembly\GAC_MSIL\System.Core\3.5.0.0__b77a5c561934e089\system.core.dll");
-            TypeDefinition type = myrLibrary.MainModule.Types.First(x => x.FullName == "System.Linq.Enumerable");
+
+            Console.WriteLine(NewMethod(Graphs[1], Graphs[0]));
+
+            //AssemblyDefinition myrLibrary = AssemblyDefinition.ReadAssembly(@"C:\Windows\assembly\GAC_MSIL\System.Core\3.5.0.0__b77a5c561934e089\system.core.dll");
+            //TypeDefinition type = myrLibrary.MainModule.Types.First(x => x.FullName == "System.Linq.Enumerable");
 
             ////foreach (var method in type.Methods.Where(x => !x.IsConstructor))
             //foreach (var method in type.Methods.Where(x => x.Name.Contains("Sum")).Take(1))
@@ -48,6 +51,8 @@ namespace DoppleGraph
             //    var newForm = new Form2(instructionWrappers);
             //    newForm.Show();
             //}'
+
+
             var csv = new StringBuilder();
             for (int i = 0; i < Graphs.Count - 1; i++)
             {
@@ -84,9 +89,9 @@ namespace DoppleGraph
             NodePairings pairing2 = GraphSimilarityCalc.GetDistance(Graph2, Graph1);
             double Score2 = (double) pairing2.Score / (double) GraphSimilarityCalc.GetSelfScore(pairing2.FirstGraph).Score;
             Console.WriteLine("{0} = {1} {2}", Graph1[0].Method.Name, Graph2[0].Method.Name, (Score1+Score2)/2 );
+            var newFormmm = new NodePairingGraph(pairing1, GraphSimilarityCalc.GetSelfScore(pairing1.FirstGraph));
+            newFormmm.Show();
             return (Score1 + Score2) / 2;
-            //var newFormmm = new NodePairingGraph(pairing, GraphSimilarityCalc.GetSelfScore(pairing.FirstGraph));
-            //newFormmm.Show();
         }
     }
 }
