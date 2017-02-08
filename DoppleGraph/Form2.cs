@@ -481,7 +481,7 @@ namespace DoppleGraph
 
                 if (goNodeWrapper.InstructionNode.InliningProperties.Inlined || goNodeWrapper.InstructionNode.MarkForDebugging)
                 {
-                    if (goNodeWrapper.InstructionNode.MarkForDebugging)
+                    if (goNodeWrapper.InstructionNode.SingleUnitNodes.Count > 0)
                     {
                         goNodeWrapper.Node.Shape.PenColor = Color.Red;
                     }
@@ -490,7 +490,6 @@ namespace DoppleGraph
                         goNodeWrapper.Node.Shape.PenColor = Color.Blue;
                     }
                     goNodeWrapper.Node.Shape.PenWidth = 3;
-                    goNodeWrapper.Node.Shadowed = true;
                     goNodeWrapper.Node.ToolTipText = goNodeWrapper.InstructionNode.Method.Name + "*************";
                 }
 

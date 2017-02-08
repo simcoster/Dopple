@@ -8,6 +8,8 @@ using Mono.Cecil;
 using DoppleTry2.InstructionNodes;
 using System.Diagnostics;
 using GraphSimilarityByMatching;
+using System.Text;
+using System.IO;
 
 namespace DoppleGraph
 {
@@ -37,24 +39,54 @@ namespace DoppleGraph
             AssemblyDefinition myrLibrary = AssemblyDefinition.ReadAssembly(@"C:\Windows\assembly\GAC_MSIL\System.Core\3.5.0.0__b77a5c561934e089\system.core.dll");
             TypeDefinition type = myrLibrary.MainModule.Types.First(x => x.FullName == "System.Linq.Enumerable");
 
-            //foreach (var method in type.Methods.Where(x => !x.IsConstructor))
-            foreach (var method in type.Methods.Where(x => x.Name.Contains("Sum")).Take(1))
+            ////foreach (var method in type.Methods.Where(x => !x.IsConstructor))
+            //foreach (var method in type.Methods.Where(x => x.Name.Contains("Sum")).Take(1))
+            //{
+            //    var backTraceManager = new GraphBuilder(method);
+            //    List<InstructionNode> instructionWrappers = backTraceManager.Run();
+            //    //Graphs.Add(instructionWrappers);
+            //    var newForm = new Form2(instructionWrappers);
+            //    newForm.Show();
+            //}'
+            var csv = new StringBuilder();
+            for (int i = 0; i < Graphs.Count - 1; i++)
             {
-                var backTraceManager = new GraphBuilder(method);
-                List<InstructionNode> instructionWrappers = backTraceManager.Run();
-                //Graphs.Add(instructionWrappers);
-                var newForm = new Form2(instructionWrappers);
-                newForm.Show();
+                csv.Append(Graphs[i][0].Method.Name);
             }
-            NewMethod(Graphs.GetRange(0, 2));
+            csv.AppendLine();
+            for (int i =0; i<Graphs.Count-1; i++)
+            {
+                for (int j=0; j < Graphs.Count; j++)
+                {
+                    if (j==0)
+                    {
+                        csv.Append(Graphs[i][0].Method.Name); 
+                    }
+                    else if (j >= i + 1)
+                    {
+                        csv.Append(NewMethod(Graphs[i], Graphs[j]));
+                    }
+                    else if (j >= i + 1)
+                    {
+                        csv.Append(" ");
+                    }
+                    csv.Append(",");
+                }
+                csv.AppendLine();
+            }
+            File.WriteAllText("C:\\temp\\comparisons.csv", csv.ToString());
         }
 
-        private static void NewMethod(List<List<InstructionNode>> Graphs)
+        private static double NewMethod(List<InstructionNode> Graph1, List<InstructionNode> Graph2)
         {
-            var biggerGraph = Graphs.OrderByDescending(x => x.Count).First();
-            NodePairings pairing = GraphSimilarityCalc.GetDistance(Graphs[1], Graphs[0]);
-            var newFormmm = new NodePairingGraph(pairing, GraphSimilarityCalc.GetSelfScore(pairing.FirstGraph));
-            newFormmm.Show();
+            NodePairings pairing1 = GraphSimilarityCalc.GetDistance(Graph1, Graph2);
+            double Score1 = (double) pairing1.Score / (double) GraphSimilarityCalc.GetSelfScore(pairing1.FirstGraph).Score;
+            NodePairings pairing2 = GraphSimilarityCalc.GetDistance(Graph2, Graph1);
+            double Score2 = (double) pairing2.Score / (double) GraphSimilarityCalc.GetSelfScore(pairing2.FirstGraph).Score;
+            Console.WriteLine("{0} = {1} {2}", Graph1[0].Method.Name, Graph2[0].Method.Name, (Score1+Score2)/2 );
+            return (Score1 + Score2) / 2;
+            //var newFormmm = new NodePairingGraph(pairing, GraphSimilarityCalc.GetSelfScore(pairing.FirstGraph));
+            //newFormmm.Show();
         }
     }
 }
