@@ -30,14 +30,12 @@ namespace DoppleGraph
             //foreach (var method in type.Methods.Where(x => !x.IsConstructor))
             foreach (var method in typee.Methods.Where(x => !x.IsConstructor))
             {
-                var backTraceManager = new GraphBuilder(method);
-                List<InstructionNode> instructionWrappers = backTraceManager.Run();
-                Graphs.Add(instructionWrappers);
-                var newForm = new Form2(instructionWrappers);
+                var graphBuilder = new GraphBuilder(method);
+                List<InstructionNode> instructionNodes = graphBuilder.Run();
+                Graphs.Add(instructionNodes);
+                var newForm = new Form2(instructionNodes);
                 newForm.Show();
             }
-
-            Console.WriteLine(NewMethod(Graphs[1], Graphs[0]));
 
             //AssemblyDefinition myrLibrary = AssemblyDefinition.ReadAssembly(@"C:\Windows\assembly\GAC_MSIL\System.Core\3.5.0.0__b77a5c561934e089\system.core.dll");
             //TypeDefinition type = myrLibrary.MainModule.Types.First(x => x.FullName == "System.Linq.Enumerable");
@@ -54,9 +52,11 @@ namespace DoppleGraph
 
 
             var csv = new StringBuilder();
+            csv.Append(',');
             for (int i = 0; i < Graphs.Count - 1; i++)
             {
                 csv.Append(Graphs[i][0].Method.Name);
+                csv.Append(',');
             }
             csv.AppendLine();
             for (int i =0; i<Graphs.Count-1; i++)
@@ -65,9 +65,10 @@ namespace DoppleGraph
                 {
                     if (j==0)
                     {
-                        csv.Append(Graphs[i][0].Method.Name); 
+                        csv.Append(Graphs[i][0].Method.Name);
+                        csv.Append(","); 
                     }
-                    else if (j >= i + 1)
+                    if (j >= i)
                     {
                         csv.Append(NewMethod(Graphs[i], Graphs[j]));
                     }
@@ -87,6 +88,8 @@ namespace DoppleGraph
             NodePairings pairing1 = GraphSimilarityCalc.GetDistance(Graph1, Graph2);
             double Score1 = (double) pairing1.Score / (double) GraphSimilarityCalc.GetSelfScore(pairing1.FirstGraph).Score;
             NodePairings pairing2 = GraphSimilarityCalc.GetDistance(Graph2, Graph1);
+            var newFormm = new NodePairingGraph(pairing2, GraphSimilarityCalc.GetSelfScore(pairing2.FirstGraph));
+            newFormm.Show();
             double Score2 = (double) pairing2.Score / (double) GraphSimilarityCalc.GetSelfScore(pairing2.FirstGraph).Score;
             Console.WriteLine("{0} = {1} {2}", Graph1[0].Method.Name, Graph2[0].Method.Name, (Score1+Score2)/2 );
             var newFormmm = new NodePairingGraph(pairing1, GraphSimilarityCalc.GetSelfScore(pairing1.FirstGraph));

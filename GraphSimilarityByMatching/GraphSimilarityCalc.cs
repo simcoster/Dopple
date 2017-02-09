@@ -51,6 +51,10 @@ namespace GraphSimilarityByMatching
                     nodePairing.Score += winningPair.Value;
                     pairings[winningPair.Key].Add(new SingleNodePairing(firstGraphVertex, winningPair.Value));
                 }
+                else
+                {
+                    //nodePairing.Score -= VertexScorePoints.VertexExactMatch;
+                }
             }
             return nodePairing;
         }

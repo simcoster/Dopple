@@ -53,7 +53,7 @@ namespace DoppleTry2
             RecursionFix();
             RemoveHelperCodes();
             //MergeSingleOperationNodes();
-            //MergeSimilarInstructions();
+            MergeSimilarInstructions();
             LdElemBackTrace();
             AddZeroNode();
             SetInstructionIndexes();

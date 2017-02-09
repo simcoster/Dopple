@@ -63,7 +63,7 @@ namespace GraphSimilarityByMatching
                     totalScore += winningMatchScore;
                 }
             }
-            totalScore -= unmachedSecondEdges.Count * EdgeScorePoints.ExactMatch;
+            totalScore -= unmachedSecondEdges.Count * 1;
             return totalScore;
         }
 
