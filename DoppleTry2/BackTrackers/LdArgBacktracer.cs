@@ -19,7 +19,7 @@ namespace DoppleTry2.BackTrackers
         {
             if (instNode.InliningProperties.Inlined)
             {
-                IEnumerable<InlineableCallNode> inlinedCalls = _SingleIndexBackSearcher.SearchBackwardsForDataflowInstrcutions(x => x is InlineableCallNode && ((InlineableCallNode)x).TargetMethod == instNode.Method,instNode).Cast<InlineableCallNode>();
+                IEnumerable<InlineableCallNode> inlinedCalls = _SingleIndexBackSearcher.SearchBackwardsForDataflowInstrcutions(x => x is InlineableCallNode && ((InlineableCallNode)x).TargetMethod.FullName == instNode.Method.FullName,instNode).Cast<InlineableCallNode>();
                 var argSuppliers = new List<InstructionNode>();
                 foreach(var inlinedCall in inlinedCalls)
                 {
