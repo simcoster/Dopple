@@ -481,7 +481,7 @@ namespace DoppleGraph
 
                 if (goNodeWrapper.InstructionNode.InliningProperties.Inlined || goNodeWrapper.InstructionNode.MarkForDebugging)
                 {
-                    if (goNodeWrapper.InstructionNode.SingleUnitNodes.Count > 0)
+                    if (goNodeWrapper.InstructionNode.SingleUnitNodes.Count > 0 || goNodeWrapper.InstructionNode.StackPopCount > 0)
                     {
                         goNodeWrapper.Node.Shape.PenColor = Color.Red;
                     }

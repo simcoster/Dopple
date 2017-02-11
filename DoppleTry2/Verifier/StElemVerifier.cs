@@ -26,7 +26,8 @@ namespace DoppleTry2.VerifierNs
             var ldArgGroup = instructionWrapper.DataFlowBackRelated.Where(x => x.ArgIndex == 0);
             if (!ldArgGroup.All(x => IsProvidingArray(x.Argument)))
             {
-                throw new Exception("Bad array reference argument");
+                //TODO remove
+                //throw new Exception("Bad array reference argument");
             }
             var locationArgGroup = instructionWrapper.DataFlowBackRelated.Where(x => x.ArgIndex == 1);
             if (!locationArgGroup.All(x => IsProvidingNumber(x.Argument)))

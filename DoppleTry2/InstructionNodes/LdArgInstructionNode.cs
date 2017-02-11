@@ -60,7 +60,7 @@ namespace DoppleTry2.InstructionNodes
             ArgType = argTypeTemp;
             if (ArgName == "this")
             {
-                StackPushCount = 0;
+                //StackPushCount = 0;
             }
         }
 

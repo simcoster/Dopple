@@ -94,7 +94,7 @@ namespace DoppleGraph
             Console.WriteLine("{0} = {1} {2}", Graph1[0].Method.Name, Graph2[0].Method.Name, (Score1+Score2)/2 );
             var newFormmm = new NodePairingGraph(pairing1, GraphSimilarityCalc.GetSelfScore(pairing1.FirstGraph));
             newFormmm.Show();
-            return (Score1 + Score2) / 2;
+            return Math.Round((Score1 + Score2) / 2,2);
         }
     }
 }

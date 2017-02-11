@@ -10,14 +10,14 @@ namespace Utility
 {
     public class Class1
     {
-        public static int SumInSingleStep(int a, int b, int c)
-        {
-            return a + b + c;
-        }
-        public static int SumInTwoStep(int a, int b, int c)
-        {
-            return new[] { a, b, c }.Sum();
-        }
+        //public static int SumInSingleStep(int a, int b, int c)
+        //{
+        //    return a + b + c;
+        //}
+        //public static int SumInTwoStep(int a, int b, int c)
+        //{
+        //    return new[] { a, b, c }.Sum();
+        //}
         //public static void insertionSort(int[] array)
         //{
         //    for (int i = 0; i < array.Length - 1; i++)
@@ -294,29 +294,29 @@ namespace Utility
         //}
 
 
-        //public static bool BinarySearch(int first, int last, int[] mynumbers, int target)
-        //{
-        //    while (first <= last)
-        //    {
-        //        var mid = (first + last) / 2;
+        public static bool BinarySearch(int first, int last, int[] mynumbers, int target)
+        {
+            while (first <= last)
+            {
+                var mid = (first + last) / 2;
 
-        //        if (target < mynumbers[mid])
-        //        {
-        //            first = mid + 1;
-        //        }
+                if (target < mynumbers[mid])
+                {
+                    first = mid + 1;
+                }
 
-        //        if (target > mynumbers[mid])
-        //        {
-        //            last = mid - 1;
-        //        }
+                if (target > mynumbers[mid])
+                {
+                    last = mid - 1;
+                }
 
-        //        else
-        //        {
-        //            return true;
-        //        }
-        //    }
-        //    return false;
-        //}
+                else
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
 
         //public bool BinarySearchRec(int first, int last, int[] mynumbers, int target)
         //{
@@ -340,5 +340,40 @@ namespace Utility
         //        return true;
         //    }
         //}
+
+        //public int NonStaticRec(int first, int second)
+        //{
+        //    return NonStaticRec(first, second);
+        //}
+
+
+        //public static int StaticRec(int first, int second)
+        //{
+        //    return StaticRec(first, second);
+        //}
+
+
+        public bool BinarySearchRec(int first, int last, int[] mynumbers, int target)
+        {
+            if (first == last)
+            {
+                return mynumbers[first] == target;
+            }
+
+            var mid = (first + last) / 2;
+
+            if (target < mynumbers[mid])
+            {
+                return BinarySearchRec(mid + 1, last, mynumbers, target);
+            }
+            if (target > mynumbers[mid])
+            {
+                return BinarySearchRec(first, mid - 1, mynumbers, target);
+            }
+            else
+            {
+                return true;
+            }
+        }
     }
 }
