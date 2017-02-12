@@ -11,12 +11,13 @@ namespace DoppleTry2.InstructionModifiers
 {
     class AddHelperReturnInstsModifer : IModifier
     {
+        private InstructionNodeFactory _InstructionNodeFactory = new InstructionNodeFactory();
         public void Modify(List<InstructionNode> instructionWrappers)
         {
             foreach (var callInst in instructionWrappers.Where(x => CodeGroups.CallCodes.Contains(x.Instruction.OpCode.Code)).ToArray())
             {
                 var opcode = Instruction.Create(OpCodes.Ret);
-                InstructionNode retInstWrapper = InstructionNodeFactory.GetInstructionWrapper(opcode, (MethodDefinition)callInst.Instruction.Operand);
+                InstructionNode retInstWrapper = _InstructionNodeFactory.GetInstructionWrapper(opcode, (MethodDefinition)callInst.Instruction.Operand);
                 retInstWrapper.ProgramFlowBackRoutes.AddTwoWay(callInst);
                 foreach (var forwardFlowInst in callInst.ProgramFlowForwardRoutes)
                 {

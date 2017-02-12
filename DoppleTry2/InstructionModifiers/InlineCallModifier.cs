@@ -18,6 +18,7 @@ namespace DoppleTry2.InstructionModifiers
         readonly ProgramFlowManager programFlowHanlder = new ProgramFlowManager();
         private static List<InstructionNode> MyInstructionNodes;
         private readonly Dictionary<MethodDefinition, int> inlinedCountPerMethod = new Dictionary<MethodDefinition, int>();
+        private InstructionNodeFactory _InstructionNodeFactory = new InstructionNodeFactory();
 
         public void Modify(List<InstructionNode> instructionNodes)
         {
@@ -62,9 +63,8 @@ namespace DoppleTry2.InstructionModifiers
             {
                 return new List<InstructionNode>();
             }
-            List<InstructionNode> inlinedNodes = calledFunc.Body.Instructions.Select(x => InstructionNodeFactory.GetInstructionWrapper(x, calledFunc)).ToList();
+            List<InstructionNode> inlinedNodes = calledFunc.Body.Instructions.Select(x => _InstructionNodeFactory.GetInstructionWrapper(x, calledFunc)).ToList();
             programFlowHanlder.AddFlowConnections(inlinedNodes);
-            //InFuncBackTrace(inlinedNodes);
             StitchProgramFlow(callNode, inlinedNodes[0]);
             List<InlineableCallNode> inlinedCallNodes = inlinedNodes.Where(x => x is InlineableCallNode).Cast<InlineableCallNode>().ToList();
             inlinedNodes.Except(inlinedCallNodes).ForEach(x => x.InliningProperties = callNode.InliningProperties);

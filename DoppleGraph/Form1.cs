@@ -86,14 +86,17 @@ namespace DoppleGraph
         private static double NewMethod(List<InstructionNode> Graph1, List<InstructionNode> Graph2)
         {
             NodePairings pairing1 = GraphSimilarityCalc.GetDistance(Graph1, Graph2);
-            double Score1 = (double) pairing1.Score / (double) GraphSimilarityCalc.GetSelfScore(pairing1.FirstGraph).Score;
             NodePairings pairing2 = GraphSimilarityCalc.GetDistance(Graph2, Graph1);
-            var newFormm = new NodePairingGraph(pairing2, GraphSimilarityCalc.GetSelfScore(pairing2.FirstGraph));
-            newFormm.Show();
+            if (Graph1 != Graph2)
+            {
+                var newFormm = new NodePairingGraph(pairing2, GraphSimilarityCalc.GetSelfScore(pairing2.FirstGraph));
+                newFormm.Show();
+                var newFormmm = new NodePairingGraph(pairing1, GraphSimilarityCalc.GetSelfScore(pairing1.FirstGraph));
+                newFormmm.Show();
+            }
+            double Score1 = (double) pairing1.Score / (double) GraphSimilarityCalc.GetSelfScore(pairing1.FirstGraph).Score;
             double Score2 = (double) pairing2.Score / (double) GraphSimilarityCalc.GetSelfScore(pairing2.FirstGraph).Score;
             Console.WriteLine("{0} = {1} {2}", Graph1[0].Method.Name, Graph2[0].Method.Name, (Score1+Score2)/2 );
-            var newFormmm = new NodePairingGraph(pairing1, GraphSimilarityCalc.GetSelfScore(pairing1.FirstGraph));
-            newFormmm.Show();
             return Math.Round((Score1 + Score2) / 2,2);
         }
     }

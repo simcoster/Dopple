@@ -8,8 +8,8 @@ namespace DoppleTry2.InstructionNodes
 {
     public class InstructionNodeFactory
     {
-        static SystemMethodsLoader systemMethodsLoader = new SystemMethodsLoader();
-        public static InstructionNode GetInstructionWrapper(Instruction instruction, MethodDefinition method)
+        SystemMethodsLoader systemMethodsLoader = new SystemMethodsLoader();
+        public InstructionNode GetInstructionWrapper(Instruction instruction, MethodDefinition method)
         {
             Code nodeCode = instruction.OpCode.Code;
             if (CodeGroups.CallCodes.Contains(nodeCode))

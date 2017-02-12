@@ -20,6 +20,7 @@ namespace DoppleTry2
         private MethodDefinition metDef;
         public List<InstructionNode> InstructionNodes;
         private readonly BackTraceManager _backTraceManager;
+        private InstructionNodeFactory _InstructionNodeFactory = new InstructionNodeFactory();
 
         public GraphBuilder(IEnumerable<InstructionNode> instNodes)
         {
@@ -29,7 +30,7 @@ namespace DoppleTry2
         {
             metDef = methodDefinition;
             InstructionNodes =
-                methodDefinition.Body.Instructions.Select(x => InstructionNodeFactory.GetInstructionWrapper(x, methodDefinition)).ToList();
+                methodDefinition.Body.Instructions.Select(x => _InstructionNodeFactory.GetInstructionWrapper(x, methodDefinition)).ToList();
             foreach (var inst in InstructionNodes)
             {
                 inst.InstructionIndex = InstructionNodes.IndexOf(inst);
@@ -52,7 +53,7 @@ namespace DoppleTry2
             BackTrace();
             RecursionFix();
             RemoveHelperCodes();
-            MergeSingleOperationNodes();
+            //MergeSingleOperationNodes();
             MergeSimilarInstructions();
             LdElemBackTrace();
             AddZeroNode();
@@ -171,7 +172,7 @@ namespace DoppleTry2
         private void AddZeroNode()
         {
             var inst = Instruction.Create(typeof(OpCodes).GetFields().Select(x => x.GetValue(null)).Cast<OpCode>().First(x => x.Code == Code.Nop));
-            var nodeZero = InstructionNodeFactory.GetInstructionWrapper(inst, metDef);
+            var nodeZero = _InstructionNodeFactory.GetInstructionWrapper(inst, metDef);
 
             foreach (var firstNode in InstructionNodes.Where(x => x.DataFlowBackRelated.Count == 0))
             {
