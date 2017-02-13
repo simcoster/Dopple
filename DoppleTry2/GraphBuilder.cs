@@ -36,8 +36,6 @@ namespace DoppleTry2
                 inst.InstructionIndex = InstructionNodes.IndexOf(inst);
             }
 
-            _preBacktraceModifiers = new IPreBacktraceModifier[] { new InlineCallModifier(), new RemoveUselessModifier() };
-
             _postBacktraceModifiers = new IPostBackTraceModifier[] { };
 
             _backTraceManager = new BackTraceManager(InstructionNodes);
@@ -53,7 +51,7 @@ namespace DoppleTry2
             BackTrace();
             RecursionFix();
             RemoveHelperCodes();
-            //MergeSingleOperationNodes();
+            ////MergeSingleOperationNodes();
             MergeSimilarInstructions();
             LdElemBackTrace();
             AddZeroNode();
@@ -61,6 +59,27 @@ namespace DoppleTry2
             Verify();
 
             return InstructionNodes;
+        }
+
+        private void RecursionFix()
+        {
+            foreach(var inlinedCallNode in InstructionNodes.Where(x => x is InlineableCallNode))
+            {
+                inlinedCallNode.DataFlowForwardRelated.RemoveAllTwoWay();
+            }
+            foreach(var recusriveMethodNodesGroup in InstructionNodes.GroupBy(x => new { x.Method, x.Instruction.Offset }).Where(x => x.Count() >1).ToList())
+            {
+                if (recusriveMethodNodesGroup.Count(x => !x.InliningProperties.Recursive) != 1)
+                {
+                    throw new Exception("only one non recursive instance should exist");
+                }
+                var nonRecursiveNode = recusriveMethodNodesGroup.First(x => !x.InliningProperties.Recursive);
+                foreach (var recursiveNode in recusriveMethodNodesGroup.Where(x => x.InliningProperties.Recursive))
+                {
+                    recursiveNode.MergeInto(nonRecursiveNode);
+                    InstructionNodes.Remove(recursiveNode);
+                }
+            }
         }
 
         private void MergeSingleOperationNodes()
@@ -95,11 +114,6 @@ namespace DoppleTry2
                     frontMostNode.SingleUnitNodes.Add(currNode);
                 }
             }
-        }
-
-        private void RecursionFix()
-        {
-            InlineCallModifier.PostBacktraceRecursionStitch(InstructionNodes);
         }
 
         private void LdElemBackTrace()
@@ -164,9 +178,9 @@ namespace DoppleTry2
             RemoveInstWrappers(InstructionNodes.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(InstructionNodes.Where(x => x is LdArgInstructionNode && x.DataFlowBackRelated.Count >0 && !x.DataFlowBackRelated.SelfFeeding));
             RemoveInstWrappers(InstructionNodes.Where(x => x is InlineableCallNode));
-            RemoveInstWrappers(InstructionNodes.Where(x => x is StIndInstructionNode && ((StIndInstructionNode)x).AddressType == AddressType.LocalVar));
-            RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Ret && x.DataFlowForwardRelated.Count >0 && !x.DataFlowBackRelated.SelfFeeding));
-            RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Dup));
+            RemoveInstWrappers(InstructionNodes.Where(x => x is StIndInstructionNode && ((StIndInstructionNode) x).AddressType == AddressType.LocalVar));
+            //RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Ret && x.DataFlowForwardRelated.Count >0 && !x.DataFlowBackRelated.SelfFeeding));
+            //RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Dup));
         }
 
         private void AddZeroNode()
@@ -293,10 +307,7 @@ namespace DoppleTry2
 
         private void InlineFunctionCalls()
         {
-            foreach (var modifier in _preBacktraceModifiers)
-            {
-                modifier.Modify(InstructionNodes);
-            }
+            new InlineCallModifier().Modify(InstructionNodes);
         }
 
         private void Verify()
@@ -339,8 +350,7 @@ namespace DoppleTry2
             foreach (var nodeToRemove in instsToRemove.ToArray())
             {
                 nodeToRemove.SelfRemove();
-                //TODO remove
-                //Verify();
+                Verify();
                 InstructionNodes.Remove(nodeToRemove);
                 var stillPointingToRemoved = InstructionNodes.Where(x => x.DataFlowBackRelated.Any(y => y.Argument == nodeToRemove)
                                                || x.DataFlowForwardRelated.Any(y => y.Argument == nodeToRemove)

@@ -42,7 +42,7 @@ namespace DoppleTry2.InstructionWrapperMembers
         }
         public void AddTwoWay(IEnumerable<InstructionNode> rangeToAdd)
         {
-            foreach (var backArgToAdd in rangeToAdd)
+            foreach (var backArgToAdd in rangeToAdd.ToArray())
             {
                 AddTwoWay(backArgToAdd);
             }

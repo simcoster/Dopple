@@ -10,22 +10,24 @@ namespace DoppleTry2.InstructionNodes
         public InlineableCallNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
             CalledFunction = (MethodDefinition)TargetMethod;
+            SetStackPushCount(CalledFunction);
         }
         public InlineableCallNode(Instruction instruction,MethodDefinition calledFunc, MethodDefinition method) : base(instruction, method)
         {
             CalledFunction = calledFunc;
+            SetStackPushCount(CalledFunction);
         }
-        //private void SetStackPushCount(MethodDefinition TargetMethod)
-        //{
-        //    if (TargetMethod.ReturnType.FullName == "System.Void")
-        //    {
-        //        StackPushCount = 0;
-        //    }
-        //    else
-        //    {
-        //        StackPushCount = 1;
-        //    }
-        //}
+        private void SetStackPushCount(MethodDefinition TargetMethod)
+        {
+            if (TargetMethod.ReturnType.FullName == "System.Void")
+            {
+                StackPushCount = 0;
+            }
+            else
+            {
+                StackPushCount = 1;
+            }
+        }
         public MethodDefinition CalledFunction { get; private set; }
     }
 }

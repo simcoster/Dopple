@@ -352,6 +352,20 @@ namespace Utility
         //    return StaticRec(first, second);
         //}
 
+        public int RecNeverEnds(int a)
+        {
+            if (a ==5)
+            {
+                return 3;
+            }
+            else
+            {
+                int b = 5;
+                int c = RecNeverEnds(a - 1);
+                b++;
+                return b + c;
+            }
+        }
 
         public bool BinarySearchRec(int first, int last, int[] mynumbers, int target)
         {

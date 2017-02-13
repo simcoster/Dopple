@@ -94,12 +94,7 @@ namespace DoppleTry2.InstructionNodes
         }
 
         private int GetStackPushCount(Instruction instruction)
-        {
-            if (InlineCallModifier.CallOpCodes.Contains(instruction.OpCode.Code))
-            {
-                return 0;
-            }
-
+        { 
             switch (instruction.OpCode.StackBehaviourPush)
             {
                 case StackBehaviour.Push0:
