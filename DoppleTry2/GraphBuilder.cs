@@ -49,23 +49,43 @@ namespace DoppleTry2
             InlineFunctionCalls();
             SetInstructionIndexes();
             BackTrace();
-            RecursionFix();
             RemoveHelperCodes();
-            ////MergeSingleOperationNodes();
+            //MergeSingleOperationNodes();
+            RecursionFix();
+            BackTraceConditionals();
             MergeSimilarInstructions();
             LdElemBackTrace();
-            AddZeroNode();
+            //AddZeroNode();
             SetInstructionIndexes();
             Verify();
 
             return InstructionNodes;
         }
 
+        private void BackTraceConditionals()
+        {
+            ConditionionalsBackTracer conditionalBacktracer = new ConditionionalsBackTracer(InstructionNodes);
+            foreach(var condNode in InstructionNodes.Where(x => x is ConditionalJumpNode))
+            {
+                conditionalBacktracer.AddBackDataflowConnections(condNode);
+            }
+        }
+
         private void RecursionFix()
         {
-            foreach(var inlinedCallNode in InstructionNodes.Where(x => x is InlineableCallNode))
+            foreach(var inlinedCallNode in InstructionNodes.Where(x => x is InlineableCallNode).ToArray())
             {
                 inlinedCallNode.DataFlowForwardRelated.RemoveAllTwoWay();
+                inlinedCallNode.DataFlowBackRelated.RemoveAllTwoWay();
+                inlinedCallNode.ProgramFlowBackAffected.RemoveAllTwoWay();
+                inlinedCallNode.ProgramFlowForwardAffecting.RemoveAllTwoWay();
+                foreach(var forwardRoute in inlinedCallNode.ProgramFlowForwardRoutes)
+                {
+                    forwardRoute.ProgramFlowBackRoutes.AddTwoWay(inlinedCallNode.ProgramFlowBackRoutes);
+                }
+                inlinedCallNode.ProgramFlowBackRoutes.RemoveAllTwoWay();
+                inlinedCallNode.ProgramFlowForwardRoutes.RemoveAllTwoWay();
+                InstructionNodes.Remove(inlinedCallNode);
             }
             foreach(var recusriveMethodNodesGroup in InstructionNodes.GroupBy(x => new { x.Method, x.Instruction.Offset }).Where(x => x.Count() >1).ToList())
             {
@@ -177,10 +197,9 @@ namespace DoppleTry2
             RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.LdLocCodes.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(InstructionNodes.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(InstructionNodes.Where(x => x is LdArgInstructionNode && x.DataFlowBackRelated.Count >0 && !x.DataFlowBackRelated.SelfFeeding));
-            RemoveInstWrappers(InstructionNodes.Where(x => x is InlineableCallNode));
             RemoveInstWrappers(InstructionNodes.Where(x => x is StIndInstructionNode && ((StIndInstructionNode) x).AddressType == AddressType.LocalVar));
-            //RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Ret && x.DataFlowForwardRelated.Count >0 && !x.DataFlowBackRelated.SelfFeeding));
-            //RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Dup));
+            RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Ret && x.DataFlowForwardRelated.Count > 0 && !x.DataFlowBackRelated.SelfFeeding));
+            RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Dup));
         }
 
         private void AddZeroNode()
@@ -350,7 +369,7 @@ namespace DoppleTry2
             foreach (var nodeToRemove in instsToRemove.ToArray())
             {
                 nodeToRemove.SelfRemove();
-                Verify();
+                //Verify();
                 InstructionNodes.Remove(nodeToRemove);
                 var stillPointingToRemoved = InstructionNodes.Where(x => x.DataFlowBackRelated.Any(y => y.Argument == nodeToRemove)
                                                || x.DataFlowForwardRelated.Any(y => y.Argument == nodeToRemove)

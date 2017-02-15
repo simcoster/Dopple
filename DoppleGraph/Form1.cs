@@ -23,7 +23,7 @@ namespace DoppleGraph
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            AssemblyDefinition mysecondLibrary = AssemblyDefinition.ReadAssembly(@"C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\Utility\bin\release\Utility.dll");
+            AssemblyDefinition mysecondLibrary = AssemblyDefinition.ReadAssembly(@"C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\Utility\bin\Release\Utility.dll");
             TypeDefinition typee = mysecondLibrary.MainModule.Types.First(x => x.Name == "Class1");
 
             var Graphs = new List<List<InstructionNode>>();
@@ -59,22 +59,17 @@ namespace DoppleGraph
                 csv.Append(',');
             }
             csv.AppendLine();
-            for (int i =0; i<Graphs.Count-1; i++)
+            for (int i =0; i<Graphs.Count; i++)
             {
-                for (int j=0; j < Graphs.Count; j++)
+                for (int j=-1; j < Graphs.Count; j++)
                 {
-                    if (j==0)
+                    if (j==-1)
                     {
                         csv.Append(Graphs[i][0].Method.Name);
-                        csv.Append(","); 
                     }
-                    if (j >= i)
+                    else
                     {
                         csv.Append(NewMethod(Graphs[i], Graphs[j]));
-                    }
-                    else if (j >= i + 1)
-                    {
-                        csv.Append(" ");
                     }
                     csv.Append(",");
                 }
@@ -87,17 +82,18 @@ namespace DoppleGraph
         {
             NodePairings pairing1 = GraphSimilarityCalc.GetDistance(Graph1, Graph2);
             NodePairings pairing2 = GraphSimilarityCalc.GetDistance(Graph2, Graph1);
-            if (Graph1 != Graph2)
+            if (Graph1 == Graph2)
             {
                 var newFormm = new NodePairingGraph(pairing2, GraphSimilarityCalc.GetSelfScore(pairing2.FirstGraph));
                 newFormm.Show();
                 var newFormmm = new NodePairingGraph(pairing1, GraphSimilarityCalc.GetSelfScore(pairing1.FirstGraph));
                 newFormmm.Show();
             }
-            double Score1 = (double) pairing1.Score / (double) GraphSimilarityCalc.GetSelfScore(pairing1.FirstGraph).Score;
-            double Score2 = (double) pairing2.Score / (double) GraphSimilarityCalc.GetSelfScore(pairing2.FirstGraph).Score;
-            Console.WriteLine("{0} = {1} {2}", Graph1[0].Method.Name, Graph2[0].Method.Name, (Score1+Score2)/2 );
-            return Math.Round((Score1 + Score2) / 2,2);
+            double Score1 = pairing1.Score;
+            double Score2 = pairing2.Score;
+            Console.WriteLine("{0} = {1} {2}", Graph1[0].Method.Name, Graph2[0].Method.Name, (Score1 + Score2) / 2);
+            double selfScoreSum = GraphSimilarityCalc.GetSelfScore(pairing1.FirstGraph).Score + GraphSimilarityCalc.GetSelfScore(pairing1.SecondGraph).Score;
+            return Math.Round((Score1 +Score2) / selfScoreSum, 2);
         }
     }
 }

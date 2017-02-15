@@ -37,7 +37,7 @@ namespace GraphSimilarityByMatching
                 }
                 else
                 {
-                    indexImportance = opCodeInfo.GetIndexImportance(firstEdge.DestinationVertex.Opcode);
+                    indexImportance = opCodeInfo.GetIndexImportance(vertexToMatch.Opcode);
                 }
                 if (indexImportance == IndexImportance.Critical)
                 {
@@ -48,26 +48,26 @@ namespace GraphSimilarityByMatching
                     predicate = x => x.EdgeType == firstEdge.EdgeType;
                 }
                 var relevantSecondEdges = unmachedSecondEdges.Where(predicate);
-                relevantSecondEdges.ForEach(secondEdge => pairingScores.Add(secondEdge, GetEdgeMatchScore(firstEdge, secondEdge, sharedSourceOrDest, pairings)));
-                var winningPairs = pairingScores.GroupBy(x => x.Value).OrderByDescending(x => x.Key).FirstOrDefault();
-                if (winningPairs == null)
+                relevantSecondEdges.ForEach(secondEdge => pairingScores.Add(secondEdge, GetEdgeMatchScore(firstEdge, secondEdge, sharedSourceOrDest, pairings, indexImportance)));
+                var possiblePairings = pairingScores.Where(x => x.Value > 0).GroupBy(x => x.Value).OrderByDescending(x => x.Key).FirstOrDefault();
+                if (possiblePairings == null)
                 {
                     edgePairings.Add(firstEdge, null);
                 }
                 else
                 {
-                    KeyValuePair<LabeledEdge,int> winningPair = winningPairs.ElementAt(rnd.Next(0, winningPairs.Count()));
+                    KeyValuePair<LabeledEdge,int> winningPair = possiblePairings.ElementAt(rnd.Next(0, possiblePairings.Count()));
                     edgePairings.Add(firstEdge, winningPair.Key);
                     unmachedSecondEdges.Remove(winningPair.Key);
-                    var winningMatchScore = GetEdgeMatchScore(firstEdge, winningPair.Key, sharedSourceOrDest, pairings, false);
+                    var winningMatchScore = GetEdgeMatchScore(firstEdge, winningPair.Key, sharedSourceOrDest, pairings, indexImportance, false);
                     totalScore += winningMatchScore;
                 }
             }
-            totalScore -= unmachedSecondEdges.Count * 1;
+            totalScore -= unmachedSecondEdges.Count * EdgeScorePoints.ExactMatch;
             return totalScore;
         }
 
-        public static int GetEdgeMatchScore(LabeledEdge firstEdge, LabeledEdge secondEdge, SharedSourceOrDest sharingSourceOrDest, NodePairings pairings, bool usePastPairings = true)
+        public static int GetEdgeMatchScore(LabeledEdge firstEdge, LabeledEdge secondEdge, SharedSourceOrDest sharingSourceOrDest, NodePairings pairings, IndexImportance indexImportance, bool usePastPairings = true)
         {
             int edgeMatchScore = 0;
             LabeledVertex firstEdgeVertex;
@@ -83,7 +83,7 @@ namespace GraphSimilarityByMatching
                 secondEdgeVertex = secondEdge.SourceVertex;
             }
 
-            if (secondEdge.Index == firstEdge.Index)
+            if (secondEdge.Index == firstEdge.Index && indexImportance != IndexImportance.NotImportant)
             {
                 edgeMatchScore += EdgeScorePoints.IndexMatch;
             }

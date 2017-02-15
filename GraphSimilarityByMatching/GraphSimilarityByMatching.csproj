@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EdgeScorePoints.cs" />
+    <Compile Include="MatchWeights.cs" />
     <Compile Include="SingleNodePairing.cs" />
     <Compile Include="SmallBigLinkEdge.cs" />
     <Compile Include="EdgeIndexInfo.cs" />

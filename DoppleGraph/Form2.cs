@@ -417,7 +417,7 @@ namespace DoppleGraph
         {
             foreach (var node in colNodes)
             {
-                 var nodesToUpdate = node.InstructionNode.DataFlowForwardRelated
+                var nodesToUpdate = node.InstructionNode.DataFlowForwardRelated
                 //var nodesToUpdate = node.InstructionNode.ProgramFlowForwardRoutes
                .Select(x => GetNodeWrapper(x.Argument))
                //.Select(x => GetNodeWrapper(x))

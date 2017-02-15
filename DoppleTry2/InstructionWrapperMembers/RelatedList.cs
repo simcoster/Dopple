@@ -37,6 +37,11 @@ namespace DoppleTry2.InstructionWrapperMembers
 
         public void AddTwoWay(InstructionNode toAdd)
         {
+            if (Contains(toAdd))
+            {
+                //No duplicities allowed
+                return;
+            }
             base.Add(toAdd);
             GetRelatedList(toAdd).Add(_ContainingNode);
         }

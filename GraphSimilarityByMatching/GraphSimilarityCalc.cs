@@ -44,7 +44,7 @@ namespace GraphSimilarityByMatching
                 {
                     vertexPossiblePairings.Add(secondGraphCandidate, GetScore(firstGraphVertex, secondGraphCandidate, nodePairing));
                 }
-                var winningPairs = vertexPossiblePairings.GroupBy(x => x.Value).OrderByDescending(x => x.Key).FirstOrDefault();
+                var winningPairs = vertexPossiblePairings.Where(x=> x.Value >0).GroupBy(x => x.Value).OrderByDescending(x => x.Key).FirstOrDefault();
                 if (winningPairs != null)
                 {
                     KeyValuePair<LabeledVertex, int> winningPair = winningPairs.ElementAt(rnd.Next(0, winningPairs.Count()));
@@ -53,7 +53,7 @@ namespace GraphSimilarityByMatching
                 }
                 else
                 {
-                    //nodePairing.Score -= VertexScorePoints.VertexExactMatch;
+                    nodePairing.Score -= VertexScorePoints.VertexExactMatch;
                 }
             }
             return nodePairing;
@@ -183,13 +183,18 @@ namespace GraphSimilarityByMatching
             }
         }
 
+        public static NodePairings GetSelfScore(List<InstructionNode> graph)
+        {
+            var labeledGraph = GetLabeled(graph);
+            return GetSelfScore(labeledGraph);
+        }
         public static NodePairings GetSelfScore(List<LabeledVertex> labeledGraph)
         {
             NodePairings nodePairings = new NodePairings(labeledGraph, labeledGraph);
-            foreach(var node in labeledGraph)
+            foreach (var node in labeledGraph)
             {
                 int score = VertexScorePoints.VertexExactMatch + node.BackEdges.Concat(node.ForwardEdges).Sum(x => EdgeScorePoints.ExactMatch);
-                nodePairings.Pairings[node].Add(new SingleNodePairing(node,score));
+                nodePairings.Pairings[node].Add(new SingleNodePairing(node, score));
                 nodePairings.Score += score;
             }
             return nodePairings;
