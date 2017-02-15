@@ -83,7 +83,7 @@ namespace GraphSimilarityByMatching
                 secondEdgeVertex = secondEdge.SourceVertex;
             }
 
-            if (secondEdge.Index == firstEdge.Index && indexImportance != IndexImportance.NotImportant)
+            if (secondEdge.Index == firstEdge.Index || indexImportance == IndexImportance.NotImportant)
             {
                 edgeMatchScore += EdgeScorePoints.IndexMatch;
             }

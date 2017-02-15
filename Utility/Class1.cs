@@ -10,28 +10,9 @@ namespace Utility
 {
     public class Class1
     {
-        public bool BinarySearch(int first, int last, int[] mynumbers, int target)
+        public static int SumInSingleStep(int a, int b)
         {
-            while (first <= last)
-            {
-                var mid = (first + last) / 2;
-
-                if (target < mynumbers[mid])
-                {
-                    first = mid + 1;
-                }
-
-                if (target > mynumbers[mid])
-                {
-                    last = mid - 1;
-                }
-
-                else
-                {
-                    return true;
-                }
-            }
-            return false;
+            return a + b;
         }
     }
 }

@@ -53,7 +53,7 @@ namespace GraphSimilarityByMatching
                 }
                 else
                 {
-                    nodePairing.Score -= VertexScorePoints.VertexExactMatch;
+                    nodePairing.Score -= VertexScorePoints.ExactMatch;
                 }
             }
             return nodePairing;
@@ -62,13 +62,17 @@ namespace GraphSimilarityByMatching
         private static int GetScore(LabeledVertex firstGraphVertex, LabeledVertex secondGraphVertex, NodePairings pairings)
         {
             int score = 0;
-            if (secondGraphVertex.Opcode == firstGraphVertex.Opcode)
+            if (firstGraphVertex.Opcode == secondGraphVertex.Opcode)
             {
-                score += VertexScorePoints.VertexExactMatch;
+                score += VertexScorePoints.CodeMatch;
             }
             else
             {
-                score += VertexScorePoints.VertexCodeFamilyMatch;
+                score += VertexScorePoints.CodeFamilyMatch;
+            }
+            if (firstGraphVertex.Operand == secondGraphVertex.Operand)
+            {
+                score += VertexScorePoints.OperandMatch;
             }
             var backEdgeScore = EdgeScorer.ScoreEdges(firstGraphVertex.BackEdges, secondGraphVertex.BackEdges, pairings, SharedSourceOrDest.Dest);
             var forwardEdgeScore = EdgeScorer.ScoreEdges(firstGraphVertex.ForwardEdges, secondGraphVertex.ForwardEdges, pairings, SharedSourceOrDest.Source);
@@ -193,7 +197,7 @@ namespace GraphSimilarityByMatching
             NodePairings nodePairings = new NodePairings(labeledGraph, labeledGraph);
             foreach (var node in labeledGraph)
             {
-                int score = VertexScorePoints.VertexExactMatch + node.BackEdges.Concat(node.ForwardEdges).Sum(x => EdgeScorePoints.ExactMatch);
+                int score = VertexScorePoints.ExactMatch + node.BackEdges.Concat(node.ForwardEdges).Sum(x => EdgeScorePoints.ExactMatch);
                 nodePairings.Pairings[node].Add(new SingleNodePairing(node, score));
                 nodePairings.Score += score;
             }
