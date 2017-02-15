@@ -166,7 +166,7 @@ namespace DoppleGraph
                 pairingScore = 0;
             }
             Color edgeColor = Color.FromArgb(Convert.ToInt32(255 - 255 * pairingScore), Convert.ToInt32(255 * pairingScore), 0);
-            link.ToolTipText = (pairingScore.ToString());
+            link.ToolTipText = (pairinigEdge.Score.ToString());
             link.Pen = new Pen(edgeColor);
             if (secondVertexWrapper == null || firstVertexWrapper == null)
             {

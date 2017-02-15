@@ -180,7 +180,7 @@ namespace DoppleTry2
                     foreach (var secondInstOption in secondInstOptions.ToArray())
                     {
                         var secondInstBackRelated = secondInstOption.DataFlowBackRelated.Where(x => x.Argument != secondInstOption);
-                        if (ArgList.SequenceEqualsDeep(secondInstBackRelated,firstInstBackRelated) && firstInst.DataFlowBackRelated.SelfFeeding == secondInstOption.DataFlowBackRelated.SelfFeeding)
+                        if (ArgList.SequenceEqualsWithIndexes(secondInstBackRelated,firstInstBackRelated) && firstInst.DataFlowBackRelated.SelfFeeding == secondInstOption.DataFlowBackRelated.SelfFeeding)
                         {
                             MergeNodes(new[] { firstInst, secondInstOption });
                             mergesWereDone = true;

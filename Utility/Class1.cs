@@ -10,9 +10,23 @@ namespace Utility
 {
     public class Class1
     {
-        public static int SumInSingleStep(int a, int b)
+
+        static public int TestRec(int[] arr, int left, int right)
         {
-            return a + b;
+            var lefttemp = left + 5;
+            var rightTemp = 4;
+            TestRec(arr, lefttemp, rightTemp);
+            TestRec(new int[4], lefttemp, rightTemp);
+            if (left >5)
+            {
+                return left;
+            }
+            return right;
+        }
+
+        public static int SumInSingleStep(int a, int b, int c)
+        {
+            return a + b + c;
         }
     }
 }

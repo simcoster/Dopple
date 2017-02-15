@@ -24,14 +24,37 @@ namespace DoppleTry2
             return base.Equals(obj);
         }
 
-        public static bool SequenceEqualsDeep(IEnumerable<IndexedArgument> firstList, IEnumerable<IndexedArgument> secondList)
+        public static bool SequenceEqualsWithIndexes(IEnumerable<IndexedArgument> firstList, IEnumerable<IndexedArgument> secondList)
         {
             if (firstList.GetType() != secondList.GetType())
             {
                 return false;
             }
-            return firstList.All(x => secondList.Any(y => y.ArgIndex == x.ArgIndex && x.Argument == y.Argument));
+            List<IndexedArgument> firstListCopy = new List<IndexedArgument>(firstList);
+            List<IndexedArgument> secondListCopy = new List<IndexedArgument>(secondList);
+            foreach(var indexedArg in firstList)
+            {
+                var secondListMatch = secondListCopy.FirstOrDefault(x => x.Argument == indexedArg.Argument && x.ArgIndex == indexedArg.ArgIndex);
+                if (secondListMatch == null)
+                {
+                    return false;
+                }
+                else
+                {
+                    firstListCopy.Remove(indexedArg);
+                    secondListCopy.Remove(secondListMatch);
+                }
+            }
+            if (secondListCopy.Count > 0)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
+
 
         protected readonly InstructionNode containingWrapper;
         public int MaxArgIndex = -1;

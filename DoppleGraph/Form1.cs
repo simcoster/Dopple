@@ -82,7 +82,7 @@ namespace DoppleGraph
         {
             NodePairings pairing1 = GraphSimilarityCalc.GetDistance(Graph1, Graph2);
             NodePairings pairing2 = GraphSimilarityCalc.GetDistance(Graph2, Graph1);
-            if (Graph1 == Graph2)
+            if (Graph1 != Graph2)
             {
                 var newFormm = new NodePairingGraph(pairing2, GraphSimilarityCalc.GetSelfScore(pairing2.FirstGraph));
                 newFormm.Show();
