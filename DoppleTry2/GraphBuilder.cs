@@ -50,7 +50,7 @@ namespace DoppleTry2
             SetInstructionIndexes();
             BackTrace();
             RemoveHelperCodes();
-            //MergeSingleOperationNodes();
+            MergeSingleOperationNodes();
             RecursionFix();
             BackTraceConditionals();
             MergeSimilarInstructions();
@@ -172,6 +172,7 @@ namespace DoppleTry2
                     var secondInstOptions = InstructionNodes
                                         .Where(x => x != firstInst)
                                         .Where(x => x.Instruction.OpCode.Code == firstInst.Instruction.OpCode.Code)
+                                        .Where(x => x.Instruction.Operand == firstInst.Instruction.Operand)
                                         .Where(x => typeof(OpCodes).GetFields().Select(y => y.GetValue(null))
                                                     .Cast<OpCode>().Where(y => y.StackBehaviourPop != StackBehaviour.Pop0).Select(y => y.Code)
                                                     .Contains(x.Instruction.OpCode.Code))

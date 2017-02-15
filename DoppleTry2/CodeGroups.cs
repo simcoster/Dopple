@@ -27,7 +27,8 @@ namespace DoppleTry2
         public static Code[] ArithmeticCodes = {Code.Add, Code.Add_Ovf, Code.Add_Ovf_Un, Code.Sub, Code.Sub_Ovf, Code.Sub_Ovf_Un, Code.Mul, Code.Mul_Ovf, Code.Mul_Ovf_Un,
                                                 Code.Div, Code.Div_Un};
         public static Code[] StIndCodes = { Code.Stind_I, Code.Stind_I1, Code.Stind_I2, Code.Stind_I4, Code.Stind_I8, Code.Stind_R4, Code.Stind_R8 };
-
+        public static Code[] LoadFieldCodes = { Code.Ldfld, Code.Ldsfld};
+        public static Code[] StoreFieldCodes = { Code.Stfld, Code.Stsfld};
         public static Code[][] CodeGroupLists = typeof(CodeGroups).GetFields().Select(x => x.GetValue(null)).Where(x => x is Code[]).Cast<Code[]>().ToArray();
         public static bool AreSameGroup (Code firstCode, Code secondCode)
         {

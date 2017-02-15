@@ -23,7 +23,7 @@ namespace DoppleTry2
                 //TypeDefinition type = library.MainModule.Types.First(x => x.FullName == "System.Linq.Enumerable");
                 foreach(var typeDef in library.MainModule.Types)
                 {
-                    foreach (var method in typeDef.Methods.Where(x => x.FullName.Contains("Array")).ToList())
+                    foreach (var method in typeDef.Methods.Where(x => x.FullName.Contains("Sum")).ToList())
                     {
                         if (SystemMethods.ContainsKey(method.FullName))
                         {

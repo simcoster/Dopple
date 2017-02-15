@@ -10,23 +10,15 @@ namespace Utility
 {
     public class Class1
     {
-
-        static public int TestRec(int[] arr, int left, int right)
+        public static int SumMe(int[] arr)
         {
-            var lefttemp = left + 5;
-            var rightTemp = 4;
-            TestRec(arr, lefttemp, rightTemp);
-            TestRec(new int[4], lefttemp, rightTemp);
-            if (left >5)
-            {
-                return left;
-            }
-            return right;
+            return arr.Sum();
         }
+    }
 
-        public static int SumInSingleStep(int a, int b, int c)
-        {
-            return a + b + c;
-        }
+    public class TwoNums
+    {
+        public int a;
+        public int b;
     }
 }
