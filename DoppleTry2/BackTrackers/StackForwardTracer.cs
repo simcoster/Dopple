@@ -50,7 +50,7 @@ namespace Dopple.BackTrackers
             {
                 if (stackedNodes.Count > 1)
                 {
-                    throw new StackPopException("Finished with extra nodes", visitedNodes);
+                    throw new StackPopException("Finished with extra nodes", visitedNodes.Concat(new[] { currentNode }).ToList());
                 }
                 return;
             }

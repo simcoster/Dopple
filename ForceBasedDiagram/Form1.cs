@@ -61,12 +61,15 @@ namespace ForceBasedDiagram
                 Form1 newForm = new Form1();
                 newForm.btnGenerate.Hide();
                 GraphBuilder backTraceManager = new GraphBuilder(method);
-                List<InstructionNode> instructionWrappers;
+                List<InstructionNode> instructionWrappers = new List<InstructionNode>();
                 try
                 {
                     instructionWrappers = backTraceManager.Run();
                 }
                 catch (StackPopException stackPopException)
+                {
+
+                }
 
                 List<GoNodeWrapper> nodeWrappers = new List<GoNodeWrapper>();
 

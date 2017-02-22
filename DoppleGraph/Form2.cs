@@ -289,19 +289,40 @@ namespace DoppleGraph
             {
                 foreach (var indexedArg in nodeWrapper.InstructionNode.DataFlowBackRelated)
                 {
-                    Color linkColor = GetPredefinedDataLinkColor(indexedArg.ArgIndex);
-                    GoLink edge = DrawEdge(nodeWrapper, myView, indexedArg.Argument, dataLinksLayer, new Pen(linkColor));
-                    edge.ToolTipText = indexedArg.ArgIndex.ToString();
+                    try
+                    {
+                        Color linkColor = GetPredefinedDataLinkColor(indexedArg.ArgIndex);
+                        GoLink edge = DrawEdge(nodeWrapper, myView, indexedArg.Argument, dataLinksLayer, new Pen(linkColor));
+                        edge.ToolTipText = indexedArg.ArgIndex.ToString();
+                    }
+                    catch
+                    {
+                        Console.WriteLine("Failed to draw edge");
+                    }
                 }
                 foreach (var indexedArg in nodeWrapper.InstructionNode.ProgramFlowBackAffected)
                 {
-                    Color linkColor = GetPredefinedFlowAffectLinkColor(indexedArg.ArgIndex);
-                    GoLink edge = DrawEdge(nodeWrapper, myView, indexedArg.Argument, flowAffectingLinksLayer, new Pen(linkColor));
-                    edge.ToolTipText = indexedArg.ArgIndex.ToString() + " " + edge.PenColor.R;
+                    try
+                    {
+                        Color linkColor = GetPredefinedFlowAffectLinkColor(indexedArg.ArgIndex);
+                        GoLink edge = DrawEdge(nodeWrapper, myView, indexedArg.Argument, flowAffectingLinksLayer, new Pen(linkColor));
+                        edge.ToolTipText = indexedArg.ArgIndex.ToString() + " " + edge.PenColor.R;
+                    }
+                    catch
+                    {
+                        Console.WriteLine("Failed to draw edge");
+                    }
                 }
                 foreach (var backRouteNode in nodeWrapper.InstructionNode.ProgramFlowBackRoutes)
                 {
-                    DrawEdge(nodeWrapper, myView, backRouteNode, flowRoutesLinksLayer, new Pen(Color.Black) { DashStyle = DashStyle.Dash });
+                    try
+                    {
+                        DrawEdge(nodeWrapper, myView, backRouteNode, flowRoutesLinksLayer, new Pen(Color.Black) { DashStyle = DashStyle.Dash });
+                    }
+                    catch
+                    {
+                        Console.WriteLine("Failed to draw edge");
+                    }
                 }
                 foreach (var backRelatedNode in nodeWrapper.InstructionNode.SingleUnitBackRelated)
                 {
@@ -383,7 +404,7 @@ namespace DoppleGraph
             SetRowIndexes(nodeWrappers);
             FixDuplicateCoordinates(nodeWrappers);
             int totalHeight = 1000;
-            int totalWidth = 2000;
+            int totalWidth = 16000;
             float heightOffset = Convert.ToSingle(totalHeight / nodeWrappers.Select(x => x.DisplayRow).Max());
             float widthOffset = Convert.ToSingle(totalWidth / nodeWrappers.Select(x => x.DisplayCol).Max());
             foreach (var nodeWrapper in nodeWrappers)
@@ -422,10 +443,12 @@ namespace DoppleGraph
         {
             foreach (var node in colNodes)
             {
-                var nodesToUpdate = node.InstructionNode.DataFlowForwardRelated
-                //var nodesToUpdate = node.InstructionNode.ProgramFlowForwardRoutes
-               .Select(x => GetNodeWrapper(x.Argument))
-               //.Select(x => GetNodeWrapper(x))
+                //var nodesToUpdate = node.InstructionNode.DataFlowForwardRelated
+                var nodesToUpdate = node.InstructionNode.ProgramFlowForwardRoutes
+               //.Select(x => GetNodeWrapper(x.Argument))
+               .Select(x => GetNodeWrapper(x))
+               //TODO remove, this hides a problem
+               .Where(x=> x != null)
                .Where(x => x.LongestPath.Count == 0 || !x.LongestPath.Intersect(node.LongestPath).SequenceEqual(x.LongestPath))
                .Where(x => x.LongestPath.Count < node.LongestPath.Count + 1)
                .ToList();

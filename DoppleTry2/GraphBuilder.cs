@@ -51,7 +51,14 @@ namespace Dopple
             _programFlowManager.AddFlowConnections(InstructionNodes);
             InlineFunctionCalls();
             SetInstructionIndexes();
-            BackTrace();
+            try
+            {
+                BackTrace();
+            }
+            catch(StackPopException stackPopException)
+            {
+                return stackPopException.problematicRoute;
+            }
             //RemoveHelperCodes();
             //RecursionFix();
             //MergeSingleOperationNodes();
