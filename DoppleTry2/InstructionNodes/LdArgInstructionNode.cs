@@ -3,7 +3,7 @@ using Mono.Cecil.Cil;
 using System;
 using System.Linq;
 
-namespace DoppleTry2.InstructionNodes
+namespace Dopple.InstructionNodes
 {
     public class LdArgInstructionNode : FunctionArgInstNode
     {
@@ -29,6 +29,22 @@ namespace DoppleTry2.InstructionNodes
                 default:
                     index = -1;
                     return false;
+            }
+        }
+        public override int StackPopCount
+        {
+            get
+            {
+                if (InliningProperties.Inlined)
+                {
+                    return 0;
+                }
+                return base.StackPopCount;
+            }
+
+            set
+            {
+                base.StackPopCount = value;
             }
         }
     }

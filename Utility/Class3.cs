@@ -10,42 +10,54 @@ namespace Utility
 {
     public class Class3
     {
-        public void SimpleTwoLoops()
-        {
+        private int Counter;
 
-            int j = 0;
-            if (j> 5)
-            {
-                Console.Write("blah");
-            } 
+        Task AsyncLoop()
+        {
+            return AsyncLoopTask().ContinueWith(t =>
+                Counter = t.Result,
+                TaskScheduler.FromCurrentSynchronizationContext());
         }
-        public int SumArray(int[] array)
+        Task<int> AsyncLoopTask()
         {
-            int sum = 0;
-            for(int i=0; i <array.Length; i++)
-            {
-                sum += array[i];
-            }
-
-            return sum;
+            var tcs = new TaskCompletionSource<int>();
+            DoIteration(tcs);
+            return tcs.Task;
+        }
+        void DoIteration(TaskCompletionSource<int> tcs)
+        {
+            LoadNextItem().ContinueWith(t => {
+                if (t.Exception != null)
+                {
+                    tcs.TrySetException(t.Exception.InnerException);
+                }
+                else if (t.Result.Contains("a"))
+                {
+                    tcs.TrySetResult(t.Result.Length);
+                }
+                else
+                {
+                    DoIteration(tcs);
+                }
+            });
         }
 
-        public static int SumArrayInStages(int[] array)
+        private Task<string> LoadNextItem()
         {
-            int sumEven = 0;
-            for (int i = 0; i < array.Length; i +=2)
+            throw new NotImplementedException();
+        }
+
+        async Task AsyncLoopAsync()
+        {
+            while (true)
             {
-                sumEven += array[i];
+                string result = await LoadNextItem();
+                if (result.Contains("target"))
+                {
+                    Counter = result.Length;
+                    break;
+                }
             }
-
-            int sumOdd = 0;
-            for (int i = 1; i < array.Length; i += 2)
-            {
-                sumOdd += array[i];
-            }
-
-            return sumEven + sumOdd;
-
         }
     }
 }

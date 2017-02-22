@@ -1,11 +1,11 @@
-﻿using DoppleTry2.InstructionNodes;
+﻿using Dopple.InstructionNodes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DoppleTry2.BackTrackers
+namespace Dopple.BackTrackers
 {
     public class StackForwardTracer
     {
@@ -34,6 +34,11 @@ namespace DoppleTry2.BackTrackers
             }            
             for (int i=0; i < currentNode.StackPopCount; i++)
             {
+                //TODO remove
+                //if (stackedNodes.Count ==0)
+                //{
+                //    continue;
+                //}
                 currentNode.DataFlowBackRelated.AddTwoWay(stackedNodes.Pop(), currentNode.StackPopCount - i - 1);
             }
             for (int i = 0; i < currentNode.StackPushCount; i++)
@@ -45,7 +50,7 @@ namespace DoppleTry2.BackTrackers
             {
                 if (stackedNodes.Count > 1)
                 {
-                    throw new Exception("someone didn't get everything");
+                    throw new StackPopException("Finished with extra nodes", visitedNodes);
                 }
                 return;
             }

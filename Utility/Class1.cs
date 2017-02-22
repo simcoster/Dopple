@@ -10,15 +10,9 @@ namespace Utility
 {
     public class Class1
     {
-        public static int SumMe(int[] arr)
+       public static IEnumerable<bool> SelectMe(int[] arr)
         {
-            return arr.Sum();
+            return arr.Select(x => x > 5);
         }
-    }
-
-    public class TwoNums
-    {
-        public int a;
-        public int b;
     }
 }

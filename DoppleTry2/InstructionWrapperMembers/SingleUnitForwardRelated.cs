@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using DoppleTry2.InstructionWrapperMembers;
+using Dopple.InstructionWrapperMembers;
 
-namespace DoppleTry2.InstructionNodes
+namespace Dopple.InstructionNodes
 {
     public class SingleUnitForwardRelated : RelatedList
     {

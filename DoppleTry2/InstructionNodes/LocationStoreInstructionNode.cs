@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Mono.Cecil.Cil;
 using Mono.Cecil;
 
-namespace DoppleTry2.InstructionNodes
+namespace Dopple.InstructionNodes
 {
     public class LocationStoreInstructionNode : LocationInstructionNode
     {

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DoppleTry2.InstructionNodes;
+using Dopple.InstructionNodes;
 
-namespace DoppleTry2.VerifierNs
+namespace Dopple.VerifierNs
 {
     class ArgRemovedVerifier : Verifier
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace DoppleTry2.InstructionNodes
+namespace Dopple.InstructionNodes
 {
     public class InliningProperties
     {

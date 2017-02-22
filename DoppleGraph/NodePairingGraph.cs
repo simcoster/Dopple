@@ -34,7 +34,7 @@ namespace DoppleGraph
             SecondGraphNodes = pairings.FirstGraph.Select(x => new GoLabeledVertexWrapper(new GoTextNodeHoverable(), x)).ToList();
             AllNodeWrappers = SecondGraphNodes.Concat(FirstGraphNodes).ToList();
             InitializeComponent();
-            ScoreLbl.Text = ((double)pairings.Score / (double)selfPairing.Score).ToString();
+            ScoreLbl.Text = ((double)pairings.TotalScore / (double)selfPairing.TotalScore).ToString();
         }
 
         private void NodePairingGraph_Load(object sender, EventArgs e)
@@ -160,13 +160,13 @@ namespace DoppleGraph
             
             var firstVertexWrapper = FirstGraphNodes.First(x => x.LabledVertex == pairinigEdge.FirstGraphVertex);
             var secondVertexWrapper = SecondGraphNodes.First(x => x.LabledVertex == pairinigEdge.SecondGraphVertex);
-            double pairingScore = (double) pairinigEdge.Score / (double) _selfPairings.Pairings[pairinigEdge.SecondGraphVertex].First().PairingScore;
+            double pairingScore = (double) pairinigEdge.Score / (double) _selfPairings.Pairings[pairinigEdge.FirstGraphVertex].First().PairingScore;
             if (pairingScore < 0)
             {
                 pairingScore = 0;
             }
             Color edgeColor = Color.FromArgb(Convert.ToInt32(255 - 255 * pairingScore), Convert.ToInt32(255 * pairingScore), 0);
-            link.ToolTipText = (pairinigEdge.Score.ToString());
+            link.ToolTipText = (pairingScore.ToString());
             link.Pen = new Pen(edgeColor);
             if (secondVertexWrapper == null || firstVertexWrapper == null)
             {

@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DoppleTry2.InstructionNodes;
-using DoppleTry2;
+using Dopple.InstructionNodes;
+using Dopple;
 
 namespace GraphSimilarity.EditOperations
 {

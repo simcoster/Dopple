@@ -1,4 +1,4 @@
-﻿using DoppleTry2.InstructionNodes;
+﻿using Dopple.InstructionNodes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DoppleTry2
+namespace Dopple
 {
     public abstract class ArgList : List<IndexedArgument>, IMergable
     {
@@ -151,8 +151,7 @@ namespace DoppleTry2
             {
                 if (!this.Any(x => x.ArgIndex == i))
                 {
-                    //TODO remove
-                    //throw new Exception("Index missing");
+                    throw new Exception("Index missing");
                 }
             }
         }

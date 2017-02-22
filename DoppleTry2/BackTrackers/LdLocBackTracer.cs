@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Mono.Cecil.Cil;
-using DoppleTry2.InstructionNodes;
+using Dopple.InstructionNodes;
 
-namespace DoppleTry2.BackTrackers
+namespace Dopple.BackTrackers
 {
     public class LdLocBackTracer : SingeIndexBackTracer
     {

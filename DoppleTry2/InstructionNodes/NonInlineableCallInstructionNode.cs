@@ -2,7 +2,7 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
-namespace DoppleTry2.InstructionNodes
+namespace Dopple.InstructionNodes
 {
     internal class NonInlineableCallInstructionNode : CallNode
     {

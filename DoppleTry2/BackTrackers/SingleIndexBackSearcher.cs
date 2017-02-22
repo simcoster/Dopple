@@ -1,11 +1,11 @@
-﻿using DoppleTry2.InstructionNodes;
+﻿using Dopple.InstructionNodes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DoppleTry2.BackTrackers
+namespace Dopple.BackTrackers
 {
     public class SingleIndexBackSearcher
     {
@@ -21,6 +21,7 @@ namespace DoppleTry2.BackTrackers
             List<InstructionNode> foundBackInstructions = SafeSearchBackwardsForDataflowInstrcutions(predicate, startInstruction);
             if (foundBackInstructions.Count == 0)
             {
+                //TODO remove
                  //throw new Exception("Reached first instWrapper without correct one found");
             }
             return foundBackInstructions;

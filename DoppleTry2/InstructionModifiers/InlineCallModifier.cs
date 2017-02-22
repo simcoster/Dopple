@@ -5,19 +5,23 @@ using System.Text;
 using System.Threading.Tasks;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using DoppleTry2.BackTrackers;
-using DoppleTry2.ProgramFlowHanlder;
-using DoppleTry2.InstructionNodes;
+using Dopple.BackTrackers;
+using Dopple.ProgramFlowHanlder;
+using Dopple.InstructionNodes;
 using System.Diagnostics;
 
-namespace DoppleTry2.InstructionModifiers
+namespace Dopple.InstructionModifiers
 {
     class InlineCallModifier : IPreBacktraceModifier
     {
         readonly ProgramFlowManager programFlowHanlder = new ProgramFlowManager();
         private readonly Dictionary<MethodDefinition, int> inlinedInstancesCountPerMethod = new Dictionary<MethodDefinition, int>();
-        private InstructionNodeFactory _InstructionNodeFactory = new InstructionNodeFactory();
-
+        private InstructionNodeFactory _InstructionNodeFactory;
+        
+        public InlineCallModifier(InstructionNodeFactory instructionNodeFactory)
+        {
+            _InstructionNodeFactory = instructionNodeFactory;
+        }
         public void Modify(List<InstructionNode> instructionNodes)
         {
             var callNodes = instructionNodes.Where(x => x is InlineableCallNode).Cast<InlineableCallNode>().ToArray();
@@ -45,8 +49,8 @@ namespace DoppleTry2.InstructionModifiers
             {
                 callNode.StackPushCount = 0;
             }
-            List<InstructionNode> inlinedNodes = calledFunc.Body.Instructions.Select(x => _InstructionNodeFactory.GetInstructionWrapper(x, calledFunc)).ToList();
-            inlinedNodes.ForEach(x => SetCallNodeProps(x, callSequenceClone));
+            List<InstructionNode> inlinedNodes = calledFunc.Body.Instructions.SelectMany(x => _InstructionNodeFactory.GetInstructionNodes(x, calledFunc)).ToList();
+            inlinedNodes.ForEach(x => SetNodeProps(x, callSequenceClone));
             programFlowHanlder.AddFlowConnections(inlinedNodes);
             StitchProgramFlow(callNode, inlinedNodes[0]);
             foreach (var lastInlinedNode in inlinedNodes.Where(x => x.ProgramFlowForwardRoutes.Count == 0))
@@ -61,10 +65,10 @@ namespace DoppleTry2.InstructionModifiers
             return inlinedNodes;
         }
 
-        private void SetCallNodeProps(InstructionNode inlinedNode, List<MethodDefinition> callSequence)
+        private void SetNodeProps(InstructionNode inlinedNode, List<MethodDefinition> callSequence)
         {
             inlinedNode.InliningProperties.Inlined = true;
-            if (callSequence.Contains(inlinedNode.Method))
+            if (callSequence.Contains(inlinedNode.Method) && inlinedNode.Instruction.OpCode.Code != Code.Callvirt)
             {
                 inlinedNode.InliningProperties.Recursive = true;
                 inlinedNode.InliningProperties.RecursionLevel = callSequence.Count(x => x == inlinedNode.Method);

@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using DoppleTry2.VerifierNs;
+using Dopple.VerifierNs;
 
-namespace DoppleTry2.InstructionNodes
+namespace Dopple.InstructionNodes
 {
     class StElemInstructionNode : InstructionNode
     {

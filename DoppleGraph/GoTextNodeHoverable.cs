@@ -1,4 +1,4 @@
-﻿using DoppleTry2;
+﻿using Dopple;
 using Northwoods.Go;
 using System;
 using System.Collections.Generic;

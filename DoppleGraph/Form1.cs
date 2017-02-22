@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
-using DoppleTry2;
+using Dopple;
 using Mono.Cecil;
-using DoppleTry2.InstructionNodes;
+using Dopple.InstructionNodes;
 using System.Diagnostics;
 using GraphSimilarityByMatching;
 using System.Text;
@@ -84,16 +84,24 @@ namespace DoppleGraph
             NodePairings pairing2 = GraphSimilarityCalc.GetDistance(Graph2, Graph1);
             if (Graph1 != Graph2)
             {
-                var newFormm = new NodePairingGraph(pairing2, GraphSimilarityCalc.GetSelfScore(pairing2.FirstGraph));
+                var newFormm = new NodePairingGraph(pairing2, GraphSimilarityCalc.GetSelfScore(pairing2.SecondGraph));
                 newFormm.Show();
-                var newFormmm = new NodePairingGraph(pairing1, GraphSimilarityCalc.GetSelfScore(pairing1.FirstGraph));
+                var newFormmm = new NodePairingGraph(pairing1, GraphSimilarityCalc.GetSelfScore(pairing1.SecondGraph));
                 newFormmm.Show();
             }
-            double Score1 = pairing1.Score;
-            double Score2 = pairing2.Score;
+            double Score1 = pairing1.TotalScore;
+            double Score2 = pairing2.TotalScore;
             Console.WriteLine("{0} = {1} {2}", Graph1[0].Method.Name, Graph2[0].Method.Name, (Score1 + Score2) / 2);
-            double selfScoreSum = GraphSimilarityCalc.GetSelfScore(pairing1.FirstGraph).Score + GraphSimilarityCalc.GetSelfScore(pairing1.SecondGraph).Score;
-            return Math.Round((Score1 +Score2) / selfScoreSum, 2);
+            double selfScoreSum = GraphSimilarityCalc.GetSelfScore(pairing1.SecondGraph).TotalScore + GraphSimilarityCalc.GetSelfScore(pairing2.SecondGraph).TotalScore;
+            double normalizedScore =  Math.Round((Score1 +Score2) / selfScoreSum, 2);
+            if (normalizedScore < 0)
+            {
+                return 0;
+            }
+            else
+            {
+                return normalizedScore;
+            }
         }
     }
 }

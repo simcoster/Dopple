@@ -8,10 +8,10 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
-using DoppleTry2.BackTrackers;
+using Dopple.BackTrackers;
 using Utility;
 
-namespace DoppleTry2
+namespace Dopple
 {
     class Program
     {

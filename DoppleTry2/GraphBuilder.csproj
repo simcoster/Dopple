@@ -68,17 +68,22 @@
   <ItemGroup>
     <Compile Include="BackTrackers\BackTraceManager.cs" />
     <Compile Include="BackTrackers\ConditionionalsBackTracer.cs" />
+    <Compile Include="BackTrackers\InlinedNewObjBackTracer.cs" />
     <Compile Include="BackTrackers\RecursiveBacktracer.cs" />
     <Compile Include="BackTrackers\SingleArithmeticWithConstantBacktracer.cs" />
     <Compile Include="BackTrackers\SingleConditionOperationUnitBackTracer.cs" />
     <Compile Include="BackTrackers\StackForwardTracer.cs" />
+    <Compile Include="BackTrackers\StackPopException.cs" />
     <Compile Include="BackTrackers\StIndBackTracer.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="InstructionModifiers\SetStackPopPushForCalls.cs" />
     <Compile Include="InstructionModifiers\SingleFuncInlineCall.cs" />
     <Compile Include="InstructionNodes\CallNode.cs" />
     <Compile Include="InstructionNodes\ConditionalJumpNode.cs" />
+    <Compile Include="InstructionNodes\ConstructorCallNode.cs" />
     <Compile Include="InstructionNodes\IMergable.cs" />
+    <Compile Include="InstructionNodes\LoadFunctionNode.cs" />
+    <Compile Include="InstructionNodes\NewObjectNode.cs" />
     <Compile Include="InstructionNodes\NewObjInstructionNode.cs" />
     <Compile Include="InstructionNodes\RetInstructionNode.cs" />
     <Compile Include="InstructionNodes\StElemInstructionNode.cs" />

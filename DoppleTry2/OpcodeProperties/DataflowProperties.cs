@@ -1,7 +1,7 @@
 using System.Linq;
 using Mono.Cecil.Cil;
 
-namespace DoppleTry2.OpcodeProperties
+namespace Dopple.OpcodeProperties
 {
     public class DataflowProperties
     {

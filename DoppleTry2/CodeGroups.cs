@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DoppleTry2
+namespace Dopple
 {
     public static class CodeGroups
     {

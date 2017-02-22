@@ -1,5 +1,5 @@
-﻿using DoppleTry2.InstructionNodes;
-using DoppleTry2.VerifierNs;
+﻿using Dopple.InstructionNodes;
+using Dopple.VerifierNs;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System;
@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace DoppleTry2.VerifierNs
+namespace Dopple.VerifierNs
 {
     class StElemVerifier : Verifier
     {
@@ -26,8 +26,7 @@ namespace DoppleTry2.VerifierNs
             var ldArgGroup = instructionWrapper.DataFlowBackRelated.Where(x => x.ArgIndex == 0);
             if (!ldArgGroup.All(x => IsProvidingArray(x.Argument)))
             {
-                //TODO remove
-                //throw new Exception("Bad array reference argument");
+                throw new Exception("Bad array reference argument");
             }
             var locationArgGroup = instructionWrapper.DataFlowBackRelated.Where(x => x.ArgIndex == 1);
             if (!locationArgGroup.All(x => IsProvidingNumber(x.Argument)))

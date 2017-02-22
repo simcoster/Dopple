@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using DoppleTry2.InstructionNodes;
+using Dopple.InstructionNodes;
 
-namespace DoppleTry2.BackTrackers
+namespace Dopple.BackTrackers
 {
     public abstract class RecursiveBacktracer : BackTracer
     {

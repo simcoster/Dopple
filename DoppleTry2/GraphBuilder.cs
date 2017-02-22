@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using DoppleTry2.BackTrackers;
-using DoppleTry2.InstructionModifiers;
-using DoppleTry2.ProgramFlowHanlder;
+using Dopple.BackTrackers;
+using Dopple.InstructionModifiers;
+using Dopple.ProgramFlowHanlder;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using DoppleTry2.VerifierNs;
-using DoppleTry2.InstructionNodes;
+using Dopple.VerifierNs;
+using Dopple.InstructionNodes;
 
-namespace DoppleTry2
+namespace Dopple
 {
     public class GraphBuilder
     {
@@ -21,16 +21,18 @@ namespace DoppleTry2
         public List<InstructionNode> InstructionNodes;
         private readonly BackTraceManager _backTraceManager;
         private InstructionNodeFactory _InstructionNodeFactory = new InstructionNodeFactory();
+        private InlineCallModifier _inlineCallModifier;
 
         public GraphBuilder(IEnumerable<InstructionNode> instNodes)
         {
             InstructionNodes = instNodes.ToList();
+            _inlineCallModifier = new InlineCallModifier(_InstructionNodeFactory);
         }
         public GraphBuilder(MethodDefinition methodDefinition)
         {
             metDef = methodDefinition;
             InstructionNodes =
-                methodDefinition.Body.Instructions.Select(x => _InstructionNodeFactory.GetInstructionWrapper(x, methodDefinition)).ToList();
+                methodDefinition.Body.Instructions.SelectMany(x => _InstructionNodeFactory.GetInstructionNodes(x, methodDefinition)).ToList();
             foreach (var inst in InstructionNodes)
             {
                 inst.InstructionIndex = InstructionNodes.IndexOf(inst);
@@ -39,6 +41,7 @@ namespace DoppleTry2
             _postBacktraceModifiers = new IPostBackTraceModifier[] { };
 
             _backTraceManager = new BackTraceManager(InstructionNodes);
+            _inlineCallModifier = new InlineCallModifier(_InstructionNodeFactory);
         }
 
 
@@ -49,15 +52,15 @@ namespace DoppleTry2
             InlineFunctionCalls();
             SetInstructionIndexes();
             BackTrace();
-            RemoveHelperCodes();
-            MergeSingleOperationNodes();
-            RecursionFix();
-            BackTraceConditionals();
-            MergeSimilarInstructions();
-            LdElemBackTrace();
+            //RemoveHelperCodes();
+            //RecursionFix();
+            //MergeSingleOperationNodes();
+            //BackTraceConditionals();
+            //MergeSimilarInstructions();
+            //LdElemBackTrace();
             //AddZeroNode();
             SetInstructionIndexes();
-            Verify();
+            //Verify();
 
             return InstructionNodes;
         }
@@ -206,7 +209,7 @@ namespace DoppleTry2
         private void AddZeroNode()
         {
             var inst = Instruction.Create(typeof(OpCodes).GetFields().Select(x => x.GetValue(null)).Cast<OpCode>().First(x => x.Code == Code.Nop));
-            var nodeZero = _InstructionNodeFactory.GetInstructionWrapper(inst, metDef);
+            InstructionNode nodeZero = _InstructionNodeFactory.GetSingleInstructionNode(inst, metDef);
 
             foreach (var firstNode in InstructionNodes.Where(x => x.DataFlowBackRelated.Count == 0))
             {
@@ -240,6 +243,8 @@ namespace DoppleTry2
             {
                 _backTraceManager.BackTrace(instWrapper);
             }
+            //TODO remove
+            return;
             var stIndAddressBackTracer = new StIndAddressBackTracer(InstructionNodes);
             foreach (var instWrapper in InstructionNodes.Where(x => stIndAddressBackTracer.HandlesCodes.Contains(x.Instruction.OpCode.Code)).OrderByDescending(x => x.InstructionIndex))
             {
@@ -327,7 +332,7 @@ namespace DoppleTry2
 
         private void InlineFunctionCalls()
         {
-            new InlineCallModifier().Modify(InstructionNodes);
+            _inlineCallModifier.Modify(InstructionNodes);
         }
 
         private void Verify()

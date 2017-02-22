@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using DoppleTry2.InstructionNodes;
-using DoppleTry2.VerifierNs;
+using Dopple.InstructionNodes;
+using Dopple.VerifierNs;
 using System.Linq;
 
-namespace DoppleTry2
+namespace Dopple
 {
     internal class ArgIndexVerifier : Verifier
     {

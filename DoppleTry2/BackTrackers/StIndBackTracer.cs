@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DoppleTry2.InstructionNodes;
+using Dopple.InstructionNodes;
 using Mono.Cecil.Cil;
 
-namespace DoppleTry2.BackTrackers
+namespace Dopple.BackTrackers
 {
     class StIndAddressBackTracer : BackTracer
     {

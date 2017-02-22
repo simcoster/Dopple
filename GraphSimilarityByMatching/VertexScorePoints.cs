@@ -12,6 +12,6 @@ namespace GraphSimilarityByMatching
         public const int CodeMatch = 2;
         public const int OperandMatch = 1;
         public const int ExactMatch = CodeMatch + OperandMatch;
-        public const int SingleToMultipleVertexMatchPenalty = 1;
+        public const int SingleToMultipleVertexMatchPenalty = 10;
     }
 }

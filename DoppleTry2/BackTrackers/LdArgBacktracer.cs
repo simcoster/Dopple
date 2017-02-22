@@ -4,17 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Mono.Cecil.Cil;
-using DoppleTry2.InstructionNodes;
+using Dopple.InstructionNodes;
 
-namespace DoppleTry2.BackTrackers
+namespace Dopple.BackTrackers
 {
     class LdArgBacktracer : SingeIndexBackTracer
     {
-        public LdArgBacktracer(List<InstructionNode> instructionNodes, BackTraceManager backtraceManager) : base(instructionNodes)
+        public LdArgBacktracer(List<InstructionNode> instructionNodes) : base(instructionNodes)
         {
-            this.backtraceManager = backtraceManager;
         }
-        private readonly BackTraceManager backtraceManager;
         protected override IEnumerable<InstructionNode> GetDataflowBackRelatedArgGroup(InstructionNode instNode)
         {
             if (instNode.InliningProperties.Inlined)
@@ -23,10 +21,6 @@ namespace DoppleTry2.BackTrackers
                 var argSuppliers = new List<InstructionNode>();
                 foreach(var inlinedCall in inlinedCalls)
                 {
-                    if (inlinedCall.StackPopCount > 0)
-                    {
-                        backtraceManager.BackTrace(inlinedCall);
-                    }
                     argSuppliers.AddRange(inlinedCall.DataFlowBackRelated.Where(x => x.ArgIndex == ((LdArgInstructionNode) instNode).ArgIndex).Select(x => x.Argument));
                 }
                 return argSuppliers;          

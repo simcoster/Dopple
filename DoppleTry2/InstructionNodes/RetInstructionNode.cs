@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
-namespace DoppleTry2.InstructionNodes
+namespace Dopple.InstructionNodes
 {
     class RetInstructionNode : InstructionNode
     {

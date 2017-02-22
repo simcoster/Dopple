@@ -1,5 +1,5 @@
-﻿using DoppleTry2;
-using DoppleTry2.InstructionNodes;
+﻿using Dopple;
+using Dopple.InstructionNodes;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Northwoods.Go;
@@ -247,10 +247,15 @@ namespace DoppleGraph
 
             int minIndexInt = Convert.ToInt32(minIndex.Text);
             int maxIndexInt = Convert.ToInt32(maxIndex.Text);
+            if (maxIndexInt <= minIndexInt)
+            {
+                return;
+            }
             var nodesToShow = InstructionNodes
                                 .Where(x => x.InstructionIndex >= minIndexInt && x.InstructionIndex <= maxIndexInt)
                                 .Select(x => GetNodeWrapper(x).Node)
                                 .ToList();
+            ObjectsToHide[HiddenNodesHideIndex].Clear();
             ObjectsToHide[HiddenNodesHideIndex].AddRange(GetObjectsToHide(nodesToShow));
             ReShow();
         }
@@ -378,7 +383,7 @@ namespace DoppleGraph
             SetRowIndexes(nodeWrappers);
             FixDuplicateCoordinates(nodeWrappers);
             int totalHeight = 1000;
-            int totalWidth = 1000;
+            int totalWidth = 2000;
             float heightOffset = Convert.ToSingle(totalHeight / nodeWrappers.Select(x => x.DisplayRow).Max());
             float widthOffset = Convert.ToSingle(totalWidth / nodeWrappers.Select(x => x.DisplayCol).Max());
             foreach (var nodeWrapper in nodeWrappers)

@@ -1,6 +1,6 @@
 ﻿using C5;
-using DoppleTry2;
-using DoppleTry2.InstructionNodes;
+using Dopple;
+using Dopple.InstructionNodes;
 using GraphSimilarity.EditOperations;
 using Mono.Cecil.Cil;
 using System;

@@ -1,5 +1,5 @@
-﻿using DoppleTry2.InstructionNodes;
-using DoppleTry2.ProgramFlowHanlder;
+﻿using Dopple.InstructionNodes;
+using Dopple.ProgramFlowHanlder;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DoppleTry2.InstructionModifiers
+namespace Dopple.InstructionModifiers
 {
     class SingleFuncInlineCall
     {

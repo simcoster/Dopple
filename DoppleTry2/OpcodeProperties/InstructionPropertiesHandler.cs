@@ -1,6 +1,6 @@
 ﻿using Mono.Cecil.Cil;
 
-namespace DoppleTry2.OpcodeProperties
+namespace Dopple.OpcodeProperties
 {
     public static class InstructionPropertiesHandler
     {

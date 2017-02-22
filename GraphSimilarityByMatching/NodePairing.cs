@@ -14,6 +14,6 @@ namespace GraphSimilarityByMatching
         public List<LabeledVertex> FirstGraph { get; set; }
         public List<LabeledVertex> SecondGraph { get; set; }
         public Dictionary<LabeledVertex, List<SingleNodePairing>> Pairings { get; set; } = new Dictionary<LabeledVertex, List<SingleNodePairing>>();
-        public double Score { get; set; } = 0;
+        public double TotalScore { get; set; } = 0;
     }
 }

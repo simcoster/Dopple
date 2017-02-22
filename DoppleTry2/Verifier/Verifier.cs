@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using DoppleTry2.InstructionNodes;
+using Dopple.InstructionNodes;
 using Mono.Cecil.Cil;
 using System.Linq;
 
-namespace DoppleTry2.VerifierNs
+namespace Dopple.VerifierNs
 {
     public abstract class Verifier
     {

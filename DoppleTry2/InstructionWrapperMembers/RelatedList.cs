@@ -1,11 +1,11 @@
-﻿using DoppleTry2.InstructionNodes;
+﻿using Dopple.InstructionNodes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DoppleTry2.InstructionWrapperMembers
+namespace Dopple.InstructionWrapperMembers
 {
     public abstract class RelatedList : List<InstructionNode>, IMergable
     {

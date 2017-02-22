@@ -3,7 +3,7 @@ using Mono.Cecil.Cil;
 using System;
 using System.Linq;
 
-namespace DoppleTry2.InstructionNodes
+namespace Dopple.InstructionNodes
 {
     class LdImmediateInstNode : InstructionNode
     {

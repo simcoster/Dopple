@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DoppleTry2.InstructionModifiers;
+using Dopple.InstructionModifiers;
 using Mono.Cecil.Cil;
-using DoppleTry2.InstructionNodes;
+using Dopple.InstructionNodes;
 
-namespace DoppleTry2.ProgramFlowHanlder
+namespace Dopple.ProgramFlowHanlder
 {
     class MultiplePathsHandler : ProgramFlowHandler
     {

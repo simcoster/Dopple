@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using DoppleTry2.InstructionModifiers;
+using Dopple.InstructionModifiers;
 using Mono.Cecil.Cil;
 using Mono.Cecil;
 using System;
-using DoppleTry2.InstructionWrapperMembers;
+using Dopple.InstructionWrapperMembers;
 
-namespace DoppleTry2.InstructionNodes
+namespace Dopple.InstructionNodes
 {
     public class InstructionNode
     {
@@ -46,7 +46,7 @@ namespace DoppleTry2.InstructionNodes
         public int MemoryReadCount { get; set; }
         public int MemoryStoreCount { get; set; }
         public MethodDefinition Method { get; set; }
-        public int StackPopCount { get; set; }
+        public virtual int StackPopCount { get; set; }
         public int StackPushCount { get; set; }
         public List<Type> DoneBackTracers = new List<Type>();
         public bool ProgramFlowResolveDone { get; set; } = false;

@@ -1,4 +1,4 @@
-﻿using DoppleTry2;
+﻿using Dopple;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +9,7 @@ namespace GraphSimilarityByMatching
 {
     class EdgeScorer
     {
+        public const int ImportantEdgeTypeMultiplier = 3;
         private static readonly CodeInfo opCodeInfo = new CodeInfo();
 
         public static int ScoreEdges(List<LabeledEdge> firstEdges, List<LabeledEdge> secondEdges, NodePairings pairings, SharedSourceOrDest sharedSourceOrDest)
@@ -98,6 +99,10 @@ namespace GraphSimilarityByMatching
             else if (CodeGroups.AreSameGroup(firstEdgeVertex.Opcode, secondEdgeVertex.Opcode))
             {
                 edgeMatchScore += EdgeScorePoints.TargetVertexCodeFamilyMatch;
+            }
+            if (firstEdge.EdgeType != EdgeType.ProgramFlowAffecting)
+            {
+                edgeMatchScore *= ImportantEdgeTypeMultiplier;
             }
             return edgeMatchScore;
         }

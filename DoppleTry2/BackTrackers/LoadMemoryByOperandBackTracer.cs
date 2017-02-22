@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Mono.Cecil.Cil;
-using DoppleTry2.InstructionNodes;
+using Dopple.InstructionNodes;
 
-namespace DoppleTry2.BackTrackers
+namespace Dopple.BackTrackers
 {
     class LoadMemoryByOperandBackTracer : SingeIndexBackTracer
     {

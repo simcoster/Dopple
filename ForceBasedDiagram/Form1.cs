@@ -1,5 +1,6 @@
 ﻿using DoppleGraph;
-using DoppleTry2;
+using Dopple;
+using Dopple.InstructionNodes;
 using Mono.Cecil;
 using System;
 using System.Collections.Generic;
@@ -60,7 +61,12 @@ namespace ForceBasedDiagram
                 Form1 newForm = new Form1();
                 newForm.btnGenerate.Hide();
                 GraphBuilder backTraceManager = new GraphBuilder(method);
-                var instructionWrappers = backTraceManager.Run();
+                List<InstructionNode> instructionWrappers;
+                try
+                {
+                    instructionWrappers = backTraceManager.Run();
+                }
+                catch (StackPopException stackPopException)
 
                 List<GoNodeWrapper> nodeWrappers = new List<GoNodeWrapper>();
 

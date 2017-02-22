@@ -1,13 +1,13 @@
-﻿using DoppleTry2.BackTrackers;
-using DoppleTry2.InstructionNodes;
-using DoppleTry2.VerifierNs;
+﻿using Dopple.BackTrackers;
+using Dopple.InstructionNodes;
+using Dopple.VerifierNs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DoppleTry2.BackTrackers
+namespace Dopple.BackTrackers
 {
     public class BackTraceManager
     {
@@ -19,7 +19,8 @@ namespace DoppleTry2.BackTrackers
             backTracers =
                            new BackTracer[]
                            {
-                            new LdArgBacktracer(instructionNodes,this),
+                            new LdArgBacktracer(instructionNodes),
+                            new InlinedNewObjBackTracer(instructionNodes),
                             new LdStaticFieldBackTracer(instructionNodes),
                             new LoadFieldByStackBackTracer(instructionNodes),
                             new LoadMemoryByOperandBackTracer(instructionNodes),

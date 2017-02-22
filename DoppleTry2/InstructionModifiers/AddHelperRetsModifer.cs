@@ -1,4 +1,4 @@
-﻿using DoppleTry2.InstructionNodes;
+﻿using Dopple.InstructionNodes;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DoppleTry2.InstructionModifiers
+namespace Dopple.InstructionModifiers
 {
     class AddHelperReturnInstsModifer : IModifier
     {
@@ -17,7 +17,7 @@ namespace DoppleTry2.InstructionModifiers
             foreach (var callInst in instructionWrappers.Where(x => CodeGroups.CallCodes.Contains(x.Instruction.OpCode.Code)).ToArray())
             {
                 var opcode = Instruction.Create(OpCodes.Ret);
-                InstructionNode retInstWrapper = _InstructionNodeFactory.GetInstructionWrapper(opcode, (MethodDefinition)callInst.Instruction.Operand);
+                InstructionNode retInstWrapper = _InstructionNodeFactory.GetSingleInstructionNode(opcode, (MethodDefinition)callInst.Instruction.Operand);
                 retInstWrapper.ProgramFlowBackRoutes.AddTwoWay(callInst);
                 foreach (var forwardFlowInst in callInst.ProgramFlowForwardRoutes)
                 {

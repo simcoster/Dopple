@@ -1,10 +1,10 @@
-﻿using DoppleTry2.InstructionNodes;
+﻿using Dopple.InstructionNodes;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DoppleTry2.InstructionModifiers
+namespace Dopple.InstructionModifiers
 {
     interface IModifier
     {
