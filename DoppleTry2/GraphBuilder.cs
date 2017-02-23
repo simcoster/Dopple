@@ -254,8 +254,6 @@ namespace Dopple
             {
                 _backTraceManager.BackTrace(instWrapper);
             }
-            //TODO remove
-            return;
             var stIndAddressBackTracer = new StIndAddressBackTracer(InstructionNodes);
             foreach (var instWrapper in InstructionNodes.Where(x => stIndAddressBackTracer.HandlesCodes.Contains(x.Instruction.OpCode.Code)).OrderByDescending(x => x.InstructionIndex))
             {
