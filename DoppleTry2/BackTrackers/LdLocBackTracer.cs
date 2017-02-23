@@ -5,7 +5,7 @@ using System.Linq;
 using Mono.Cecil.Cil;
 using Dopple.InstructionNodes;
 
-namespace Dopple.BackTrackers
+namespace Dopple.BackTracers
 {
     public class LdLocBackTracer : SingeIndexBackTracer
     {

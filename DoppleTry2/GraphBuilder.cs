@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Dopple.BackTrackers;
+using Dopple.BackTracers;
 using Dopple.InstructionModifiers;
 using Dopple.ProgramFlowHanlder;
 using Mono.Cecil;
@@ -60,11 +60,11 @@ namespace Dopple
                 return stackPopException.problematicRoute;
             }
             RemoveHelperCodes();
-            //RecursionFix();
+            RecursionFix();
             //MergeSingleOperationNodes();
             BackTraceConditionals();
             MergeSimilarInstructions();
-            //LdElemBackTrace();
+            LdElemBackTrace();
             AddZeroNode();
             SetInstructionIndexes();
             //Verify();
@@ -97,6 +97,9 @@ namespace Dopple
                 inlinedCallNode.ProgramFlowForwardRoutes.RemoveAllTwoWay();
                 InstructionNodes.Remove(inlinedCallNode);
             }
+
+            //need to fix this so it only applies to recursive node instances
+            return;
             foreach(var recusriveMethodNodesGroup in InstructionNodes.GroupBy(x => new { x.Method, x.Instruction.Offset }).Where(x => x.Count() >1).ToList())
             {
                 if (recusriveMethodNodesGroup.Count(x => !x.InliningProperties.Recursive) != 1)
@@ -209,7 +212,8 @@ namespace Dopple
             RemoveInstWrappers(InstructionNodes.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(InstructionNodes.Where(x => x is LdArgInstructionNode && x.DataFlowBackRelated.Count >0 && !x.DataFlowBackRelated.SelfFeeding));
             RemoveInstWrappers(InstructionNodes.Where(x => x is StIndInstructionNode && ((StIndInstructionNode) x).AddressType == AddressType.LocalVar));
-            RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Ret && x.DataFlowForwardRelated.Count > 0 && !x.DataFlowBackRelated.SelfFeeding));
+            //TODO check this
+            RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Ret && x.InliningProperties.Inlined && !x.DataFlowBackRelated.SelfFeeding));
             RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Dup));
         }
 

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dopple.BackTrackers
+namespace Dopple.BackTracers
 {
     public class SingleIndexBackSearcher
     {

@@ -7,7 +7,7 @@ using Dopple.InstructionNodes;
 using Mono.Cecil.Cil;
 using System.Diagnostics;
 
-namespace Dopple.BackTrackers
+namespace Dopple.BackTracers
 {
     class ConditionionalsBackTracer : BackTracer
     {

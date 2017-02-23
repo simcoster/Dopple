@@ -7,7 +7,7 @@ using Dopple.InstructionModifiers;
 using Mono.Cecil.Cil;
 using Dopple.InstructionNodes;
 
-namespace Dopple.BackTrackers
+namespace Dopple.BackTracers
 {
     public abstract class BackTracer
     {

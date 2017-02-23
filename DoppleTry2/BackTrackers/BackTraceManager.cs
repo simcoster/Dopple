@@ -1,4 +1,4 @@
-﻿using Dopple.BackTrackers;
+﻿using Dopple.BackTracers;
 using Dopple.InstructionNodes;
 using Dopple.VerifierNs;
 using System;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dopple.BackTrackers
+namespace Dopple.BackTracers
 {
     public class BackTraceManager
     {

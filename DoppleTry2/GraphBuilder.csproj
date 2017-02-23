@@ -70,6 +70,7 @@
     <Compile Include="BackTrackers\ConditionionalsBackTracer.cs" />
     <Compile Include="BackTrackers\ConstructorReturnBackTracer.cs" />
     <Compile Include="BackTrackers\InlinedNewObjBackTracer.cs" />
+    <Compile Include="BackTrackers\LdFldBacktracer.cs" />
     <Compile Include="BackTrackers\RecursiveBacktracer.cs" />
     <Compile Include="BackTrackers\SingleArithmeticWithConstantBacktracer.cs" />
     <Compile Include="BackTrackers\SingleConditionOperationUnitBackTracer.cs" />
@@ -107,7 +108,6 @@
     <Compile Include="GraphBuilder.cs" />
     <Compile Include="BackTrackers\LdArgBacktracer.cs" />
     <Compile Include="BackTrackers\LdStaticFieldBackTracer.cs" />
-    <Compile Include="BackTrackers\LoadArrayElemBackTracer.cs" />
     <Compile Include="BackTrackers\LoadMemoryByOperandBackTracer.cs" />
     <Compile Include="BackTrackers\LoadFieldByStackBackTracer.cs" />
     <Compile Include="BackTrackers\SingleIndexBackTracer.cs" />

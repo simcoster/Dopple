@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Dopple.InstructionNodes;
 using Mono.Cecil.Cil;
 
-namespace Dopple.BackTrackers
+namespace Dopple.BackTracers
 {
     class LdElemBacktracer : SingeIndexBackTracer
     {

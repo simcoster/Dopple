@@ -7,7 +7,7 @@ using Dopple.InstructionNodes;
 using Mono.Cecil.Cil;
 using Mono.Cecil;
 
-namespace Dopple.BackTrackers
+namespace Dopple.BackTracers
 {
     class InlinedNewObjBackTracer : SingeIndexBackTracer
     {

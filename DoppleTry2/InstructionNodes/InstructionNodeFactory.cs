@@ -30,8 +30,12 @@ namespace Dopple.InstructionNodes
             }
             else if (nodeCode == Code.Newobj)
             {
-                MethodDefinition constructorMethodDef;
-                if (systemMethodsLoader.TryGetSystemMethod(instruction, out constructorMethodDef))
+                MethodDefinition constructorMethodDef = null;
+                if (instruction.Operand is MethodDefinition)
+                {
+                    constructorMethodDef = (MethodDefinition)instruction.Operand;
+                }
+                if (constructorMethodDef != null || systemMethodsLoader.TryGetSystemMethod(instruction, out constructorMethodDef))
                 {
                     var noArgsNewObject = new NewObjectNode(instruction, method);
                     noArgsNewObject.StackPopCount = 0;

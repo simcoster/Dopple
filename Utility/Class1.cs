@@ -10,9 +10,28 @@ namespace Utility
 {
     public class Class1
     {
-       public static IEnumerable<bool> SelectMe(int[] arr)
+       public static TestParent SelectMe()
         {
-            return arr.Select(x => x > 5).ToArray();
+            return new TestChild();
+        }
+    }
+
+    public class TestParent
+    {
+        public int Count { get; set; }
+        public TestParent()
+        {
+            Count = 5;
+        }
+    }
+
+    public class TestChild : TestParent
+    {
+        public int Blah { get; set; }
+        public TestChild()
+        {
+            Blah = Count;
+            Count = Blah;
         }
     }
 }
