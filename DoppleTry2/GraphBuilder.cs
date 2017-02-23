@@ -59,13 +59,13 @@ namespace Dopple
             {
                 return stackPopException.problematicRoute;
             }
-            //RemoveHelperCodes();
+            RemoveHelperCodes();
             //RecursionFix();
             //MergeSingleOperationNodes();
-            //BackTraceConditionals();
-            //MergeSimilarInstructions();
+            BackTraceConditionals();
+            MergeSimilarInstructions();
             //LdElemBackTrace();
-            //AddZeroNode();
+            AddZeroNode();
             SetInstructionIndexes();
             //Verify();
 

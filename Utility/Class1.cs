@@ -12,7 +12,7 @@ namespace Utility
     {
        public static IEnumerable<bool> SelectMe(int[] arr)
         {
-            return arr.Select(x => x > 5);
+            return arr.Select(x => x > 5).ToArray();
         }
     }
 }

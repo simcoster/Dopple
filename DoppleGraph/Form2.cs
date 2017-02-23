@@ -403,8 +403,8 @@ namespace DoppleGraph
             SetLongestPathRec(firstNode);
             SetRowIndexes(nodeWrappers);
             FixDuplicateCoordinates(nodeWrappers);
-            int totalHeight = 1000;
-            int totalWidth = 8000;
+            int totalHeight = 2000;
+            int totalWidth = 2000;
             float heightOffset = Convert.ToSingle(totalHeight / nodeWrappers.Select(x => x.DisplayRow).Max());
             float widthOffset = Convert.ToSingle(totalWidth / nodeWrappers.Select(x => x.DisplayCol).Max());
             foreach (var nodeWrapper in nodeWrappers)
@@ -443,10 +443,10 @@ namespace DoppleGraph
         {
             foreach (var node in colNodes)
             {
-                //var nodesToUpdate = node.InstructionNode.DataFlowForwardRelated
-                var nodesToUpdate = node.InstructionNode.ProgramFlowForwardRoutes
-               //.Select(x => GetNodeWrapper(x.Argument))
-               .Select(x => GetNodeWrapper(x))
+                var nodesToUpdate = node.InstructionNode.DataFlowForwardRelated
+                //var nodesToUpdate = node.InstructionNode.ProgramFlowForwardRoutes
+               .Select(x => GetNodeWrapper(x.Argument))
+               //.Select(x => GetNodeWrapper(x))
                //TODO remove, this hides a problem
                .Where(x=> x != null)
                .Where(x => x.LongestPath.Count == 0 || !x.LongestPath.Intersect(node.LongestPath).SequenceEqual(x.LongestPath))

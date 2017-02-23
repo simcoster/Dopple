@@ -13,6 +13,7 @@ namespace Dopple.InstructionNodes
         public int ConstructorParamCount { get; set; }
         public NewObjectNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
+            StackPopCount = ((MethodReference) instruction.Operand).Parameters.Count;
             ConstructorParamCount = StackPopCount;
         }
     }

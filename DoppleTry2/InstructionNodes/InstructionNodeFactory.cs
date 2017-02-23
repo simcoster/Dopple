@@ -34,6 +34,7 @@ namespace Dopple.InstructionNodes
                 if (systemMethodsLoader.TryGetSystemMethod(instruction, out constructorMethodDef))
                 {
                     var noArgsNewObject = new NewObjectNode(instruction, method);
+                    noArgsNewObject.StackPopCount = 0;
                     var constructorCall = new ConstructorCallNode(instruction, constructorMethodDef, method);
                     noArgsNewObject.StackPopCount = 0;
                     noArgsNewObject.ProgramFlowForwardRoutes.AddTwoWay(constructorCall);
