@@ -13,9 +13,5 @@ namespace Dopple.InstructionNodes
         {
 
         }
-        protected override int GetStackPopCount()
-        {
-            return TargetMethod.Parameters.Count;
-        }
     }
 }

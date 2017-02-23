@@ -51,6 +51,10 @@ namespace Dopple.InstructionModifiers
             }
             List<InstructionNode> inlinedNodes = calledFunc.Body.Instructions.SelectMany(x => _InstructionNodeFactory.GetInstructionNodes(x, calledFunc)).ToList();
             inlinedNodes.ForEach(x => SetNodeProps(x, callSequenceClone));
+            if (callNode is ConstructorCallNode)
+            {
+                inlinedNodes.Where(x => x is RetInstructionNode).ForEach(x => x.StackPushCount = 1);
+            }
             programFlowHanlder.AddFlowConnections(inlinedNodes);
             StitchProgramFlow(callNode, inlinedNodes[0]);
             foreach (var lastInlinedNode in inlinedNodes.Where(x => x.ProgramFlowForwardRoutes.Count == 0))

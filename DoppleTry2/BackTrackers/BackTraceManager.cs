@@ -25,7 +25,8 @@ namespace Dopple.BackTrackers
                             new LoadFieldByStackBackTracer(instructionNodes),
                             new LoadMemoryByOperandBackTracer(instructionNodes),
                             new TypedReferenceBackTracer(instructionNodes),
-                            new LdLocBackTracer(instructionNodes)
+                            new LdLocBackTracer(instructionNodes),
+                            new ConstructorReturnBackTracer(instructionNodes)
                            };
             verifiers = new Verifier[] {new StElemVerifier(instructionNodes), new StackPopPushVerfier(instructionNodes),
                                             new TwoWayVerifier(instructionNodes), new ArithmeticsVerifier(instructionNodes),

@@ -17,7 +17,7 @@ namespace Dopple.InstructionNodes
                 MethodDefinition systemMethodDef = null;
                 if (instruction.Operand is MethodDefinition)
                 {
-                    return new[] {new InlineableCallNode(instruction, method)};
+                    return new[] { new InlineableCallNode(instruction, method) };
                 }
                 else if (systemMethodsLoader.TryGetSystemMethod(instruction, out systemMethodDef))
                 {
@@ -38,57 +38,57 @@ namespace Dopple.InstructionNodes
                     noArgsNewObject.StackPopCount = 0;
                     noArgsNewObject.ProgramFlowForwardRoutes.AddTwoWay(constructorCall);
                     noArgsNewObject.ProgramFlowResolveDone = true;
-                    constructorCall.Instruction.Next = constructorCall.Instruction.Next; 
+                    constructorCall.Instruction.Next = constructorCall.Instruction.Next;
                     return new InstructionNode[] { noArgsNewObject, constructorCall };
                 }
                 else
                 {
-                    return new[] {new NewObjectNode(instruction, method)};
+                    return new[] { new NewObjectNode(instruction, method) };
                 }
             }
             else if (CodeGroups.LdArgCodes.Contains(nodeCode))
             {
-                return new[] {new LdArgInstructionNode(instruction, method)};
+                return new[] { new LdArgInstructionNode(instruction, method) };
             }
             else if (CodeGroups.StArgCodes.Contains(nodeCode))
             {
-                return new[] {new StArgInstructionNode(instruction, method)};
+                return new[] { new StArgInstructionNode(instruction, method) };
             }
             else if (CodeGroups.LdLocCodes.Contains(nodeCode))
             {
-                return new[] {new LocationLoadInstructionNode(instruction, method)};
+                return new[] { new LocationLoadInstructionNode(instruction, method) };
             }
             else if (CodeGroups.StLocCodes.Contains(nodeCode))
             {
-                return new[] {new LocationStoreInstructionNode(instruction, method)};
+                return new[] { new LocationStoreInstructionNode(instruction, method) };
             }
             else if (CodeGroups.LdImmediateFromOperandCodes.Concat(CodeGroups.LdImmediateValueCodes).Contains(nodeCode))
             {
-                return new[] {new LdImmediateInstNode(instruction, method)};
+                return new[] { new LdImmediateInstNode(instruction, method) };
             }
             else if (CodeGroups.LdElemCodes.Contains(nodeCode))
             {
-                return new[] {new LdElemInstructionNode(instruction, method)};
+                return new[] { new LdElemInstructionNode(instruction, method) };
             }
             else if (nodeCode == Code.Ret)
             {
-                return new[] {new RetInstructionNode(instruction, method)};
+                return new[] { new RetInstructionNode(instruction, method) };
             }
             else if (nodeCode == Code.Newobj)
             {
-                return new[] {new NewObjInstructionNode(instruction, method)};
+                return new[] { new NewObjInstructionNode(instruction, method) };
             }
             else if (CodeGroups.CondJumpCodes.Contains(nodeCode))
             {
-                return new[] {new ConditionalJumpNode(instruction, method)};
+                return new[] { new ConditionalJumpNode(instruction, method) };
             }
             else if (CodeGroups.StIndCodes.Contains(nodeCode))
             {
-                return new[] {new StIndInstructionNode(instruction, method)};
+                return new[] { new StIndInstructionNode(instruction, method) };
             }
             else if (nodeCode == Code.Ldftn)
             {
-                return new[] {new LoadFunctionNode(instruction, method)};
+                return new[] { new LoadFunctionNode(instruction, method) };
             }
             return new[] {new InstructionNode(instruction, method)};
         }

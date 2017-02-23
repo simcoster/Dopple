@@ -29,7 +29,7 @@ namespace Dopple.BackTrackers
             }
         }
 
-        protected abstract IEnumerable<InstructionNode> GetDataflowBackRelatedArgGroup(InstructionNode instWrapper);
+        protected abstract IEnumerable<InstructionNode> GetDataflowBackRelatedArgGroup(InstructionNode instructionNode);
 
        
     }
