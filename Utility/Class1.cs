@@ -10,9 +10,13 @@ namespace Utility
 {
     public class Class1
     {
-       public static TestParent SelectMe()
+        //public static TestParent SelectMe()
+        //{
+        //    return new TestChild();
+        //}
+        public static bool[] LinqSelect(int[] arr)
         {
-            return new TestChild();
+            return arr.Select(x => x > 7).ToArray();
         }
     }
 

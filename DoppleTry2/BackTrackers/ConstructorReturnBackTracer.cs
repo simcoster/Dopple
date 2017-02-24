@@ -23,12 +23,13 @@ namespace Dopple.BackTracers
 
         protected override IEnumerable<InstructionNode> GetDataflowBackRelatedArgGroup(InstructionNode instructionNode)
         {
-            if (!instructionNode.Method.IsConstructor)
+            RetInstructionNode retInstructionNode = (RetInstructionNode) instructionNode;
+            if (!retInstructionNode.ReturnsNewObject)
             {
                 return new InstructionNode[0];
             }
             var constructorCalls = _SingleIndexBackSearcher.SearchBackwardsForDataflowInstrcutions(x => x is ConstructorCallNode && ((ConstructorCallNode) x).CalledFunction == instructionNode.Method, instructionNode);
-            if (constructorCalls.Count > 1)
+            if (constructorCalls.Count != 1)
             {
                 throw new Exception("Should only be one");
             }

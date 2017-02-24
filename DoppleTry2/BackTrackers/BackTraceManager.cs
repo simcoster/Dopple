@@ -20,7 +20,6 @@ namespace Dopple.BackTracers
                            new BackTracer[]
                            {
                             new LdArgBacktracer(instructionNodes),
-                            new InlinedNewObjBackTracer(instructionNodes),
                             new LdStaticFieldBackTracer(instructionNodes),
                             new LoadFieldByStackBackTracer(instructionNodes),
                             new LoadMemoryByOperandBackTracer(instructionNodes),

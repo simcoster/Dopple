@@ -34,11 +34,6 @@ namespace Dopple.BackTracers
             }            
             for (int i=0; i < currentNode.StackPopCount; i++)
             {
-                //TODO remove
-                //if (stackedNodes.Count ==0)
-                //{
-                //    continue;
-                //}
                 currentNode.DataFlowBackRelated.AddTwoWay(stackedNodes.Pop(), currentNode.StackPopCount - i - 1);
             }
             for (int i = 0; i < currentNode.StackPushCount; i++)

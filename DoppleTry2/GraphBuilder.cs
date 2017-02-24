@@ -60,7 +60,7 @@ namespace Dopple
                 return stackPopException.problematicRoute;
             }
             RemoveHelperCodes();
-            RecursionFix();
+            //RecursionFix();
             //MergeSingleOperationNodes();
             BackTraceConditionals();
             MergeSimilarInstructions();
@@ -83,7 +83,7 @@ namespace Dopple
 
         private void RecursionFix()
         {
-            foreach(var inlinedCallNode in InstructionNodes.Where(x => x is InlineableCallNode).ToArray())
+            foreach(var inlinedCallNode in InstructionNodes.Where(x => x is InlineableCallNode && !(x is ConstructorCallNode)).ToArray())
             {
                 inlinedCallNode.DataFlowForwardRelated.RemoveAllTwoWay();
                 inlinedCallNode.DataFlowBackRelated.RemoveAllTwoWay();
@@ -170,7 +170,13 @@ namespace Dopple
         {
             MergeLdArgs();
             MergeImmediateValue();
+            MergeLoadNulls();
             MergeEquivilentPairs();
+        }
+
+        private void MergeLoadNulls()
+        {
+            MergeNodes(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Ldnull));
         }
 
         private void MergeEquivilentPairs()

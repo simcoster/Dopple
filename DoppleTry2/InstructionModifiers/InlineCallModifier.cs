@@ -53,7 +53,7 @@ namespace Dopple.InstructionModifiers
             inlinedNodes.ForEach(x => SetNodeProps(x, callSequenceClone));
             if (callNode is ConstructorCallNode)
             {
-                inlinedNodes.Where(x => x is RetInstructionNode).ForEach(x => x.StackPushCount = 1);
+                inlinedNodes.Where(x => x is RetInstructionNode).Cast<RetInstructionNode>().ForEach(x => { x.StackPushCount = 1; x.ReturnsNewObject = true; });
             }
             programFlowHanlder.AddFlowConnections(inlinedNodes);
             StitchProgramFlow(callNode, inlinedNodes[0]);

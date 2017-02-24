@@ -69,7 +69,6 @@
     <Compile Include="BackTrackers\BackTraceManager.cs" />
     <Compile Include="BackTrackers\ConditionionalsBackTracer.cs" />
     <Compile Include="BackTrackers\ConstructorReturnBackTracer.cs" />
-    <Compile Include="BackTrackers\InlinedNewObjBackTracer.cs" />
     <Compile Include="BackTrackers\LdFldBacktracer.cs" />
     <Compile Include="BackTrackers\RecursiveBacktracer.cs" />
     <Compile Include="BackTrackers\SingleArithmeticWithConstantBacktracer.cs" />

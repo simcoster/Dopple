@@ -22,5 +22,7 @@ namespace Dopple.InstructionNodes
                 StackPushCount = 1;
             }
         }
+
+        public bool ReturnsNewObject { get; internal set; }
     }
 }

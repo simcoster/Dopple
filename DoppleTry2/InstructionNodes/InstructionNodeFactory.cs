@@ -39,11 +39,11 @@ namespace Dopple.InstructionNodes
                 {
                     var noArgsNewObject = new NewObjectNode(instruction, method);
                     noArgsNewObject.StackPopCount = 0;
-                    var constructorCall = new ConstructorCallNode(instruction, constructorMethodDef, method);
-                    noArgsNewObject.StackPopCount = 0;
-                    noArgsNewObject.ProgramFlowForwardRoutes.AddTwoWay(constructorCall);
-                    noArgsNewObject.ProgramFlowResolveDone = true;
-                    constructorCall.Instruction.Next = constructorCall.Instruction.Next;
+                    var constructorCallInst = Instruction.Create(typeof(OpCodes).GetFields().Select(x => x.GetValue(null)).Cast<OpCode>().First(x => x.Code == Code.Call),(MethodReference)instruction.Operand);
+                    constructorCallInst.Operand = instruction.Operand;
+                    constructorCallInst.Next = instruction.Next;
+                    var constructorCall = new ConstructorCallNode(constructorCallInst, constructorMethodDef, method);
+                    noArgsNewObject.Instruction.Next = constructorCallInst;
                     return new InstructionNode[] { noArgsNewObject, constructorCall };
                 }
                 else

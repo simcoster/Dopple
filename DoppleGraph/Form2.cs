@@ -46,6 +46,7 @@ namespace DoppleGraph
         const int HiddenNodesHideIndex = 7;
         const int RightLinksHideIndex = 8;
         const int LeftLinksHideIndex = 9;
+        const int FreeTextHideIndex = 10;
 
 
         private Dictionary<int, List<GoObject>> ObjectsToHide = new Dictionary<int, List<GoObject>>() {
@@ -57,7 +58,8 @@ namespace DoppleGraph
                                                                                     { FlowBackTreeHideIndex,new List<GoObject>() },
                                                                                     { HiddenNodesHideIndex,new List<GoObject>() } ,
                                                                                     { RightLinksHideIndex,new List<GoObject>() },
-                                                                                    { LeftLinksHideIndex,new List<GoObject>() } };
+                                                                                    { LeftLinksHideIndex,new List<GoObject>() } ,
+                                                                                    { FreeTextHideIndex,new List<GoObject>() } };
         private Random rnd = new Random();
         private List<InstructionNode> InstructionNodes;
 
@@ -403,8 +405,8 @@ namespace DoppleGraph
             SetLongestPathRec(firstNode);
             SetRowIndexes(nodeWrappers);
             FixDuplicateCoordinates(nodeWrappers);
-            int totalHeight = 1000;
-            int totalWidth = 1000;
+            int totalHeight = 2000;
+            int totalWidth = 3000;
             float heightOffset = Convert.ToSingle(totalHeight / nodeWrappers.Select(x => x.DisplayRow).Max());
             float widthOffset = Convert.ToSingle(totalWidth / nodeWrappers.Select(x => x.DisplayCol).Max());
             foreach (var nodeWrapper in nodeWrappers)
@@ -559,6 +561,23 @@ namespace DoppleGraph
             }
             SetCoordinates(nodeWrappers);
             DrawLinks(myView);
+        }
+
+        private void freeTextTextBox_TextChanged(object sender, EventArgs e)
+        {
+            lock (ObjectsToHide)
+            {
+
+                ObjectsToHide[FreeTextHideIndex].Clear();
+                if (freeTextTextBox.Text != "")
+                {
+                    var relevantNodes = myView.Document.Where(x => x is GoTextNodeHoverable)
+                                                       .Cast<GoTextNodeHoverable>()
+                                                       .Where(x => x.Text.Contains(freeTextTextBox.Text));
+                    ObjectsToHide[FreeTextHideIndex].AddRange(GetObjectsToHide(relevantNodes));
+                }
+                ReShow();
+            }
         }
     }
 }

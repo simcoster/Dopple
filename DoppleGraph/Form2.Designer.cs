@@ -36,6 +36,7 @@
             this.maxIndex = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.FlowAffectingChb = new System.Windows.Forms.CheckBox();
+            this.freeTextTextBox = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // ShowProgramFlowLinks
@@ -44,7 +45,7 @@
             this.ShowProgramFlowLinks.AutoSize = true;
             this.ShowProgramFlowLinks.Checked = true;
             this.ShowProgramFlowLinks.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.ShowProgramFlowLinks.Location = new System.Drawing.Point(193, 12);
+            this.ShowProgramFlowLinks.Location = new System.Drawing.Point(871, 12);
             this.ShowProgramFlowLinks.Name = "ShowProgramFlowLinks";
             this.ShowProgramFlowLinks.Size = new System.Drawing.Size(76, 17);
             this.ShowProgramFlowLinks.TabIndex = 0;
@@ -58,7 +59,7 @@
             this.ShowDataFlowLinks.AutoSize = true;
             this.ShowDataFlowLinks.Checked = true;
             this.ShowDataFlowLinks.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.ShowDataFlowLinks.Location = new System.Drawing.Point(192, 35);
+            this.ShowDataFlowLinks.Location = new System.Drawing.Point(870, 35);
             this.ShowDataFlowLinks.Name = "ShowDataFlowLinks";
             this.ShowDataFlowLinks.Size = new System.Drawing.Size(77, 17);
             this.ShowDataFlowLinks.TabIndex = 1;
@@ -72,7 +73,7 @@
             this.ShowRightDataLinks.AutoSize = true;
             this.ShowRightDataLinks.Checked = true;
             this.ShowRightDataLinks.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.ShowRightDataLinks.Location = new System.Drawing.Point(164, 77);
+            this.ShowRightDataLinks.Location = new System.Drawing.Point(842, 77);
             this.ShowRightDataLinks.Name = "ShowRightDataLinks";
             this.ShowRightDataLinks.Size = new System.Drawing.Size(105, 17);
             this.ShowRightDataLinks.TabIndex = 2;
@@ -86,7 +87,7 @@
             this.ShowLeftDataLinks.AutoSize = true;
             this.ShowLeftDataLinks.Checked = true;
             this.ShowLeftDataLinks.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.ShowLeftDataLinks.Location = new System.Drawing.Point(171, 100);
+            this.ShowLeftDataLinks.Location = new System.Drawing.Point(849, 100);
             this.ShowLeftDataLinks.Name = "ShowLeftDataLinks";
             this.ShowLeftDataLinks.Size = new System.Drawing.Size(98, 17);
             this.ShowLeftDataLinks.TabIndex = 3;
@@ -97,7 +98,7 @@
             // minIndex
             // 
             this.minIndex.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.minIndex.Location = new System.Drawing.Point(173, 123);
+            this.minIndex.Location = new System.Drawing.Point(851, 123);
             this.minIndex.Name = "minIndex";
             this.minIndex.Size = new System.Drawing.Size(37, 20);
             this.minIndex.TabIndex = 4;
@@ -106,7 +107,7 @@
             // maxIndex
             // 
             this.maxIndex.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.maxIndex.Location = new System.Drawing.Point(232, 123);
+            this.maxIndex.Location = new System.Drawing.Point(910, 123);
             this.maxIndex.Name = "maxIndex";
             this.maxIndex.Size = new System.Drawing.Size(37, 20);
             this.maxIndex.TabIndex = 5;
@@ -116,31 +117,41 @@
             // 
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(216, 126);
+            this.label1.Location = new System.Drawing.Point(894, 126);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(10, 13);
             this.label1.TabIndex = 6;
             this.label1.Text = "-";
             // 
-            // flowAffectingChb
+            // FlowAffectingChb
             // 
             this.FlowAffectingChb.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.FlowAffectingChb.AutoSize = true;
             this.FlowAffectingChb.Checked = true;
             this.FlowAffectingChb.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.FlowAffectingChb.Location = new System.Drawing.Point(148, 57);
-            this.FlowAffectingChb.Name = "flowAffectingChb";
+            this.FlowAffectingChb.Location = new System.Drawing.Point(826, 57);
+            this.FlowAffectingChb.Name = "FlowAffectingChb";
             this.FlowAffectingChb.Size = new System.Drawing.Size(121, 17);
             this.FlowAffectingChb.TabIndex = 7;
             this.FlowAffectingChb.Text = "Flow Affecting Links";
             this.FlowAffectingChb.UseVisualStyleBackColor = true;
             this.FlowAffectingChb.CheckedChanged += new System.EventHandler(this.ShowFlowAffectingLinks_CheckedChanged);
             // 
+            // freeTextTextBox
+            // 
+            this.freeTextTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.freeTextTextBox.Location = new System.Drawing.Point(842, 158);
+            this.freeTextTextBox.Name = "freeTextTextBox";
+            this.freeTextTextBox.Size = new System.Drawing.Size(100, 20);
+            this.freeTextTextBox.TabIndex = 8;
+            this.freeTextTextBox.TextChanged += new System.EventHandler(this.freeTextTextBox_TextChanged);
+            // 
             // Form2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(276, 277);
+            this.ClientSize = new System.Drawing.Size(954, 481);
+            this.Controls.Add(this.freeTextTextBox);
             this.Controls.Add(this.FlowAffectingChb);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.maxIndex);
@@ -167,5 +178,6 @@
         private System.Windows.Forms.TextBox maxIndex;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckBox FlowAffectingChb;
+        private System.Windows.Forms.TextBox freeTextTextBox;
     }
 }
