@@ -21,7 +21,7 @@ namespace Dopple.BackTracers
             List<InstructionNode> foundBackInstructions = SafeSearchBackwardsForDataflowInstrcutions(predicate, startInstruction);
             if (foundBackInstructions.Count == 0)
             {
-                throw new Exception("Reached first instWrapper without correct one found");
+                //throw new Exception("Reached first instWrapper without correct one found");
             }
             return foundBackInstructions;
         }

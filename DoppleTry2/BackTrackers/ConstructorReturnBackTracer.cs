@@ -28,7 +28,7 @@ namespace Dopple.BackTracers
             {
                 return new InstructionNode[0];
             }
-            var constructorCalls = _SingleIndexBackSearcher.SearchBackwardsForDataflowInstrcutions(x => x is ConstructorCallNode && ((ConstructorCallNode) x).CalledFunction == instructionNode.Method, instructionNode);
+            var constructorCalls = _SingleIndexBackSearcher.SearchBackwardsForDataflowInstrcutions(x => x is ConstructorCallNode && ((ConstructorCallNode) x).TargetMethodDefinion == instructionNode.Method, instructionNode);
             if (constructorCalls.Count != 1)
             {
                 throw new Exception("Should only be one");
