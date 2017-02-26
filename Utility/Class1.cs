@@ -16,39 +16,60 @@ namespace Utility
         //    Console.WriteLine("Interrupting");
         //    return DoThing(myObj2);
         //}
-        //public static int DoThing(TestChild myObj)
-        //{
-        //    var myObj2 = new TestChild();
-        //    myObj2 = myObj;
-        //    Console.WriteLine("Interrupting");
-        //    return myObj2.NotStatic();
-        //}
-        public static bool[] LinqSelect(int[] arr)
+        public static int DoThing(bool isTrue)
         {
-            return arr.Select(x => x > 7).ToArray();
+            TestParent myObj2;
+            if (isTrue)
+            {
+                myObj2 = new TestChild();
+            }
+            else
+            {
+                myObj2 = new TestAnotherChild();
+            }
+            return myObj2.Overridable(7);
         }
+        //public static bool[] LinqSelect(int[] arr)
+        //{
+        //    return arr.Select(x => x > 7).ToArray();
+        //}
     }
 
     public class TestParent
     {
         public int Count { get; set; }
-        public TestParent()
+        public virtual int Overridable(int arg)
         {
-            Count = 5;
+            return 5;
         }
     }
 
-    public struct TestChild
+    public class TestChild : TestParent
     {
         public int Blah { get; set; }
+        public override int Overridable(int arg)
+        {
+            return arg + base.Overridable(arg);
+        }
         //public TestChild()
         //{
         //    Blah = Count;
         //    Count = Blah;
         //}
-        public int NotStatic()
+
+    }
+
+    public class TestAnotherChild : TestParent
+    {
+        public override int Overridable(int arg)
         {
-            return Blah;
+            return arg;
         }
+        //public TestChild()
+        //{
+        //    Blah = Count;
+        //    Count = Blah;
+        //}
+
     }
 }

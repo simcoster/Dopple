@@ -9,7 +9,7 @@ namespace Dopple
 {
     public static class CodeGroups
     {
-        public static Code[] CallCodes     = { Code.Call, Code.Calli, Code.Callvirt };
+        public static Code[] CallCodes     = { Code.Call, Code.Calli};
         public static Code[] LdArgCodes    = { Code.Ldarg, Code.Ldarg_0, Code.Ldarg_1, Code.Ldarg_2, Code.Ldarg_3, Code.Ldarg_S};
         public static Code[] StArgCodes   =  { Code.Starg, Code.Starg_S};
         public static Code[] LdElemCodes  =  { Code.Ldelem_Any, Code.Ldelem_I, Code.Ldelem_I1, Code.Ldelem_I2, Code.Ldelem_I4, Code.Ldelem_I8,

@@ -63,7 +63,7 @@ namespace Dopple
             //RecursionFix();
             //MergeSingleOperationNodes();
             BackTraceConditionals();
-            MergeSimilarInstructions();
+            //MergeSimilarInstructions();
             LdElemBackTrace();
             AddZeroNode();
             SetInstructionIndexes();
@@ -368,6 +368,10 @@ namespace Dopple
 
         public void MergeNodes(IEnumerable<InstructionNode> nodesToMerge)
         {
+            if (!nodesToMerge.Any())
+            {
+                return;
+            }
             var nodeToKeep = nodesToMerge.First();
             foreach (var nodeToRemove in nodesToMerge.ToArray().Except(new[] { nodeToKeep }))
             {

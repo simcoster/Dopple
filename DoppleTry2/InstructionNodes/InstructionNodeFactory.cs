@@ -28,6 +28,10 @@ namespace Dopple.InstructionNodes
                     return new[] { new NonInlineableCallInstructionNode(instruction, method) };
                 }
             }
+            else if (nodeCode == Code.Callvirt)
+            {
+                return new[] { new NonInlineableCallInstructionNode(instruction, method) };
+            }
             else if (nodeCode == Code.Newobj)
             {
                 MethodDefinition constructorMethodDef = null;

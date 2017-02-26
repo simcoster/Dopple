@@ -57,19 +57,25 @@ namespace Dopple
 
         internal bool TryGetSystemMethod(Instruction instruction, out MethodDefinition systemMethodDef)
         {
-            var metRef = (MethodReference) instruction.Operand;
-            string nameToSearch = metRef.FullName;
-            nameToSearch = Regex.Replace(nameToSearch, "<[^ ]*?>\\(", "(");
-            nameToSearch = Regex.Replace(nameToSearch, "<[^ ]*?>::", "::");
-            nameToSearch = nameToSearch.Replace("!!1", "TResult");
-            var foundMethod = TryGetMethodDifferentOptions(nameToSearch);
-            if (foundMethod != null && foundMethod.HasBody)
-            {
-                systemMethodDef = foundMethod;
-                return true;
-            }
             systemMethodDef = null;
             return false;
+            //TODO change
+            var metRef = (MethodReference) instruction.Operand;
+            systemMethodDef = metRef.Resolve();
+            return true;
+
+            //string nameToSearch = metRef.FullName;
+            //nameToSearch = Regex.Replace(nameToSearch, "<[^ ]*?>\\(", "(");
+            //nameToSearch = Regex.Replace(nameToSearch, "<[^ ]*?>::", "::");
+            //nameToSearch = nameToSearch.Replace("!!1", "TResult");
+            //var foundMethod = TryGetMethodDifferentOptions(nameToSearch);
+            //if (foundMethod != null && foundMethod.HasBody)
+            //{
+            //    systemMethodDef = foundMethod;
+            //    return true;
+            //}
+            //systemMethodDef = null;
+            //return false;
         }
 
         private MethodDefinition TryGetMethodDifferentOptions(string nameToSearch)
