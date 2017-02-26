@@ -9,13 +9,13 @@ namespace Dopple.InstructionNodes
     {
         public InlineableCallNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
-            TargetMethodDefinion = (MethodDefinition)TargetMethod;
-            SetStackPushCount(TargetMethodDefinion);
+            CalledFunction = (MethodDefinition)TargetMethod;
+            SetStackPushCount(CalledFunction);
         }
         public InlineableCallNode(Instruction instruction,MethodDefinition calledFunc, MethodDefinition method) : base(instruction, method)
         {
-            TargetMethodDefinion = calledFunc;
-            SetStackPushCount(TargetMethodDefinion);
+            CalledFunction = calledFunc;
+            SetStackPushCount(CalledFunction);
         }
         private void SetStackPushCount(MethodDefinition TargetMethod)
         {
@@ -28,6 +28,6 @@ namespace Dopple.InstructionNodes
                 StackPushCount = 1;
             }
         }
-        public MethodDefinition TargetMethodDefinion { get; private set; }
+        public MethodDefinition CalledFunction { get; private set; }
     }
 }

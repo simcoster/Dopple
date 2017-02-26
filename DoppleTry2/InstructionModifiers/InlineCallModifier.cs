@@ -35,7 +35,7 @@ namespace Dopple.InstructionModifiers
         private List<InstructionNode> InlineRec(InlineableCallNode callNode, List<MethodDefinition> callSequence)
         {
             List<InstructionNode> callNodeOriginalForwardRoutes = callNode.ProgramFlowForwardRoutes.ToList();
-            MethodDefinition calledFunc = callNode.TargetMethodDefinion;
+            MethodDefinition calledFunc = callNode.CalledFunction;
             var callSequenceClone = new List<MethodDefinition>(callSequence);
             if (calledFunc.Body == null)
             {  
