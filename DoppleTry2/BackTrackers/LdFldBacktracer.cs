@@ -31,6 +31,8 @@ namespace Dopple.BackTracers
                                                              x.DataFlowBackRelated.Where(y => y.ArgIndex == 0).Select(y => y.Argument).SequenceEqual(objectInstanceArgs) &&
                                                              ((FieldReference)x.Instruction.Operand).MetadataToken == fieldDefinitionArg.MetadataToken;
             var found = _SingleIndexBackSearcher.SafeSearchBackwardsForDataflowInstrcutions(predicate, instructionNode);
+            var found2 = _SingleIndexBackSearcher.SafeSearchBackwardsForDataflowInstrcutions(x => x.Instruction.OpCode.Code == Code.Stfld && ((FieldReference) x.Instruction.Operand).Name == fieldDefinitionArg.Name, instructionNode);
+
             if (found.Count ==0)
             {
                 Console.WriteLine("notine foound for " + instructionNode.InstructionIndex);

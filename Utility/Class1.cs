@@ -10,9 +10,18 @@ namespace Utility
 {
     public class Class1
     {
-        //public static TestParent SelectMe()
+        //public static int SelectMe()
         //{
-        //    return new TestChild();
+        //    var myObj2 = new TestChild();
+        //    Console.WriteLine("Interrupting");
+        //    return DoThing(myObj2);
+        //}
+        //public static int DoThing(TestChild myObj)
+        //{
+        //    var myObj2 = new TestChild();
+        //    myObj2 = myObj;
+        //    Console.WriteLine("Interrupting");
+        //    return myObj2.NotStatic();
         //}
         public static bool[] LinqSelect(int[] arr)
         {
@@ -29,13 +38,17 @@ namespace Utility
         }
     }
 
-    public class TestChild : TestParent
+    public struct TestChild
     {
         public int Blah { get; set; }
-        public TestChild()
+        //public TestChild()
+        //{
+        //    Blah = Count;
+        //    Count = Blah;
+        //}
+        public int NotStatic()
         {
-            Blah = Count;
-            Count = Blah;
+            return Blah;
         }
     }
 }

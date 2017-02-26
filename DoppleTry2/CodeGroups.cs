@@ -19,7 +19,8 @@ namespace Dopple
         public static Code[] LdImmediateFromOperandCodes = { Code.Ldc_I4_S, Code.Ldc_I4, Code.Ldc_R4, Code.Ldc_R8, Code.Ldc_I8 };
         public static Code[] LdImmediateValueCodes = { Code.Ldc_I4_0, Code.Ldc_I4_1, Code.Ldc_I4_2, Code.Ldc_I4_3, Code.Ldc_I4_4, Code.Ldc_I4_5,
                                                Code.Ldc_I4_6, Code.Ldc_I4_7, Code.Ldc_I4_8};
-        public static Code[] LdLocCodes   =  { Code.Ldloc_0, Code.Ldloc_1, Code.Ldloc_2, Code.Ldloc_3, Code.Ldloc, Code.Ldloc_S};
+        //TODO should Ldloca and ldloca_s be here?
+        public static Code[] LdLocCodes   =  { Code.Ldloc_0, Code.Ldloc_1, Code.Ldloc_2, Code.Ldloc_3, Code.Ldloc, Code.Ldloc_S, Code.Ldloca, Code.Ldloca_S};
         public static Code[] StLocCodes   =  { Code.Stloc, Code.Stloc_0, Code.Stloc_1, Code.Stloc_2, Code.Stloc_3, Code.Stloc_S };
         public static Code[] CondJumpCodes = { Code.Beq, Code.Beq_S, Code.Bge_S, Code.Bge_Un, Code.Bge_Un_S, Code.Bgt, Code.Bgt_S, Code.Bgt_Un, Code.Bgt_Un_S,
                                                Code.Ble, Code.Ble_S, Code.Ble_Un, Code.Ble_Un_S, Code.Blt, Code.Blt_S, Code.Blt_Un, Code.Blt_Un_S, Code.Bne_Un,

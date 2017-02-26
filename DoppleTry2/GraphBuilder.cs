@@ -153,6 +153,7 @@ namespace Dopple
         {
             var postMergeBackTracers = new BackTracer[] {
                                                         new LdElemBacktracer(InstructionNodes),
+                                                        new LdFldBacktracer(InstructionNodes)
                                                         };
             foreach (var node in InstructionNodes.OrderByDescending(x => x.InstructionIndex))
             {
@@ -216,7 +217,7 @@ namespace Dopple
             RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.StLocCodes.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.LdLocCodes.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(InstructionNodes.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code)));
-            //RemoveInstWrappers(InstructionNodes.Where(x => x is LdArgInstructionNode && x.DataFlowBackRelated.Count >0 && !x.DataFlowBackRelated.SelfFeeding));
+            RemoveInstWrappers(InstructionNodes.Where(x => x is LdArgInstructionNode && x.DataFlowBackRelated.Count >0 && !x.DataFlowBackRelated.SelfFeeding));
             RemoveInstWrappers(InstructionNodes.Where(x => x is StIndInstructionNode && ((StIndInstructionNode) x).AddressType == AddressType.LocalVar));
             //TODO check this
             RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Ret && x.InliningProperties.Inlined && !x.DataFlowBackRelated.SelfFeeding));

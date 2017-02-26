@@ -19,7 +19,7 @@ namespace Dopple
             List<AssemblyDefinition> myLibraries = new List<AssemblyDefinition>();
             myLibraries.Add(AssemblyDefinition.ReadAssembly(@"C:\Windows\assembly\GAC_MSIL\System.Core\3.5.0.0__b77a5c561934e089\system.core.dll"));
             myLibraries.Add(AssemblyDefinition.ReadAssembly(@"C:\Windows\assembly\GAC_32\mscorlib\2.0.0.0__b77a5c561934e089\mscorlib.dll"));
-
+                        
             foreach (var library in myLibraries)
             {
                 Parallel.ForEach(library.MainModule.Types, (typeToLoad) =>
