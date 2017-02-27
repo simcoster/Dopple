@@ -23,9 +23,11 @@ namespace Dopple
                 {
                     TypeReference objectTypeReference = GetObjectType(objectArg);
                     TypeDefinition objectTypeDefinition = objectTypeReference.Resolve();
+                    var objectTypeInheritancePath = GetInheritancePath(objectTypeReference).Select(x => x.Resolve());
+
                     if (virtualMethodDeclaringTypeDefinition.IsInterface)
                     {
-                        if (!objectTypeDefinition.Interfaces.Contains(virtualMethodDeclaringTypeReference))
+                        if (!GetAllInterfaces(objectTypeInheritancePath).Contains(virtualMethodDeclaringTypeReference))
                         {
                             continue;
                         }
@@ -43,6 +45,11 @@ namespace Dopple
                 }
             }
             inlinlingWasMade = false;
+        }
+
+        private static IEnumerable<TypeReference> GetAllInterfaces(IEnumerable<TypeDefinition> inheritancePath)
+        {
+            return inheritancePath.SelectMany(x => x.Interfaces.SelectMany(y => GetInheritancePath(y))).Distinct();
         }
 
         private static List<TypeReference> GetInheritancePath(TypeReference baseTypeReference)
