@@ -10,20 +10,20 @@ namespace Utility
 {
     public class Class1
     {
+        public static IEnumerable<bool> SelectMe(int[] arr)
+        {
+            return arr.Select(x => x > 7).ToArray();
 
-        public IntClass TestOrder()
-        {
-            return new IntClass(4);
         }
-        public int Ordered(int first, int second)
-        {
-            return first - second;
-        }
-        //public static IEnumerable<bool> SelectMe(int[] arr)
+        //public IntClass TestOrder()
         //{
-        //    return arr.Select(x => x > 7).ToArray();
-            
+        //    return new IntClass(4);
         //}
+        //public int Ordered(int first, int second)
+        //{
+        //    return first - second;
+        //}
+        
         //public static int DoThing(bool isTrue)
         //{
         //    TestParent myObj2;

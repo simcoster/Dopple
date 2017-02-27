@@ -19,13 +19,12 @@ namespace Dopple.InstructionNodes
 
         protected void SetStackPopCount(MethodReference targetMethod)
         {
-            int stackPopCount = targetMethod.Parameters.Count;
+            int tempStackPopCount = targetMethod.Parameters.Count;
             if (targetMethod.HasThis)
             {
-                stackPopCount++;
+                tempStackPopCount++;
             }
-            StackPopCount =  stackPopCount;
-            DataFlowBackRelated.ResetIndex();
+            StackPopCount = tempStackPopCount;
         }
 
         protected void SetStackPushCount(MethodReference targetMethod)

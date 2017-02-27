@@ -206,6 +206,12 @@ namespace Dopple
                 CurrentIndex = this.Max(x => x.ArgIndex);
             }
         }
+
+        internal void AddTwoWayWithNewIndex(InstructionNode node)
+        {
+            int newIndex = this.Count == 0?  0  : this.Max(x => x.ArgIndex) + 1;
+            base.AddTwoWay(node, newIndex);
+        }
     }
 
  

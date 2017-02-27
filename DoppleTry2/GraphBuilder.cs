@@ -59,7 +59,7 @@ namespace Dopple
             {
                 return stackPopException.problematicRoute;
             }
-            //RemoveHelperCodes();
+            RemoveHelperCodes();
             bool shouldRerun;
             ResolveVirtualMethods(out shouldRerun);
             //RecursionFix();
@@ -239,7 +239,7 @@ namespace Dopple
 
             foreach (var firstNode in InstructionNodes.Where(x => x.DataFlowBackRelated.Count == 0))
             {
-                firstNode.DataFlowBackRelated.AddTwoWay(nodeZero);
+                firstNode.DataFlowBackRelated.AddTwoWayWithNewIndex(nodeZero);
             }
             var firstOrderLdArgs = GetFirstOrderLdArgs();
             foreach (var firstOrderLdArg in firstOrderLdArgs)

@@ -14,11 +14,12 @@ namespace Dopple.InstructionNodes
         {
             Instruction = instruction;
             Method = method;
+            // TODO rework, this must precede StackPopCount for now, yuck
+            DataFlowBackRelated = new DataFlowBackArgList(this);
             StackPushCount = GetStackPushCount(instruction);
             StackPopCount = GetStackPopCount(instruction);
             MemoryReadCount = MemoryProperties.GetMemReadCount(instruction.OpCode.Code);
             MemoryStoreCount = MemoryProperties.GetMemStoreCount(instruction.OpCode.Code);
-            DataFlowBackRelated = new DataFlowBackArgList(this);
             ProgramFlowBackRoutes = new ProgramFlowBackRoutes(this);
             ProgramFlowBackAffected = new ProgramFlowBackAffectedArgList(this);
             ProgramFlowForwardRoutes = new ProgramFlowForwardRoutes(this);
@@ -45,7 +46,18 @@ namespace Dopple.InstructionNodes
         public int MemoryReadCount { get; set; }
         public int MemoryStoreCount { get; set; }
         public MethodDefinition Method { get; set; }
-        public virtual int StackPopCount { get; protected set; }
+        public virtual int StackPopCount
+        {
+            get
+            {
+                return _StackPopCount;
+            }
+            protected set
+            {
+                _StackPopCount = value;
+                DataFlowBackRelated.ResetIndex();
+            }
+        }
         public int StackPushCount { get; set; }
         public List<Type> DoneBackTracers = new List<Type>();
         public bool ProgramFlowResolveDone { get; set; } = false;
@@ -54,6 +66,7 @@ namespace Dopple.InstructionNodes
         public virtual bool DataChangingNode { get; } = false;
 
         public InliningProperties InliningProperties = new InliningProperties();
+        private int _StackPopCount;
 
         protected int GetStackPopCount(Instruction instruction)
         {

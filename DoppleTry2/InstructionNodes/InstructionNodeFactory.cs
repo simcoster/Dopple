@@ -45,7 +45,7 @@ namespace Dopple.InstructionNodes
                     var constructorCallInst = Instruction.Create(typeof(OpCodes).GetFields().Select(x => x.GetValue(null)).Cast<OpCode>().First(x => x.Code == Code.Call),(MethodReference)instruction.Operand);
                     constructorCallInst.Operand = instruction.Operand;
                     constructorCallInst.Next = instruction.Next;
-                    var constructorCall = new ConstructorCallNode(constructorCallInst, constructorMethodDef, method);
+                    var constructorCall = new ConstructorCallNode(constructorCallInst, constructorMethodDef, method, noArgsNewObject);
                     noArgsNewObject.Instruction.Next = constructorCallInst;
                    
                     return new InstructionNode[] { noArgsNewObject, constructorCall };
@@ -99,7 +99,7 @@ namespace Dopple.InstructionNodes
             {
                 return new[] { new ArithmaticsNode(instruction, method) };
             }
-            else if (new []{ Code.Castclass}.Contains(nodeCode))
+            else if (new []{ Code.Castclass, Code.Isinst}.Contains(nodeCode))
             {
                 return new[] {new SingleIndexDataTransferNode(instruction, method) };
             }
