@@ -8,18 +8,17 @@ using System.Threading.Tasks;
 
 namespace Dopple
 {
-    public abstract class ArgList : List<IndexedArgument>, IMergable
+    public abstract class CoupledIndexedArgList : List<IndexedArgument>, IMergable
     {
-        protected int LargestIndex = -1;
-        public ArgList(InstructionNode instructionWrapper)
+        public CoupledIndexedArgList(InstructionNode instructionNode)
         {
-            containingWrapper = instructionWrapper;
+            containingNode = instructionNode;
         }
         public override bool Equals(object obj)
         {
-            if (obj is ArgList)
+            if (obj is CoupledIndexedArgList)
             {
-                return this.All(x => ((ArgList)obj).Any(y => y.ArgIndex == x.ArgIndex && y.Argument == x.Argument));
+                return this.All(x => ((CoupledIndexedArgList)obj).Any(y => y.ArgIndex == x.ArgIndex && y.Argument == x.Argument));
             }
             return base.Equals(obj);
         }
@@ -56,14 +55,14 @@ namespace Dopple
         }
 
 
-        protected readonly InstructionNode containingWrapper;
+        protected readonly InstructionNode containingNode;
         public int MaxArgIndex = -1;
 
         public bool SelfFeeding
         {
             get
             {
-                return this.Any(x => x.Argument == containingWrapper);
+                return this.Any(x => x.Argument == containingNode);
             }
         }
 
@@ -99,17 +98,12 @@ namespace Dopple
             var toAddClone = new IndexedArgument(toAdd.ArgIndex, toAdd.Argument, toAdd.ContainingList);
             Add(toAddClone);
             var mirrorList = GetMirrorList(toAddClone.Argument);
-            var mirrorArg = new IndexedArgument(toAddClone.ArgIndex, containingWrapper, mirrorList);
+            var mirrorArg = new IndexedArgument(toAddClone.ArgIndex, containingNode, mirrorList);
             mirrorArg.MirrorArg = toAddClone;
             toAddClone.MirrorArg = mirrorArg;
             mirrorList.Add(mirrorArg);
         }
-        public void AddTwoWay(InstructionNode toAdd)
-        {
-            var indexedToAdd = new IndexedArgument(LargestIndex +1, toAdd ,this);
-            AddTwoWay(indexedToAdd);
-            LargestIndex++;
-        }
+      
         public void AddTwoWay(IEnumerable<IndexedArgument> rangeToAdd)
         {
             foreach (var backArgToAdd in rangeToAdd)
@@ -118,11 +112,7 @@ namespace Dopple
             }
         }
 
-        public void AddTwoWaySingleIndex(IEnumerable<InstructionNode> backInstructions)
-        {
-            int index = LargestIndex + 1 ;
-            AddTwoWay(backInstructions.Select(x => new IndexedArgument(index, x,this)));
-        }
+     
         public void AddTwoWay(InstructionNode backInstruction , int index)
         {
             AddTwoWay(new IndexedArgument(index, backInstruction,this));
@@ -155,12 +145,12 @@ namespace Dopple
                 }
             }
         }
-        internal abstract ArgList GetSameList(InstructionNode nodeToMergeInto);
-        protected abstract ArgList GetMirrorList(InstructionNode node);
+        internal abstract CoupledIndexedArgList GetSameList(InstructionNode nodeToMergeInto);
+        protected abstract CoupledIndexedArgList GetMirrorList(InstructionNode node);
 
         void IMergable.MergeInto(InstructionNode nodeToMergeInto)
         {
-            ArgList mergedNodeSameArgList = GetSameList(nodeToMergeInto);
+            CoupledIndexedArgList mergedNodeSameArgList = GetSameList(nodeToMergeInto);
             foreach (var arg in this.ToArray())
             {
                 mergedNodeSameArgList.AddTwoWay(arg);
@@ -169,104 +159,102 @@ namespace Dopple
         }
     }
 
-    public class DataFlowBackArgList : ArgList
+    public class DataFlowBackArgList : CoupledIndexedArgList
     {
+        protected int CurrentIndex;
         public DataFlowBackArgList(InstructionNode instructionWrapper) : base(instructionWrapper)
         {
+            ResetIndex();
         }
 
-        protected override ArgList GetMirrorList(InstructionNode node)
+        public void ResetIndex()
+        {
+            CurrentIndex = containingNode.StackPopCount - 1;
+        }
+
+        public virtual void AddTwoWaySingleIndex(IEnumerable<InstructionNode> backInstructions)
+        {
+            int index = CurrentIndex + 1;
+            AddTwoWay(backInstructions.Select(x => new IndexedArgument(index, x, this)));
+        }
+
+        public virtual void AddTwoWay(InstructionNode toAdd)
+        {
+            if (CurrentIndex < 0)
+            {
+                throw new Exception("Current Index should be 0 or larger");
+            }
+            var indexedToAdd = new IndexedArgument(CurrentIndex, toAdd, this);
+            AddTwoWay(indexedToAdd);
+            CurrentIndex--;
+        }
+
+        protected override CoupledIndexedArgList GetMirrorList(InstructionNode node)
         {
             return node.DataFlowForwardRelated;
         }
 
-        internal override ArgList GetSameList(InstructionNode nodeToMergeInto)
+        internal override CoupledIndexedArgList GetSameList(InstructionNode nodeToMergeInto)
         {
             return nodeToMergeInto.DataFlowBackRelated;
-        }
-
-        internal void ResetIndex()
-        {
-            LargestIndex = -1;
-        }
+        }      
 
         internal void UpdateLargestIndex()
         {
             if (this.Count > 0)
             {
-                LargestIndex = this.Max(x => x.ArgIndex);
+                CurrentIndex = this.Max(x => x.ArgIndex);
             }
         }
     }
 
-    public class CallDataFlowBackArgList : DataFlowBackArgList
-    {
-        public CallDataFlowBackArgList(CallNode instructionWrapper) : base(instructionWrapper)
-        {
-        }
-
-        public override void AddTwoWay(IndexedArgument toAdd)
-        {
-            int argIndex;
-            if (((CallNode)containingWrapper).TargetMethod.HasThis)
-            {
-                argIndex = toAdd.ArgIndex + 1;
-            }
-            else
-            {
-                argIndex = toAdd.ArgIndex;
-            }
-            var newIndexedArg = new IndexedArgument(argIndex, toAdd.Argument, this);
-            base.AddTwoWay(newIndexedArg);
-        }
-    }
-
-    public class DataFlowForwardArgList : ArgList
+ 
+    public class DataFlowForwardArgList : CoupledIndexedArgList
     {
         public DataFlowForwardArgList(InstructionNode instructionWrapper) : base(instructionWrapper)
         {
         }
 
-        protected override ArgList GetMirrorList(InstructionNode node)
+        protected override CoupledIndexedArgList GetMirrorList(InstructionNode node)
         {
             return node.DataFlowBackRelated;
         }
 
-        internal override ArgList GetSameList(InstructionNode nodeToMergeInto)
+        internal override CoupledIndexedArgList GetSameList(InstructionNode nodeToMergeInto)
         {
             return nodeToMergeInto.DataFlowForwardRelated;
         }
     }
 
-    public class ProgramFlowBackAffectedArgList : ArgList
+    public class ProgramFlowBackAffectedArgList : CoupledIndexedArgList
     {
         public ProgramFlowBackAffectedArgList(InstructionNode instructionWrapper) : base(instructionWrapper)
         {
         }
 
-        protected override ArgList GetMirrorList(InstructionNode node)
+        protected override CoupledIndexedArgList GetMirrorList(InstructionNode node)
         {
             return node.ProgramFlowForwardAffecting;
         }
 
-        internal override ArgList GetSameList(InstructionNode nodeToMergeInto)
+        internal override CoupledIndexedArgList GetSameList(InstructionNode nodeToMergeInto)
         {
             return nodeToMergeInto.ProgramFlowBackAffected;
         }
     }
 
-    public class ProgramFlowForwardAffectingArgList : ArgList
+    public class ProgramFlowForwardAffectingArgList : CoupledIndexedArgList
     {
         public ProgramFlowForwardAffectingArgList(InstructionNode instructionWrapper) : base(instructionWrapper)
         {
         }
 
-        protected override ArgList GetMirrorList(InstructionNode node)
+        protected override CoupledIndexedArgList GetMirrorList(InstructionNode node)
         {
             return node.ProgramFlowBackAffected;
         }
 
-        internal override ArgList GetSameList(InstructionNode nodeToMergeInto)
+        internal override CoupledIndexedArgList GetSameList(InstructionNode nodeToMergeInto)
         {
             return nodeToMergeInto.ProgramFlowForwardAffecting;
         }

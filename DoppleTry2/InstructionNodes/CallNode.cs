@@ -13,19 +13,32 @@ namespace Dopple.InstructionNodes
         public CallNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
             TargetMethod = (MethodReference) instruction.Operand;
-            StackPopCount = GetStackPopCount();
+            SetStackPopCount(TargetMethod);
+            SetStackPushCount(TargetMethod);
         }
 
-        protected virtual int GetStackPopCount()
+        protected void SetStackPopCount(MethodReference targetMethod)
         {
-            int stackPopCount = TargetMethod.Parameters.Count;
-            if (TargetMethod.HasThis)
+            int stackPopCount = targetMethod.Parameters.Count;
+            if (targetMethod.HasThis)
             {
                 stackPopCount++;
             }
-            return stackPopCount;
+            StackPopCount =  stackPopCount;
+            DataFlowBackRelated.ResetIndex();
         }
 
+        protected void SetStackPushCount(MethodReference targetMethod)
+        {
+            if (targetMethod.ReturnType.FullName == "System.Void")
+            {
+                StackPushCount =  0;
+            }
+            else
+            {
+                StackPushCount = 1;
+            }
+        }
         public MethodReference TargetMethod { get; private set; }
     }
 }

@@ -26,7 +26,7 @@ namespace Dopple.BackTracers
         {
             var index0Arg = instWrapper.DataFlowBackRelated.Where(x => x.ArgIndex == 0).Select(x => x.Argument).ToArray();
             var index1Arg = instWrapper.DataFlowBackRelated.Where(x => x.ArgIndex == 1).Select(x => x.Argument).ToArray();
-            Func<InstructionNode, bool> predicate = x => CodeGroups.StElemCodes.Contains(x.Instruction.OpCode.Code) &&
+            Func<InstructionNode, bool> predicate = x => x is StElemInstructionNode &&
                                                              x.DataFlowBackRelated.Where(y => y.ArgIndex == 0).Select(y => y.Argument).SequenceEqual(index0Arg) &&
                                                              x.DataFlowBackRelated.Where(y => y.ArgIndex == 1).Select(y => y.Argument).SequenceEqual(index1Arg);
             var found = _SingleIndexBackSearcher.SafeSearchBackwardsForDataflowInstrcutions(x => CodeGroups.StElemCodes.Contains(x.Instruction.OpCode.Code), instWrapper);

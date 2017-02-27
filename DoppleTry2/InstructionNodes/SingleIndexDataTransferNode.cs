@@ -5,13 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
-using Dopple.VerifierNs;
 
 namespace Dopple.InstructionNodes
 {
-    class StElemInstructionNode : DataTransferingNode
+    class SingleIndexDataTransferNode : DataTransferingNode
     {
-        public StElemInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
+        public SingleIndexDataTransferNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
         }
 
@@ -19,7 +18,7 @@ namespace Dopple.InstructionNodes
         {
             get
             {
-                return 2;
+                return 0;
             }
         }
     }

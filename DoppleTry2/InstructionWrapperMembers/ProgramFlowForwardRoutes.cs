@@ -7,18 +7,18 @@ using Dopple.InstructionNodes;
 
 namespace Dopple.InstructionWrapperMembers
 {
-    public class ProgramFlowForwardRoutes : RelatedList
+    public class ProgramFlowForwardRoutes : CoupledList
     {
         public ProgramFlowForwardRoutes(InstructionNode containingWrapper) : base(containingWrapper)
         {
         }
 
-        internal override List<InstructionNode> GetRelatedList(InstructionNode backArgToRemove)
+        internal override List<InstructionNode> GetPartnerList(InstructionNode backArgToRemove)
         {
             return backArgToRemove.ProgramFlowBackRoutes;
         }
 
-        internal override RelatedList GetSameList(InstructionNode nodeToMergeInto)
+        internal override CoupledList GetSameListInOtherObject(InstructionNode nodeToMergeInto)
         {
             return nodeToMergeInto.ProgramFlowForwardRoutes;
         }

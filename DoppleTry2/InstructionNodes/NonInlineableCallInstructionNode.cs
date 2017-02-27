@@ -8,14 +8,6 @@ namespace Dopple.InstructionNodes
     {
         public NonInlineableCallInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
-            if (TargetMethod.ReturnType.FullName == "System.Void")
-            {
-                StackPushCount = 0;
-            }
-            else
-            {
-                StackPushCount = 1;
-            }
         }
     }
 }

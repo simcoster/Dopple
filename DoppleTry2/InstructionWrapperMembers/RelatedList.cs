@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Dopple.InstructionWrapperMembers
 {
-    public abstract class RelatedList : List<InstructionNode>, IMergable
+    public abstract class CoupledList : List<InstructionNode>, IMergable
     {
-        public RelatedList(InstructionNode containingNode)
+        public CoupledList(InstructionNode containingNode)
         {
             _ContainingNode = containingNode;
         }
@@ -17,11 +17,11 @@ namespace Dopple.InstructionWrapperMembers
         public void RemoveTwoWay (InstructionNode backArgToRemove)
         {
             base.Remove(backArgToRemove);
-            var forwardArg = GetRelatedList(backArgToRemove).First(x => x == _ContainingNode);
-            GetRelatedList(backArgToRemove).Remove(forwardArg);
+            var forwardArg = GetPartnerList(backArgToRemove).First(x => x == _ContainingNode);
+            GetPartnerList(backArgToRemove).Remove(forwardArg);
         }
 
-        internal abstract List<InstructionNode> GetRelatedList(InstructionNode backArgToRemove);
+        internal abstract List<InstructionNode> GetPartnerList(InstructionNode backArgToRemove);
 
         public void RemoveAllTwoWay (Predicate<InstructionNode> predicate)
         {
@@ -43,7 +43,7 @@ namespace Dopple.InstructionWrapperMembers
                 return;
             }
             base.Add(toAdd);
-            GetRelatedList(toAdd).Add(_ContainingNode);
+            GetPartnerList(toAdd).Add(_ContainingNode);
         }
         public void AddTwoWay(IEnumerable<InstructionNode> rangeToAdd)
         {
@@ -55,7 +55,7 @@ namespace Dopple.InstructionWrapperMembers
 
         public IEnumerable<InstructionNode> GetBackTree()
         {
-            return this.SelectMany(x => GetSameList(x).GetBackTree().Concat(new[] { x }));
+            return this.SelectMany(x => GetSameListInOtherObject(x).GetBackTree().Concat(new[] { x }));
         }
 
         [Obsolete ("Please use AddTwoWay instead")]
@@ -88,10 +88,10 @@ namespace Dopple.InstructionWrapperMembers
             foreach (var arg in this.ToArray())
             {
                 this.RemoveTwoWay(arg);
-                GetSameList(nodeToMergeInto).AddTwoWay(arg);
+                GetSameListInOtherObject(nodeToMergeInto).AddTwoWay(arg);
             }
         }
 
-        internal abstract RelatedList GetSameList(InstructionNode nodeToMergeInto);
+        internal abstract CoupledList GetSameListInOtherObject(InstructionNode nodeToMergeInto);
     }
 }

@@ -4,18 +4,18 @@ using Dopple.InstructionWrapperMembers;
 
 namespace Dopple.InstructionNodes
 {
-    public class SingleUnitForwardRelated : RelatedList
+    public class SingleUnitForwardRelated : CoupledList
     {
         public SingleUnitForwardRelated(InstructionNode containingNode) : base(containingNode)
         {
         }
 
-        internal override List<InstructionNode> GetRelatedList(InstructionNode relatedNode)
+        internal override List<InstructionNode> GetPartnerList(InstructionNode relatedNode)
         {
             return relatedNode.SingleUnitBackRelated;
         }
 
-        internal override RelatedList GetSameList(InstructionNode nodeToMergeInto)
+        internal override CoupledList GetSameListInOtherObject(InstructionNode nodeToMergeInto)
         {
             return nodeToMergeInto.SingleUnitForwardRelated;
         }

@@ -8,11 +8,19 @@ using System.Threading.Tasks;
 
 namespace Dopple.InstructionNodes
 {
-    public class LdElemInstructionNode : InstructionNode
+    public class LdElemInstructionNode : DataTransferingNode
     {
         public LdElemInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
             DataFlowBackRelated.MaxArgIndex = 2;
+        }
+
+        public override int DataFlowDataProdivderIndex
+        {
+            get
+            {
+                return 2;
+            }
         }
     }
 }

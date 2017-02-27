@@ -41,13 +41,13 @@ namespace Dopple.InstructionNodes
                 }
                 if (constructorMethodDef != null || systemMethodsLoader.TryGetSystemMethod(instruction, out constructorMethodDef))
                 {
-                    var noArgsNewObject = new NewObjectNode(instruction, method);
-                    noArgsNewObject.StackPopCount = 0;
+                    var noArgsNewObject = new ConstructorNewObjectNode(instruction, method);
                     var constructorCallInst = Instruction.Create(typeof(OpCodes).GetFields().Select(x => x.GetValue(null)).Cast<OpCode>().First(x => x.Code == Code.Call),(MethodReference)instruction.Operand);
                     constructorCallInst.Operand = instruction.Operand;
                     constructorCallInst.Next = instruction.Next;
                     var constructorCall = new ConstructorCallNode(constructorCallInst, constructorMethodDef, method);
                     noArgsNewObject.Instruction.Next = constructorCallInst;
+                   
                     return new InstructionNode[] { noArgsNewObject, constructorCall };
                 }
                 else
@@ -83,10 +83,6 @@ namespace Dopple.InstructionNodes
             {
                 return new[] { new RetInstructionNode(instruction, method) };
             }
-            else if (nodeCode == Code.Newobj)
-            {
-                return new[] { new NewObjInstructionNode(instruction, method) };
-            }
             else if (CodeGroups.CondJumpCodes.Contains(nodeCode))
             {
                 return new[] { new ConditionalJumpNode(instruction, method) };
@@ -98,6 +94,14 @@ namespace Dopple.InstructionNodes
             else if (nodeCode == Code.Ldftn)
             {
                 return new[] { new LoadFunctionNode(instruction, method) };
+            }
+            else if (CodeGroups.ArithmeticCodes.Contains(nodeCode))
+            {
+                return new[] { new ArithmaticsNode(instruction, method) };
+            }
+            else if (new []{ Code.Castclass}.Contains(nodeCode))
+            {
+                return new[] {new SingleIndexDataTransferNode(instruction, method) };
             }
             return new[] {new InstructionNode(instruction, method)};
         }

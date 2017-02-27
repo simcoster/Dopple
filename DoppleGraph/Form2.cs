@@ -405,8 +405,8 @@ namespace DoppleGraph
             SetLongestPathRec(firstNode);
             SetRowIndexes(nodeWrappers);
             FixDuplicateCoordinates(nodeWrappers);
-            int totalHeight = 1000;
-            int totalWidth = 1000;
+            int totalHeight = 4000;
+            int totalWidth = 4000;
             float heightOffset = Convert.ToSingle(totalHeight / nodeWrappers.Select(x => x.DisplayRow).Max());
             float widthOffset = Convert.ToSingle(totalWidth / nodeWrappers.Select(x => x.DisplayCol).Max());
             foreach (var nodeWrapper in nodeWrappers)
@@ -465,18 +465,18 @@ namespace DoppleGraph
 
         private void SetRowIndexes(List<GoNodeWrapper> allNodes)
         {
-            Dictionary<MethodDefinition, int> methodRows = new Dictionary<MethodDefinition, int>();
-            int highestRowIndex = 1;
-            foreach (var node in allNodes)
-            {
-                if (!methodRows.ContainsKey(node.InstructionNode.Method))
-                {
-                    methodRows.Add(node.InstructionNode.Method, highestRowIndex);
-                    highestRowIndex++;
-                }
-                node.DisplayRow = methodRows[node.InstructionNode.Method];
-            }
-            return;
+            //Dictionary<MethodDefinition, int> methodRows = new Dictionary<MethodDefinition, int>();
+            //int highestRowIndex = 1;
+            //foreach (var node in allNodes)
+            //{
+            //    if (!methodRows.ContainsKey(node.InstructionNode.Method))
+            //    {
+            //        methodRows.Add(node.InstructionNode.Method, highestRowIndex);
+            //        highestRowIndex++;
+            //    }
+            //    node.DisplayRow = methodRows[node.InstructionNode.Method];
+            //}
+            //return;
             foreach (int col in allNodes.Select(x => x.DisplayCol).Distinct())
             {
                 var orderedNodes = allNodes.Where(x => x.DisplayCol == col)

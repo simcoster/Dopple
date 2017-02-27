@@ -59,17 +59,25 @@ namespace Dopple
             {
                 return stackPopException.problematicRoute;
             }
-            RemoveHelperCodes();
+            //RemoveHelperCodes();
+            bool shouldRerun;
+            ResolveVirtualMethods(out shouldRerun);
             //RecursionFix();
             //MergeSingleOperationNodes();
             BackTraceConditionals();
             //MergeSimilarInstructions();
             LdElemBackTrace();
+
             AddZeroNode();
             SetInstructionIndexes();
             //Verify();
 
             return InstructionNodes;
+        }
+
+        private void ResolveVirtualMethods(out bool inliningWasDone)
+        {
+            VirtualMethodResolver.ResolveVirtualMethods(InstructionNodes, out inliningWasDone);
         }
 
         private void BackTraceConditionals()
@@ -201,7 +209,7 @@ namespace Dopple
                     foreach (var secondInstOption in secondInstOptions.ToArray())
                     {
                         var secondInstBackRelated = secondInstOption.DataFlowBackRelated.Where(x => x.Argument != secondInstOption);
-                        if (ArgList.SequenceEqualsWithIndexes(secondInstBackRelated,firstInstBackRelated) && firstInst.DataFlowBackRelated.SelfFeeding == secondInstOption.DataFlowBackRelated.SelfFeeding)
+                        if (CoupledIndexedArgList.SequenceEqualsWithIndexes(secondInstBackRelated,firstInstBackRelated) && firstInst.DataFlowBackRelated.SelfFeeding == secondInstOption.DataFlowBackRelated.SelfFeeding)
                         {
                             MergeNodes(new[] { firstInst, secondInstOption });
                             mergesWereDone = true;

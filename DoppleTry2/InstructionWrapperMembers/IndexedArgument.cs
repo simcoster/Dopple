@@ -9,7 +9,7 @@ namespace Dopple
 {
     public class IndexedArgument
     {
-        public IndexedArgument(int argIndex, InstructionNode argument, ArgList containingList)
+        public IndexedArgument(int argIndex, InstructionNode argument, CoupledIndexedArgList containingList)
         {
             ArgIndex = argIndex;
             Argument = argument;
@@ -17,7 +17,7 @@ namespace Dopple
         }
         public int ArgIndex { get; set; }
         public InstructionNode Argument { get; set; }
-        public ArgList ContainingList { get; set; }
+        public CoupledIndexedArgList ContainingList { get; set; }
         public IndexedArgument MirrorArg { get; set; }
     }
 }

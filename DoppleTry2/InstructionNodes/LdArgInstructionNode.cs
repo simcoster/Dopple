@@ -42,7 +42,7 @@ namespace Dopple.InstructionNodes
                 return base.StackPopCount;
             }
 
-            set
+            protected set
             {
                 base.StackPopCount = value;
             }
@@ -74,10 +74,6 @@ namespace Dopple.InstructionNodes
             ParamDefinition = GetArgNameAndType(ArgIndex, method, out argNameTemp, out argTypeTemp);
             ArgName = argNameTemp;
             ArgType = argTypeTemp;
-            if (ArgName == "this")
-            {
-                //StackPushCount = 0;
-            }
         }
 
         private static ParameterDefinition GetArgNameAndType(int argIndex, MethodDefinition method, out string argName, out TypeReference argType)

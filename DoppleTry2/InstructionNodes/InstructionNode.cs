@@ -10,7 +10,6 @@ namespace Dopple.InstructionNodes
 {
     public class InstructionNode
     {
-
         public InstructionNode(Instruction instruction, MethodDefinition method)
         {
             Instruction = instruction;
@@ -34,7 +33,7 @@ namespace Dopple.InstructionNodes
         public ProgramFlowBackRoutes ProgramFlowBackRoutes { get; set; }
         public ProgramFlowForwardRoutes ProgramFlowForwardRoutes { get; set; }
         public DataFlowForwardArgList DataFlowForwardRelated { get; private set; }
-        virtual public DataFlowBackArgList DataFlowBackRelated { get; private set; }
+        public DataFlowBackArgList DataFlowBackRelated { get; protected set; }
         public ProgramFlowForwardAffectingArgList ProgramFlowForwardAffecting { get; internal set; }
         public ProgramFlowBackAffectedArgList ProgramFlowBackAffected { get; set; }
         public SingleUnitBackRelated SingleUnitBackRelated { get; set; }
@@ -46,16 +45,17 @@ namespace Dopple.InstructionNodes
         public int MemoryReadCount { get; set; }
         public int MemoryStoreCount { get; set; }
         public MethodDefinition Method { get; set; }
-        public virtual int StackPopCount { get; set; }
+        public virtual int StackPopCount { get; protected set; }
         public int StackPushCount { get; set; }
         public List<Type> DoneBackTracers = new List<Type>();
         public bool ProgramFlowResolveDone { get; set; } = false;
         public Guid MyGuid { get; private set; }
         public List<InstructionNode> SingleUnitNodes { get; private set; }
+        public virtual bool DataChangingNode { get; } = false;
 
         public InliningProperties InliningProperties = new InliningProperties();
 
-        private int GetStackPopCount(Instruction instruction)
+        protected int GetStackPopCount(Instruction instruction)
         {
             StackBehaviour[] pop1Codes = { StackBehaviour.Pop1, StackBehaviour.Popi, StackBehaviour.Popref, };
             StackBehaviour[] pop2Codes =
@@ -69,12 +69,7 @@ namespace Dopple.InstructionNodes
                 StackBehaviour.Popref_popi_popr4, StackBehaviour.Popref_popi_popr8, StackBehaviour.Popref_popi_popref
             };
 
-            if (CodeGroups.CallCodes.Contains(instruction.OpCode.Code))
-            {
-                return 0;
-                //return ((Mono.Cecil.MethodReference) instruction.Operand).Parameters.Count;
-            }
-            else if (Instruction.OpCode.StackBehaviourPop == StackBehaviour.Pop0)
+            if (Instruction.OpCode.StackBehaviourPop == StackBehaviour.Pop0)
             {
                 return 0;
             }
@@ -108,12 +103,31 @@ namespace Dopple.InstructionNodes
 
         public void MergeInto(InstructionNode nodeToMergeInto)
         {
-            foreach (IMergable args in new IMergable[] { DataFlowBackRelated, DataFlowForwardRelated, ProgramFlowBackAffected, ProgramFlowForwardAffecting, ProgramFlowBackRoutes, ProgramFlowForwardRoutes})
+            foreach (IMergable args in new IMergable[] { DataFlowBackRelated, DataFlowForwardRelated, ProgramFlowBackAffected, ProgramFlowForwardAffecting, ProgramFlowBackRoutes, ProgramFlowForwardRoutes })
             {
                 args.MergeInto(nodeToMergeInto);
             }
         }
 
+        public IEnumerable<InstructionNode> GetDataOriginNodes()
+        {
+            var justThis = new[] { this };
+            if (DataFlowBackRelated.Count ==0)
+            {
+                return justThis;
+            }
+            var thisAsDataTrasferingNode = this as DataTransferingNode;
+            if (thisAsDataTrasferingNode == null)
+            {
+                return justThis;
+            }
+            if (thisAsDataTrasferingNode.DataFlowBackRelated.Any(x => x.ArgIndex == thisAsDataTrasferingNode.DataFlowDataProdivderIndex) == false)
+            {
+                return justThis;
+            }
+            return DataFlowBackRelated.Where(x => x.ArgIndex == thisAsDataTrasferingNode.DataFlowDataProdivderIndex)
+                                      .SelectMany(x => x.Argument.GetDataOriginNodes());
+        }
 
         internal virtual void SelfRemove()
         {
@@ -128,11 +142,11 @@ namespace Dopple.InstructionNodes
                 forwardPath.ProgramFlowBackRoutes.AddTwoWay(ProgramFlowBackRoutes);
                 ProgramFlowForwardRoutes.RemoveTwoWay(forwardPath);
             }
-            foreach (ArgList args in new ArgList[]{ DataFlowBackRelated, ProgramFlowBackAffected, ProgramFlowForwardAffecting})
+            foreach (CoupledIndexedArgList args in new CoupledIndexedArgList[]{ DataFlowBackRelated, ProgramFlowBackAffected, ProgramFlowForwardAffecting})
             {
                 args.RemoveAllTwoWay();
             }
-            foreach (RelatedList related in new RelatedList[] { ProgramFlowBackRoutes, SingleUnitBackRelated, SingleUnitForwardRelated})
+            foreach (CoupledList related in new CoupledList[] { ProgramFlowBackRoutes, SingleUnitBackRelated, SingleUnitForwardRelated})
             {
                 related.RemoveAllTwoWay();
             }

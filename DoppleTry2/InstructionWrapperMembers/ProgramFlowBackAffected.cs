@@ -7,18 +7,18 @@ using System.Threading.Tasks;
 
 namespace Dopple.InstructionWrapperMembers
 {
-    public class ProgramFlowBackAffected : ArgList
+    public class ProgramFlowBackAffected : CoupledIndexedArgList
     {
         public ProgramFlowBackAffected(InstructionNode containingWrapper) : base(containingWrapper)
         {
         }
 
-        protected override ArgList GetMirrorList(InstructionNode node)
+        protected override CoupledIndexedArgList GetMirrorList(InstructionNode node)
         {
             return node.ProgramFlowForwardAffecting;
         }
 
-        internal override ArgList GetSameList(InstructionNode nodeToMergeInto)
+        internal override CoupledIndexedArgList GetSameList(InstructionNode nodeToMergeInto)
         {
             throw new NotImplementedException();
         }

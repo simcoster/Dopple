@@ -7,8 +7,8 @@
     <ProjectGuid>{77C5971E-3C37-4932-911D-9C6050E67FFA}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DoppleTry2</RootNamespace>
-    <AssemblyName>DoppleTry2</AssemblyName>
+    <RootNamespace>Dopple</RootNamespace>
+    <AssemblyName>Dopple</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -79,14 +79,16 @@
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="InstructionModifiers\SetStackPopPushForCalls.cs" />
     <Compile Include="InstructionModifiers\SingleFuncInlineCall.cs" />
+    <Compile Include="InstructionNodes\ArithmaticsNode.cs" />
     <Compile Include="InstructionNodes\CallNode.cs" />
     <Compile Include="InstructionNodes\ConditionalJumpNode.cs" />
     <Compile Include="InstructionNodes\ConstructorCallNode.cs" />
+    <Compile Include="InstructionNodes\DataTransferingNode.cs" />
     <Compile Include="InstructionNodes\IMergable.cs" />
     <Compile Include="InstructionNodes\LoadFunctionNode.cs" />
     <Compile Include="InstructionNodes\NewObjectNode.cs" />
-    <Compile Include="InstructionNodes\NewObjInstructionNode.cs" />
     <Compile Include="InstructionNodes\RetInstructionNode.cs" />
+    <Compile Include="InstructionNodes\SingleIndexDataTransferNode.cs" />
     <Compile Include="InstructionNodes\StElemInstructionNode.cs" />
     <Compile Include="InstructionNodes\StIndInstructionNode.cs" />
     <Compile Include="InstructionWrapperMembers\SingleUnitForwardRelated.cs" />
@@ -145,6 +147,7 @@
     <Compile Include="Verifier\StElemVerifier.cs" />
     <Compile Include="Verifier\StackPopPushVerfier.cs" />
     <Compile Include="Verifier\TwoWayVerifier.cs" />
+    <Compile Include="VirtualMethodResolver.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

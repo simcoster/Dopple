@@ -8,7 +8,7 @@ using Mono.Cecil.Cil;
 
 namespace Dopple.InstructionNodes
 {
-    public class StIndInstructionNode : InstructionNode
+    public class StIndInstructionNode : DataTransferingNode
     {
         public List<InstructionNode> AddressProvidingArgs = new List<InstructionNode>();
         public StIndInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
@@ -21,6 +21,14 @@ namespace Dopple.InstructionNodes
         }
 
         public AddressType AddressType { get; set; }
+
+        public override int DataFlowDataProdivderIndex
+        {
+            get
+            {
+                return 0;
+            }
+        }
     }
 
     public enum AddressType

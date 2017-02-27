@@ -10,29 +10,34 @@ namespace Utility
 {
     public class Class1
     {
-        //public static int SelectMe()
-        //{
-        //    var myObj2 = new TestChild();
-        //    Console.WriteLine("Interrupting");
-        //    return DoThing(myObj2);
-        //}
-        public static int DoThing(bool isTrue)
+
+        public IntClass TestOrder()
         {
-            TestParent myObj2;
-            if (isTrue)
-            {
-                myObj2 = new TestChild();
-            }
-            else
-            {
-                myObj2 = new TestAnotherChild();
-            }
-            return myObj2.Overridable(7);
+            return new IntClass(4);
         }
-        //public static bool[] LinqSelect(int[] arr)
+        public int Ordered(int first, int second)
+        {
+            return first - second;
+        }
+        //public static IEnumerable<bool> SelectMe(int[] arr)
         //{
         //    return arr.Select(x => x > 7).ToArray();
+            
         //}
+        //public static int DoThing(bool isTrue)
+        //{
+        //    TestParent myObj2;
+        //    if (isTrue)
+        //    {
+        //        myObj2 = new TestChild();
+        //    }
+        //    else
+        //    {
+        //        myObj2 = new TestAnotherChild();
+        //    }
+        //    return myObj2.Overridable(7);
+        //}
+
     }
 
     public class TestParent

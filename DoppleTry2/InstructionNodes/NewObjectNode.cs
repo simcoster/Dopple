@@ -8,7 +8,7 @@ using Mono.Cecil.Cil;
 
 namespace Dopple.InstructionNodes
 {
-    class NewObjectNode : InstructionNode
+    public class NewObjectNode : InstructionNode
     {
         public int ConstructorParamCount { get; set; }
         public NewObjectNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
@@ -17,4 +17,13 @@ namespace Dopple.InstructionNodes
             ConstructorParamCount = StackPopCount;
         }
     }
+
+    public class ConstructorNewObjectNode : InstructionNode
+    {
+        public ConstructorNewObjectNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
+        {
+            StackPopCount = 0;
+            StackPushCount = 0;
+        }
+     }
 }
