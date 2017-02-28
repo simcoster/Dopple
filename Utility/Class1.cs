@@ -10,7 +10,7 @@ namespace Utility
 {
     public class Class1
     {
-        public static IEnumerable<bool> SelectMe(int[] arr)
+        public static IEnumerable<bool> SelectMe(List<int> arr)
         {
             return arr.Select(x => x > 7).ToArray();
 

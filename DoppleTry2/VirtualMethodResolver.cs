@@ -15,36 +15,40 @@ namespace Dopple
             {
                 var virtualMethodDeclaringTypeDefinition = virtualNodeCall.TargetMethod.DeclaringType.Resolve();
                 var virtualMethodDeclaringTypeReference = virtualNodeCall.TargetMethod.DeclaringType;
-                List<TypeReference> virtualMethodTypeInheritancePath = GetInheritancePath(virtualMethodDeclaringTypeReference);
+                List<TypeDefinition> virtualMethodTypeInheritancePath = GetInheritancePath(virtualMethodDeclaringTypeReference);
 
                 foreach (var objectArg in virtualNodeCall.DataFlowBackRelated.Where(x => x.ArgIndex == 0).SelectMany(x => x.Argument.GetDataOriginNodes()))
                 //foreach (var objectArg in virtualNodeCall.DataFlowBackRelated.Where(x => x.ArgIndex == 0).Select(x => x.Argument))
-
                 {
                     TypeReference objectTypeReference = GetObjectType(objectArg);
                     TypeDefinition objectTypeDefinition = objectTypeReference.Resolve();
-                    var objectTypeInheritancePath = GetInheritancePath(objectTypeReference).Select(x => x.Resolve());
 
-                    if (virtualMethodDeclaringTypeDefinition.IsInterface)
+                    if (IsImplementing(virtualMethodDeclaringTypeDefinition, virtualMethodTypeInheritancePath, objectTypeDefinition))
                     {
-                        if (!GetAllInterfaces(objectTypeInheritancePath).Contains(virtualMethodDeclaringTypeReference))
-                        {
-                            continue;
-                        }
+                        var virtualMethodImpl = objectTypeDefinition.Methods.First(x => x.MetadataToken == virtualNodeCall.TargetMethod.Resolve().MetadataToken);
                     }
-                    else if (!virtualMethodTypeInheritancePath.Contains(objectTypeReference))
-                    {
-                        continue;
-                    }
-                    else
-                    {
-
-                    }
-
                     var objectMethods = GetObjectMethods(objectArg);
                 }
             }
             inlinlingWasMade = false;
+        }
+
+        private static bool IsImplementing(TypeDefinition virtualMethodDeclaringTypeDefinition, List<TypeDefinition> virtualMethodTypeInheritancePath, TypeDefinition objectTypeDefinition)
+        {
+            var objectTypeInheritancePath = GetInheritancePath(objectTypeDefinition).Select(x => x.Resolve());
+
+            if (virtualMethodDeclaringTypeDefinition.IsInterface)
+            {
+                if (!GetAllInterfaces(objectTypeInheritancePath).Any(x => x.MetadataToken == virtualMethodDeclaringTypeDefinition.MetadataToken))
+                {
+                    return false;
+                }
+            }
+            else if (!virtualMethodTypeInheritancePath.Any(x => x.MetadataToken == objectTypeDefinition.MetadataToken))
+            {
+                return false;
+            }
+            return true;
         }
 
         private static IEnumerable<TypeReference> GetAllInterfaces(IEnumerable<TypeDefinition> inheritancePath)
@@ -52,14 +56,15 @@ namespace Dopple
             return inheritancePath.SelectMany(x => x.Interfaces.SelectMany(y => GetInheritancePath(y))).Distinct();
         }
 
-        private static List<TypeReference> GetInheritancePath(TypeReference baseTypeReference)
+        private static List<TypeDefinition> GetInheritancePath(TypeReference baseTypeReference)
         {
+            List<TypeDefinition> typeInheritancePath = new List<TypeDefinition>();
             TypeReference currTypeRef = baseTypeReference;
-            List<TypeReference> typeInheritancePath = new List<TypeReference>();
             while (currTypeRef != null)
             {
-                typeInheritancePath.Add(currTypeRef);
-                currTypeRef = currTypeRef.DeclaringType;
+                TypeDefinition currTypeDef = currTypeRef.Resolve();
+                typeInheritancePath.Add(currTypeDef);
+                currTypeRef = currTypeDef.BaseType;
             }
             return typeInheritancePath;
         }
