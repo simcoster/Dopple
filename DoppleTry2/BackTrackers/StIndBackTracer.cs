@@ -10,10 +10,6 @@ namespace Dopple.BackTracers
 {
     class StIndAddressBackTracer : BackTracer
     {
-        public StIndAddressBackTracer(List<InstructionNode> instructionsWrappers) : base(instructionsWrappers)
-        {
-        }
-
         public override Code[] HandlesCodes
         {
             get

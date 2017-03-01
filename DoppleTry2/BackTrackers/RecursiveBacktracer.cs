@@ -7,7 +7,7 @@ namespace Dopple.BackTracers
     {
         protected BackTraceManager backtraceManager;
 
-        public RecursiveBacktracer(List<InstructionNode> instructionNodes, BackTraceManager backtraceManager) : base(instructionNodes)
+        public RecursiveBacktracer(BackTraceManager backtraceManager)
         {
             this.backtraceManager = backtraceManager;
         }

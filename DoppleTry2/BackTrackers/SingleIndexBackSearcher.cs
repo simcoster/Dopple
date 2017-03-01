@@ -7,15 +7,9 @@ using System.Threading.Tasks;
 
 namespace Dopple.BackTracers
 {
-    public class SingleIndexBackSearcher
+    public static class SingleIndexBackSearcher
     {
-        private List<InstructionNode> InstructionWrappers;
-        public SingleIndexBackSearcher(List<InstructionNode> instructionsWrappers)
-        {
-            InstructionWrappers = instructionsWrappers;
-        }
-
-        public List<InstructionNode> SearchBackwardsForDataflowInstrcutions(Func<InstructionNode, bool> predicate,
+        public static List<InstructionNode> SearchBackwardsForDataflowInstrcutions(Func<InstructionNode, bool> predicate,
        InstructionNode startInstruction)
         {
             List<InstructionNode> foundBackInstructions = SafeSearchBackwardsForDataflowInstrcutions(predicate, startInstruction);
@@ -26,13 +20,13 @@ namespace Dopple.BackTracers
             return foundBackInstructions;
         }
 
-        public List<InstructionNode> SafeSearchBackwardsForDataflowInstrcutions(Func<InstructionNode, bool> predicate,
+        public static List<InstructionNode> SafeSearchBackwardsForDataflowInstrcutions(Func<InstructionNode, bool> predicate,
            InstructionNode startInstruction)
         {
-            return startInstruction.ProgramFlowBackRoutes.SelectMany(x => SafeSearchBackwardsForDataflowInstrcutions(InstructionWrappers, predicate, x, new List<InstructionNode>())).ToList();
+            return startInstruction.ProgramFlowBackRoutes.SelectMany(x => SafeSearchBackwardsForDataflowInstrcutions(predicate, x, new List<InstructionNode>())).ToList();
         }
 
-        public List<InstructionNode> SafeSearchBackwardsForDataflowInstrcutions(List<InstructionNode> instructionNodes, Func<InstructionNode, bool> predicate,
+        public static List<InstructionNode> SafeSearchBackwardsForDataflowInstrcutions(Func<InstructionNode, bool> predicate,
         InstructionNode startInstruction, List<InstructionNode> visitedInstructions)
         {
             if (visitedInstructions == null)
@@ -40,33 +34,27 @@ namespace Dopple.BackTracers
                 visitedInstructions = new List<InstructionNode>();
             }
             var foundInstructions = new List<InstructionNode>();
-            int index = instructionNodes.IndexOf(startInstruction);
-            if (index < 0)
-            {
-                throw new Exception("shouldn't get here");
-            }
 
-            var currInstruction = instructionNodes[index];
-            if (visitedInstructions.Contains(currInstruction))
+            if (visitedInstructions.Contains((InstructionNode) startInstruction))
             {
                 return new List<InstructionNode>();
             }
             else
             {
-                visitedInstructions.Add(currInstruction);
+                visitedInstructions.Add((InstructionNode) startInstruction);
             }
 
-            if (predicate.Invoke(currInstruction))
+            if (predicate.Invoke((InstructionNode) startInstruction))
             {
-                foundInstructions.Add(currInstruction);
+                foundInstructions.Add((InstructionNode) startInstruction);
             }
 
             else
             {
-                foreach (var instructionWrapper in currInstruction.ProgramFlowBackRoutes)
+                foreach (var instructionWrapper in startInstruction.ProgramFlowBackRoutes)
                 {
                     IEnumerable<InstructionNode> branchindexes =
-                        SafeSearchBackwardsForDataflowInstrcutions(instructionNodes, predicate, instructionWrapper, visitedInstructions);
+                        SafeSearchBackwardsForDataflowInstrcutions(predicate, instructionWrapper, visitedInstructions);
                     foundInstructions.AddRange(branchindexes);
                 }
             }

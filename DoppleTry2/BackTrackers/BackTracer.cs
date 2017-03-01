@@ -12,20 +12,10 @@ namespace Dopple.BackTracers
     public abstract class BackTracer
     {
         protected InstructionNode Instruction;
-        protected readonly List<InstructionNode> InstructionNodes;
-        protected BackTracer(List<InstructionNode> instructionNodes)
-        {
-            InstructionNodes = instructionNodes;
-        }
         protected abstract void InnerAddBackDataflowConnections(InstructionNode currentInst);
         public void AddBackDataflowConnections(InstructionNode currentInst)
         {
-            if (currentInst.DoneBackTracers.Contains(GetType()))
-            {
-                return;
-            }
             InnerAddBackDataflowConnections(currentInst);
-            currentInst.DoneBackTracers.Add(GetType());
         }
 
 

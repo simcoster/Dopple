@@ -10,13 +10,10 @@ namespace Dopple.BackTracers
 {
     class LdStaticFieldBackTracer : SingeIndexBackTracer
     {
-        public LdStaticFieldBackTracer(List<InstructionNode> instructionsWrappers) : base(instructionsWrappers)
-        {
-        }
 
         protected override IEnumerable<InstructionNode> GetDataflowBackRelatedArgGroup(InstructionNode instWrapper)
         {
-            return _SingleIndexBackSearcher.SafeSearchBackwardsForDataflowInstrcutions(x => x.Instruction.OpCode.Code == Code.Stsfld &&
+            return SingleIndexBackSearcher.SafeSearchBackwardsForDataflowInstrcutions(x => x.Instruction.OpCode.Code == Code.Stsfld &&
                                                                   x.Instruction.Operand ==
                                                                   instWrapper.Instruction.Operand, instWrapper);
         }

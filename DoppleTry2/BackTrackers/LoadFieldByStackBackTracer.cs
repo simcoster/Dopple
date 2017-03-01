@@ -10,10 +10,6 @@ namespace Dopple.BackTracers
 {
     class LoadFieldByStackBackTracer : SingeIndexBackTracer
     {
-        public LoadFieldByStackBackTracer(List<InstructionNode> instructionsWrappers) : base(instructionsWrappers)
-        {
-        }
-
         protected override IEnumerable<InstructionNode> GetDataflowBackRelatedArgGroup(InstructionNode instWrapper)
         {
 
@@ -21,7 +17,7 @@ namespace Dopple.BackTracers
                                   x.Instruction.OpCode.Code == Code.Stfld &&
                                   BackSearcher.HaveCommonStackPushAncestor(x, instWrapper) &&
                                   x.Instruction.Operand == instWrapper.Instruction.Operand;
-            var storeFieldInsts = _SingleIndexBackSearcher.SafeSearchBackwardsForDataflowInstrcutions(predicate, instWrapper);
+            var storeFieldInsts = SingleIndexBackSearcher.SafeSearchBackwardsForDataflowInstrcutions(predicate, instWrapper);
             if (storeFieldInsts.Count > 0)
             {
                 return storeFieldInsts;
@@ -29,7 +25,7 @@ namespace Dopple.BackTracers
             predicate = x =>
                 x.MemoryStoreCount > 0 &&
                 BackSearcher.HaveCommonStackPushAncestor(x, instWrapper);
-            var storeObjInsts = _SingleIndexBackSearcher.SafeSearchBackwardsForDataflowInstrcutions(predicate, instWrapper);
+            var storeObjInsts = SingleIndexBackSearcher.SafeSearchBackwardsForDataflowInstrcutions(predicate, instWrapper);
             if (storeObjInsts.Count > 0)
             {
                 return storeObjInsts;

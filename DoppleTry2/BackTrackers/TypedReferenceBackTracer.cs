@@ -10,13 +10,9 @@ namespace Dopple.BackTracers
 {
     class TypedReferenceBackTracer : SingeIndexBackTracer
     {
-        public TypedReferenceBackTracer(List<InstructionNode> instructionsWrappers) : base(instructionsWrappers)
-        {
-        }
-
         protected override IEnumerable<InstructionNode> GetDataflowBackRelatedArgGroup(InstructionNode instWrapper)
         {
-            return _SingleIndexBackSearcher.SearchBackwardsForDataflowInstrcutions(x => x.Instruction.OpCode.Code == Code.Mkrefany, instWrapper);
+            return SingleIndexBackSearcher.SearchBackwardsForDataflowInstrcutions(x => x.Instruction.OpCode.Code == Code.Mkrefany, instWrapper);
         }
 
 

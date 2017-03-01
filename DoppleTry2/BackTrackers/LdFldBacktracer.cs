@@ -11,10 +11,6 @@ namespace Dopple.BackTracers
 {
     class LdFldBacktracer : SingeIndexBackTracer
     {
-        public LdFldBacktracer(List<InstructionNode> instructionNodes) : base(instructionNodes)
-        {
-        }
-
         public override Code[] HandlesCodes
         {
             get
@@ -30,14 +26,14 @@ namespace Dopple.BackTracers
             Func<InstructionNode, bool> predicate = x => x.Instruction.OpCode.Code == Code.Stfld &&
                                                              x.DataFlowBackRelated.Where(y => y.ArgIndex == 0).Select(y => y.Argument).SequenceEqual(objectInstanceArgs) &&
                                                              ((FieldReference)x.Instruction.Operand).MetadataToken == fieldDefinitionArg.MetadataToken;
-            var found = _SingleIndexBackSearcher.SafeSearchBackwardsForDataflowInstrcutions(predicate, instructionNode);
-            var found2 = _SingleIndexBackSearcher.SafeSearchBackwardsForDataflowInstrcutions(x => x.Instruction.OpCode.Code == Code.Stfld && ((FieldReference) x.Instruction.Operand).Name == fieldDefinitionArg.Name, instructionNode);
+            var found = SingleIndexBackSearcher.SafeSearchBackwardsForDataflowInstrcutions(predicate, instructionNode);
+            var found2 = SingleIndexBackSearcher.SafeSearchBackwardsForDataflowInstrcutions(x => x.Instruction.OpCode.Code == Code.Stfld && ((FieldReference) x.Instruction.Operand).Name == fieldDefinitionArg.Name, instructionNode);
 
             if (found.Count ==0)
             {
                 Console.WriteLine("notine foound for " + instructionNode.InstructionIndex);
             }
-            return _SingleIndexBackSearcher.SafeSearchBackwardsForDataflowInstrcutions(predicate, instructionNode);
+            return SingleIndexBackSearcher.SafeSearchBackwardsForDataflowInstrcutions(predicate, instructionNode);
         }
     }
 }

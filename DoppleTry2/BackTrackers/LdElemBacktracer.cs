@@ -10,10 +10,6 @@ namespace Dopple.BackTracers
 {
     class LdElemBacktracer : SingeIndexBackTracer
     {
-        public LdElemBacktracer(List<InstructionNode> instructionsWrappers) : base(instructionsWrappers)
-        {
-        }
-
         public override Code[] HandlesCodes
         {
             get
@@ -29,9 +25,9 @@ namespace Dopple.BackTracers
             Func<InstructionNode, bool> predicate = x => x is StElemInstructionNode &&
                                                              x.DataFlowBackRelated.Where(y => y.ArgIndex == 0).Select(y => y.Argument).SequenceEqual(index0Arg) &&
                                                              x.DataFlowBackRelated.Where(y => y.ArgIndex == 1).Select(y => y.Argument).SequenceEqual(index1Arg);
-            var found = _SingleIndexBackSearcher.SafeSearchBackwardsForDataflowInstrcutions(x => CodeGroups.StElemCodes.Contains(x.Instruction.OpCode.Code), instWrapper);
+            var found = SingleIndexBackSearcher.SafeSearchBackwardsForDataflowInstrcutions(x => CodeGroups.StElemCodes.Contains(x.Instruction.OpCode.Code), instWrapper);
             var foundArgs = found.Select(x => x.DataFlowBackRelated.Select(y => y.ArgIndex + "=" + y.Argument.InstructionIndex).Aggregate((y, z) => (y + " , " + z)));
-            return _SingleIndexBackSearcher.SafeSearchBackwardsForDataflowInstrcutions(predicate, instWrapper);
+            return SingleIndexBackSearcher.SafeSearchBackwardsForDataflowInstrcutions(predicate, instWrapper);
         }
     }
 }

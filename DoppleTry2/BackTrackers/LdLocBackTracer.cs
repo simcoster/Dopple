@@ -20,13 +20,9 @@ namespace Dopple.BackTracers
                                     && ((VariableDefinition)y.Instruction.Operand).Index == ldInstNode.LocIndex
                                     && y.Method == instNode.Method);
 
-            return _SingleIndexBackSearcher.SearchBackwardsForDataflowInstrcutions(x => nodeIsARelevantStloc(x) ||  nodeIsARelevantStind(x) ,instNode);
+            return SingleIndexBackSearcher.SearchBackwardsForDataflowInstrcutions(x => nodeIsARelevantStloc(x) ||  nodeIsARelevantStind(x) ,instNode);
         }
 
         public override Code[] HandlesCodes => CodeGroups.LdLocCodes;
-
-        public LdLocBackTracer(List<InstructionNode> instructionNodes) : base(instructionNodes)
-        {
-        }
     }
 }

@@ -49,6 +49,7 @@ namespace Dopple
         public List<InstructionNode> Run()
         {
             bool shouldRerun = true ;
+            bool isFirstRun = true;
             SetInstructionIndexes();
             while (shouldRerun)
             {
@@ -57,7 +58,7 @@ namespace Dopple
                 SetInstructionIndexes();
                 try
                 {
-                    BackTrace();
+                    BackTrace(isFirstRun);
                 }
                 catch (StackPopException stackPopException)
                 {
@@ -71,6 +72,7 @@ namespace Dopple
                 LdElemBackTrace();
                 ResolveVirtualMethods(out shouldRerun);
                 SetInstructionIndexes();
+                isFirstRun = false;
             }
             AddZeroNode();
             //Verify();
@@ -85,7 +87,7 @@ namespace Dopple
 
         private void BackTraceConditionals()
         {
-            ConditionionalsBackTracer conditionalBacktracer = new ConditionionalsBackTracer(InstructionNodes);
+            ConditionionalsBackTracer conditionalBacktracer = new ConditionionalsBackTracer();
             foreach(var condNode in InstructionNodes.Where(x => x is ConditionalJumpNode))
             {
                 conditionalBacktracer.AddBackDataflowConnections(condNode);
@@ -120,8 +122,8 @@ namespace Dopple
         private void MergeSingleOperationNodes()
         {
             var postMergeBackTracers = new BackTracer[] {
-                                                        new SingleConditionOperationUnitBackTracer(InstructionNodes),
-                                                        new SingleArithmeticWithConstantBacktracer(InstructionNodes)
+                                                        new SingleConditionOperationUnitBackTracer(),
+                                                        new SingleArithmeticWithConstantBacktracer()
                                                         };
             foreach (var node in InstructionNodes.OrderByDescending(x => x.InstructionIndex))
             {
@@ -154,8 +156,8 @@ namespace Dopple
         private void LdElemBackTrace()
         {
             var postMergeBackTracers = new BackTracer[] {
-                                                        new LdElemBacktracer(InstructionNodes),
-                                                        new LdFldBacktracer(InstructionNodes)
+                                                        new LdElemBacktracer(),
+                                                        new LdFldBacktracer()
                                                         };
             foreach (var node in InstructionNodes.OrderByDescending(x => x.InstructionIndex))
             {
@@ -255,22 +257,14 @@ namespace Dopple
                                                                             .Select(x => x.OrderBy(y => y.InstructionIndex).First());
         }
 
-        private void BackTrace()
+        private void BackTrace(bool isFirstRun)
         {
-            new StackForwardTracer(InstructionNodes).TraceForward(InstructionNodes[0]);
-            foreach (var instWrapper in InstructionNodes.Where(x => x is LdArgInstructionNode).OrderByDescending(x => x.InstructionIndex))
+            if (isFirstRun)
             {
-                _backTraceManager.BackTrace(instWrapper);
+                _backTraceManager.BackTraceInFunctionBounds(InstructionNodes);
             }
-            var stIndAddressBackTracer = new StIndAddressBackTracer(InstructionNodes);
-            foreach (var instWrapper in InstructionNodes.Where(x => stIndAddressBackTracer.HandlesCodes.Contains(x.Instruction.OpCode.Code)).OrderByDescending(x => x.InstructionIndex))
-            {
-                stIndAddressBackTracer.AddBackDataflowConnections(instWrapper);
-            }
-            foreach (var node in InstructionNodes.OrderByDescending(x => x.InstructionIndex))
-            {
-                _backTraceManager.BackTrace(node);
-            }
+            _backTraceManager.BackTraceOutsideFunctionBounds(InstructionNodes);
+           
         }
 
         private void MergeImmediateValue()

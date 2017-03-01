@@ -10,10 +10,6 @@ namespace Dopple.BackTracers
 {
     class SingleConditionOperationUnitBackTracer : BackTracer
     {
-        public SingleConditionOperationUnitBackTracer(List<InstructionNode> instructionNodes) : base(instructionNodes)
-        {
-        }
-
         private Code[] InUnitCodes = CodeGroups.LdLocCodes
                                     .Concat(CodeGroups.StLocCodes)
                                     .Concat(new []{ Code.And, Code.Or, Code.Ceq, Code.Cgt, Code.Cgt_Un, Code.Clt, Code.Clt_Un }).ToArray();

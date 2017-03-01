@@ -50,7 +50,7 @@ namespace Dopple.InstructionModifiers
                 callNode.StackPushCount = 0;
             }
             List<InstructionNode> inlinedNodes = calledFunc.Body.Instructions.SelectMany(x => _InstructionNodeFactory.GetInstructionNodes(x, calledFunc)).ToList();
-            inlinedNodes.ForEach(x => SetNodeProps(x, callSequenceClone));
+            inlinedNodes.ForEach(x => SetNodeProps(x, callSequenceClone, callNode));
             if (callNode is ConstructorCallNode)
             {
                 inlinedNodes.Where(x => x is RetInstructionNode).Cast<RetInstructionNode>().ForEach(x => { x.StackPushCount = 1; x.ReturnsNewObject = true; });
@@ -69,9 +69,10 @@ namespace Dopple.InstructionModifiers
             return inlinedNodes;
         }
 
-        private void SetNodeProps(InstructionNode inlinedNode, List<MethodDefinition> callSequence)
+        private void SetNodeProps(InstructionNode inlinedNode, List<MethodDefinition> callSequence, InlineableCallNode callNode)
         {
             inlinedNode.InliningProperties.Inlined = true;
+            inlinedNode.InliningProperties.CallNode = callNode;
             if (callSequence.Contains(inlinedNode.Method) && inlinedNode.Instruction.OpCode.Code != Code.Callvirt)
             {
                 inlinedNode.InliningProperties.Recursive = true;

@@ -10,14 +10,10 @@ namespace Dopple.BackTracers
 {
     class LoadMemoryByOperandBackTracer : SingeIndexBackTracer
     {
-        public LoadMemoryByOperandBackTracer(List<InstructionNode> instructionsWrappers) : base(instructionsWrappers)
-        {
-        }
-
         protected override IEnumerable<InstructionNode> GetDataflowBackRelatedArgGroup(InstructionNode instWrapper)
         {
             var storeIndex =
-            _SingleIndexBackSearcher.SearchBackwardsForDataflowInstrcutions(x => x.MemoryStoreCount > 0 &&
+            SingleIndexBackSearcher.SearchBackwardsForDataflowInstrcutions(x => x.MemoryStoreCount > 0 &&
                                                         instWrapper.Instruction.Operand ==
                                                         x.Instruction.Operand, instWrapper);
             return storeIndex;

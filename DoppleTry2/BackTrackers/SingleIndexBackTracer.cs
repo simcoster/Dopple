@@ -9,12 +9,6 @@ namespace Dopple.BackTracers
 {
     public abstract class SingeIndexBackTracer : BackTracer
     {
-        public SingeIndexBackTracer(List<InstructionNode> instructionNodes) : base(instructionNodes)
-        {
-            _SingleIndexBackSearcher = new SingleIndexBackSearcher(instructionNodes);
-        }
-        protected SingleIndexBackSearcher _SingleIndexBackSearcher;
-
         protected IEnumerable<IEnumerable<InstructionNode>> GetDataflowBackRelated(InstructionNode instNode)
         {
             return new List<List<InstructionNode>>() { { GetDataflowBackRelatedArgGroup(instNode).ToList() } };

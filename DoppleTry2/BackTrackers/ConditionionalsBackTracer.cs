@@ -11,10 +11,6 @@ namespace Dopple.BackTracers
 {
     class ConditionionalsBackTracer : BackTracer
     {
-        public ConditionionalsBackTracer(List<InstructionNode> instructionNodes) : base(instructionNodes)
-        {
-        }
-
         private List<List<InstructionNode>> MapAllPossibleExecutionRoutes(InstructionNode startNode, List<InstructionNode> startPath = null)
         {
             List<InstructionNode> currentPath;

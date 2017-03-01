@@ -9,28 +9,22 @@ namespace Dopple.BackTracers
 {
     public class StackForwardTracer
     {
-        private List<InstructionNode> _InstructionNodes;
-
-        public StackForwardTracer(List<InstructionNode> instructionNodes)
+        public void TraceForward(List<InstructionNode> instructionNodes)
         {
-            _InstructionNodes = instructionNodes;
-        }
-        public void TraceForward(InstructionNode currentNode)
-        {
-            TraceForwardRec(currentNode);
-            foreach (var node in _InstructionNodes)
+            TraceForwardRec(instructionNodes);
+            foreach (var node in instructionNodes)
             {
                 node.DataFlowBackRelated.UpdateLargestIndex();
                 node.StackBacktraceDone = true;
             }
         }
-        public void TraceForwardRec(InstructionNode currentNode, List<InstructionNode> visitedNodes = null , Stack<InstructionNode> stackedNodes =null)
+        public void TraceForwardRec(List<InstructionNode> instructionNodes, InstructionNode currentNode = null, List<InstructionNode> visitedNodes = null , Stack<InstructionNode> stackedNodes =null)
         {
             if (stackedNodes == null && visitedNodes == null)
             {
                 stackedNodes = new Stack<InstructionNode>();
                 visitedNodes = new List<InstructionNode>();
-                currentNode = _InstructionNodes[0];
+                currentNode = instructionNodes[0];
             }
             else if (!(stackedNodes !=null && visitedNodes != null))
             {
@@ -66,7 +60,7 @@ namespace Dopple.BackTracers
 
             if (forwardRouteCount == 1)
             {
-                TraceForwardRec(currentNode.ProgramFlowForwardRoutes[0], visitedNodes, stackedNodes);
+                TraceForwardRec(instructionNodes, currentNode.ProgramFlowForwardRoutes[0], visitedNodes, stackedNodes);
             }
             else
             {
@@ -74,19 +68,7 @@ namespace Dopple.BackTracers
                 {
                     var stackedNodesClone = new Stack<InstructionNode>(stackedNodes.Reverse());
                     var visitedNodesClone = new List<InstructionNode>(visitedNodes);
-                    TraceForwardRec(forwardRoute, visitedNodesClone, stackedNodesClone);
-                }
-            }
-        }
-
-        private void MergeCloneIntoOriginal(List<InstructionNode> clonedInstructionNodes)
-        {
-            for (int i = 0; i < clonedInstructionNodes.Count; i++)
-            {
-                foreach (var backNode in clonedInstructionNodes[i].DataFlowBackRelated)
-                {
-                    int index = clonedInstructionNodes.IndexOf(backNode.Argument);
-                    _InstructionNodes[i].DataFlowBackRelated.AddTwoWay(_InstructionNodes[index], backNode.ArgIndex);
+                    TraceForwardRec(instructionNodes,forwardRoute, visitedNodesClone, stackedNodesClone);
                 }
             }
         }

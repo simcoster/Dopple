@@ -9,5 +9,6 @@ namespace Dopple.InstructionNodes
         public int SameMethodCallIndex = 0;
         public int RecursionLevel { get; set; } = 0;
         public bool Recursive { get; set; } = false;
+        public InlineableCallNode CallNode { get; set; }
     }
 }

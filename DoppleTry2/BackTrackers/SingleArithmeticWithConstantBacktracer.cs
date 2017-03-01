@@ -10,10 +10,6 @@ namespace Dopple.BackTracers
 {
     class SingleArithmeticWithConstantBacktracer : BackTracer
     {
-        public SingleArithmeticWithConstantBacktracer(List<InstructionNode> instructionNodes) : base(instructionNodes)
-        {
-        }
-
         public override Code[] HandlesCodes
         {
             get
