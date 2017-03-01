@@ -47,11 +47,27 @@ namespace Dopple.InstructionNodes
                 base.StackPopCount = value;
             }
         }
+
+        public override int DataFlowDataProdivderIndex
+        {
+            get
+            {
+                return 0;
+            }
+        }
     }
 
     public class StArgInstructionNode : FunctionArgInstNode
     {
         public StArgInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method) { }
+
+        public override int DataFlowDataProdivderIndex
+        {
+            get
+            {
+                return 0;
+            }
+        }
     }
 
     public class StThisArgInstructionWrapper : StArgInstructionNode
@@ -64,7 +80,7 @@ namespace Dopple.InstructionNodes
         }
     }
 
-    public abstract class FunctionArgInstNode : InstructionNode
+    public abstract class FunctionArgInstNode : DataTransferingNode
     {
         public FunctionArgInstNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {

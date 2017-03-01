@@ -18,7 +18,11 @@ namespace Dopple.BackTracers
         public void TraceForward(InstructionNode currentNode)
         {
             TraceForwardRec(currentNode);
-            _InstructionNodes.ForEach(x => x.DataFlowBackRelated.UpdateLargestIndex());
+            foreach (var node in _InstructionNodes)
+            {
+                node.DataFlowBackRelated.UpdateLargestIndex();
+                node.StackBacktraceDone = true;
+            }
         }
         public void TraceForwardRec(InstructionNode currentNode, List<InstructionNode> visitedNodes = null , Stack<InstructionNode> stackedNodes =null)
         {
@@ -31,21 +35,30 @@ namespace Dopple.BackTracers
             else if (!(stackedNodes !=null && visitedNodes != null))
             {
                 throw new Exception("all should be null or none");
-            }            
-            for (int i=0; i < currentNode.StackPopCount; i++)
-            {
-                currentNode.DataFlowBackRelated.AddTwoWay(stackedNodes.Pop());
             }
-            for (int i = 0; i < currentNode.StackPushCount; i++)
+            if (!currentNode.StackBacktraceDone)
             {
-                stackedNodes.Push(currentNode);
+                currentNode.DataFlowBackRelated.ResetIndex();
+                for (int i = 0; i < currentNode.StackPopCount; i++)
+                {
+                    if (stackedNodes.Count ==0)
+                    {
+                        throw new Exception("not enough stacked arguments");
+                    }
+                    currentNode.DataFlowBackRelated.AddTwoWay(stackedNodes.Pop());
+                }
+                for (int i = 0; i < currentNode.StackPushCount; i++)
+                {
+                    stackedNodes.Push(currentNode);
+                }
             }
             int forwardRouteCount = currentNode.ProgramFlowForwardRoutes.Count;
             if (forwardRouteCount == 0 || visitedNodes.Contains(currentNode))
             {
                 if (stackedNodes.Count > 1)
                 {
-                    throw new StackPopException("Finished with extra nodes", visitedNodes.Concat(new[] { currentNode }).ToList());
+                    //TODO remove
+                    //throw new StackPopException("Finished with extra nodes", visitedNodes.Concat(new[] { currentNode }).ToList());
                 }
                 return;
             }
@@ -61,7 +74,6 @@ namespace Dopple.BackTracers
                 {
                     var stackedNodesClone = new Stack<InstructionNode>(stackedNodes.Reverse());
                     var visitedNodesClone = new List<InstructionNode>(visitedNodes);
-                    _InstructionNodes.ForEach(x => x.DataFlowBackRelated.ResetIndex());
                     TraceForwardRec(forwardRoute, visitedNodesClone, stackedNodesClone);
                 }
             }

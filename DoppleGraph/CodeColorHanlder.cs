@@ -1,4 +1,5 @@
-﻿using Mono.Cecil.Cil;
+﻿using Dopple;
+using Mono.Cecil.Cil;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -76,9 +77,7 @@ namespace DoppleGraph
                 }
             }
 
-            var undeltCodes =
-            typeof(OpCodes).GetFields().Select(x => x.GetValue(null)).Cast<OpCode>()
-                           .Select(x => x.Code).Except(deltCodes.SelectMany(x => x));
+            var undeltCodes = CodeGroups.AllOpcodes.Select(x => x.Code).Except(deltCodes.SelectMany(x => x));
 
             foreach (var loneCode in undeltCodes)
             {

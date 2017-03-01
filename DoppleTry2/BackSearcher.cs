@@ -63,7 +63,7 @@ namespace Dopple
                 return new InstructionNode[0];
             }
             visited.Add(startInst);
-            visited.AddRange(startInst.ProgramFlowBackRoutes.SelectMany(x => GetBackDataTree(x, visited)).ToArray());
+            visited.AddRange(startInst.ProgramFlowBackRoutes.SelectMany(x => GetBackFlowTree(x, visited)).ToArray());
             return visited.Distinct();
         }
 

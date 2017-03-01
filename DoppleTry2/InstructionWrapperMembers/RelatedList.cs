@@ -83,15 +83,18 @@ namespace Dopple.InstructionWrapperMembers
             base.RemoveAll(predicate);
         }
 
-        public void MergeInto(InstructionNode nodeToMergeInto)
+        internal abstract CoupledList GetSameListInOtherObject(InstructionNode nodeToMergeInto);
+
+        public void MergeInto(InstructionNode nodeToMergeInto, bool KeepOriginal)
         {
             foreach (var arg in this.ToArray())
             {
-                this.RemoveTwoWay(arg);
+                if (!KeepOriginal)
+                {
+                    this.RemoveTwoWay(arg);
+                }
                 GetSameListInOtherObject(nodeToMergeInto).AddTwoWay(arg);
             }
         }
-
-        internal abstract CoupledList GetSameListInOtherObject(InstructionNode nodeToMergeInto);
     }
 }

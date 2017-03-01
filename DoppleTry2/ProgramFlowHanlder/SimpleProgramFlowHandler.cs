@@ -11,11 +11,7 @@ namespace Dopple.ProgramFlowHanlder
     {
         public SimpleProgramFlowHandler()
         {
-            HandledCodes = typeof(OpCodes).GetFields()
-                .Select(x => x.GetValue(null))
-                .Cast<OpCode>()
-                .Select(y => y.Code).
-                Except(_unhandledCodes).ToArray();
+            HandledCodes = CodeGroups.AllOpcodes.Select(x => x.Code).Except(_unhandledCodes).ToArray();
         }
 
         private readonly Code[] _unhandledCodes = new[] { Code.Br, Code.Br_S, Code.Ret };

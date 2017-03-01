@@ -14,10 +14,10 @@ namespace Dopple.InstructionNodes
         public StIndInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
         }
-        internal override void SelfRemove()
+        internal override void SelfRemoveAndStitch()
         {
             DataFlowBackRelated.RemoveAllTwoWay(x => x.ArgIndex == 0);
-            base.SelfRemove();
+            base.SelfRemoveAndStitch();
         }
 
         public AddressType AddressType { get; set; }

@@ -92,7 +92,6 @@ namespace Dopple
         {
             if (this.Any(x => x.ArgIndex==toAdd.ArgIndex && x.Argument == toAdd.Argument))
             {
-                Debug.WriteLine("skipped adding argIndex {0} with inst {1}, duplicate exists", toAdd.ArgIndex, toAdd.Argument);
                 return;
             }
             var toAddClone = new IndexedArgument(toAdd.ArgIndex, toAdd.Argument, toAdd.ContainingList);
@@ -148,13 +147,16 @@ namespace Dopple
         internal abstract CoupledIndexedArgList GetSameList(InstructionNode nodeToMergeInto);
         protected abstract CoupledIndexedArgList GetMirrorList(InstructionNode node);
 
-        void IMergable.MergeInto(InstructionNode nodeToMergeInto)
+        public void MergeInto(InstructionNode nodeToMergeInto, bool KeepOriginal)
         {
             CoupledIndexedArgList mergedNodeSameArgList = GetSameList(nodeToMergeInto);
             foreach (var arg in this.ToArray())
             {
                 mergedNodeSameArgList.AddTwoWay(arg);
-                RemoveTwoWay(arg);
+                if (!KeepOriginal)
+                {
+                    RemoveTwoWay(arg);
+                }
             }
         }
     }

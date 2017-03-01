@@ -111,7 +111,6 @@ namespace DoppleGraph
 
         private void MyView_KeyPress(object sender, KeyPressEventArgs e)
         {
-            var backTraceManager = new GraphBuilder(InstructionNodes);
             if (e.KeyChar == '/')
             {
                 ObjectsToHide[HiddenNodesHideIndex].AddRange(myView.Selection);

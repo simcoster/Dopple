@@ -9,51 +9,82 @@ namespace Dopple
 {
     internal class VirtualMethodResolver
     {
-        internal static void ResolveVirtualMethods(List<InstructionNode> instructionNodes, out bool inlinlingWasMade)
+        InstructionNodeFactory _InstructionNodeFactory = new InstructionNodeFactory();
+        internal void ResolveVirtualMethods(List<InstructionNode> instructionNodes, out bool inlinlingWasMade)
         {
-            foreach (NonInlineableCallInstructionNode virtualNodeCall in instructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Callvirt))
+            inlinlingWasMade = false;
+
+            foreach (VirtualCallInstructionNode virtualNodeCall in instructionNodes
+                .Where(x => x is VirtualCallInstructionNode && ((VirtualCallInstructionNode)x).ResolveAttempted==false)
+                .ToArray())
             {
+                bool methodImplementationFound = false;
                 var virtualMethodDeclaringTypeDefinition = virtualNodeCall.TargetMethod.DeclaringType.Resolve();
                 var virtualMethodDeclaringTypeReference = virtualNodeCall.TargetMethod.DeclaringType;
                 List<TypeDefinition> virtualMethodTypeInheritancePath = GetInheritancePath(virtualMethodDeclaringTypeReference);
-
-                foreach (var objectArg in virtualNodeCall.DataFlowBackRelated.Where(x => x.ArgIndex == 0).SelectMany(x => x.Argument.GetDataOriginNodes()))
-                //foreach (var objectArg in virtualNodeCall.DataFlowBackRelated.Where(x => x.ArgIndex == 0).Select(x => x.Argument))
+                foreach (var objectArgument in virtualNodeCall.DataFlowBackRelated.Where(x => x.ArgIndex == 0).ToArray())
                 {
-                    TypeReference objectTypeReference = GetObjectType(objectArg);
-                    TypeDefinition objectTypeDefinition = objectTypeReference.Resolve();
-
-                    if (IsImplementing(virtualMethodDeclaringTypeDefinition, virtualMethodTypeInheritancePath, objectTypeDefinition))
+                    foreach (var dataOriginNode in objectArgument.Argument.GetDataOriginNodes())
                     {
-                        var virtualMethodImpl = objectTypeDefinition.Methods.First(x => x.MetadataToken == virtualNodeCall.TargetMethod.Resolve().MetadataToken);
+                        //TODO remove
+                        TypeReference objectTypeReference = GetObjectType(dataOriginNode);
+                        TypeDefinition objectTypeDefinition = objectTypeReference.Resolve();
+                        if (objectTypeDefinition.IsAbstract)
+                        {
+                            virtualNodeCall.ResolveAttempted = true;
+                            continue;
+                        }
+                        var methodImplementation = GetImplementation(virtualMethodDeclaringTypeDefinition, objectTypeDefinition, virtualNodeCall.TargetMethod.Resolve());
+                        if (methodImplementation != null)
+                        {
+                            ReplaceVirtualCallWithImplementation(instructionNodes, virtualNodeCall, objectArgument.Argument, methodImplementation);
+                            inlinlingWasMade = true;
+                            methodImplementationFound = true;
+                        }
                     }
-                    var objectMethods = GetObjectMethods(objectArg);
+                }
+                if (!methodImplementationFound)
+                {
+                    virtualNodeCall.SelfRemove();
+                    instructionNodes.Remove(virtualNodeCall);
                 }
             }
-            inlinlingWasMade = false;
         }
 
-        private static bool IsImplementing(TypeDefinition virtualMethodDeclaringTypeDefinition, List<TypeDefinition> virtualMethodTypeInheritancePath, TypeDefinition objectTypeDefinition)
+        private static void ReplaceVirtualCallWithImplementation(List<InstructionNode> instructionNodes, VirtualCallInstructionNode virtualNodeCall, InstructionNode objectArgument, MethodDefinition virtualMethodImpl)
         {
-            var objectTypeInheritancePath = GetInheritancePath(objectTypeDefinition).Select(x => x.Resolve());
+            var callOpCode = Instruction.Create(CodeGroups.AllOpcodes.First(x => x.Code == Code.Call), virtualMethodImpl);
+            var callInstructionNode = new InlineableCallNode(callOpCode, virtualMethodImpl, virtualNodeCall.Method);
+            virtualNodeCall.MergeInto(callInstructionNode,true);
+            callInstructionNode.DataFlowBackRelated.RemoveAllTwoWay(x => x.ArgIndex == 0 && x.Argument != objectArgument);
+            instructionNodes.Add(callInstructionNode);
+            instructionNodes.Remove(virtualNodeCall);
+        }
 
+        private static MethodDefinition GetImplementation(TypeDefinition virtualMethodDeclaringTypeDefinition, TypeDefinition objectTypeDefinition
+                                                ,MethodDefinition virtualMethodReference)
+        {
+            var objectTypeInheritancePath = GetInheritancePath(objectTypeDefinition).Select(x => x.Resolve()).ToArray();
+
+            TypeDefinition implementingType;
             if (virtualMethodDeclaringTypeDefinition.IsInterface)
             {
-                if (!GetAllInterfaces(objectTypeInheritancePath).Any(x => x.MetadataToken == virtualMethodDeclaringTypeDefinition.MetadataToken))
-                {
-                    return false;
-                }
+                implementingType = objectTypeInheritancePath.FirstOrDefault(x => x.Interfaces.Any(y => y.Resolve().MetadataToken == virtualMethodDeclaringTypeDefinition.MetadataToken));
             }
-            else if (!virtualMethodTypeInheritancePath.Any(x => x.MetadataToken == objectTypeDefinition.MetadataToken))
+            else
             {
-                return false;
+                implementingType = objectTypeInheritancePath.FirstOrDefault(x => x.MetadataToken == virtualMethodDeclaringTypeDefinition.MetadataToken);
             }
-            return true;
-        }
-
-        private static IEnumerable<TypeReference> GetAllInterfaces(IEnumerable<TypeDefinition> inheritancePath)
-        {
-            return inheritancePath.SelectMany(x => x.Interfaces.SelectMany(y => GetInheritancePath(y))).Distinct();
+            if (implementingType == null)
+            {
+                return null;
+            }
+            var sameNameMethods = implementingType.Methods.Where(x => x.Name == virtualMethodReference.Name);
+            if (sameNameMethods.Count() != 1)
+            {
+                throw new Exception("None or more than 1 methods found that implement virtual");
+            }
+            return sameNameMethods.First();
         }
 
         private static List<TypeDefinition> GetInheritancePath(TypeReference baseTypeReference)
@@ -83,31 +114,11 @@ namespace Dopple
             {
                 return ((MethodReference) objectArg.Instruction.Operand).DeclaringType;
             }
-            return null;
-        }
-
-        private static ICollection<MethodDefinition> GetObjectMethods(InstructionNode objectArg)
-        {
-            if (objectArg is NewObjectNode)
+            if (objectArg is RetInstructionNode)
             {
-                return ((MethodReference) objectArg.Instruction.Operand).DeclaringType.Resolve().Methods;
+                return objectArg.Method.ReturnType;
             }
-            if (objectArg is LdArgInstructionNode)
-            {
-                return ((LdArgInstructionNode) objectArg).ArgType.Resolve().Methods;
-            }
-            return new MethodDefinition[0];
-            //throw new Exception("No object methods found");
-
-        }
-
-        private static bool IsProvidingObject(InstructionNode argument)
-        {
-            if (argument is NewObjectNode)
-            {
-                return true;
-            }
-            return false;
+            throw new Exception("didn't find correct type");
         }
     }
 }

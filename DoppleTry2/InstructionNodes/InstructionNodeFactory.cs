@@ -30,7 +30,7 @@ namespace Dopple.InstructionNodes
             }
             else if (nodeCode == Code.Callvirt)
             {
-                return new[] { new NonInlineableCallInstructionNode(instruction, method) };
+                return new[] { new VirtualCallInstructionNode(instruction, method) };
             }
             else if (nodeCode == Code.Newobj)
             {
@@ -42,7 +42,7 @@ namespace Dopple.InstructionNodes
                 if (constructorMethodDef != null || systemMethodsLoader.TryGetSystemMethod(instruction, out constructorMethodDef))
                 {
                     var noArgsNewObject = new ConstructorNewObjectNode(instruction, method);
-                    var constructorCallInst = Instruction.Create(typeof(OpCodes).GetFields().Select(x => x.GetValue(null)).Cast<OpCode>().First(x => x.Code == Code.Call),(MethodReference)instruction.Operand);
+                    var constructorCallInst = Instruction.Create(CodeGroups.AllOpcodes.First(x => x.Code == Code.Call),(MethodReference)instruction.Operand);
                     constructorCallInst.Operand = instruction.Operand;
                     constructorCallInst.Next = instruction.Next;
                     var constructorCall = new ConstructorCallNode(constructorCallInst, constructorMethodDef, method, noArgsNewObject);

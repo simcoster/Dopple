@@ -9,6 +9,7 @@ namespace Dopple
 {
     public static class CodeGroups
     {
+        public static OpCode[] AllOpcodes = typeof(OpCodes).GetFields().Select(x => x.GetValue(null)).Cast<OpCode>().ToArray();
         public static Code[] CallCodes     = { Code.Call, Code.Calli};
         public static Code[] LdArgCodes    = { Code.Ldarg, Code.Ldarg_0, Code.Ldarg_1, Code.Ldarg_2, Code.Ldarg_3, Code.Ldarg_S};
         public static Code[] StArgCodes   =  { Code.Starg, Code.Starg_S};

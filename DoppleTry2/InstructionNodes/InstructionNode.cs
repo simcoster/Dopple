@@ -46,6 +46,7 @@ namespace Dopple.InstructionNodes
         public int MemoryReadCount { get; set; }
         public int MemoryStoreCount { get; set; }
         public MethodDefinition Method { get; set; }
+        public bool StackBacktraceDone { get; set; } = false;
         public virtual int StackPopCount
         {
             get
@@ -114,11 +115,11 @@ namespace Dopple.InstructionNodes
             }
         }
 
-        public void MergeInto(InstructionNode nodeToMergeInto)
+        public void MergeInto(InstructionNode nodeToMergeInto, bool keepOriginal)
         {
             foreach (IMergable args in new IMergable[] { DataFlowBackRelated, DataFlowForwardRelated, ProgramFlowBackAffected, ProgramFlowForwardAffecting, ProgramFlowBackRoutes, ProgramFlowForwardRoutes })
             {
-                args.MergeInto(nodeToMergeInto);
+                args.MergeInto(nodeToMergeInto, keepOriginal);
             }
         }
 
@@ -142,7 +143,22 @@ namespace Dopple.InstructionNodes
                                       .SelectMany(x => x.Argument.GetDataOriginNodes());
         }
 
-        internal virtual void SelfRemove()
+        internal void SelfRemove()
+        {
+            DataFlowForwardRelated.RemoveAllTwoWay();
+            DataFlowBackRelated.RemoveAllTwoWay();
+            ProgramFlowBackAffected.RemoveAllTwoWay();
+            ProgramFlowForwardAffecting.RemoveAllTwoWay();
+            foreach (var forwardRoute in ProgramFlowForwardRoutes)
+            {
+                forwardRoute.ProgramFlowBackRoutes.AddTwoWay(ProgramFlowBackRoutes);
+            }
+            ProgramFlowBackRoutes.RemoveAllTwoWay();
+            ProgramFlowForwardRoutes.RemoveAllTwoWay();
+        }
+
+
+        internal virtual void SelfRemoveAndStitch()
         {
             foreach (var forwardInst in DataFlowForwardRelated.ToArray())
             {

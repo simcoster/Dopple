@@ -21,6 +21,7 @@ namespace Dopple
         public List<InstructionNode> InstructionNodes;
         private readonly BackTraceManager _backTraceManager;
         private InstructionNodeFactory _InstructionNodeFactory = new InstructionNodeFactory();
+        private VirtualMethodResolver _VirtualMethodResolver = new VirtualMethodResolver();
         private InlineCallModifier _inlineCallModifier;
 
         public GraphBuilder(IEnumerable<InstructionNode> instNodes)
@@ -47,29 +48,31 @@ namespace Dopple
 
         public List<InstructionNode> Run()
         {
+            bool shouldRerun = true ;
             SetInstructionIndexes();
-            _programFlowManager.AddFlowConnections(InstructionNodes);
-            InlineFunctionCalls();
-            SetInstructionIndexes();
-            try
+            while (shouldRerun)
             {
-                BackTrace();
+                _programFlowManager.AddFlowConnections(InstructionNodes);
+                InlineFunctionCalls();
+                SetInstructionIndexes();
+                try
+                {
+                    BackTrace();
+                }
+                catch (StackPopException stackPopException)
+                {
+                    return stackPopException.problematicRoute;
+                }
+                RemoveHelperCodes();
+                //RecursionFix();
+                //MergeSingleOperationNodes();
+                BackTraceConditionals();
+                //MergeSimilarInstructions();
+                LdElemBackTrace();
+                ResolveVirtualMethods(out shouldRerun);
+                SetInstructionIndexes();
             }
-            catch(StackPopException stackPopException)
-            {
-                return stackPopException.problematicRoute;
-            }
-            RemoveHelperCodes();
-            bool shouldRerun;
-            ResolveVirtualMethods(out shouldRerun);
-            //RecursionFix();
-            //MergeSingleOperationNodes();
-            BackTraceConditionals();
-            //MergeSimilarInstructions();
-            LdElemBackTrace();
-
             AddZeroNode();
-            SetInstructionIndexes();
             //Verify();
 
             return InstructionNodes;
@@ -77,7 +80,7 @@ namespace Dopple
 
         private void ResolveVirtualMethods(out bool inliningWasDone)
         {
-            VirtualMethodResolver.ResolveVirtualMethods(InstructionNodes, out inliningWasDone);
+            _VirtualMethodResolver.ResolveVirtualMethods(InstructionNodes, out inliningWasDone);
         }
 
         private void BackTraceConditionals()
@@ -93,16 +96,7 @@ namespace Dopple
         {
             foreach(var inlinedCallNode in InstructionNodes.Where(x => x is InlineableCallNode && !(x is ConstructorCallNode)).ToArray())
             {
-                inlinedCallNode.DataFlowForwardRelated.RemoveAllTwoWay();
-                inlinedCallNode.DataFlowBackRelated.RemoveAllTwoWay();
-                inlinedCallNode.ProgramFlowBackAffected.RemoveAllTwoWay();
-                inlinedCallNode.ProgramFlowForwardAffecting.RemoveAllTwoWay();
-                foreach(var forwardRoute in inlinedCallNode.ProgramFlowForwardRoutes)
-                {
-                    forwardRoute.ProgramFlowBackRoutes.AddTwoWay(inlinedCallNode.ProgramFlowBackRoutes);
-                }
-                inlinedCallNode.ProgramFlowBackRoutes.RemoveAllTwoWay();
-                inlinedCallNode.ProgramFlowForwardRoutes.RemoveAllTwoWay();
+                inlinedCallNode.SelfRemove();
                 InstructionNodes.Remove(inlinedCallNode);
             }
 
@@ -117,7 +111,7 @@ namespace Dopple
                 var nonRecursiveNode = recusriveMethodNodesGroup.First(x => !x.InliningProperties.Recursive);
                 foreach (var recursiveNode in recusriveMethodNodesGroup.Where(x => x.InliningProperties.Recursive))
                 {
-                    recursiveNode.MergeInto(nonRecursiveNode);
+                    recursiveNode.MergeInto(nonRecursiveNode,false);
                     InstructionNodes.Remove(recursiveNode);
                 }
             }
@@ -150,7 +144,7 @@ namespace Dopple
                 {
                     var currNode = singleUnitBackNodes.Dequeue();
                     currNode.SingleUnitBackRelated.ForEach(x => singleUnitBackNodes.Enqueue(x));
-                    currNode.MergeInto(frontMostNode);
+                    currNode.MergeInto(frontMostNode,false);
                     InstructionNodes.Remove(currNode);
                     frontMostNode.SingleUnitNodes.Add(currNode);
                 }
@@ -201,8 +195,7 @@ namespace Dopple
                                         .Where(x => x != firstInst)
                                         .Where(x => x.Instruction.OpCode.Code == firstInst.Instruction.OpCode.Code)
                                         .Where(x => x.Instruction.Operand == firstInst.Instruction.Operand)
-                                        .Where(x => typeof(OpCodes).GetFields().Select(y => y.GetValue(null))
-                                                    .Cast<OpCode>().Where(y => y.StackBehaviourPop != StackBehaviour.Pop0).Select(y => y.Code)
+                                        .Where(x => CodeGroups.AllOpcodes.Where(y => y.StackBehaviourPop != StackBehaviour.Pop0).Select(y => y.Code)
                                                     .Contains(x.Instruction.OpCode.Code))
                                         .Where(x => !new[] { Code.Ret }.Concat(CodeGroups.CallCodes).Contains(x.Instruction.OpCode.Code));
                     var firstInstBackRelated = firstInst.DataFlowBackRelated.Where(x => x.Argument != firstInst);
@@ -224,17 +217,17 @@ namespace Dopple
         {
             RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.StLocCodes.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.LdLocCodes.Contains(x.Instruction.OpCode.Code)));
-            RemoveInstWrappers(InstructionNodes.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code)));
-            RemoveInstWrappers(InstructionNodes.Where(x => x is LdArgInstructionNode && x.DataFlowBackRelated.Count >0 && !x.DataFlowBackRelated.SelfFeeding));
-            RemoveInstWrappers(InstructionNodes.Where(x => x is StIndInstructionNode && ((StIndInstructionNode) x).AddressType == AddressType.LocalVar));
-            //TODO check this
-            RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Ret && x.InliningProperties.Inlined && !x.DataFlowBackRelated.SelfFeeding));
-            RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Dup));
+            //RemoveInstWrappers(InstructionNodes.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code)));
+            //RemoveInstWrappers(InstructionNodes.Where(x => x is LdArgInstructionNode && x.DataFlowBackRelated.Count >0 && !x.DataFlowBackRelated.SelfFeeding));
+            //RemoveInstWrappers(InstructionNodes.Where(x => x is StIndInstructionNode && ((StIndInstructionNode) x).AddressType == AddressType.LocalVar));
+            ////TODO check this
+            //RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Ret && x.InliningProperties.Inlined && !x.DataFlowBackRelated.SelfFeeding));
+            //RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Dup));
         }
 
         private void AddZeroNode()
         {
-            var inst = Instruction.Create(typeof(OpCodes).GetFields().Select(x => x.GetValue(null)).Cast<OpCode>().First(x => x.Code == Code.Nop));
+            var inst = Instruction.Create(CodeGroups.AllOpcodes.First(x => x.Code == Code.Nop));
             InstructionNode nodeZero = _InstructionNodeFactory.GetSingleInstructionNode(inst, metDef);
 
             foreach (var firstNode in InstructionNodes.Where(x => x.DataFlowBackRelated.Count == 0))
@@ -383,7 +376,7 @@ namespace Dopple
             var nodeToKeep = nodesToMerge.First();
             foreach (var nodeToRemove in nodesToMerge.ToArray().Except(new[] { nodeToKeep }))
             {
-                nodeToRemove.MergeInto(nodeToKeep);
+                nodeToRemove.MergeInto(nodeToKeep,false);
                 InstructionNodes.Remove(nodeToRemove);
                 var stillPointingToRemoved = InstructionNodes.Where(x => x.DataFlowBackRelated.Any(y => y.Argument == nodeToRemove)
                                               || x.DataFlowForwardRelated.Any(y => y.Argument == nodeToRemove)
@@ -402,7 +395,7 @@ namespace Dopple
         {
             foreach (var nodeToRemove in instsToRemove.ToArray())
             {
-                nodeToRemove.SelfRemove();
+                nodeToRemove.SelfRemoveAndStitch();
                 //Verify();
                 InstructionNodes.Remove(nodeToRemove);
                 var stillPointingToRemoved = InstructionNodes.Where(x => x.DataFlowBackRelated.Any(y => y.Argument == nodeToRemove)
