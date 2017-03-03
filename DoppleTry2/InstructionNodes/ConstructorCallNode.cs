@@ -5,20 +5,12 @@ namespace Dopple.InstructionNodes
 {
     public class ConstructorCallNode : InlineableCallNode
     {
-        public ConstructorCallNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
-        {
-
-        }
-        public ConstructorCallNode(Instruction instruction, MethodDefinition targetMethod, MethodDefinition method) : base(instruction,targetMethod,method)
-        {
-
-        }
-
         public ConstructorCallNode(Instruction instruction, MethodDefinition targetMethod, MethodDefinition method, ConstructorNewObjectNode newObjectNode) : base(instruction, targetMethod, method)
         {
             DataFlowBackRelated = new ConstructorCallDataFlowBackArgList(this);
             DataFlowBackRelated.AddTwoWay(newObjectNode, 0);
             StackPopCount--;
+            StackPushCount = 1;
         }
     }
 

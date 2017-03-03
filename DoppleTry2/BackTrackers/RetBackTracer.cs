@@ -18,10 +18,14 @@ namespace Dopple.BackTracers
             }
         }
 
-        protected override void InnerAddBackDataflowConnections(InstructionNode currentInst)
+        protected override void BackTraceDataFlowSingle(InstructionNode currentInst)
         {
             if (currentInst.InliningProperties.Inlined)
             {
+                if (currentInst.InliningProperties.CallNode is ConstructorCallNode)
+                {
+                    currentInst.DataFlowBackRelated.AddTwoWaySingleIndex(currentInst.DataFlowBackRelated.Where(x => x.ArgIndex == 0).Select(x => x.Argument));
+                }
                 currentInst.DataFlowForwardRelated.AddTwoWay(currentInst.InliningProperties.CallNode.DataFlowForwardRelated);
             }
         }

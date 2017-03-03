@@ -404,8 +404,8 @@ namespace DoppleGraph
             SetLongestPathRec(firstNode);
             SetRowIndexes(nodeWrappers);
             FixDuplicateCoordinates(nodeWrappers);
-            int totalHeight = 4000;
-            int totalWidth = 4000;
+            int totalHeight = 1000;
+            int totalWidth = 5000;
             float heightOffset = Convert.ToSingle(totalHeight / nodeWrappers.Select(x => x.DisplayRow).Max());
             float widthOffset = Convert.ToSingle(totalWidth / nodeWrappers.Select(x => x.DisplayCol).Max());
             foreach (var nodeWrapper in nodeWrappers)
@@ -553,8 +553,8 @@ namespace DoppleGraph
 
                 if (goNodeWrapper.InstructionNode.InliningProperties.Recursive)
                 {
-                    goNodeWrapper.Node.Text += " RecIndex:" + goNodeWrapper.InstructionNode.InliningProperties.SameMethodCallIndex;
-                    goNodeWrapper.Node.Text += " Recursive:" + goNodeWrapper.InstructionNode.InliningProperties.RecursionLevel;
+                    goNodeWrapper.Node.Text += " RecIndex:" + goNodeWrapper.InstructionNode.InliningProperties.RecursionInstanceIndex;
+                    goNodeWrapper.Node.Text += " Recursive:" + goNodeWrapper.InstructionNode.InliningProperties.CallSequence;
                 }
                 frontLayer.Add(goNodeWrapper.Node);
             }

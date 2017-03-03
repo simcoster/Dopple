@@ -17,7 +17,7 @@ namespace Dopple.BackTracers
                 return CodeGroups.StIndCodes;
             }
         }
-        protected override void InnerAddBackDataflowConnections(InstructionNode currentInst)
+        protected override void BackTraceDataFlowSingle(InstructionNode currentInst)
         {
             StIndInstructionNode stIndInst = (StIndInstructionNode) currentInst;
             var addressNodes = currentInst.DataFlowBackRelated.Where(x => x.ArgIndex == 0)

@@ -10,20 +10,19 @@ namespace Utility
 {
     public class Class1
     {
-        public static IEnumerable<bool> SelectMe(List<int> arr)
+        public static int CalcAtzeret(int number, int multSoFar)
         {
-            return arr.Select(x => x > 7).ToArray();
-
+            if (number == 1)
+            {
+                return multSoFar;
+            }
+            return CalcAtzeret(number - 1, multSoFar * number);
         }
-        //public IntClass TestOrder()
+        //public static IEnumerable<bool> SelectMe(List<int> arr)
         //{
-        //    return new IntClass(4);
+        //    return arr.Select(x => x > 7).ToArray();
         //}
-        //public int Ordered(int first, int second)
-        //{
-        //    return first - second;
-        //}
-        
+
         //public static int DoThing(bool isTrue)
         //{
         //    TestParent myObj2;
@@ -37,6 +36,15 @@ namespace Utility
         //    }
         //    return myObj2.Overridable(7);
         //}
+        //public IntClass TestOrder()
+        //{
+        //    return new IntClass(4);
+        //}
+        //public int Ordered(int first, int second)
+        //{
+        //    return first - second;
+        //}
+
 
     }
 

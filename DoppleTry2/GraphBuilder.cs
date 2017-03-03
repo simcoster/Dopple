@@ -19,10 +19,11 @@ namespace Dopple
         private readonly ProgramFlowManager _programFlowManager = new ProgramFlowManager();
         private MethodDefinition metDef;
         public List<InstructionNode> InstructionNodes;
-        private readonly BackTraceManager _backTraceManager;
+        private readonly BackTraceManager _backTraceManager = new BackTraceManager();
         private InstructionNodeFactory _InstructionNodeFactory = new InstructionNodeFactory();
         private VirtualMethodResolver _VirtualMethodResolver = new VirtualMethodResolver();
         private InlineCallModifier _inlineCallModifier;
+        ConditionionalsBackTracer _ConditionalBacktracer = new ConditionionalsBackTracer();
 
         public GraphBuilder(IEnumerable<InstructionNode> instNodes)
         {
@@ -38,10 +39,6 @@ namespace Dopple
             {
                 inst.InstructionIndex = InstructionNodes.IndexOf(inst);
             }
-
-            _postBacktraceModifiers = new IPostBackTraceModifier[] { };
-
-            _backTraceManager = new BackTraceManager(InstructionNodes);
             _inlineCallModifier = new InlineCallModifier(_InstructionNodeFactory);
         }
 
@@ -54,25 +51,30 @@ namespace Dopple
             while (shouldRerun)
             {
                 _programFlowManager.AddFlowConnections(InstructionNodes);
+                if (isFirstRun)
+                {
+                    try
+                    {
+
+                        _backTraceManager.BackTraceInFunctionBounds(InstructionNodes);
+                    }
+                    catch (StackPopException stackPopException)
+                    {
+                        return stackPopException.problematicRoute;
+                    }
+                }
                 InlineFunctionCalls();
                 SetInstructionIndexes();
-                try
-                {
-                    BackTrace(isFirstRun);
-                }
-                catch (StackPopException stackPopException)
-                {
-                    return stackPopException.problematicRoute;
-                }
-                RemoveHelperCodes();
-                //RecursionFix();
+                _backTraceManager.BackTraceOutsideFunctionBounds(InstructionNodes);
+                //RemoveHelperCodes();
+                RecursionFix();
                 //MergeSingleOperationNodes();
-                BackTraceConditionals();
                 //MergeSimilarInstructions();
                 LdElemBackTrace();
                 ResolveVirtualMethods(out shouldRerun);
                 SetInstructionIndexes();
                 isFirstRun = false;
+                shouldRerun = false;
             }
             AddZeroNode();
             //Verify();
@@ -87,11 +89,7 @@ namespace Dopple
 
         private void BackTraceConditionals()
         {
-            ConditionionalsBackTracer conditionalBacktracer = new ConditionionalsBackTracer();
-            foreach(var condNode in InstructionNodes.Where(x => x is ConditionalJumpNode))
-            {
-                conditionalBacktracer.AddBackDataflowConnections(condNode);
-            }
+            _ConditionalBacktracer.AddBackDataflowConnections(InstructionNodes);
         }
 
         private void RecursionFix()
@@ -103,38 +101,21 @@ namespace Dopple
             }
 
             //need to fix this so it only applies to recursive node instances
-            return;
-            foreach(var recusriveMethodNodesGroup in InstructionNodes.GroupBy(x => new { x.Method, x.Instruction.Offset }).Where(x => x.Count() >1).ToList())
+            foreach(var recusriveMethodNodesGroup in InstructionNodes.Where(x => x.InliningProperties.Recursive).GroupBy(x => new { x.Method, x.Instruction.Offset }).Where(x => x.Count() >1).ToList())
             {
-                if (recusriveMethodNodesGroup.Count(x => !x.InliningProperties.Recursive) != 1)
+                var nodeInFirstRecursiveCall = recusriveMethodNodesGroup.OrderBy(x => x.InliningProperties.RecursionInstanceIndex).First();
+                foreach (var nodeInSubsequentCall in recusriveMethodNodesGroup.Where(x => x != nodeInFirstRecursiveCall))
                 {
-                    throw new Exception("only one non recursive instance should exist");
-                }
-                var nonRecursiveNode = recusriveMethodNodesGroup.First(x => !x.InliningProperties.Recursive);
-                foreach (var recursiveNode in recusriveMethodNodesGroup.Where(x => x.InliningProperties.Recursive))
-                {
-                    recursiveNode.MergeInto(nonRecursiveNode,false);
-                    InstructionNodes.Remove(recursiveNode);
+                    nodeInSubsequentCall.MergeInto(nodeInFirstRecursiveCall,false);
+                    InstructionNodes.Remove(nodeInSubsequentCall);
                 }
             }
         }
 
         private void MergeSingleOperationNodes()
         {
-            var postMergeBackTracers = new BackTracer[] {
-                                                        new SingleConditionOperationUnitBackTracer(),
-                                                        new SingleArithmeticWithConstantBacktracer()
-                                                        };
-            foreach (var node in InstructionNodes.OrderByDescending(x => x.InstructionIndex))
-            {
-                foreach (var backTracer in postMergeBackTracers)
-                {
-                    if (backTracer.HandlesCodes.Contains(node.Instruction.OpCode.Code))
-                    {
-                        backTracer.AddBackDataflowConnections(node);
-                    }
-                }
-            }
+            new SingleConditionOperationUnitBackTracer().AddBackDataflowConnections(InstructionNodes);
+            new SingleArithmeticWithConstantBacktracer().AddBackDataflowConnections(InstructionNodes);
 
             var blah = InstructionNodes.Where(x => x.SingleUnitBackRelated.Count > 0);
             var frontMostNodes = InstructionNodes.Where(x => x.SingleUnitBackRelated.Count > 0 && x.SingleUnitForwardRelated.Count == 0);
@@ -155,20 +136,8 @@ namespace Dopple
 
         private void LdElemBackTrace()
         {
-            var postMergeBackTracers = new BackTracer[] {
-                                                        new LdElemBacktracer(),
-                                                        new LdFldBacktracer()
-                                                        };
-            foreach (var node in InstructionNodes.OrderByDescending(x => x.InstructionIndex))
-            {
-                foreach (var backTracer in postMergeBackTracers)
-                {
-                    if (backTracer.HandlesCodes.Contains(node.Instruction.OpCode.Code))
-                    {
-                        backTracer.AddBackDataflowConnections(node);
-                    }
-                }
-            }
+            new LdElemBacktracer().AddBackDataflowConnections(InstructionNodes);
+            new LdFldBacktracer().AddBackDataflowConnections(InstructionNodes);
         }
 
         private void MergeSimilarInstructions()
@@ -220,11 +189,11 @@ namespace Dopple
             RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.StLocCodes.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.LdLocCodes.Contains(x.Instruction.OpCode.Code)));
             //RemoveInstWrappers(InstructionNodes.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code)));
-            //RemoveInstWrappers(InstructionNodes.Where(x => x is LdArgInstructionNode && x.DataFlowBackRelated.Count >0 && !x.DataFlowBackRelated.SelfFeeding));
-            //RemoveInstWrappers(InstructionNodes.Where(x => x is StIndInstructionNode && ((StIndInstructionNode) x).AddressType == AddressType.LocalVar));
+            RemoveInstWrappers(InstructionNodes.Where(x => x is LdArgInstructionNode && x.DataFlowBackRelated.Count > 0 && !x.DataFlowBackRelated.SelfFeeding));
+            RemoveInstWrappers(InstructionNodes.Where(x => x is StIndInstructionNode && ((StIndInstructionNode) x).AddressType == AddressType.LocalVar));
             ////TODO check this
-            //RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Ret && x.InliningProperties.Inlined && !x.DataFlowBackRelated.SelfFeeding));
-            //RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Dup));
+            RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Ret && x.InliningProperties.Inlined && !x.DataFlowBackRelated.SelfFeeding));
+            RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Dup));
         }
 
         private void AddZeroNode()
@@ -241,7 +210,7 @@ namespace Dopple
             {
                 if (!firstOrderLdArg.DataFlowBackRelated.Any(x => x.Argument == nodeZero))
                 {
-                    firstOrderLdArg.DataFlowBackRelated.AddTwoWay(nodeZero);
+                    firstOrderLdArg.DataFlowBackRelated.AddTwoWay(nodeZero, -1);
                 }
             }
             InstructionNodes[0].ProgramFlowBackRoutes.AddTwoWay(nodeZero);

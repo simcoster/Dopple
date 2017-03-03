@@ -56,7 +56,7 @@ namespace Dopple.BackTracers
             }
         }
 
-        protected override void InnerAddBackDataflowConnections(InstructionNode currentNode)
+        protected override void BackTraceDataFlowSingle(InstructionNode currentNode)
         {
             foreach (var executionTrack in GetNodesInClosedCondition(currentNode))
             {

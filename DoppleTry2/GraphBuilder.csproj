@@ -68,7 +68,6 @@
   <ItemGroup>
     <Compile Include="BackTrackers\BackTraceManager.cs" />
     <Compile Include="BackTrackers\ConditionionalsBackTracer.cs" />
-    <Compile Include="BackTrackers\ConstructorReturnBackTracer.cs" />
     <Compile Include="BackTrackers\LdFldBacktracer.cs" />
     <Compile Include="BackTrackers\RecursiveBacktracer.cs" />
     <Compile Include="BackTrackers\RetBackTracer.cs" />
@@ -78,8 +77,6 @@
     <Compile Include="BackTrackers\StackPopException.cs" />
     <Compile Include="BackTrackers\StIndBackTracer.cs" />
     <Compile Include="ExtensionMethods.cs" />
-    <Compile Include="InstructionModifiers\SetStackPopPushForCalls.cs" />
-    <Compile Include="InstructionModifiers\SingleFuncInlineCall.cs" />
     <Compile Include="InstructionNodes\ArithmaticsNode.cs" />
     <Compile Include="InstructionNodes\CallNode.cs" />
     <Compile Include="InstructionNodes\VirtualCallInstructionNode.cs" />
