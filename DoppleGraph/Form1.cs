@@ -28,7 +28,7 @@ namespace DoppleGraph
 
             var Graphs = new List<List<InstructionNode>>();
             //foreach (var method in type.Methods.Where(x => !x.IsConstructor))
-            foreach (var method in typee.Methods.Where(x => !x.IsConstructor))
+            foreach (var method in typee.Methods.Where(x => !x.IsConstructor && !x.IsAbstract))
             {
                 var graphBuilder = new GraphBuilder(method);
                 List<InstructionNode> instructionNodes = graphBuilder.Run();

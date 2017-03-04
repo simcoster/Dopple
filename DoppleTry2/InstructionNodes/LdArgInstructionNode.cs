@@ -80,7 +80,7 @@ namespace Dopple.InstructionNodes
         }
     }
 
-    public abstract class FunctionArgInstNode : DataTransferingNode
+    public abstract class FunctionArgInstNode : InstructionNode, IDataTransferingNode
     {
         public FunctionArgInstNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
@@ -118,6 +118,7 @@ namespace Dopple.InstructionNodes
         public TypeReference ArgType { get; set; }
         public string ArgName { get; set; }
         public ParameterDefinition ParamDefinition { get; private set; }
+        public abstract int DataFlowDataProdivderIndex { get; }
 
         private int GetArgIndex(Instruction instruction, MethodDefinition method)
         {

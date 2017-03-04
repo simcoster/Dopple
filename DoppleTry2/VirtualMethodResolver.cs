@@ -4,6 +4,7 @@ using Dopple.InstructionNodes;
 using System.Linq;
 using Mono.Cecil.Cil;
 using Mono.Cecil;
+using System.Text.RegularExpressions;
 
 namespace Dopple
 {
@@ -57,7 +58,8 @@ namespace Dopple
             var callInstructionNode = new InlineableCallNode(callOpCode, virtualMethodImpl, virtualNodeCall.Method);
             virtualNodeCall.MergeInto(callInstructionNode,true);
             callInstructionNode.DataFlowBackRelated.RemoveAllTwoWay(x => x.ArgIndex == 0 && x.Argument != objectArgument);
-            instructionNodes.Add(callInstructionNode);
+            callInstructionNode.InliningProperties.CallSequence = virtualNodeCall.InliningProperties.CallSequence;
+            instructionNodes.Insert(instructionNodes.IndexOf(virtualNodeCall), callInstructionNode);
             instructionNodes.Remove(virtualNodeCall);
         }
 
@@ -66,25 +68,16 @@ namespace Dopple
         {
             var objectTypeInheritancePath = GetInheritancePath(objectTypeDefinition).Select(x => x.Resolve()).ToArray();
 
-            TypeDefinition implementingType;
-            if (virtualMethodDeclaringTypeDefinition.IsInterface)
+            MethodDefinition methodImpl = null;
+            foreach(var typeDef in objectTypeInheritancePath)
             {
-                implementingType = objectTypeInheritancePath.FirstOrDefault(x => x.Interfaces.Any(y => y.Resolve().MetadataToken == virtualMethodDeclaringTypeDefinition.MetadataToken));
+                methodImpl = typeDef.Methods.FirstOrDefault(x => MethodSignitureMatch(virtualMethodReference.FullName, x.FullName) && !x.IsAbstract);
+                if (methodImpl != null)
+                {
+                    break;
+                }
             }
-            else
-            {
-                implementingType = objectTypeInheritancePath.FirstOrDefault(x => x.MetadataToken == virtualMethodDeclaringTypeDefinition.MetadataToken);
-            }
-            if (implementingType == null)
-            {
-                return null;
-            }
-            var sameNameMethods = implementingType.Methods.Where(x => x.Name == virtualMethodReference.Name);
-            if (sameNameMethods.Count() != 1)
-            {
-                throw new Exception("None or more than 1 methods found that implement virtual");
-            }
-            return sameNameMethods.First();
+            return methodImpl;
         }
 
         private static List<TypeDefinition> GetInheritancePath(TypeReference baseTypeReference)
@@ -119,6 +112,14 @@ namespace Dopple
                 return objectArg.Method.ReturnType;
             }
             throw new Exception("didn't find correct type");
+        }
+
+        private static bool MethodSignitureMatch(string method1, string method2)
+        {
+            string pattern = " .*::";
+            string replacement = " ";
+            Regex rgx = new Regex(pattern);
+            return rgx.Replace(method1, replacement) == rgx.Replace(method2, replacement);
         }
     }
 }

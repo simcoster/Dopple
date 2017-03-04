@@ -23,6 +23,7 @@ namespace Dopple.InstructionModifiers
         {
             _InstructionNodeFactory = instructionNodeFactory;
         }
+        //problem, need to mark the originals if the son is discovered to be reucrisve
         public void Modify(List<InstructionNode> instructionNodes)
         {
             List<InstructionNode> originalNodes = new List<InstructionNode>(instructionNodes);
@@ -30,7 +31,7 @@ namespace Dopple.InstructionModifiers
             var startCallSequence = new List<MethodDefinition>() { instructionNodes[0].Method };
             foreach (var callNode in callNodes)
             {
-                instructionNodes.InsertRange(instructionNodes.IndexOf(callNode), InlineRec(callNode, startCallSequence));
+                instructionNodes.InsertRange(instructionNodes.IndexOf(callNode), InlineRec(callNode, instructionNodes));
             }
             bool topMostMethodIsRecursive = instructionNodes.Any(x => x is InlineableCallNode && ((InlineableCallNode) x).TargetMethod == originalNodes[0].Method);
             if (topMostMethodIsRecursive)
@@ -43,16 +44,18 @@ namespace Dopple.InstructionModifiers
             }
         }
 
-        private List<InstructionNode> InlineRec(InlineableCallNode inlinedCallNode, List<MethodDefinition> callSequence)
+        private List<InstructionNode> InlineRec(InlineableCallNode inlinedCallNode, List<InstructionNode> originalNodes)
         {
             List<InstructionNode> callNodeOriginalForwardRoutes = inlinedCallNode.ProgramFlowForwardRoutes.ToList();
             MethodDefinition calledMethodDef = inlinedCallNode.TargetMethodDefinition;
-            var callSequenceClone = new List<MethodDefinition>(callSequence);
+            List<InstructionNode> originalNodesClone = new List<InstructionNode>(originalNodes);
+
             if (calledMethodDef.Body == null)
             {  
                 return new List<InstructionNode>();
             }
-            var isSecondLevelRecursiveCall = callSequenceClone.Count(x => x == inlinedCallNode.Method) > 1;
+
+            var isSecondLevelRecursiveCall = inlinedCallNode.InliningProperties.CallSequence.Count(x => x.Method == inlinedCallNode.TargetMethod) > 1;
             if (isSecondLevelRecursiveCall)
             {
                 return new List<InstructionNode>();
@@ -81,6 +84,7 @@ namespace Dopple.InstructionModifiers
             inlinedNode.InliningProperties.CallNode = callNode;
             SetRecursionRelatedProps(inlinedNode, callSequence);
             inlinedNode.ProgramFlowBackAffected.AddTwoWay(callNode.ProgramFlowBackAffected);
+            inlinedNode.InliningProperties.CallSequence = callSequence;
         }
 
         private void SetRecursionRelatedProps(InstructionNode inlinedNode, List<MethodDefinition> callSequence)
@@ -88,7 +92,6 @@ namespace Dopple.InstructionModifiers
             if (callSequence.Contains(inlinedNode.Method))
             {
                 inlinedNode.InliningProperties.Recursive = true;
-                inlinedNode.InliningProperties.CallSequence = callSequence;
             }
             if (!inlinedInstancesCountPerMethod.ContainsKey(inlinedNode.Method))
             {

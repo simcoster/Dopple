@@ -130,12 +130,12 @@ namespace Dopple.InstructionNodes
             {
                 return justThis;
             }
-            var thisAsDataTrasferingNode = this as DataTransferingNode;
+            var thisAsDataTrasferingNode = this as IDataTransferingNode;
             if (thisAsDataTrasferingNode == null)
             {
                 return justThis;
             }
-            if (thisAsDataTrasferingNode.DataFlowBackRelated.Any(x => x.ArgIndex == thisAsDataTrasferingNode.DataFlowDataProdivderIndex) == false)
+            if (DataFlowBackRelated.Any(x => x.ArgIndex == thisAsDataTrasferingNode.DataFlowDataProdivderIndex) == false)
             {
                 return justThis;
             }

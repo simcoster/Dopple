@@ -77,12 +77,13 @@
     <Compile Include="BackTrackers\StackPopException.cs" />
     <Compile Include="BackTrackers\StIndBackTracer.cs" />
     <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="InstructionModifiers\MethodAndNodes.cs" />
     <Compile Include="InstructionNodes\ArithmaticsNode.cs" />
     <Compile Include="InstructionNodes\CallNode.cs" />
     <Compile Include="InstructionNodes\VirtualCallInstructionNode.cs" />
     <Compile Include="InstructionNodes\ConditionalJumpNode.cs" />
     <Compile Include="InstructionNodes\ConstructorCallNode.cs" />
-    <Compile Include="InstructionNodes\DataTransferingNode.cs" />
+    <Compile Include="InstructionNodes\IDataTransferingNode.cs" />
     <Compile Include="InstructionNodes\IMergable.cs" />
     <Compile Include="InstructionNodes\LoadFunctionNode.cs" />
     <Compile Include="InstructionNodes\NewObjectNode.cs" />

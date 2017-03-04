@@ -9,13 +9,13 @@ using Dopple.VerifierNs;
 
 namespace Dopple.InstructionNodes
 {
-    class StElemInstructionNode : DataTransferingNode
+    class StElemInstructionNode : InstructionNode, IDataTransferingNode
     {
         public StElemInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
         }
 
-        public override int DataFlowDataProdivderIndex
+        public int DataFlowDataProdivderIndex
         {
             get
             {

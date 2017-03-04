@@ -1,9 +1,10 @@
-﻿using Mono.Cecil;
+﻿using System;
+using Mono.Cecil;
 using Mono.Cecil.Cil;
 
 namespace Dopple.InstructionNodes
 {
-    public class ConstructorCallNode : InlineableCallNode
+    public class ConstructorCallNode : InlineableCallNode , IDataTransferingNode
     {
         public ConstructorCallNode(Instruction instruction, MethodDefinition targetMethod, MethodDefinition method, ConstructorNewObjectNode newObjectNode) : base(instruction, targetMethod, method)
         {
@@ -11,6 +12,14 @@ namespace Dopple.InstructionNodes
             DataFlowBackRelated.AddTwoWay(newObjectNode, 0);
             StackPopCount--;
             StackPushCount = 1;
+        }
+
+        public int DataFlowDataProdivderIndex
+        {
+            get
+            {
+                return 0;
+            }
         }
     }
 

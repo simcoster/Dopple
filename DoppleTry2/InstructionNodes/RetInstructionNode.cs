@@ -8,7 +8,7 @@ using Mono.Cecil.Cil;
 
 namespace Dopple.InstructionNodes
 {
-    class RetInstructionNode : DataTransferingNode
+    class RetInstructionNode : InstructionNode , IDataTransferingNode
     {
         public RetInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
@@ -23,7 +23,7 @@ namespace Dopple.InstructionNodes
             }
         }
 
-        public override int DataFlowDataProdivderIndex
+        public int DataFlowDataProdivderIndex
         {
             get
             {

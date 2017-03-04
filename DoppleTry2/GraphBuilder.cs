@@ -66,15 +66,14 @@ namespace Dopple
                 InlineFunctionCalls();
                 SetInstructionIndexes();
                 _backTraceManager.BackTraceOutsideFunctionBounds(InstructionNodes);
-                //RemoveHelperCodes();
+                RemoveHelperCodes();
                 RecursionFix();
                 //MergeSingleOperationNodes();
-                //MergeSimilarInstructions();
+                MergeSimilarInstructions();
                 LdElemBackTrace();
                 ResolveVirtualMethods(out shouldRerun);
                 SetInstructionIndexes();
                 isFirstRun = false;
-                shouldRerun = false;
             }
             AddZeroNode();
             //Verify();

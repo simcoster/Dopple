@@ -8,16 +8,13 @@ using System.Xml;
 
 namespace Utility
 {
-    public class Class1
+    public abstract class Class1
     {
-        public static int CalcAtzeret(int number, int multSoFar)
+        public int CallVirtual()
         {
-            if (number == 1)
-            {
-                return multSoFar;
-            }
-            return CalcAtzeret(number - 1, multSoFar * number);
+            return new ChildClass().CalcAtzeret(6, 7);
         }
+        public abstract int CalcAtzeret(int number, int multSoFar);
         //public static IEnumerable<bool> SelectMe(List<int> arr)
         //{
         //    return arr.Select(x => x > 7).ToArray();
@@ -44,45 +41,17 @@ namespace Utility
         //{
         //    return first - second;
         //}
-
-
     }
 
-    public class TestParent
+    public class ChildClass : Class1
     {
-        public int Count { get; set; }
-        public virtual int Overridable(int arg)
+        public override int CalcAtzeret(int number, int multSoFar)
         {
-            return 5;
+            if (number == 1)
+            {
+                return multSoFar;
+            }
+            return CalcAtzeret(number - 1, multSoFar * number);
         }
-    }
-
-    public class TestChild : TestParent
-    {
-        public int Blah { get; set; }
-        public override int Overridable(int arg)
-        {
-            return arg + base.Overridable(arg);
-        }
-        //public TestChild()
-        //{
-        //    Blah = Count;
-        //    Count = Blah;
-        //}
-
-    }
-
-    public class TestAnotherChild : TestParent
-    {
-        public override int Overridable(int arg)
-        {
-            return arg;
-        }
-        //public TestChild()
-        //{
-        //    Blah = Count;
-        //    Count = Blah;
-        //}
-
     }
 }

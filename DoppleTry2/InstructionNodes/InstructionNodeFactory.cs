@@ -17,6 +17,11 @@ namespace Dopple.InstructionNodes
                 MethodDefinition systemMethodDef = null;
                 if (instruction.Operand is MethodDefinition)
                 {
+                    var targetMethodDef = (MethodDefinition) instruction.Operand;
+                    if (targetMethodDef.IsVirtual)
+                    {
+                        return new[] { new VirtualCallInstructionNode(instruction, method) };
+                    }
                     return new[] { new InlineableCallNode(instruction, method) };
                 }
                 else if (systemMethodsLoader.TryGetSystemMethod(instruction, out systemMethodDef))
