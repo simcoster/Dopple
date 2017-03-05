@@ -397,15 +397,13 @@ namespace DoppleGraph
             }
         }
 
-        private void SetCoordinates(List<GoNodeWrapper> nodeWrappers)
+        private void SetCoordinates(List<GoNodeWrapper> nodeWrappers, int totalHeight, int totalWidth)
         {
             Dictionary<int, List<GoNodeWrapper>> nodeWrapperCols = new Dictionary<int, List<GoNodeWrapper>>();
             var firstNode = nodeWrappers.Where(x => x.InstructionNode.DataFlowBackRelated.Count == 0).ToList();
             SetLongestPathRec(firstNode);
             SetRowIndexes(nodeWrappers);
             FixDuplicateCoordinates(nodeWrappers);
-            int totalHeight = 1000;
-            int totalWidth = 1000;
             float heightOffset = Convert.ToSingle(totalHeight / nodeWrappers.Select(x => x.DisplayRow).Max());
             float widthOffset = Convert.ToSingle(totalWidth / nodeWrappers.Select(x => x.DisplayCol).Max());
             foreach (var nodeWrapper in nodeWrappers)
@@ -558,7 +556,7 @@ namespace DoppleGraph
                 }
                 frontLayer.Add(goNodeWrapper.Node);
             }
-            SetCoordinates(nodeWrappers);
+            SetCoordinates(nodeWrappers, 1000, 1000);
             DrawLinks(myView);
         }
 
@@ -577,6 +575,27 @@ namespace DoppleGraph
                 }
                 ReShow();
             }
+        }
+
+        private void SetWidthTxt_TextChanged(object sender, EventArgs e)
+        {
+            SetNewCoordinates();
+        }
+
+        private void SetHightTxt_TextChanged(object sender, EventArgs e)
+        {
+            SetNewCoordinates();
+        }
+
+        private void SetNewCoordinates()
+        {
+            int newHeight;
+            int newWidth;
+            if (int.TryParse(SetHightTxt.Text, out newHeight) && int.TryParse(SetWidthTxt.Text, out newWidth))
+            {
+                SetCoordinates(nodeWrappers, newHeight, newWidth);
+            }
+            myView.Refresh();
         }
     }
 }

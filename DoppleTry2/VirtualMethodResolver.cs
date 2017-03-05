@@ -58,7 +58,7 @@ namespace Dopple
             var callInstructionNode = new InlineableCallNode(callOpCode, virtualMethodImpl, virtualNodeCall.Method);
             virtualNodeCall.MergeInto(callInstructionNode,true);
             callInstructionNode.DataFlowBackRelated.RemoveAllTwoWay(x => x.ArgIndex == 0 && x.Argument != objectArgument);
-            callInstructionNode.InliningProperties.CallSequence = virtualNodeCall.InliningProperties.CallSequence;
+            callInstructionNode.InliningProperties = virtualNodeCall.InliningProperties;
             instructionNodes.Insert(instructionNodes.IndexOf(virtualNodeCall), callInstructionNode);
             instructionNodes.Remove(virtualNodeCall);
         }

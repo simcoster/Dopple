@@ -17,7 +17,8 @@ namespace Dopple.InstructionNodes
             SetStackPopCount(calledFunc);
             SetStackPushCount(calledFunc);
         }
-       
+
+        public bool CallWasInlined { get; internal set; } = false;
         public MethodDefinition TargetMethodDefinition { get; private set; }
     }
 }

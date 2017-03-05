@@ -117,6 +117,10 @@ namespace Dopple.InstructionNodes
 
         public void MergeInto(InstructionNode nodeToMergeInto, bool keepOriginal)
         {
+            if (nodeToMergeInto == this)
+            {
+                throw new Exception("Can't merge into self");
+            }
             foreach (IMergable args in new IMergable[] { DataFlowBackRelated, DataFlowForwardRelated, ProgramFlowBackAffected, ProgramFlowForwardAffecting, ProgramFlowBackRoutes, ProgramFlowForwardRoutes })
             {
                 args.MergeInto(nodeToMergeInto, keepOriginal);

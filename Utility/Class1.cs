@@ -10,11 +10,27 @@ namespace Utility
 {
     public abstract class Class1
     {
+        public int TestConditionals(int number, int multSoFar)
+        {
+            if (number == multSoFar)
+            {
+                return TestConditionals(number + 1, multSoFar + 1);
+            }
+            else
+            {
+                return 0;
+            }
+            return multSoFar;
+        }
+        public abstract int CalcAtzeret(int number, int multSoFar);
+
         public int CallVirtual()
         {
             return new ChildClass().CalcAtzeret(6, 7);
         }
-        public abstract int CalcAtzeret(int number, int multSoFar);
+
+       
+
         //public static IEnumerable<bool> SelectMe(List<int> arr)
         //{
         //    return arr.Select(x => x > 7).ToArray();

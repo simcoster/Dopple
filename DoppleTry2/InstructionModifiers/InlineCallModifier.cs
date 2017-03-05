@@ -12,57 +12,47 @@ using System.Diagnostics;
 
 namespace Dopple.InstructionModifiers
 {
-    class InlineCallModifier : IPreBacktraceModifier
+    class CallInliner
     {
         readonly ProgramFlowManager programFlowHanlder = new ProgramFlowManager();
         private readonly Dictionary<MethodDefinition, int> inlinedInstancesCountPerMethod = new Dictionary<MethodDefinition, int>();
         private InstructionNodeFactory _InstructionNodeFactory;
         private BackTraceManager _BackTraceManager = new BackTraceManager();
         
-        public InlineCallModifier(InstructionNodeFactory instructionNodeFactory)
+        public CallInliner(InstructionNodeFactory instructionNodeFactory)
         {
             _InstructionNodeFactory = instructionNodeFactory;
         }
         //problem, need to mark the originals if the son is discovered to be reucrisve
-        public void Modify(List<InstructionNode> instructionNodes)
+        public void InlineCallNodes(List<InstructionNode> instructionNodes)
         {
             List<InstructionNode> originalNodes = new List<InstructionNode>(instructionNodes);
-            var callNodes = instructionNodes.Where(x => x is InlineableCallNode).Cast<InlineableCallNode>().ToArray();
-            var startCallSequence = new List<MethodDefinition>() { instructionNodes[0].Method };
+            instructionNodes.ForEach(x => x.InliningProperties.CallSequence.Add(new MethodAndNode() { Method = instructionNodes[0].Method, MethodsNodes = instructionNodes.ToList() }));
+            var callNodes = instructionNodes.Where(x => x is InlineableCallNode).Cast<InlineableCallNode>().Where(x => !x.CallWasInlined).ToArray();
             foreach (var callNode in callNodes)
             {
-                instructionNodes.InsertRange(instructionNodes.IndexOf(callNode), InlineRec(callNode, instructionNodes));
-            }
-            bool topMostMethodIsRecursive = instructionNodes.Any(x => x is InlineableCallNode && ((InlineableCallNode) x).TargetMethod == originalNodes[0].Method);
-            if (topMostMethodIsRecursive)
-            {
-                foreach(var originalNode in originalNodes)
-                {
-                    originalNode.InliningProperties.Recursive = true;
-                    originalNode.InliningProperties.RecursionInstanceIndex = -1;
-                }
+                instructionNodes.InsertRange(instructionNodes.IndexOf(callNode), InlineRec(callNode));
             }
         }
 
-        private List<InstructionNode> InlineRec(InlineableCallNode inlinedCallNode, List<InstructionNode> originalNodes)
+        private List<InstructionNode> InlineRec(InlineableCallNode inlinedCallNode)
         {
-            List<InstructionNode> callNodeOriginalForwardRoutes = inlinedCallNode.ProgramFlowForwardRoutes.ToList();
             MethodDefinition calledMethodDef = inlinedCallNode.TargetMethodDefinition;
-            List<InstructionNode> originalNodesClone = new List<InstructionNode>(originalNodes);
-
+            inlinedCallNode.CallWasInlined = true;
             if (calledMethodDef.Body == null)
             {  
                 return new List<InstructionNode>();
             }
-
             var isSecondLevelRecursiveCall = inlinedCallNode.InliningProperties.CallSequence.Count(x => x.Method == inlinedCallNode.TargetMethod) > 1;
             if (isSecondLevelRecursiveCall)
             {
                 return new List<InstructionNode>();
             }
             inlinedCallNode.StackPushCount = 0;
+            List<InstructionNode> callNodeOriginalForwardRoutes = inlinedCallNode.ProgramFlowForwardRoutes.ToList();
+
             List<InstructionNode> inlinedNodes = calledMethodDef.Body.Instructions.SelectMany(x => _InstructionNodeFactory.GetInstructionNodes(x, calledMethodDef)).ToList();
-            inlinedNodes.ForEach(x => SetNodeProps(x, callSequenceClone, inlinedCallNode));
+            inlinedNodes.ForEach(x => SetNodeProps(x, inlinedNodes, inlinedCallNode));
             programFlowHanlder.AddFlowConnections(inlinedNodes);
             _BackTraceManager.BackTraceInFunctionBounds(inlinedNodes);
             StitchProgramFlow(inlinedCallNode, inlinedNodes[0]);
@@ -70,26 +60,49 @@ namespace Dopple.InstructionModifiers
             {
                 StitchProgramFlow(lastInlinedNode, callNodeOriginalForwardRoutes);
             }
-            callSequenceClone.Add(calledMethodDef);
             foreach (InlineableCallNode secondLevelInlinedCallNode in inlinedNodes.Where(x => x is InlineableCallNode).ToList())
             {
-                inlinedNodes.InsertRange(inlinedNodes.IndexOf(secondLevelInlinedCallNode), InlineRec(secondLevelInlinedCallNode, callSequenceClone));
+                inlinedNodes.InsertRange(inlinedNodes.IndexOf(secondLevelInlinedCallNode), InlineRec(secondLevelInlinedCallNode));
             }
             return inlinedNodes;
         }
 
-        private void SetNodeProps(InstructionNode inlinedNode, List<MethodDefinition> callSequence, InlineableCallNode callNode)
+        public void RemoveCallNodes(List<InstructionNode> instructionNodes)
+        {
+            foreach (var inlinedCallNode in instructionNodes.Where(x => x is InlineableCallNode && !(x is ConstructorCallNode)).ToArray())
+            {
+                inlinedCallNode.SelfRemove();
+                instructionNodes.Remove(inlinedCallNode);
+            }
+        }
+        public void MergeRecursiveNodes(List<InstructionNode> instructionNodes)
+        {            
+            foreach (var recusriveNode in instructionNodes.Where(x => x.InliningProperties.Recursive).ToList())
+            {
+                MethodAndNode firstCallNodes = recusriveNode.InliningProperties.CallSequence.Where(x => x.Method == recusriveNode.Method).First();
+                var equivilentNodes = firstCallNodes.MethodsNodes.Where(x => x.Instruction.Offset == recusriveNode.Instruction.Offset);
+                if (equivilentNodes.Count() != 1)
+                {
+                    throw new Exception("Only one matching node should exist");
+                }
+                recusriveNode.MergeInto(equivilentNodes.First(),false);
+                instructionNodes.Remove(recusriveNode);
+            }
+        }
+
+        private void SetNodeProps(InstructionNode inlinedNode, List<InstructionNode> nodes, InlineableCallNode callNode)
         {
             inlinedNode.InliningProperties.Inlined = true;
             inlinedNode.InliningProperties.CallNode = callNode;
-            SetRecursionRelatedProps(inlinedNode, callSequence);
+            inlinedNode.InliningProperties.CallSequence = callNode.InliningProperties.CallSequence.ToList();
             inlinedNode.ProgramFlowBackAffected.AddTwoWay(callNode.ProgramFlowBackAffected);
-            inlinedNode.InliningProperties.CallSequence = callSequence;
+            inlinedNode.InliningProperties.CallSequence.Add(new MethodAndNode() { Method = callNode.TargetMethodDefinition, MethodsNodes = nodes });
+            SetRecursionIndex(inlinedNode, nodes);
         }
 
-        private void SetRecursionRelatedProps(InstructionNode inlinedNode, List<MethodDefinition> callSequence)
+        private void SetRecursionIndex(InstructionNode inlinedNode, List<InstructionNode> higherLevelNodes)
         {
-            if (callSequence.Contains(inlinedNode.Method))
+            if (inlinedNode.InliningProperties.CallSequence.Count(x => x.Method == inlinedNode.Method) >1)
             {
                 inlinedNode.InliningProperties.Recursive = true;
             }

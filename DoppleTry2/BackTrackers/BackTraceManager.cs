@@ -18,7 +18,6 @@ namespace Dopple.BackTracers
         private readonly StIndAddressBackTracer _StIndAddressBackTracer = new StIndAddressBackTracer();
         private readonly LdLocBackTracer _LdLocBackTracer = new LdLocBackTracer();
         private readonly RetBackTracer _RetBackTracer = new RetBackTracer();
-        private readonly ConditionionalsBackTracer _ConditionalBacktracer = new ConditionionalsBackTracer();
 
         internal void BackTraceInFunctionBounds(List<InstructionNode> instructionNodes)
         {
@@ -27,7 +26,6 @@ namespace Dopple.BackTracers
             _StIndAddressBackTracer.AddBackDataflowConnections(instructionNodes);
             _LdLocBackTracer.AddBackDataflowConnections(instructionNodes);
             _RetBackTracer.AddBackDataflowConnections(instructionNodes);
-            _ConditionalBacktracer.AddBackDataflowConnections(instructionNodes);
 
         }
 
@@ -35,6 +33,7 @@ namespace Dopple.BackTracers
         private readonly LoadFieldByStackBackTracer _LoadFieldByStackBackTracer = new LoadFieldByStackBackTracer();
         private readonly LoadMemoryByOperandBackTracer _LoadMemoryByOperandBackTracer = new LoadMemoryByOperandBackTracer();
         private readonly TypedReferenceBackTracer _TypedReferenceBackTracer = new TypedReferenceBackTracer();
+        private readonly ConditionionalsBackTracer _ConditionalBacktracer = new ConditionionalsBackTracer();
 
         internal void BackTraceOutsideFunctionBounds(List<InstructionNode> instructionNodes)
         {
@@ -42,6 +41,7 @@ namespace Dopple.BackTracers
             _LoadFieldByStackBackTracer.AddBackDataflowConnections(instructionNodes);
             _LoadMemoryByOperandBackTracer.AddBackDataflowConnections(instructionNodes);
             _TypedReferenceBackTracer.AddBackDataflowConnections(instructionNodes);
+            _ConditionalBacktracer.AddBackDataflowConnections(instructionNodes);
         }
     }
 }

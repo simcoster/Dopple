@@ -37,6 +37,12 @@
             this.label1 = new System.Windows.Forms.Label();
             this.FlowAffectingChb = new System.Windows.Forms.CheckBox();
             this.freeTextTextBox = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.SetWidthTxt = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.SetHightTxt = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // ShowProgramFlowLinks
@@ -146,11 +152,76 @@
             this.freeTextTextBox.TabIndex = 8;
             this.freeTextTextBox.TextChanged += new System.EventHandler(this.freeTextTextBox_TextChanged);
             // 
+            // label2
+            // 
+            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(771, 161);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(65, 13);
+            this.label2.TabIndex = 9;
+            this.label2.Text = "Search Text";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(770, 126);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(80, 13);
+            this.label3.TabIndex = 10;
+            this.label3.Text = "Limit to Indexes";
+            // 
+            // SetWidthTxt
+            // 
+            this.SetWidthTxt.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.SetWidthTxt.Location = new System.Drawing.Point(842, 199);
+            this.SetWidthTxt.Name = "SetWidthTxt";
+            this.SetWidthTxt.Size = new System.Drawing.Size(100, 20);
+            this.SetWidthTxt.TabIndex = 11;
+            this.SetWidthTxt.Text = "1000";
+            this.SetWidthTxt.TextChanged += new System.EventHandler(this.SetWidthTxt_TextChanged);
+            // 
+            // label4
+            // 
+            this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(782, 199);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(54, 13);
+            this.label4.TabIndex = 12;
+            this.label4.Text = "Set Width";
+            // 
+            // SetHightTxt
+            // 
+            this.SetHightTxt.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.SetHightTxt.Location = new System.Drawing.Point(842, 245);
+            this.SetHightTxt.Name = "SetHightTxt";
+            this.SetHightTxt.Size = new System.Drawing.Size(100, 20);
+            this.SetHightTxt.TabIndex = 13;
+            this.SetHightTxt.Text = "1000";
+            this.SetHightTxt.TextChanged += new System.EventHandler(this.SetHightTxt_TextChanged);
+            // 
+            // label5
+            // 
+            this.label5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(779, 245);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(57, 13);
+            this.label5.TabIndex = 14;
+            this.label5.Text = "Set Height";
+            // 
             // Form2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(954, 481);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.SetHightTxt);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.SetWidthTxt);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.freeTextTextBox);
             this.Controls.Add(this.FlowAffectingChb);
             this.Controls.Add(this.label1);
@@ -179,5 +250,11 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckBox FlowAffectingChb;
         private System.Windows.Forms.TextBox freeTextTextBox;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox SetWidthTxt;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.TextBox SetHightTxt;
+        private System.Windows.Forms.Label label5;
     }
 }

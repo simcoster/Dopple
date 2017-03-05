@@ -22,13 +22,13 @@ namespace Dopple
         private readonly BackTraceManager _backTraceManager = new BackTraceManager();
         private InstructionNodeFactory _InstructionNodeFactory = new InstructionNodeFactory();
         private VirtualMethodResolver _VirtualMethodResolver = new VirtualMethodResolver();
-        private InlineCallModifier _inlineCallModifier;
+        private CallInliner _inlineCallModifier;
         ConditionionalsBackTracer _ConditionalBacktracer = new ConditionionalsBackTracer();
 
         public GraphBuilder(IEnumerable<InstructionNode> instNodes)
         {
             InstructionNodes = instNodes.ToList();
-            _inlineCallModifier = new InlineCallModifier(_InstructionNodeFactory);
+            _inlineCallModifier = new CallInliner(_InstructionNodeFactory);
         }
         public GraphBuilder(MethodDefinition methodDefinition)
         {
@@ -39,7 +39,7 @@ namespace Dopple
             {
                 inst.InstructionIndex = InstructionNodes.IndexOf(inst);
             }
-            _inlineCallModifier = new InlineCallModifier(_InstructionNodeFactory);
+            _inlineCallModifier = new CallInliner(_InstructionNodeFactory);
         }
 
 
@@ -67,14 +67,15 @@ namespace Dopple
                 SetInstructionIndexes();
                 _backTraceManager.BackTraceOutsideFunctionBounds(InstructionNodes);
                 RemoveHelperCodes();
-                RecursionFix();
                 //MergeSingleOperationNodes();
                 MergeSimilarInstructions();
                 LdElemBackTrace();
+                RecursionFix();
                 ResolveVirtualMethods(out shouldRerun);
                 SetInstructionIndexes();
                 isFirstRun = false;
             }
+            RemoveInstWrappers(InstructionNodes.Where(x => x.InliningProperties.Inlined && x is LdArgInstructionNode && x.DataFlowBackRelated.Count > 0 && !x.DataFlowBackRelated.SelfFeeding));
             AddZeroNode();
             //Verify();
 
@@ -86,29 +87,11 @@ namespace Dopple
             _VirtualMethodResolver.ResolveVirtualMethods(InstructionNodes, out inliningWasDone);
         }
 
-        private void BackTraceConditionals()
-        {
-            _ConditionalBacktracer.AddBackDataflowConnections(InstructionNodes);
-        }
-
         private void RecursionFix()
         {
-            foreach(var inlinedCallNode in InstructionNodes.Where(x => x is InlineableCallNode && !(x is ConstructorCallNode)).ToArray())
-            {
-                inlinedCallNode.SelfRemove();
-                InstructionNodes.Remove(inlinedCallNode);
-            }
-
-            //need to fix this so it only applies to recursive node instances
-            foreach(var recusriveMethodNodesGroup in InstructionNodes.Where(x => x.InliningProperties.Recursive).GroupBy(x => new { x.Method, x.Instruction.Offset }).Where(x => x.Count() >1).ToList())
-            {
-                var nodeInFirstRecursiveCall = recusriveMethodNodesGroup.OrderBy(x => x.InliningProperties.RecursionInstanceIndex).First();
-                foreach (var nodeInSubsequentCall in recusriveMethodNodesGroup.Where(x => x != nodeInFirstRecursiveCall))
-                {
-                    nodeInSubsequentCall.MergeInto(nodeInFirstRecursiveCall,false);
-                    InstructionNodes.Remove(nodeInSubsequentCall);
-                }
-            }
+            _inlineCallModifier.MergeRecursiveNodes(InstructionNodes);
+            _inlineCallModifier.RemoveCallNodes(InstructionNodes);
+            
         }
 
         private void MergeSingleOperationNodes()
@@ -188,7 +171,7 @@ namespace Dopple
             RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.StLocCodes.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.LdLocCodes.Contains(x.Instruction.OpCode.Code)));
             //RemoveInstWrappers(InstructionNodes.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code)));
-            RemoveInstWrappers(InstructionNodes.Where(x => x is LdArgInstructionNode && x.DataFlowBackRelated.Count > 0 && !x.DataFlowBackRelated.SelfFeeding));
+            //RemoveInstWrappers(InstructionNodes.Where(x => x is LdArgInstructionNode && x.DataFlowBackRelated.Count > 0 && !x.DataFlowBackRelated.SelfFeeding));
             RemoveInstWrappers(InstructionNodes.Where(x => x is StIndInstructionNode && ((StIndInstructionNode) x).AddressType == AddressType.LocalVar));
             ////TODO check this
             RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Ret && x.InliningProperties.Inlined && !x.DataFlowBackRelated.SelfFeeding));
@@ -311,7 +294,7 @@ namespace Dopple
 
         private void InlineFunctionCalls()
         {
-            _inlineCallModifier.Modify(InstructionNodes);
+            _inlineCallModifier.InlineCallNodes(InstructionNodes);
         }
 
         private void Verify()

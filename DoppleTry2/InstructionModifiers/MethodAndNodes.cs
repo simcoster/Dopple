@@ -10,7 +10,7 @@ namespace Dopple.InstructionModifiers
 {
     public class MethodAndNode
     {
-        List<InstructionNode> Nodes { get; set; }
-        MethodDefinition Method { get; set; }
+        public List<InstructionNode> MethodsNodes { get; set; }
+        public MethodDefinition Method { get; set; }
     }
 }
