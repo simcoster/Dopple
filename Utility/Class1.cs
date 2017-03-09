@@ -10,30 +10,109 @@ namespace Utility
 {
     public abstract class Class1
     {
-        public int TestConditionals(int number, int multSoFar)
+        //--------------- iterative version ---------------------    
+        static int FibonacciIterative(int n)
         {
-            if (number == multSoFar)
-            {
-                return TestConditionals(number + 1, multSoFar + 1);
-            }
-            else
-            {
-                return 0;
-            }
-            return multSoFar;
-        }
-        public abstract int CalcAtzeret(int number, int multSoFar);
+            if (n == 0) return 0;
+            if (n == 1) return 1;
 
-        public int CallVirtual()
+            int prevPrev = 0;
+            int prev = 1;
+            int result = 0;
+
+            for (int i = 2; i <= n; i++)
+            {
+                result = prev + prevPrev;
+                prevPrev = prev;
+                prev = result;
+            }
+            return result;
+        }
+
+        //--------------- naive recursive version --------------------- 
+        static int FibonacciRecursive(int n)
         {
-            return new ChildClass().CalcAtzeret(6, 7);
+            if (n == 0) return 0;
+            if (n == 1) return 1;
+
+            return FibonacciRecursive(n - 1) + FibonacciRecursive(n - 2);
         }
 
-       
+
+        //public static void insertionSort(int[] array)
+        //{
+        //    for (int i = 0; i < array.Length - 1; i++)
+        //    {
+        //        int nextMin = int.MaxValue;
+        //        int nextMinIndex = -1;
+        //        for (int j = i; j < array.Length; j++)
+        //        {
+        //            if (array[j] < nextMin)
+        //            {
+        //                nextMin = array[j];
+        //                nextMinIndex = j;
+        //            }
+        //        }
+        //        if (nextMin < array[i])
+        //        {
+        //            int temp = array[i];
+        //            array[i] = array[nextMinIndex];
+        //            array[nextMinIndex] = temp;
+        //        }
+        //    }
+        //}
+
+
+        //public static void insertionSortWithHelpers(int[] array)
+        //{
+        //    for (int i = 0; i < array.Length - 1; i++)
+        //    {
+        //        int min;
+        //        int minIndex;
+        //        findMinAndIndex(array, i, out min, out minIndex);
+        //        //int min = int.MaxValue;
+        //        //int minIndex = -1;
+        //        for (int j = i; j < array.Length; j++)
+        //        {
+        //            if (array[j] < min)
+        //            {
+        //                min = array[j];
+        //                minIndex = j;
+        //            }
+        //        }
+        //        if (min < array[i])
+        //        {
+        //            swapTwo(array, i, minIndex);
+        //        }
+        //    }
+        //}
+
+        //public static void swapTwo(int[] array, int i, int j)
+        //{
+        //    int temp = array[i];
+        //    array[i] = array[j];
+        //    array[j] = temp;
+        //}
+
+        //public static void findMinAndIndex(int[] array, int startIndex, out int minValue, out int minIndex)
+        //{
+        //    int currentMin = int.MaxValue;
+        //    int currentMinIndex = -1;
+        //    for (int i = startIndex; i < array.Length; i++)
+        //    {
+        //        if (array[i] < currentMin)
+        //        {
+        //            currentMin = array[i];
+        //            currentMinIndex = i;
+        //        }
+        //    }
+        //    minValue = currentMin;
+        //    minIndex = currentMinIndex;
+        //}
 
         //public static IEnumerable<bool> SelectMe(List<int> arr)
         //{
-        //    return arr.Select(x => x > 7).ToArray();
+        //    return arr.Select(x => x > 7).ToList();
         //}
 
         //public static int DoThing(bool isTrue)
@@ -59,15 +138,8 @@ namespace Utility
         //}
     }
 
-    public class ChildClass : Class1
-    {
-        public override int CalcAtzeret(int number, int multSoFar)
-        {
-            if (number == 1)
-            {
-                return multSoFar;
-            }
-            return CalcAtzeret(number - 1, multSoFar * number);
-        }
-    }
+    //public class ChildClass : Class1
+    //{
+    //   
+    //}
 }

@@ -39,9 +39,9 @@ namespace Dopple.BackTracers
                 else
                 {
                     currentPath.Add(currentNode);
-                    foreach (var path in currentNode.ProgramFlowForwardRoutes)
+                    foreach (var forwardNode in currentNode.ProgramFlowForwardRoutes)
                     {
-                        possibleExecutionRoutes.AddRange(MapAllPossibleExecutionRoutes(path, currentPath));
+                        possibleExecutionRoutes.AddRange(MapAllPossibleExecutionRoutes(forwardNode, currentPath));
                     }
                     return possibleExecutionRoutes;
                 }
@@ -73,7 +73,7 @@ namespace Dopple.BackTracers
 
         private List<ExecutionTrack> GetNodesInClosedCondition(InstructionNode currentNode)
         {
-            var relevantTracks = MapAllPossibleExecutionRoutes(currentNode).Select(x => x.Skip(1).ToList());
+            var relevantTracks = MapAllPossibleExecutionRoutes(currentNode).Select(x => x.Skip(1).ToList()).ToList();
             List<InstructionNode> sharedNodes = relevantTracks.Aggregate((x, y) => x.Intersect(y).ToList()).ToList();
             IEnumerable<InstructionNode> nodesInCondition;
             List<ExecutionTrack> executionTracks = new List<ExecutionTrack>();
@@ -83,7 +83,7 @@ namespace Dopple.BackTracers
                 nodesInCondition = relevantTracks
                                           .Select(x => x.TakeWhile(y => y != conditionEndNode))
                                           .Aggregate((x, y) => x.Concat(y))
-                                          .Distinct();
+                                          .Distinct().ToList();
                 executionTracks.Add(new ExecutionTrack(nodesInCondition.ToList(),TrackType.ClosedBranch));
                 return executionTracks;
             }
@@ -110,7 +110,7 @@ namespace Dopple.BackTracers
         internal TrackType TrackType { get; private set; }
     }
 
-    internal enum TrackType
+    public enum TrackType
     {
         Loop =1,
         ClosedBranch=2,

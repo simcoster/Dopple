@@ -9,6 +9,7 @@ using Dopple.BackTracers;
 using Dopple.ProgramFlowHanlder;
 using Dopple.InstructionNodes;
 using System.Diagnostics;
+using Dopple.VerifierNs;
 
 namespace Dopple.InstructionModifiers
 {
@@ -19,6 +20,8 @@ namespace Dopple.InstructionModifiers
         private InstructionNodeFactory _InstructionNodeFactory;
         private BackTraceManager _BackTraceManager = new BackTraceManager();
         
+        //TODO remove
+        public Verifier[] Verifiers { get; set; }
         public CallInliner(InstructionNodeFactory instructionNodeFactory)
         {
             _InstructionNodeFactory = instructionNodeFactory;
@@ -27,7 +30,7 @@ namespace Dopple.InstructionModifiers
         public void InlineCallNodes(List<InstructionNode> instructionNodes)
         {
             List<InstructionNode> originalNodes = new List<InstructionNode>(instructionNodes);
-            instructionNodes.ForEach(x => x.InliningProperties.CallSequence.Add(new MethodAndNode() { Method = instructionNodes[0].Method, MethodsNodes = instructionNodes.ToList() }));
+            instructionNodes.ForEach(x => x.InliningProperties.CallSequence.Add(new MethodAndNode() { Method = instructionNodes[0].Method, MethodsNodes = originalNodes }));
             var callNodes = instructionNodes.Where(x => x is InlineableCallNode).Cast<InlineableCallNode>().Where(x => !x.CallWasInlined).ToArray();
             foreach (var callNode in callNodes)
             {
@@ -50,9 +53,8 @@ namespace Dopple.InstructionModifiers
             }
             inlinedCallNode.StackPushCount = 0;
             List<InstructionNode> callNodeOriginalForwardRoutes = inlinedCallNode.ProgramFlowForwardRoutes.ToList();
-
             List<InstructionNode> inlinedNodes = calledMethodDef.Body.Instructions.SelectMany(x => _InstructionNodeFactory.GetInstructionNodes(x, calledMethodDef)).ToList();
-            inlinedNodes.ForEach(x => SetNodeProps(x, inlinedNodes, inlinedCallNode));
+            inlinedNodes.ForEach(x =>  SetNodeProps(x, inlinedNodes, inlinedCallNode));
             programFlowHanlder.AddFlowConnections(inlinedNodes);
             _BackTraceManager.BackTraceInFunctionBounds(inlinedNodes);
             StitchProgramFlow(inlinedCallNode, inlinedNodes[0]);
@@ -85,8 +87,18 @@ namespace Dopple.InstructionModifiers
                 {
                     throw new Exception("Only one matching node should exist");
                 }
-                recusriveNode.MergeInto(equivilentNodes.First(),false);
+                var equivilentNode = equivilentNodes.First();
+                bool equivilentWasRemoved = !instructionNodes.Contains(equivilentNode);
+                if (equivilentWasRemoved)
+                {
+                    recusriveNode.SelfRemove();
+                }
+                else
+                {
+                    recusriveNode.MergeInto(equivilentNodes.First(), false);
+                }
                 instructionNodes.Remove(recusriveNode);
+                instructionNodes.ForEach(x => Verifiers.ForEach(y => y.Verify(x)));
             }
         }
 
@@ -96,7 +108,7 @@ namespace Dopple.InstructionModifiers
             inlinedNode.InliningProperties.CallNode = callNode;
             inlinedNode.InliningProperties.CallSequence = callNode.InliningProperties.CallSequence.ToList();
             inlinedNode.ProgramFlowBackAffected.AddTwoWay(callNode.ProgramFlowBackAffected);
-            inlinedNode.InliningProperties.CallSequence.Add(new MethodAndNode() { Method = callNode.TargetMethodDefinition, MethodsNodes = nodes });
+            inlinedNode.InliningProperties.CallSequence.Add(new MethodAndNode() { Method = callNode.TargetMethodDefinition, MethodsNodes = new List<InstructionNode>(nodes) });
             SetRecursionIndex(inlinedNode, nodes);
         }
 

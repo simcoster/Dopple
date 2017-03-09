@@ -442,10 +442,10 @@ namespace DoppleGraph
         {
             foreach (var node in colNodes)
             {
-                var nodesToUpdate = node.InstructionNode.DataFlowForwardRelated
-                //var nodesToUpdate = node.InstructionNode.ProgramFlowForwardRoutes
-               .Select(x => GetNodeWrapper(x.Argument))
-               //.Select(x => GetNodeWrapper(x))
+                //var nodesToUpdate = node.InstructionNode.DataFlowForwardRelated
+                var nodesToUpdate = node.InstructionNode.ProgramFlowForwardRoutes
+               //.Select(x => GetNodeWrapper(x.Argument))
+               .Select(x => GetNodeWrapper(x))
                //TODO remove, this hides a problem
                .Where(x=> x != null)
                .Where(x => x.LongestPath.Count == 0 || !x.LongestPath.Intersect(node.LongestPath).SequenceEqual(x.LongestPath))
@@ -537,26 +537,30 @@ namespace DoppleGraph
                 if (new[] { Code.Call, Code.Calli, Code.Callvirt }.Contains(
                         goNodeWrapper.InstructionNode.Instruction.OpCode.Code))
                 {
-                    goNodeWrapper.Node.Text += ((MethodReference) goNodeWrapper.InstructionNode.Instruction.Operand).FullName ?? " ";
+                    //TODO remove
+                    //goNodeWrapper.Node.Text += ((MethodReference) goNodeWrapper.InstructionNode.Instruction.Operand).FullName ?? " ";
                 }
                 else if (goNodeWrapper.InstructionNode is FunctionArgInstNode)
                 {
-                    var ArgInstWrapper = (FunctionArgInstNode) goNodeWrapper.InstructionNode;
-                    goNodeWrapper.Node.Text += " " + ArgInstWrapper.ArgName + " " + ArgInstWrapper.ArgIndex;
+                    //TODO remove
+                    //var ArgInstWrapper = (FunctionArgInstNode) goNodeWrapper.InstructionNode;
+                    //goNodeWrapper.Node.Text += " " + ArgInstWrapper.ArgName + " " + ArgInstWrapper.ArgIndex;
                 }
                 else if (goNodeWrapper.InstructionNode.Instruction.Operand != null)
                 {
-                    goNodeWrapper.Node.Text += goNodeWrapper.InstructionNode.Instruction.Operand.ToString();
+                    //TODO remove
+                    //goNodeWrapper.Node.Text += goNodeWrapper.InstructionNode.Instruction.Operand.ToString();
                 }
 
                 if (goNodeWrapper.InstructionNode.InliningProperties.Recursive)
                 {
-                    goNodeWrapper.Node.Text += " RecIndex:" + goNodeWrapper.InstructionNode.InliningProperties.RecursionInstanceIndex;
-                    goNodeWrapper.Node.Text += " Recursive:" + goNodeWrapper.InstructionNode.InliningProperties.CallSequence;
+                    //TODO remove
+                    //goNodeWrapper.Node.Text += " RecIndex:" + goNodeWrapper.InstructionNode.InliningProperties.RecursionInstanceIndex;
+                    //goNodeWrapper.Node.Text += " Recursive:" + goNodeWrapper.InstructionNode.InliningProperties.CallSequence;
                 }
                 frontLayer.Add(goNodeWrapper.Node);
             }
-            SetCoordinates(nodeWrappers, 1000, 1000);
+            SetCoordinates(nodeWrappers, int.Parse(SetHightTxt.Text), int.Parse(SetWidthTxt.Text));
             DrawLinks(myView);
         }
 

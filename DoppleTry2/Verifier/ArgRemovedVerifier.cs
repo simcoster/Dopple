@@ -16,7 +16,8 @@ namespace Dopple.VerifierNs
         public override void Verify(InstructionNode instructionNode)
         {
             var allRelated = instructionNode.DataFlowBackRelated.Concat(instructionNode.DataFlowForwardRelated).Concat(instructionNode.ProgramFlowBackAffected).Concat(instructionNode.ProgramFlowForwardAffecting);
-            if (allRelated.Any(x => !instructionNodes.Contains(x.Argument)))
+            var removedRelated = allRelated.Where(x => !instructionNodes.Contains(x.Argument)).ToList();
+            if (removedRelated.Any())
             {
                 var removed = instructionNode.DataFlowBackRelated.Where(x => !instructionNodes.Contains(x.Argument)).ToList();
                 var removed2 = instructionNode.DataFlowForwardRelated.Where(x => !instructionNodes.Contains(x.Argument)).ToList();

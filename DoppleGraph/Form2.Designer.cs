@@ -49,8 +49,6 @@
             // 
             this.ShowProgramFlowLinks.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.ShowProgramFlowLinks.AutoSize = true;
-            this.ShowProgramFlowLinks.Checked = true;
-            this.ShowProgramFlowLinks.CheckState = System.Windows.Forms.CheckState.Checked;
             this.ShowProgramFlowLinks.Location = new System.Drawing.Point(871, 12);
             this.ShowProgramFlowLinks.Name = "ShowProgramFlowLinks";
             this.ShowProgramFlowLinks.Size = new System.Drawing.Size(76, 17);
@@ -165,7 +163,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(770, 126);
+            this.label3.Location = new System.Drawing.Point(765, 126);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(80, 13);
             this.label3.TabIndex = 10;
@@ -178,7 +176,7 @@
             this.SetWidthTxt.Name = "SetWidthTxt";
             this.SetWidthTxt.Size = new System.Drawing.Size(100, 20);
             this.SetWidthTxt.TabIndex = 11;
-            this.SetWidthTxt.Text = "1000";
+            this.SetWidthTxt.Text = "2000";
             this.SetWidthTxt.TextChanged += new System.EventHandler(this.SetWidthTxt_TextChanged);
             // 
             // label4

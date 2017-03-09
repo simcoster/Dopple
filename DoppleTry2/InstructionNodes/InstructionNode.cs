@@ -115,7 +115,7 @@ namespace Dopple.InstructionNodes
             }
         }
 
-        public void MergeInto(InstructionNode nodeToMergeInto, bool keepOriginal)
+        public virtual void MergeInto(InstructionNode nodeToMergeInto, bool keepOriginal)
         {
             if (nodeToMergeInto == this)
             {

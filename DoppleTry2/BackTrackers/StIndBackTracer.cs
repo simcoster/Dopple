@@ -24,10 +24,11 @@ namespace Dopple.BackTracers
                                 .SelectMany(x => TraceBackwardsLdStLocs(x.Argument));
             if (addressNodes.Any(x => !GetAddressType(x).HasValue))
             {
-                throw new Exception("some args don't provide address");
+                //TODO
+                //throw new Exception("some args don't provide address");
             }
-            stIndInst.AddressType = GetAddressType(addressNodes.First()).Value;
-            stIndInst.AddressProvidingArgs = addressNodes.ToList();
+            //stIndInst.AddressType = GetAddressType(addressNodes.First()).Value;
+            //stIndInst.AddressProvidingArgs = addressNodes.ToList();
         }
 
         private IEnumerable<InstructionNode> TraceBackwardsLdStLocs(InstructionNode startInstruction, List<InstructionNode> visited = null)

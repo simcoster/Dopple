@@ -44,6 +44,10 @@ namespace Dopple.InstructionNodes
                 {
                     constructorMethodDef = (MethodDefinition)instruction.Operand;
                 }
+                else if (instruction.Operand is MethodReference)
+                {
+                    constructorMethodDef = ((MethodReference) instruction.Operand).Resolve();
+                }
                 if (constructorMethodDef != null || systemMethodsLoader.TryGetSystemMethod(instruction, out constructorMethodDef))
                 {
                     var noArgsNewObject = new ConstructorNewObjectNode(instruction, method);
