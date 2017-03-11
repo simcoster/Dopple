@@ -41,6 +41,7 @@ namespace Dopple.InstructionModifiers
         private List<InstructionNode> InlineRec(InlineableCallNode inlinedCallNode)
         {
             MethodDefinition calledMethodDef = inlinedCallNode.TargetMethodDefinition;
+
             inlinedCallNode.CallWasInlined = true;
             if (calledMethodDef.Body == null)
             {  
@@ -49,6 +50,12 @@ namespace Dopple.InstructionModifiers
             var isSecondLevelRecursiveCall = inlinedCallNode.InliningProperties.CallSequence.Count(x => x.Method == inlinedCallNode.TargetMethod) > 1;
             if (isSecondLevelRecursiveCall)
             {
+                return new List<InstructionNode>();
+            }
+            //TODO check
+            if (inlinedCallNode.InliningProperties.CallSequence.Count >5)
+            {
+                inlinedCallNode.CallWasInlined = true;
                 return new List<InstructionNode>();
             }
             inlinedCallNode.StackPushCount = 0;

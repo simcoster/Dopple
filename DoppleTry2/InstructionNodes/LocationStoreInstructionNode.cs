@@ -18,13 +18,21 @@ namespace Dopple.InstructionNodes
         public LocationLoadInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method) { }
     }
 
-    public abstract class LocationInstructionNode : InstructionNode
+    public abstract class LocationInstructionNode : InstructionNode, IDataTransferingNode
     {
         public LocationInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
             LocIndex = GetLocIndex(instruction);
         }
         public int LocIndex { get; private set; }
+
+        public int DataFlowDataProdivderIndex
+        {
+            get
+            {
+                return 0;
+            }
+        }
 
         private static readonly Dictionary<Code, int> LcCodesIndexes = new Dictionary<Code, int>
         {

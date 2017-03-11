@@ -13,6 +13,5 @@ namespace GraphBuilderTests
             return a + b;
         }
 
-        public static void AddTwoNumbers()
     }
 }

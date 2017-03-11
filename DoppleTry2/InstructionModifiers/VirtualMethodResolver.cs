@@ -10,6 +10,7 @@ namespace Dopple
 {
     internal class VirtualMethodResolver
     {
+        TypeDefinition ArrayTypeDefinition = ModuleDefinition.ReadModule(typeof(object).Module.FullyQualifiedName).Types.First(x => x.FullName == "System.Array");
         InstructionNodeFactory _InstructionNodeFactory = new InstructionNodeFactory();
         internal void ResolveVirtualMethods(List<InstructionNode> instructionNodes, out bool inlinlingWasMade)
         {
@@ -19,6 +20,7 @@ namespace Dopple
                 .Where(x => x is VirtualCallInstructionNode && ((VirtualCallInstructionNode)x).ResolveAttempted==false)
                 .ToArray())
             {
+
                 bool methodImplementationFound = false;
                 var virtualMethodDeclaringTypeDefinition = virtualNodeCall.TargetMethod.DeclaringType.Resolve();
                 var virtualMethodDeclaringTypeReference = virtualNodeCall.TargetMethod.DeclaringType;
@@ -27,13 +29,24 @@ namespace Dopple
                 {
                     foreach (var dataOriginNode in objectArgument.Argument.GetDataOriginNodes())
                     {
-                        //TODO remove
                         TypeReference objectTypeReference = GetObjectType(dataOriginNode);
-                        TypeDefinition objectTypeDefinition = objectTypeReference.Resolve();
-                        if (objectTypeDefinition.IsAbstract)
+                        if (objectTypeReference == null)
                         {
-                            virtualNodeCall.ResolveAttempted = true;
                             continue;
+                        }
+                        TypeDefinition objectTypeDefinition;
+                        if (objectTypeReference.IsArray)
+                        {
+                            objectTypeDefinition = ArrayTypeDefinition;
+                        }
+                        else
+                        {
+                            objectTypeDefinition = objectTypeReference.Resolve();
+                            if (objectTypeDefinition.IsAbstract)
+                            {
+                                virtualNodeCall.ResolveAttempted = true;
+                                continue;
+                            }
                         }
                         var methodImplementation = GetImplementation(virtualMethodDeclaringTypeDefinition, objectTypeDefinition, virtualNodeCall.TargetMethod.Resolve());
                         if (methodImplementation != null)
@@ -44,7 +57,7 @@ namespace Dopple
                         }
                     }
                 }
-                if (!methodImplementationFound)
+                if (methodImplementationFound)
                 {
                     virtualNodeCall.SelfRemove();
                     instructionNodes.Remove(virtualNodeCall);
@@ -60,7 +73,6 @@ namespace Dopple
             callInstructionNode.DataFlowBackRelated.RemoveAllTwoWay(x => x.ArgIndex == 0 && x.Argument != objectArgument);
             callInstructionNode.InliningProperties = virtualNodeCall.InliningProperties;
             instructionNodes.Insert(instructionNodes.IndexOf(virtualNodeCall), callInstructionNode);
-            instructionNodes.Remove(virtualNodeCall);
         }
 
         private static MethodDefinition GetImplementation(TypeDefinition virtualMethodDeclaringTypeDefinition, TypeDefinition objectTypeDefinition
@@ -111,7 +123,9 @@ namespace Dopple
             {
                 return objectArg.Method.ReturnType;
             }
-            throw new Exception("didn't find correct type");
+            return null;
+            //TODO remove
+            //throw new Exception("didn't find correct type");
         }
 
         private static bool MethodSignitureMatch(string method1, string method2)

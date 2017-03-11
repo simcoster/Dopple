@@ -537,8 +537,7 @@ namespace DoppleGraph
                 if (new[] { Code.Call, Code.Calli, Code.Callvirt }.Contains(
                         goNodeWrapper.InstructionNode.Instruction.OpCode.Code))
                 {
-                    //TODO remove
-                    //goNodeWrapper.Node.Text += ((MethodReference) goNodeWrapper.InstructionNode.Instruction.Operand).FullName ?? " ";
+                    goNodeWrapper.Node.Text += ((MethodReference) goNodeWrapper.InstructionNode.Instruction.Operand).FullName ?? " ";
                 }
                 else if (goNodeWrapper.InstructionNode is FunctionArgInstNode)
                 {

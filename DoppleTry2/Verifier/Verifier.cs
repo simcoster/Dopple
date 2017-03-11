@@ -49,6 +49,10 @@ namespace Dopple.VerifierNs
             {
                 return true;
             }
+            if (CodeGroups.LoadFieldCodes.Contains(insturctionWrapper.Instruction.OpCode.Code))
+            {
+
+            }
             return false;
         }
         public bool IsProvidingNumber(InstructionNode instructionWrapper)

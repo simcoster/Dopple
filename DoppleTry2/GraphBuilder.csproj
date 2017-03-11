@@ -147,7 +147,7 @@
     <Compile Include="Verifier\StElemVerifier.cs" />
     <Compile Include="Verifier\StackPopPushVerfier.cs" />
     <Compile Include="Verifier\TwoWayVerifier.cs" />
-    <Compile Include="VirtualMethodResolver.cs" />
+    <Compile Include="InstructionModifiers\VirtualMethodResolver.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

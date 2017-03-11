@@ -18,6 +18,11 @@ namespace Dopple.InstructionNodes
                 if (instruction.Operand is MethodDefinition)
                 {
                     var targetMethodDef = (MethodDefinition) instruction.Operand;
+                    //TODO remove again.;
+                    if (targetMethodDef.FullName.Contains("Console"))
+                    {
+                        return new[] { new NonInlineableCallInstructionNode(instruction, method) };
+                    }
                     if (targetMethodDef.IsVirtual)
                     {
                         return new[] { new VirtualCallInstructionNode(instruction, method) };

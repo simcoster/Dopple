@@ -78,17 +78,16 @@ namespace Dopple
                 RemoveHelperCodes();
                 //MergeSingleOperationNodes();
                 MergeSimilarInstructions();
-                Verify();
                 LdElemBackTrace();
-                //RecursionFix();
-                Verify();
+                RecursionFix();
                 ResolveVirtualMethods(out shouldRerun);
                 SetInstructionIndexes();
                 isFirstRun = false;
+                shouldRerun = false;
             }
             PostVirtualMethodResolveRemoveNodes();
             AddZeroNode();
-            Verify();
+            //Verify();
 
             return InstructionNodes;
         }
@@ -110,7 +109,7 @@ namespace Dopple
             //TODO remove
             _inlineCallModifier.Verifiers = verifiers;
             _inlineCallModifier.MergeRecursiveNodes(InstructionNodes);
-            _inlineCallModifier.RemoveCallNodes(InstructionNodes);
+            //_inlineCallModifier.RemoveCallNodes(InstructionNodes);
             
         }
 
