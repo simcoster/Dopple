@@ -117,6 +117,10 @@ namespace Dopple.InstructionNodes
             {
                 return new[] {new SingleIndexDataTransferNode(instruction, method) };
             }
+            else if (CodeGroups.LoadFieldCodes.Contains(nodeCode))
+            {
+                return new[] { new LoadFieldNode(instruction, method) };
+            }
             return new[] {new InstructionNode(instruction, method)};
         }
 

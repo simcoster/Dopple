@@ -77,15 +77,14 @@ namespace Dopple
                 _backTraceManager.BackTraceOutsideFunctionBounds(InstructionNodes);
                 RemoveHelperCodes();
                 //MergeSingleOperationNodes();
-                MergeSimilarInstructions();
+                //MergeSimilarInstructions();
                 LdElemBackTrace();
                 RecursionFix();
                 ResolveVirtualMethods(out shouldRerun);
                 SetInstructionIndexes();
                 isFirstRun = false;
-                shouldRerun = false;
             }
-            PostVirtualMethodResolveRemoveNodes();
+            //PostVirtualMethodResolveRemoveNodes();
             AddZeroNode();
             //Verify();
 
@@ -95,7 +94,6 @@ namespace Dopple
         private void PostVirtualMethodResolveRemoveNodes()
         {
             RemoveInstWrappers(InstructionNodes.Where(x => x.InliningProperties.Inlined && x is LdArgInstructionNode && x.DataFlowBackRelated.Count > 0 && !x.DataFlowBackRelated.SelfFeeding));
-            //RemoveInstWrappers(InstructionNodes.Where(x => x is LdArgInstructionNode && x.DataFlowBackRelated.Count > 0 && !x.DataFlowBackRelated.SelfFeeding));
             RemoveInstWrappers(InstructionNodes.Where(x => x is InlineableCallNode));
         }
 
@@ -108,9 +106,7 @@ namespace Dopple
         {
             //TODO remove
             _inlineCallModifier.Verifiers = verifiers;
-            _inlineCallModifier.MergeRecursiveNodes(InstructionNodes);
-            //_inlineCallModifier.RemoveCallNodes(InstructionNodes);
-            
+            _inlineCallModifier.MergeRecursiveNodes(InstructionNodes);            
         }
 
         private void MergeSingleOperationNodes()

@@ -20,18 +20,25 @@ namespace Dopple
                 .Where(x => x is VirtualCallInstructionNode && ((VirtualCallInstructionNode)x).ResolveAttempted==false)
                 .ToArray())
             {
-
-                bool methodImplementationFound = false;
+                List<IndexedArgument> resolvedObjectArgs = new List<IndexedArgument>();
                 var virtualMethodDeclaringTypeDefinition = virtualNodeCall.TargetMethod.DeclaringType.Resolve();
                 var virtualMethodDeclaringTypeReference = virtualNodeCall.TargetMethod.DeclaringType;
                 List<TypeDefinition> virtualMethodTypeInheritancePath = GetInheritancePath(virtualMethodDeclaringTypeReference);
-                foreach (var objectArgument in virtualNodeCall.DataFlowBackRelated.Where(x => x.ArgIndex == 0).ToArray())
+                var objectArgs = virtualNodeCall.DataFlowBackRelated.Where(x => x.ArgIndex == 0).ToArray();
+                foreach (var objectArgument in objectArgs)
                 {
                     foreach (var dataOriginNode in objectArgument.Argument.GetDataOriginNodes())
                     {
-                        TypeReference objectTypeReference = GetObjectType(dataOriginNode);
-                        if (objectTypeReference == null)
+                        if (dataOriginNode is InlineableCallNode || dataOriginNode is VirtualCallInstructionNode)
                         {
+                            //Wait for next round
+                            continue;
+                        }
+                        TypeReference objectTypeReference;
+                        bool typeFound = TryGetObjectType(dataOriginNode, out objectTypeReference);
+                        if (!typeFound)
+                        {
+                            resolvedObjectArgs.Add(objectArgument);
                             continue;
                         }
                         TypeDefinition objectTypeDefinition;
@@ -44,20 +51,25 @@ namespace Dopple
                             objectTypeDefinition = objectTypeReference.Resolve();
                             if (objectTypeDefinition.IsAbstract)
                             {
-                                virtualNodeCall.ResolveAttempted = true;
+                                resolvedObjectArgs.Add(objectArgument);
                                 continue;
                             }
                         }
                         var methodImplementation = GetImplementation(virtualMethodDeclaringTypeDefinition, objectTypeDefinition, virtualNodeCall.TargetMethod.Resolve());
                         if (methodImplementation != null)
                         {
-                            ReplaceVirtualCallWithImplementation(instructionNodes, virtualNodeCall, objectArgument.Argument, methodImplementation);
+                            AddVirtualCallImplementation(instructionNodes, virtualNodeCall, objectArgument.Argument, methodImplementation);
                             inlinlingWasMade = true;
-                            methodImplementationFound = true;
+                            virtualNodeCall.DataFlowBackRelated.RemoveTwoWay(objectArgument);
+                            resolvedObjectArgs.Add(objectArgument);
+                        }
+                        else
+                        {
+                            virtualNodeCall.DataFlowBackRelated.RemoveTwoWay(objectArgument);
                         }
                     }
                 }
-                if (methodImplementationFound)
+                if (objectArgs.Except(resolvedObjectArgs).Any() == false)
                 {
                     virtualNodeCall.SelfRemove();
                     instructionNodes.Remove(virtualNodeCall);
@@ -65,7 +77,7 @@ namespace Dopple
             }
         }
 
-        private static void ReplaceVirtualCallWithImplementation(List<InstructionNode> instructionNodes, VirtualCallInstructionNode virtualNodeCall, InstructionNode objectArgument, MethodDefinition virtualMethodImpl)
+        private static void AddVirtualCallImplementation(List<InstructionNode> instructionNodes, VirtualCallInstructionNode virtualNodeCall, InstructionNode objectArgument, MethodDefinition virtualMethodImpl)
         {
             var callOpCode = Instruction.Create(CodeGroups.AllOpcodes.First(x => x.Code == Code.Call), virtualMethodImpl);
             var callInstructionNode = new InlineableCallNode(callOpCode, virtualMethodImpl, virtualNodeCall.Method);
@@ -83,7 +95,15 @@ namespace Dopple
             MethodDefinition methodImpl = null;
             foreach(var typeDef in objectTypeInheritancePath)
             {
-                methodImpl = typeDef.Methods.FirstOrDefault(x => MethodSignitureMatch(virtualMethodReference.FullName, x.FullName) && !x.IsAbstract);
+                if (typeDef.FullName == "System.Array")
+                {
+                    //Arrays are special
+                    methodImpl = typeDef.Methods.FirstOrDefault(x => virtualMethodReference.Name == x.Name && !x.IsAbstract);
+                }
+                else
+                {
+                    methodImpl = typeDef.Methods.FirstOrDefault(x => MethodSignitureMatch(virtualMethodReference.FullName, x.FullName) && !x.IsAbstract);
+                }
                 if (methodImpl != null)
                 {
                     break;
@@ -105,35 +125,47 @@ namespace Dopple
             return typeInheritancePath;
         }
 
-        private static TypeReference GetObjectType(InstructionNode objectArg)
+        private static bool TryGetObjectType(InstructionNode objectArg, out TypeReference foundType)
         {
-            if (objectArg is CallNode)
+            foundType = null;
+            if (objectArg is NonInlineableCallInstructionNode)
             {
-                return ((CallNode) objectArg).TargetMethod.ReturnType;
+                foundType = ((CallNode) objectArg).TargetMethod.ReturnType;
             }
             if (objectArg is LdArgInstructionNode)
             {
-                return ((LdArgInstructionNode) objectArg).ArgType;
+                foundType = ((LdArgInstructionNode) objectArg).ArgType;
             }
             if (objectArg is NewObjectNode || objectArg is ConstructorNewObjectNode)
             {
-                return ((MethodReference) objectArg.Instruction.Operand).DeclaringType;
+                foundType = ((MethodReference) objectArg.Instruction.Operand).DeclaringType;
             }
             if (objectArg is RetInstructionNode)
             {
-                return objectArg.Method.ReturnType;
+                foundType = objectArg.Method.ReturnType;
             }
-            return null;
+            if (foundType == null)
+            {
+                return false;
+            }
+            return true ;
             //TODO remove
             //throw new Exception("didn't find correct type");
         }
 
         private static bool MethodSignitureMatch(string method1, string method2)
         {
+            string[] methodNames = new string[] { method1, method2 };
             string pattern = " .*::";
             string replacement = " ";
             Regex rgx = new Regex(pattern);
-            return rgx.Replace(method1, replacement) == rgx.Replace(method2, replacement);
+            for(int i=0; i<methodNames.Length; i++)
+            {
+                methodNames[i] = rgx.Replace(methodNames[i], replacement);
+                methodNames[i] = methodNames[i].Replace("TSource", "T");
+            }
+            
+            return methodNames[0] == methodNames[1];
         }
     }
 }

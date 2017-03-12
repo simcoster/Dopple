@@ -49,9 +49,9 @@ namespace Dopple.VerifierNs
             {
                 return true;
             }
-            if (CodeGroups.LoadFieldCodes.Contains(insturctionWrapper.Instruction.OpCode.Code))
+            if (insturctionWrapper is LoadFieldNode)
             {
-
+                return ((LoadFieldNode) insturctionWrapper).FieldDefinition.FieldType.IsArray;
             }
             return false;
         }

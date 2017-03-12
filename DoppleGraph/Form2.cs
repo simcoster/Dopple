@@ -480,7 +480,7 @@ namespace DoppleGraph
                     .OrderBy(x => x.InstructionNode.Instruction.OpCode.Code.ToString()).ToList();
                 foreach (var node in orderedNodes)
                 {
-                    node.DisplayRow = orderedNodes.IndexOf(node) +1;
+                    node.DisplayRow = orderedNodes.IndexOf(node) + 1;
                 }
             }
         }

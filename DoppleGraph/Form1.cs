@@ -36,19 +36,7 @@ namespace DoppleGraph
                 var newForm = new Form2(instructionNodes);
                 newForm.Show();
             }
-
-            //AssemblyDefinition myrLibrary = AssemblyDefinition.ReadAssembly(@"C:\Windows\assembly\GAC_MSIL\System.Core\3.5.0.0__b77a5c561934e089\system.core.dll");
-            //TypeDefinition type = myrLibrary.MainModule.Types.First(x => x.FullName == "System.Linq.Enumerable");
-
-            ////foreach (var method in type.Methods.Where(x => !x.IsConstructor))
-            //foreach (var method in type.Methods.Where(x => x.Name.Contains("Sum")).Take(1))
-            //{
-            //    var backTraceManager = new GraphBuilder(method);
-            //    List<InstructionNode> instructionWrappers = backTraceManager.Run();
-            //    //Graphs.Add(instructionWrappers);
-            //    var newForm = new Form2(instructionWrappers);
-            //    newForm.Show();
-            //}'
+            
             var csv = new StringBuilder();
             csv.Append(',');
             for (int i = 0; i < Graphs.Count ; i++)

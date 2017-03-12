@@ -38,33 +38,32 @@ namespace Dopple.InstructionModifiers
             }
         }
 
-        private List<InstructionNode> InlineRec(InlineableCallNode inlinedCallNode)
+        private List<InstructionNode> InlineRec(InlineableCallNode callNode)
         {
-            MethodDefinition calledMethodDef = inlinedCallNode.TargetMethodDefinition;
-
-            inlinedCallNode.CallWasInlined = true;
+            MethodDefinition calledMethodDef = callNode.TargetMethodDefinition;
+            callNode.CallWasInlined = true;
             if (calledMethodDef.Body == null)
             {  
                 return new List<InstructionNode>();
             }
-            var isSecondLevelRecursiveCall = inlinedCallNode.InliningProperties.CallSequence.Count(x => x.Method == inlinedCallNode.TargetMethod) > 1;
+            var isSecondLevelRecursiveCall = callNode.InliningProperties.CallSequence.Count(x => x.Method == callNode.TargetMethod) > 1;
             if (isSecondLevelRecursiveCall)
             {
                 return new List<InstructionNode>();
             }
             //TODO check
-            if (inlinedCallNode.InliningProperties.CallSequence.Count >5)
+            if (callNode.InliningProperties.CallSequence.Count >20)
             {
-                inlinedCallNode.CallWasInlined = true;
+                callNode.CallWasInlined = true;
                 return new List<InstructionNode>();
             }
-            inlinedCallNode.StackPushCount = 0;
-            List<InstructionNode> callNodeOriginalForwardRoutes = inlinedCallNode.ProgramFlowForwardRoutes.ToList();
+            callNode.StackPushCount = 0;
+            List<InstructionNode> callNodeOriginalForwardRoutes = callNode.ProgramFlowForwardRoutes.ToList();
             List<InstructionNode> inlinedNodes = calledMethodDef.Body.Instructions.SelectMany(x => _InstructionNodeFactory.GetInstructionNodes(x, calledMethodDef)).ToList();
-            inlinedNodes.ForEach(x =>  SetNodeProps(x, inlinedNodes, inlinedCallNode));
+            inlinedNodes.ForEach(x =>  SetNodeProps(x, inlinedNodes, callNode));
             programFlowHanlder.AddFlowConnections(inlinedNodes);
             _BackTraceManager.BackTraceInFunctionBounds(inlinedNodes);
-            StitchProgramFlow(inlinedCallNode, inlinedNodes[0]);
+            StitchProgramFlow(callNode, inlinedNodes[0]);
             foreach (var lastInlinedNode in inlinedNodes.Where(x => x.ProgramFlowForwardRoutes.Count == 0))
             {
                 StitchProgramFlow(lastInlinedNode, callNodeOriginalForwardRoutes);

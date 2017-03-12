@@ -13,7 +13,7 @@ namespace Dopple.BackTracers
         protected override IEnumerable<InstructionNode> GetDataflowBackRelatedArgGroup(InstructionNode instWrapper)
         {
             var storeIndex =
-            SingleIndexBackSearcher.SearchBackwardsForDataflowInstrcutions(x => x.MemoryStoreCount > 0 &&
+            SingleIndexBackSearcher.SafeSearchBackwardsForDataflowInstrcutions(x => x.MemoryStoreCount > 0 &&
                                                         instWrapper.Instruction.Operand ==
                                                         x.Instruction.Operand, instWrapper);
             return storeIndex;

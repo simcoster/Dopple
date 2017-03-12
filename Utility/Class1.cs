@@ -13,7 +13,16 @@ namespace Utility
         //public static int SumMe(Helper[] array)
         public static int SumMe(int[] array)
         {
-            return array.Sum(x => x);
+            return Enumerable.Sum(array);
+        }
+        public static int RegularSum(int[] array)
+        {
+            int sum = 0;
+            foreach(int a in array)
+            {
+                sum += a;
+            }
+            return sum;
         }
     }
 
