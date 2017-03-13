@@ -15,15 +15,15 @@ namespace Utility
         {
             return Enumerable.Sum(array);
         }
-        public static int RegularSum(int[] array)
-        {
-            int sum = 0;
-            foreach(int a in array)
-            {
-                sum += a;
-            }
-            return sum;
-        }
+        //public static int RegularSum(int[] array)
+        //{
+        //    int sum = 0;
+        //    foreach(int a in array)
+        //    {
+        //        sum += a;
+        //    }
+        //    return sum;
+        //}
     }
 
     public class Helper

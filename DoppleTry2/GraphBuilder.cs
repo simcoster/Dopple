@@ -84,9 +84,8 @@ namespace Dopple
                 SetInstructionIndexes();
                 isFirstRun = false;
             }
-            why removing helper codes doesn't make a re-inputting on node ADDOVF?
-            // PostVirtualMethodResolveRemoveNodes();
-            //RemoveHelperCodes();
+            RemoveHelperCodes();
+            PostVirtualMethodResolveRemoveNodes();
             AddZeroNode();
             //Verify();
 
@@ -360,6 +359,7 @@ namespace Dopple
                     throw new Exception("there's someone still pointing to the removed");
                 }
             }
+            solve the node removla process
             SetInstructionIndexes();
         }
         
