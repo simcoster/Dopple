@@ -36,7 +36,9 @@ namespace DoppleGraph
                 var newForm = new Form2(instructionNodes);
                 newForm.Show();
             }
-            
+
+            return;
+
             var csv = new StringBuilder();
             csv.Append(',');
             for (int i = 0; i < Graphs.Count ; i++)

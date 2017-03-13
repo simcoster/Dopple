@@ -47,6 +47,7 @@ namespace DoppleGraph
         const int RightLinksHideIndex = 8;
         const int LeftLinksHideIndex = 9;
         const int FreeTextHideIndex = 10;
+        const int MethodNameHideIndex = 11;
 
 
         private Dictionary<int, List<GoObject>> ObjectsToHide = new Dictionary<int, List<GoObject>>() {
@@ -59,7 +60,8 @@ namespace DoppleGraph
                                                                                     { HiddenNodesHideIndex,new List<GoObject>() } ,
                                                                                     { RightLinksHideIndex,new List<GoObject>() },
                                                                                     { LeftLinksHideIndex,new List<GoObject>() } ,
-                                                                                    { FreeTextHideIndex,new List<GoObject>() } };
+                                                                                    { FreeTextHideIndex,new List<GoObject>() } , 
+                                                                                    { MethodNameHideIndex,new List<GoObject>() } };
         private Random rnd = new Random();
         private List<InstructionNode> InstructionNodes;
 
@@ -123,7 +125,9 @@ namespace DoppleGraph
                     ObjectsToHide[DataBackTreeHideIndex].Clear();
                     var backTreeNodes = BackSearcher.GetBackDataTree(GetNodeWrapper(myView.Selection.First(x => x is GoNode) as GoNode).InstructionNode)
                                                                                                           .Select(x => GetNodeWrapper(x).Node).ToList();
-                    ObjectsToHide[DataBackTreeHideIndex].AddRange(GetObjectsToHide(backTreeNodes));
+                    ObjectsToHide[DataBackTreeHideIndex].AddRange(myView.Document.Where(x => (x is GoNode)).Cast<GoNode>().Except(backTreeNodes));
+                    ObjectsToHide[DataBackTreeHideIndex].AddRange(myView.Document.Where(x => x is GoLink && (!backTreeNodes.Contains(((GoLink) x).FromNode) || !backTreeNodes.Contains(((GoLink) x).ToNode))));
+
                 }                
             }
             else if (e.KeyChar == '+')
@@ -599,6 +603,23 @@ namespace DoppleGraph
                 SetCoordinates(nodeWrappers, newHeight, newWidth);
             }
             myView.Refresh();
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            lock (ObjectsToHide)
+            {
+
+                ObjectsToHide[MethodNameHideIndex].Clear();
+                if (textBox1.Text != "")
+                {
+                    var relevantNodes = myView.Document.Where(x => x is GoTextNodeHoverable)
+                                                       .Cast<GoTextNodeHoverable>()
+                                                       .Where(x => GetNodeWrapper(x).InstructionNode.Method.FullName.Contains(textBox1.Text));
+                    ObjectsToHide[MethodNameHideIndex].AddRange(GetObjectsToHide(relevantNodes));
+                }
+                ReShow();
+            }
         }
     }
 }

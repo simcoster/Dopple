@@ -65,7 +65,7 @@ namespace Dopple
                     try
                     {
 
-                        _backTraceManager.BackTraceInFunctionBounds(InstructionNodes);
+                        _backTraceManager.DataTraceInFunctionBounds(InstructionNodes);
                     }
                     catch (StackPopException stackPopException)
                     {
@@ -75,7 +75,7 @@ namespace Dopple
                 InlineFunctionCalls();
                 SetInstructionIndexes();
                 _backTraceManager.BackTraceOutsideFunctionBounds(InstructionNodes);
-                RemoveHelperCodes();
+                //RemoveHelperCodes();
                 //MergeSingleOperationNodes();
                 //MergeSimilarInstructions();
                 LdElemBackTrace();
@@ -84,7 +84,9 @@ namespace Dopple
                 SetInstructionIndexes();
                 isFirstRun = false;
             }
-            //PostVirtualMethodResolveRemoveNodes();
+            why removing helper codes doesn't make a re-inputting on node ADDOVF?
+            // PostVirtualMethodResolveRemoveNodes();
+            //RemoveHelperCodes();
             AddZeroNode();
             //Verify();
 
@@ -188,7 +190,7 @@ namespace Dopple
             RemoveInstWrappers(InstructionNodes.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(InstructionNodes.Where(x => x is StIndInstructionNode && ((StIndInstructionNode) x).AddressType == AddressType.LocalVar));
             ////TODO check this
-            RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Ret && x.InliningProperties.Inlined && !x.DataFlowBackRelated.SelfFeeding));
+            //RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Ret && x.InliningProperties.Inlined && !x.DataFlowBackRelated.SelfFeeding));
             RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Dup));
         }
 
@@ -226,7 +228,7 @@ namespace Dopple
         {
             if (isFirstRun)
             {
-                _backTraceManager.BackTraceInFunctionBounds(InstructionNodes);
+                _backTraceManager.DataTraceInFunctionBounds(InstructionNodes);
             }
             _backTraceManager.BackTraceOutsideFunctionBounds(InstructionNodes);
            
@@ -386,7 +388,7 @@ namespace Dopple
                 _programFlowManager.AddFlowConnections(InstructionNodes);
                 if (isFirstRun)
                 {
-                    _backTraceManager.BackTraceInFunctionBounds(InstructionNodes);
+                    _backTraceManager.DataTraceInFunctionBounds(InstructionNodes);
                 }
                 InlineFunctionCalls();
                 SetInstructionIndexes();

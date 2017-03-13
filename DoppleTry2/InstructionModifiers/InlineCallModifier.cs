@@ -52,7 +52,7 @@ namespace Dopple.InstructionModifiers
                 return new List<InstructionNode>();
             }
             //TODO check
-            if (callNode.InliningProperties.CallSequence.Count >20)
+            if (callNode.InliningProperties.CallSequence.Count >6)
             {
                 callNode.CallWasInlined = true;
                 return new List<InstructionNode>();
@@ -62,7 +62,7 @@ namespace Dopple.InstructionModifiers
             List<InstructionNode> inlinedNodes = calledMethodDef.Body.Instructions.SelectMany(x => _InstructionNodeFactory.GetInstructionNodes(x, calledMethodDef)).ToList();
             inlinedNodes.ForEach(x =>  SetNodeProps(x, inlinedNodes, callNode));
             programFlowHanlder.AddFlowConnections(inlinedNodes);
-            _BackTraceManager.BackTraceInFunctionBounds(inlinedNodes);
+            _BackTraceManager.DataTraceInFunctionBounds(inlinedNodes);
             StitchProgramFlow(callNode, inlinedNodes[0]);
             foreach (var lastInlinedNode in inlinedNodes.Where(x => x.ProgramFlowForwardRoutes.Count == 0))
             {

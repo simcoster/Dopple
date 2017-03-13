@@ -43,6 +43,8 @@
             this.label4 = new System.Windows.Forms.Label();
             this.SetHightTxt = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.textBox1 = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // ShowProgramFlowLinks
@@ -172,7 +174,7 @@
             // SetWidthTxt
             // 
             this.SetWidthTxt.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.SetWidthTxt.Location = new System.Drawing.Point(842, 199);
+            this.SetWidthTxt.Location = new System.Drawing.Point(842, 234);
             this.SetWidthTxt.Name = "SetWidthTxt";
             this.SetWidthTxt.Size = new System.Drawing.Size(100, 20);
             this.SetWidthTxt.TabIndex = 11;
@@ -183,7 +185,7 @@
             // 
             this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(782, 199);
+            this.label4.Location = new System.Drawing.Point(782, 234);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(54, 13);
             this.label4.TabIndex = 12;
@@ -192,7 +194,7 @@
             // SetHightTxt
             // 
             this.SetHightTxt.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.SetHightTxt.Location = new System.Drawing.Point(842, 245);
+            this.SetHightTxt.Location = new System.Drawing.Point(842, 280);
             this.SetHightTxt.Name = "SetHightTxt";
             this.SetHightTxt.Size = new System.Drawing.Size(100, 20);
             this.SetHightTxt.TabIndex = 13;
@@ -203,17 +205,38 @@
             // 
             this.label5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(779, 245);
+            this.label5.Location = new System.Drawing.Point(779, 280);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(57, 13);
             this.label5.TabIndex = 14;
             this.label5.Text = "Set Height";
+            // 
+            // label6
+            // 
+            this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(756, 198);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(80, 13);
+            this.label6.TabIndex = 16;
+            this.label6.Text = "Search Method";
+            // 
+            // textBox1
+            // 
+            this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox1.Location = new System.Drawing.Point(842, 195);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(100, 20);
+            this.textBox1.TabIndex = 15;
+            this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
             // Form2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(954, 481);
+            this.Controls.Add(this.label6);
+            this.Controls.Add(this.textBox1);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.SetHightTxt);
             this.Controls.Add(this.label4);
@@ -254,5 +277,7 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox SetHightTxt;
         private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.TextBox textBox1;
     }
 }

@@ -20,15 +20,17 @@ namespace Dopple
                 .Where(x => x is VirtualCallInstructionNode && ((VirtualCallInstructionNode)x).ResolveAttempted==false)
                 .ToArray())
             {
-                List<IndexedArgument> resolvedObjectArgs = new List<IndexedArgument>();
                 var virtualMethodDeclaringTypeDefinition = virtualNodeCall.TargetMethod.DeclaringType.Resolve();
                 var virtualMethodDeclaringTypeReference = virtualNodeCall.TargetMethod.DeclaringType;
                 List<TypeDefinition> virtualMethodTypeInheritancePath = GetInheritancePath(virtualMethodDeclaringTypeReference);
                 var objectArgs = virtualNodeCall.DataFlowBackRelated.Where(x => x.ArgIndex == 0).ToArray();
+                bool unresolvedDataArgsExist = false;
                 foreach (var objectArgument in objectArgs)
                 {
-                    foreach (var dataOriginNode in objectArgument.Argument.GetDataOriginNodes())
+                    foreach (var dataOriginNode in objectArgument.Argument.GetDataOriginNodes().Except(virtualNodeCall.ResolvedObjectArgs))
                     {
+                        unresolvedDataArgsExist = true;
+                        virtualNodeCall.ResolvedObjectArgs.Add(dataOriginNode);
                         if (dataOriginNode is InlineableCallNode || dataOriginNode is VirtualCallInstructionNode)
                         {
                             //Wait for next round
@@ -38,7 +40,6 @@ namespace Dopple
                         bool typeFound = TryGetObjectType(dataOriginNode, out objectTypeReference);
                         if (!typeFound)
                         {
-                            resolvedObjectArgs.Add(objectArgument);
                             continue;
                         }
                         TypeDefinition objectTypeDefinition;
@@ -51,7 +52,6 @@ namespace Dopple
                             objectTypeDefinition = objectTypeReference.Resolve();
                             if (objectTypeDefinition.IsAbstract)
                             {
-                                resolvedObjectArgs.Add(objectArgument);
                                 continue;
                             }
                         }
@@ -61,7 +61,6 @@ namespace Dopple
                             AddVirtualCallImplementation(instructionNodes, virtualNodeCall, objectArgument.Argument, methodImplementation);
                             inlinlingWasMade = true;
                             virtualNodeCall.DataFlowBackRelated.RemoveTwoWay(objectArgument);
-                            resolvedObjectArgs.Add(objectArgument);
                         }
                         else
                         {
@@ -69,7 +68,7 @@ namespace Dopple
                         }
                     }
                 }
-                if (objectArgs.Except(resolvedObjectArgs).Any() == false)
+                if (unresolvedDataArgsExist == false)
                 {
                     virtualNodeCall.SelfRemove();
                     instructionNodes.Remove(virtualNodeCall);
@@ -92,24 +91,30 @@ namespace Dopple
         {
             var objectTypeInheritancePath = GetInheritancePath(objectTypeDefinition).Select(x => x.Resolve()).ToArray();
 
-            MethodDefinition methodImpl = null;
+            IEnumerable<MethodDefinition> methodImpls = null;
             foreach(var typeDef in objectTypeInheritancePath)
             {
                 if (typeDef.FullName == "System.Array")
                 {
                     //Arrays are special
-                    methodImpl = typeDef.Methods.FirstOrDefault(x => virtualMethodReference.Name == x.Name && !x.IsAbstract);
+                    methodImpls = typeDef.Methods.Where(x => virtualMethodReference.Name == x.Name && !x.IsAbstract);
                 }
                 else
                 {
-                    methodImpl = typeDef.Methods.FirstOrDefault(x => MethodSignitureMatch(virtualMethodReference.FullName, x.FullName) && !x.IsAbstract);
+                    //methodImpl = typeDef.Methods.FirstOrDefault(x => MethodSignitureMatch(virtualMethodReference.FullName, x.FullName) && !x.IsAbstract);
+                    methodImpls = typeDef.Methods.Where(x => MethodSignitureMatch(virtualMethodReference.Name, x.Name) && !x.IsAbstract);
                 }
-                if (methodImpl != null)
+                if (methodImpls.Count() > 1)
+                {
+                    throw new Exception("Too many implmenetations");
+                }
+
+                if (methodImpls.Count() ==1)
                 {
                     break;
                 }
             }
-            return methodImpl;
+            return methodImpls.FirstOrDefault();
         }
 
         private static List<TypeDefinition> GetInheritancePath(TypeReference baseTypeReference)

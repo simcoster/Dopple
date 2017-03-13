@@ -11,6 +11,7 @@ namespace Dopple.InstructionNodes
     internal class VirtualCallInstructionNode : NonInlineableCallInstructionNode
     {
         public bool ResolveAttempted { get; set; } = false;
+        public List<InstructionNode> ResolvedObjectArgs = new List<InstructionNode>();
         internal VirtualCallInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
         }
