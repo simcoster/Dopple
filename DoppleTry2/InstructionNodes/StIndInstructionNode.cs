@@ -5,9 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using System.Runtime.Serialization;
 
 namespace Dopple.InstructionNodes
 {
+    [DataContract]
     public class StIndInstructionNode : InstructionNode ,IDataTransferingNode
     {
         public List<InstructionNode> AddressProvidingArgs = new List<InstructionNode>();

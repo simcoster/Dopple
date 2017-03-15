@@ -45,6 +45,7 @@
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
+            this.exportToXmlBtn = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // ShowProgramFlowLinks
@@ -178,7 +179,7 @@
             this.SetWidthTxt.Name = "SetWidthTxt";
             this.SetWidthTxt.Size = new System.Drawing.Size(100, 20);
             this.SetWidthTxt.TabIndex = 11;
-            this.SetWidthTxt.Text = "2000";
+            this.SetWidthTxt.Text = "4000";
             this.SetWidthTxt.TextChanged += new System.EventHandler(this.SetWidthTxt_TextChanged);
             // 
             // label4
@@ -230,11 +231,22 @@
             this.textBox1.TabIndex = 15;
             this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
+            // exportToXmlBtn
+            // 
+            this.exportToXmlBtn.Location = new System.Drawing.Point(842, 320);
+            this.exportToXmlBtn.Name = "exportToXmlBtn";
+            this.exportToXmlBtn.Size = new System.Drawing.Size(99, 33);
+            this.exportToXmlBtn.TabIndex = 17;
+            this.exportToXmlBtn.Text = "export to xml";
+            this.exportToXmlBtn.UseVisualStyleBackColor = true;
+            this.exportToXmlBtn.Click += new System.EventHandler(this.exportToXmlBtn_Click);
+            // 
             // Form2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(954, 481);
+            this.Controls.Add(this.exportToXmlBtn);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.label5);
@@ -279,5 +291,6 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Button exportToXmlBtn;
     }
 }

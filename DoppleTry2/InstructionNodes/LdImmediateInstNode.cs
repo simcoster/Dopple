@@ -2,9 +2,11 @@
 using Mono.Cecil.Cil;
 using System;
 using System.Linq;
+using System.Runtime.Serialization;
 
 namespace Dopple.InstructionNodes
 {
+    [DataContract]
     class LdImmediateInstNode : InstructionNode
     {
         public int ImmediateIntValue { get; private set; }

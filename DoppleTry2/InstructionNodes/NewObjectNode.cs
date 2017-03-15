@@ -5,9 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using System.Runtime.Serialization;
 
 namespace Dopple.InstructionNodes
 {
+    [DataContract]
     public class NewObjectNode : InstructionNode
     {
         public int ConstructorParamCount { get; set; }
@@ -17,13 +19,4 @@ namespace Dopple.InstructionNodes
             ConstructorParamCount = StackPopCount;
         }
     }
-
-    public class ConstructorNewObjectNode : InstructionNode
-    {
-        public ConstructorNewObjectNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
-        {
-            StackPopCount = 0;
-            StackPushCount = 0;
-        }
-     }
 }

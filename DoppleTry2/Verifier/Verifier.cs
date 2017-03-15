@@ -51,7 +51,8 @@ namespace Dopple.VerifierNs
             }
             if (insturctionWrapper is LoadFieldNode)
             {
-                return ((LoadFieldNode) insturctionWrapper).FieldDefinition.FieldType.IsArray;
+                var fieldType = ((LoadFieldNode) insturctionWrapper).FieldDefinition.FieldType;
+                return fieldType.FullName == "System.Array" || fieldType.IsArray;
             }
             return false;
         }

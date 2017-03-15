@@ -4,10 +4,10 @@ using System;
 
 namespace Dopple.InstructionNodes
 {
-    internal class LoadFieldNode : InstructionNode, IDataTransferingNode
+    internal abstract class FieldManipulationNode : InstructionNode, IDataTransferingNode
     {
         public FieldDefinition FieldDefinition;
-        public LoadFieldNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
+        public FieldManipulationNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
             if (instruction.Operand is FieldDefinition)
             {
@@ -29,6 +29,20 @@ namespace Dopple.InstructionNodes
             {
                 return 1;
             }
+        }
+    }
+
+    internal class LoadFieldNode : FieldManipulationNode
+    {
+        public LoadFieldNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
+        {
+        }        
+    }
+
+    internal class StoreFieldNode : FieldManipulationNode
+    {
+        public StoreFieldNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
+        {
         }
     }
 }

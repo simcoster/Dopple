@@ -88,6 +88,7 @@ namespace DoppleGraph
 
         public Color GetColor(Code code)
         {
+
             return CodeColors[code];
         }
 

@@ -11,19 +11,19 @@ namespace Utility
     public abstract class Class1
     {
         //public static int SumMe(Helper[] array)
-        public static int SumMe(int[] array)
-        {
-            return Enumerable.Sum(array);
-        }
-        //public static int RegularSum(int[] array)
+        //public static int SumMe(int[] array)
         //{
-        //    int sum = 0;
-        //    foreach(int a in array)
-        //    {
-        //        sum += a;
-        //    }
-        //    return sum;
+        //    return Enumerable.Sum(array,x => x ++);
         //}
+        public static int RegularSum(int[] array)
+        {
+            int sum = 0;
+            foreach (int a in array)
+            {
+                sum += a;
+            }
+            return sum;
+        }
     }
 
     public class Helper

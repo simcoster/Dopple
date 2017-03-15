@@ -5,9 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using System.Runtime.Serialization;
 
 namespace Dopple.InstructionNodes
 {
+    [DataContract]
     class RetInstructionNode : InstructionNode , IDataTransferingNode
     {
         public RetInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method)

@@ -77,7 +77,7 @@ namespace Dopple
                 _backTraceManager.BackTraceOutsideFunctionBounds(InstructionNodes);
                 //RemoveHelperCodes();
                 //MergeSingleOperationNodes();
-                //MergeSimilarInstructions();
+                MergeSimilarInstructions();
                 LdElemBackTrace();
                 RecursionFix();
                 ResolveVirtualMethods(out shouldRerun);
@@ -95,7 +95,8 @@ namespace Dopple
         private void PostVirtualMethodResolveRemoveNodes()
         {
             RemoveInstWrappers(InstructionNodes.Where(x => x.InliningProperties.Inlined && x is LdArgInstructionNode && x.DataFlowBackRelated.Count > 0 && !x.DataFlowBackRelated.SelfFeeding));
-            RemoveInstWrappers(InstructionNodes.Where(x => x is InlineableCallNode));
+            InstructionNodes.Where(x => x is InlineableCallNode).ToList().ForEach(x => { x.SelfRemove(); InstructionNodes.Remove(x); });
+            RemoveInstWrappers(InstructionNodes.Where(x => x is RetInstructionNode && x.InliningProperties.Inlined && !x.DataFlowBackRelated.SelfFeeding));
         }
 
         private void ResolveVirtualMethods(out bool inliningWasDone)
@@ -186,11 +187,9 @@ namespace Dopple
         {
             RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.StLocCodes.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.LdLocCodes.Contains(x.Instruction.OpCode.Code)));
-            RemoveInstWrappers(InstructionNodes.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code)));
-            RemoveInstWrappers(InstructionNodes.Where(x => x is StIndInstructionNode && ((StIndInstructionNode) x).AddressType == AddressType.LocalVar));
-            ////TODO check this
-            //RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Ret && x.InliningProperties.Inlined && !x.DataFlowBackRelated.SelfFeeding));
-            RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Dup));
+            //RemoveInstWrappers(InstructionNodes.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code)));
+            //RemoveInstWrappers(InstructionNodes.Where(x => x is StIndInstructionNode && ((StIndInstructionNode) x).AddressType == AddressType.LocalVar));
+            //RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Dup));
         }
 
         private void AddZeroNode()
@@ -359,7 +358,6 @@ namespace Dopple
                     throw new Exception("there's someone still pointing to the removed");
                 }
             }
-            solve the node removla process
             SetInstructionIndexes();
         }
         

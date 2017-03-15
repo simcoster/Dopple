@@ -2,9 +2,11 @@
 using Mono.Cecil.Cil;
 using System;
 using System.Linq;
+using System.Runtime.Serialization;
 
 namespace Dopple.InstructionNodes
 {
+    [DataContract]
     public class InlineableCallNode : CallNode
     {
         public InlineableCallNode(Instruction instruction, MethodDefinition method) : base(instruction, method)

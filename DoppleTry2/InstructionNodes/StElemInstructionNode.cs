@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Dopple.VerifierNs;
+using System.Runtime.Serialization;
 
 namespace Dopple.InstructionNodes
 {
+    [DataContract]
     class StElemInstructionNode : InstructionNode, IDataTransferingNode
     {
         public StElemInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method)

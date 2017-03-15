@@ -9,10 +9,13 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 
 namespace DoppleGraph
 {
@@ -515,6 +518,10 @@ namespace DoppleGraph
                 goNodeWrapper.Node.UnSelected += Node_UnSelected;
                 goNodeWrapper.Index = nodeWrappers.IndexOf(goNodeWrapper);
                 var shape = ((GoShape) goNodeWrapper.Node.Background);
+                if (goNodeWrapper.InstructionNode is NonInlineableCallInstructionNode)
+                {
+                    shape.BrushColor = Color.Black;
+                }
                 shape.BrushColor = colorCode.GetColor(goNodeWrapper.InstructionNode.Instruction.OpCode.Code);
                 if (shape.BrushColor.GetBrightness() < 0.4)
                 {
@@ -541,7 +548,7 @@ namespace DoppleGraph
                 if (new[] { Code.Call, Code.Calli, Code.Callvirt }.Contains(
                         goNodeWrapper.InstructionNode.Instruction.OpCode.Code))
                 {
-                    goNodeWrapper.Node.Text += ((MethodReference) goNodeWrapper.InstructionNode.Instruction.Operand).FullName ?? " ";
+                   // goNodeWrapper.Node.Text += ((MethodReference) goNodeWrapper.InstructionNode.Instruction.Operand).FullName ?? " ";
                 }
                 else if (goNodeWrapper.InstructionNode is FunctionArgInstNode)
                 {
@@ -620,6 +627,16 @@ namespace DoppleGraph
                 }
                 ReShow();
             }
+        }
+
+        private void exportToXmlBtn_Click(object sender, EventArgs e)
+        {
+            FileStream writer = new FileStream("C:\\temp\\" +InstructionNodes[0].Method.Name + ".xml", FileMode.Create);
+            DataContractSerializer ser =
+                new DataContractSerializer(typeof(List<InstructionNode>));
+            ser.WriteObject(writer, InstructionNodes);
+            writer.Close();
+
         }
     }
 }

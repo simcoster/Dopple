@@ -5,9 +5,11 @@ using Mono.Cecil.Cil;
 using Mono.Cecil;
 using System;
 using Dopple.InstructionWrapperMembers;
+using System.Runtime.Serialization;
 
 namespace Dopple.InstructionNodes
 {
+    [DataContract, KnownType(typeof(LdImmediateInstNode))]
     public class InstructionNode
     {
         public InstructionNode(Instruction instruction, MethodDefinition method)
@@ -28,9 +30,8 @@ namespace Dopple.InstructionNodes
             SingleUnitForwardRelated= new SingleUnitForwardRelated(this);
             ProgramFlowForwardAffecting = new ProgramFlowForwardAffectingArgList(this);
             SingleUnitNodes = new List<InstructionNode>();
-            MyGuid = Guid.NewGuid();
         }
-
+        
         public ProgramFlowBackRoutes ProgramFlowBackRoutes { get; set; }
         public ProgramFlowForwardRoutes ProgramFlowForwardRoutes { get; set; }
         public DataFlowForwardArgList DataFlowForwardRelated { get; private set; }
@@ -41,6 +42,7 @@ namespace Dopple.InstructionNodes
         public SingleUnitForwardRelated SingleUnitForwardRelated { get; internal set; }
 
         public Instruction Instruction { get; set; }
+        [DataMember]
         public int InstructionIndex { get; internal set; }
         public bool MarkForDebugging { get; internal set; }
         public int MemoryReadCount { get; set; }
@@ -167,12 +169,12 @@ namespace Dopple.InstructionNodes
             foreach (var forwardInst in DataFlowForwardRelated.ToArray())
             {
                 int index = forwardInst.ArgIndex;
-                forwardInst.MirrorArg.ContainingList.AddTwoWay(DataFlowBackRelated.Select(x => x.Argument), index);
+                forwardInst.MirrorArg.ContainingList.AddTwoWay(DataFlowBackRelated.Select(x => x.Argument).ToList(), index);
                 forwardInst.ContainingList.RemoveTwoWay(forwardInst);
             }
             foreach (var forwardPath in ProgramFlowForwardRoutes.ToArray())
             {
-                forwardPath.ProgramFlowBackRoutes.AddTwoWay(ProgramFlowBackRoutes);
+                forwardPath.ProgramFlowBackRoutes.AddTwoWay(ProgramFlowBackRoutes.ToList());
                 ProgramFlowForwardRoutes.RemoveTwoWay(forwardPath);
             }
             foreach (CoupledIndexedArgList args in new CoupledIndexedArgList[]{ DataFlowBackRelated, ProgramFlowBackAffected, ProgramFlowForwardAffecting})

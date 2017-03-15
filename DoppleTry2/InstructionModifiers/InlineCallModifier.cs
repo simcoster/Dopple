@@ -52,7 +52,7 @@ namespace Dopple.InstructionModifiers
                 return new List<InstructionNode>();
             }
             //TODO check
-            if (callNode.InliningProperties.CallSequence.Count >6)
+            if (callNode.InliningProperties.CallSequence.Count >20)
             {
                 callNode.CallWasInlined = true;
                 return new List<InstructionNode>();

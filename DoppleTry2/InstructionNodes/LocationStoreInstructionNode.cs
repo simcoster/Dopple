@@ -5,19 +5,23 @@ using System.Text;
 using System.Threading.Tasks;
 using Mono.Cecil.Cil;
 using Mono.Cecil;
+using System.Runtime.Serialization;
 
 namespace Dopple.InstructionNodes
 {
+    [DataContract]
     public class LocationStoreInstructionNode : LocationInstructionNode
     {
         public LocationStoreInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method) {}
     }
-    
+
+    [DataContract]
     public class LocationLoadInstructionNode : LocationInstructionNode
     {
         public LocationLoadInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method) { }
     }
 
+    [DataContract]
     public abstract class LocationInstructionNode : InstructionNode, IDataTransferingNode
     {
         public LocationInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method)

@@ -33,7 +33,7 @@ namespace Dopple
                         virtualNodeCall.ResolvedObjectArgs.Add(dataOriginNode);
                         if (dataOriginNode is InlineableCallNode || dataOriginNode is VirtualCallInstructionNode)
                         {
-                            //Wait for next round
+                            //Wait for them to be inlined\resolved
                             continue;
                         }
                         TypeReference objectTypeReference;
@@ -46,6 +46,12 @@ namespace Dopple
                         if (objectTypeReference.IsArray)
                         {
                             objectTypeDefinition = ArrayTypeDefinition;
+                            //TODO redesign
+                            //this is a special case, I want to be able to inline the native command of GetValue
+                            if (virtualNodeCall.TargetMethod.FullName == "System.Object System.Array::GetValue(System.Int32)")
+                            {
+                                AddLoadElemImplementation(instructionNodes, virtualNodeCall, objectArgument);
+                            }
                         }
                         else
                         {
@@ -60,11 +66,6 @@ namespace Dopple
                         {
                             AddVirtualCallImplementation(instructionNodes, virtualNodeCall, objectArgument.Argument, methodImplementation);
                             inlinlingWasMade = true;
-                            virtualNodeCall.DataFlowBackRelated.RemoveTwoWay(objectArgument);
-                        }
-                        else
-                        {
-                            virtualNodeCall.DataFlowBackRelated.RemoveTwoWay(objectArgument);
                         }
                     }
                 }
@@ -76,7 +77,17 @@ namespace Dopple
             }
         }
 
-        private static void AddVirtualCallImplementation(List<InstructionNode> instructionNodes, VirtualCallInstructionNode virtualNodeCall, InstructionNode objectArgument, MethodDefinition virtualMethodImpl)
+        private static void AddLoadElemImplementation(List<InstructionNode> instructionNodes, VirtualCallInstructionNode virtualNodeCall, IndexedArgument objectArgument)
+        {
+            var callOpCode = Instruction.Create(CodeGroups.AllOpcodes.First(x => x.Code == Code.Ldelem_Ref));
+            var loadElementNode = new LdElemInstructionNode(callOpCode, virtualNodeCall.Method);
+            virtualNodeCall.MergeInto(loadElementNode, true);
+            loadElementNode.DataFlowBackRelated.RemoveAllTwoWay(x => x.ArgIndex == 0 && x.Argument != objectArgument.Argument);
+            loadElementNode.InliningProperties = virtualNodeCall.InliningProperties;
+            instructionNodes.Insert(instructionNodes.IndexOf(virtualNodeCall), loadElementNode);
+        }
+
+        private void AddVirtualCallImplementation(List<InstructionNode> instructionNodes, VirtualCallInstructionNode virtualNodeCall, InstructionNode objectArgument, MethodDefinition virtualMethodImpl)
         {
             var callOpCode = Instruction.Create(CodeGroups.AllOpcodes.First(x => x.Code == Code.Call), virtualMethodImpl);
             var callInstructionNode = new InlineableCallNode(callOpCode, virtualMethodImpl, virtualNodeCall.Method);
@@ -86,24 +97,18 @@ namespace Dopple
             instructionNodes.Insert(instructionNodes.IndexOf(virtualNodeCall), callInstructionNode);
         }
 
-        private static MethodDefinition GetImplementation(TypeDefinition virtualMethodDeclaringTypeDefinition, TypeDefinition objectTypeDefinition
+        private MethodDefinition GetImplementation(TypeDefinition virtualMethodDeclaringTypeDefinition, TypeDefinition objectTypeDefinition
                                                 ,MethodDefinition virtualMethodReference)
         {
             var objectTypeInheritancePath = GetInheritancePath(objectTypeDefinition).Select(x => x.Resolve()).ToArray();
 
             IEnumerable<MethodDefinition> methodImpls = null;
-            foreach(var typeDef in objectTypeInheritancePath)
+            foreach (var typeDef in objectTypeInheritancePath)
             {
-                if (typeDef.FullName == "System.Array")
-                {
-                    //Arrays are special
-                    methodImpls = typeDef.Methods.Where(x => virtualMethodReference.Name == x.Name && !x.IsAbstract);
-                }
-                else
-                {
-                    //methodImpl = typeDef.Methods.FirstOrDefault(x => MethodSignitureMatch(virtualMethodReference.FullName, x.FullName) && !x.IsAbstract);
-                    methodImpls = typeDef.Methods.Where(x => MethodSignitureMatch(virtualMethodReference.Name, x.Name) && !x.IsAbstract);
-                }
+                methodImpls = typeDef.Methods.Where(x => virtualMethodReference.Name == x.Name && !x.IsAbstract)
+                                             .Where(x => HasCorrespondingParams(x, virtualMethodReference));
+
+
                 if (methodImpls.Count() > 1)
                 {
                     throw new Exception("Too many implmenetations");
@@ -115,6 +120,21 @@ namespace Dopple
                 }
             }
             return methodImpls.FirstOrDefault();
+        }
+
+        private static bool HasCorrespondingParams(MethodDefinition firstMethod, MethodDefinition secondMethod)
+        {
+            var secondMethodParams = secondMethod.Parameters.Where(x => !x.ParameterType.IsGenericParameter).ToList();
+            foreach (var firstMethodParam in firstMethod.Parameters.Where(x => !x.ParameterType.IsGenericParameter))
+            {
+                var matchingSecondParam = secondMethodParams.FirstOrDefault(x => x.Name == firstMethodParam.Name && x.ParameterType == firstMethodParam.ParameterType);
+                if (matchingSecondParam == null)
+                {
+                    return false;
+                }
+                secondMethodParams.Remove(matchingSecondParam);
+            }
+            return true;
         }
 
         private static List<TypeDefinition> GetInheritancePath(TypeReference baseTypeReference)
