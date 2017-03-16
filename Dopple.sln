@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphSimilarityByMatching",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphBuilderTests", "GraphBuilderTests\GraphBuilderTests.csproj", "{167AA40F-53BB-491C-BBCC-4442ED64DFE4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestedFunctions", "TestedFunctions\TestedFunctions.csproj", "{05832BAD-A5B6-432F-86BC-A63822C2813D}"
+EndProject
 Global
 	GlobalSection(Performance) = preSolution
 		HasPerformanceSessions = true
@@ -61,6 +63,12 @@ Global
 		{167AA40F-53BB-491C-BBCC-4442ED64DFE4}.Mixed|Any CPU.Build.0 = Release|Any CPU
 		{167AA40F-53BB-491C-BBCC-4442ED64DFE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{167AA40F-53BB-491C-BBCC-4442ED64DFE4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05832BAD-A5B6-432F-86BC-A63822C2813D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05832BAD-A5B6-432F-86BC-A63822C2813D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05832BAD-A5B6-432F-86BC-A63822C2813D}.Mixed|Any CPU.ActiveCfg = Release|Any CPU
+		{05832BAD-A5B6-432F-86BC-A63822C2813D}.Mixed|Any CPU.Build.0 = Release|Any CPU
+		{05832BAD-A5B6-432F-86BC-A63822C2813D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05832BAD-A5B6-432F-86BC-A63822C2813D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

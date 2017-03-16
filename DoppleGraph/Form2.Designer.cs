@@ -233,6 +233,7 @@
             // 
             // exportToXmlBtn
             // 
+            this.exportToXmlBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.exportToXmlBtn.Location = new System.Drawing.Point(842, 320);
             this.exportToXmlBtn.Name = "exportToXmlBtn";
             this.exportToXmlBtn.Size = new System.Drawing.Size(99, 33);

@@ -9,7 +9,10 @@ using System.Runtime.Serialization;
 
 namespace Dopple.InstructionNodes
 {
-    [DataContract, KnownType(typeof(LdImmediateInstNode))]
+    [DataContract(IsReference = true), 
+        KnownType(typeof(LdImmediateInstNode)) ,KnownType(typeof(LdArgInstructionNode)),
+        KnownType(typeof(LdElemInstructionNode)), KnownType(typeof(ArithmaticsNode)),
+        KnownType(typeof(RetInstructionNode)), KnownType(typeof(ConditionalJumpNode))]
     public class InstructionNode
     {
         public InstructionNode(Instruction instruction, MethodDefinition method)
@@ -34,6 +37,7 @@ namespace Dopple.InstructionNodes
         
         public ProgramFlowBackRoutes ProgramFlowBackRoutes { get; set; }
         public ProgramFlowForwardRoutes ProgramFlowForwardRoutes { get; set; }
+        [DataMember]
         public DataFlowForwardArgList DataFlowForwardRelated { get; private set; }
         public DataFlowBackArgList DataFlowBackRelated { get; protected set; }
         public ProgramFlowForwardAffectingArgList ProgramFlowForwardAffecting { get; internal set; }

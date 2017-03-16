@@ -3,13 +3,16 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Dopple
 {
+    [CollectionDataContract]
     public abstract class CoupledIndexedArgList : List<IndexedArgument>, IMergable
     {
+        public CoupledIndexedArgList() {}
         public CoupledIndexedArgList(InstructionNode instructionNode)
         {
             containingNode = instructionNode;
@@ -220,6 +223,7 @@ namespace Dopple
  
     public class DataFlowForwardArgList : CoupledIndexedArgList
     {
+        private DataFlowForwardArgList() { }
         public DataFlowForwardArgList(InstructionNode instructionWrapper) : base(instructionWrapper)
         {
         }

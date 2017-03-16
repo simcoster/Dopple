@@ -631,12 +631,15 @@ namespace DoppleGraph
 
         private void exportToXmlBtn_Click(object sender, EventArgs e)
         {
-            FileStream writer = new FileStream("C:\\temp\\" +InstructionNodes[0].Method.Name + ".xml", FileMode.Create);
+            FileStream writer = new FileStream("C:\\temp\\tests\\" +InstructionNodes[0].Method.Name + ".xml", FileMode.Create);
             DataContractSerializer ser =
                 new DataContractSerializer(typeof(List<InstructionNode>));
             ser.WriteObject(writer, InstructionNodes);
             writer.Close();
 
+            FileStream reader = new FileStream("C:\\temp\\" + InstructionNodes[0].Method.Name + ".xml", FileMode.Open);
+            List<InstructionNode> nodes =  (List<InstructionNode>) ser.ReadObject(reader);
+            reader.Close();            
         }
     }
 }
