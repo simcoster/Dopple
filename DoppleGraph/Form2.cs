@@ -392,12 +392,10 @@ namespace DoppleGraph
         {
             switch (argIndex)
             {
-                case 1:
+                case 0:
                     return Color.Pink;
-                case 2:
+                case 1:
                     return Color.Yellow;
-                case 3:
-                    return Color.LightSeaGreen;
 
                 default:
                     throw new Exception("no one here");
@@ -454,7 +452,6 @@ namespace DoppleGraph
                //.Select(x => GetNodeWrapper(x.Argument))
                .Select(x => GetNodeWrapper(x))
                //TODO remove, this hides a problem
-               .Where(x=> x != null)
                .Where(x => x.LongestPath.Count == 0 || !x.LongestPath.Intersect(node.LongestPath).SequenceEqual(x.LongestPath))
                .Where(x => x.LongestPath.Count < node.LongestPath.Count + 1)
                .ToList();
@@ -631,15 +628,13 @@ namespace DoppleGraph
 
         private void exportToXmlBtn_Click(object sender, EventArgs e)
         {
-            FileStream writer = new FileStream("C:\\temp\\tests\\" +InstructionNodes[0].Method.Name + ".xml", FileMode.Create);
+            string filePath = "C:\\temp\\tests\\" + InstructionNodes[0].Method.Name + ".xml";
+            FileStream writer = new FileStream(filePath, FileMode.Create);
             DataContractSerializer ser =
                 new DataContractSerializer(typeof(List<InstructionNode>));
             ser.WriteObject(writer, InstructionNodes);
             writer.Close();
-
-            FileStream reader = new FileStream("C:\\temp\\" + InstructionNodes[0].Method.Name + ".xml", FileMode.Open);
-            List<InstructionNode> nodes =  (List<InstructionNode>) ser.ReadObject(reader);
-            reader.Close();            
+            MessageBox.Show("File written to " + filePath);
         }
     }
 }

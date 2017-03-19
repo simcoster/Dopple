@@ -68,6 +68,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Class1.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -75,6 +76,10 @@
     <ProjectReference Include="..\DoppleTry2\GraphBuilder.csproj">
       <Project>{77C5971E-3C37-4932-911D-9C6050E67FFA}</Project>
       <Name>GraphBuilder</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TestedFunctions\TestedFunctions.csproj">
+      <Project>{05832bad-a5b6-432f-86bc-a63822c2813d}</Project>
+      <Name>TestedFunctions</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

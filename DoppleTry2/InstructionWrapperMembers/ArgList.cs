@@ -165,8 +165,10 @@ namespace Dopple
         }
     }
 
+    [CollectionDataContract]
     public class DataFlowBackArgList : CoupledIndexedArgList
     {
+        private DataFlowBackArgList() { }
         protected int CurrentIndex;
         public DataFlowBackArgList(InstructionNode instructionWrapper) : base(instructionWrapper)
         {
@@ -258,6 +260,7 @@ namespace Dopple
 
     public class ProgramFlowForwardAffectingArgList : CoupledIndexedArgList
     {
+        private ProgramFlowForwardAffectingArgList() { }
         public ProgramFlowForwardAffectingArgList(InstructionNode instructionWrapper) : base(instructionWrapper)
         {
         }

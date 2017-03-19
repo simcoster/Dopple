@@ -141,6 +141,10 @@
       <Project>{ce4aa61a-cfe3-4c9b-8671-58c058c8e40c}</Project>
       <Name>GraphSimilarityByMatching</Name>
     </ProjectReference>
+    <ProjectReference Include="..\TestedFunctions\TestedFunctions.csproj">
+      <Project>{05832bad-a5b6-432f-86bc-a63822c2813d}</Project>
+      <Name>TestedFunctions</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

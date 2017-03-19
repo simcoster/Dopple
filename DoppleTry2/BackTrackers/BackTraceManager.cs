@@ -25,17 +25,17 @@ namespace Dopple.BackTracers
             _LdArgBacktracer.AddBackDataflowConnections(instructionNodes);
             _StIndAddressBackTracer.AddBackDataflowConnections(instructionNodes);
             _LdLocBackTracer.AddBackDataflowConnections(instructionNodes);
-            _ConditionalBacktracer.AddBackDataflowConnections(instructionNodes);
         }
 
         private readonly LdStaticFieldBackTracer _LdStaticFieldBackTracer = new LdStaticFieldBackTracer();
         private readonly LoadFieldByStackBackTracer _LoadFieldByStackBackTracer = new LoadFieldByStackBackTracer();
         private readonly LoadMemoryByOperandBackTracer _LoadMemoryByOperandBackTracer = new LoadMemoryByOperandBackTracer();
         private readonly TypedReferenceBackTracer _TypedReferenceBackTracer = new TypedReferenceBackTracer();
-        private readonly ConditionionalsBackTracer _ConditionalBacktracer = new ConditionionalsBackTracer();
+        private readonly ConditionionalsTracer _ConditionalBacktracer = new ConditionionalsTracer();
 
         internal void BackTraceOutsideFunctionBounds(List<InstructionNode> instructionNodes)
         {
+            _ConditionalBacktracer.TraceConditionals(instructionNodes);
             _RetBackTracer.AddBackDataflowConnections(instructionNodes);
             _LdStaticFieldBackTracer.AddBackDataflowConnections(instructionNodes);
             _LoadFieldByStackBackTracer.AddBackDataflowConnections(instructionNodes);

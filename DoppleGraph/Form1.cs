@@ -23,8 +23,8 @@ namespace DoppleGraph
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            AssemblyDefinition mysecondLibrary = AssemblyDefinition.ReadAssembly(@"C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\Utility\bin\Release\Utility.dll");
-            TypeDefinition typee = mysecondLibrary.MainModule.Types.First(x => x.Name == "Class1");
+            AssemblyDefinition mysecondLibrary = AssemblyDefinition.ReadAssembly(@"C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\TestedFunctions\bin\Release\TestedFunctions.dll");
+            TypeDefinition typee = mysecondLibrary.MainModule.Types.First(x => x.Name == "InProgress");
 
             var Graphs = new List<List<InstructionNode>>();
             //foreach (var method in type.Methods.Where(x => !x.IsConstructor))

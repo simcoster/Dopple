@@ -37,9 +37,10 @@ namespace Dopple.InstructionNodes
         
         public ProgramFlowBackRoutes ProgramFlowBackRoutes { get; set; }
         public ProgramFlowForwardRoutes ProgramFlowForwardRoutes { get; set; }
-        [DataMember]
         public DataFlowForwardArgList DataFlowForwardRelated { get; private set; }
+        [DataMember]
         public DataFlowBackArgList DataFlowBackRelated { get; protected set; }
+        [DataMember]
         public ProgramFlowForwardAffectingArgList ProgramFlowForwardAffecting { get; internal set; }
         public ProgramFlowBackAffectedArgList ProgramFlowBackAffected { get; set; }
         public SingleUnitBackRelated SingleUnitBackRelated { get; set; }

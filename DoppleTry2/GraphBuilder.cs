@@ -23,7 +23,7 @@ namespace Dopple
         private InstructionNodeFactory _InstructionNodeFactory = new InstructionNodeFactory();
         private VirtualMethodResolver _VirtualMethodResolver = new VirtualMethodResolver();
         private CallInliner _inlineCallModifier;
-        ConditionionalsBackTracer _ConditionalBacktracer = new ConditionionalsBackTracer();
+        //ConditionionalsTracer _ConditionalBacktracer = new ConditionionalsTracer();
         Verifier[] verifiers;
 
         public GraphBuilder(IEnumerable<InstructionNode> instNodes)
@@ -77,7 +77,7 @@ namespace Dopple
                 _backTraceManager.BackTraceOutsideFunctionBounds(InstructionNodes);
                 //RemoveHelperCodes();
                 //MergeSingleOperationNodes();
-                MergeSimilarInstructions();
+                //MergeSimilarInstructions();
                 LdElemBackTrace();
                 RecursionFix();
                 ResolveVirtualMethods(out shouldRerun);
@@ -187,7 +187,7 @@ namespace Dopple
         {
             RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.StLocCodes.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.LdLocCodes.Contains(x.Instruction.OpCode.Code)));
-            //RemoveInstWrappers(InstructionNodes.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code)));
+            RemoveInstWrappers(InstructionNodes.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code)));
             //RemoveInstWrappers(InstructionNodes.Where(x => x is StIndInstructionNode && ((StIndInstructionNode) x).AddressType == AddressType.LocalVar));
             //RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Dup));
         }
@@ -210,7 +210,7 @@ namespace Dopple
                 }
             }
             InstructionNodes[0].ProgramFlowBackRoutes.AddTwoWay(nodeZero);
-            InstructionNodes.Add(nodeZero);
+            InstructionNodes.Insert(0,nodeZero);
             SetInstructionIndexes();
         }
 
@@ -220,16 +220,6 @@ namespace Dopple
                                                                             .Cast<LdArgInstructionNode>()
                                                                             .GroupBy(x => x.ArgIndex)
                                                                             .Select(x => x.OrderBy(y => y.InstructionIndex).First());
-        }
-
-        private void BackTrace(bool isFirstRun)
-        {
-            if (isFirstRun)
-            {
-                _backTraceManager.DataTraceInFunctionBounds(InstructionNodes);
-            }
-            _backTraceManager.BackTraceOutsideFunctionBounds(InstructionNodes);
-           
         }
 
         private void MergeImmediateValue()
