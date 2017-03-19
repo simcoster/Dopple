@@ -10,3 +10,28 @@ I'm currently still developing this project and testing it, but the first set of
 I plan to add a website for people to try it out and give feedback.
 Also I'd like to integrate machine learning to the graph comparing process using a bag-of-words technique,
 where the words will be edges from a type of node to another type.
+
+Please note that Dopple does not group arguments accordning to branches
+Meaning that this:
+int a;
+int b;
+If(cond)
+  a = 3
+  b = 5
+else
+  a = 2
+  b = 4
+return a+b
+
+will result with the same graph as this:
+
+int a;
+int b;
+If(cond)
+  a = 3
+  b = 4
+else
+  a = 2
+  b = 5
+return a+b
+  
