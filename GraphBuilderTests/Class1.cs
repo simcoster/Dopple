@@ -32,10 +32,15 @@ namespace GraphBuilderTests
                 var equivilentNode = generatedNodes[node.InstructionIndex];
                 foreach (var backDataArg in node.DataFlowBackRelated)
                 {
-                    Assert.IsTrue(equivilentNode.DataFlowBackRelated.Any(x => ArgumentsMatch(backDataArg, x)));
+                    string errorMsg = "Precomputed back Data flow arg " + backDataArg + " in inst " + node.InstructionIndex +
+                                      "doesn't have corresposding arg in generated node";
+
+                    Assert.IsTrue(equivilentNode.DataFlowBackRelated.Any(x => ArgumentsMatch(backDataArg, x)), errorMsg);
                 }
                 foreach (var forwardAffectingArg in node.ProgramFlowForwardAffecting)
                 {
+                    string errorMsg = "Precomputed forward flow affecting arg " + forwardAffectingArg.Argument + " in inst " + node.InstructionIndex +
+                     "doesn't have corresposding arg in generated node";
                     Assert.IsTrue(equivilentNode.ProgramFlowForwardAffecting.Any(x => ArgumentsMatch(forwardAffectingArg, x)));
                 }
             }

@@ -35,9 +35,15 @@ namespace GraphBuilderTests
         }
 
         [TestMethod]
-        public void TestConditionsSimple()
+        public void TestMixedConditions()
         {
             HelperFuncs.TestFunction("ConpoundConditions");
+        }
+
+        [TestMethod]
+        public void TestRecursionSimple()
+        {
+            HelperFuncs.TestFunction("SimpleRecursion");
         }
     }
 }

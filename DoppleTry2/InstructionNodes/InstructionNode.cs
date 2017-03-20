@@ -33,6 +33,7 @@ namespace Dopple.InstructionNodes
             SingleUnitForwardRelated= new SingleUnitForwardRelated(this);
             ProgramFlowForwardAffecting = new ProgramFlowForwardAffectingArgList(this);
             SingleUnitNodes = new List<InstructionNode>();
+            MethodNameForSerilization = method.Name;
         }
         
         public ProgramFlowBackRoutes ProgramFlowBackRoutes { get; set; }
@@ -53,6 +54,8 @@ namespace Dopple.InstructionNodes
         public int MemoryReadCount { get; set; }
         public int MemoryStoreCount { get; set; }
         public MethodDefinition Method { get; set; }
+        [DataMember]
+        public string MethodNameForSerilization { get; set; }
         public bool StackBacktraceDone { get; set; } = false;
         public virtual int StackPopCount
         {

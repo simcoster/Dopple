@@ -13,10 +13,11 @@ namespace Dopple.BackTracers
         protected override IEnumerable<InstructionNode> GetDataflowBackRelatedArgGroup(InstructionNode instWrapper)
         {
 
+            //Need to rework this, Have common stack anccesstor is not practical
             Func<InstructionNode, bool> predicate = x =>
                                   x.Instruction.OpCode.Code == Code.Stfld &&
-                                  BackSearcher.HaveCommonStackPushAncestor(x, instWrapper) &&
-                                  x.Instruction.Operand == instWrapper.Instruction.Operand;
+                                  x.Instruction.Operand == instWrapper.Instruction.Operand &&
+                                  BackSearcher.HaveCommonStackPushAncestor(x, instWrapper);
             var storeFieldInsts = SingleIndexBackSearcher.SafeSearchBackwardsForDataflowInstrcutions(predicate, instWrapper);
             if (storeFieldInsts.Count > 0)
             {

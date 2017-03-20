@@ -17,7 +17,7 @@ namespace Dopple
             inlinlingWasMade = false;
 
             foreach (VirtualCallInstructionNode virtualNodeCall in instructionNodes
-                .Where(x => x is VirtualCallInstructionNode && ((VirtualCallInstructionNode)x).ResolveAttempted==false)
+                .Where(x => x is VirtualCallInstructionNode)
                 .ToArray())
             {
                 var virtualMethodDeclaringTypeDefinition = virtualNodeCall.TargetMethod.DeclaringType.Resolve();
@@ -75,6 +75,12 @@ namespace Dopple
                     instructionNodes.Remove(virtualNodeCall);
                 }
             }
+            if (!inlinlingWasMade)
+            {
+                var stillLeft = instructionNodes
+                .Where(x => x.DataFlowForwardRelated.Any(y => y.Argument is VirtualCallInstructionNode))
+                .ToArray();
+            }
         }
 
         private static void AddLoadElemImplementation(List<InstructionNode> instructionNodes, VirtualCallInstructionNode virtualNodeCall, IndexedArgument objectArgument)
@@ -89,6 +95,7 @@ namespace Dopple
 
         private void AddVirtualCallImplementation(List<InstructionNode> instructionNodes, VirtualCallInstructionNode virtualNodeCall, InstructionNode objectArgument, MethodDefinition virtualMethodImpl)
         {
+            the problem is Conntaining list still points to the old node
             var callOpCode = Instruction.Create(CodeGroups.AllOpcodes.First(x => x.Code == Code.Call), virtualMethodImpl);
             var callInstructionNode = new InlineableCallNode(callOpCode, virtualMethodImpl, virtualNodeCall.Method);
             virtualNodeCall.MergeInto(callInstructionNode,true);

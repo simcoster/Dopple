@@ -75,9 +75,9 @@ namespace Dopple
                 InlineFunctionCalls();
                 SetInstructionIndexes();
                 _backTraceManager.BackTraceOutsideFunctionBounds(InstructionNodes);
-                //RemoveHelperCodes();
+                RemoveHelperCodes();
                 //MergeSingleOperationNodes();
-                //MergeSimilarInstructions();
+                MergeSimilarInstructions();
                 LdElemBackTrace();
                 RecursionFix();
                 ResolveVirtualMethods(out shouldRerun);
@@ -95,6 +95,7 @@ namespace Dopple
         private void PostVirtualMethodResolveRemoveNodes()
         {
             RemoveInstWrappers(InstructionNodes.Where(x => x.InliningProperties.Inlined && x is LdArgInstructionNode && x.DataFlowBackRelated.Count > 0 && !x.DataFlowBackRelated.SelfFeeding));
+            var stillPointingToVirt = InstructionNodes.Where(x => x.DataFlowForwardRelated.Any(y => y.Argument is VirtualCallInstructionNode)).ToArray();
             InstructionNodes.Where(x => x is InlineableCallNode).ToList().ForEach(x => { x.SelfRemove(); InstructionNodes.Remove(x); });
             RemoveInstWrappers(InstructionNodes.Where(x => x is RetInstructionNode && x.InliningProperties.Inlined && !x.DataFlowBackRelated.SelfFeeding));
         }
@@ -329,7 +330,7 @@ namespace Dopple
                 }
             }
             SetInstructionIndexes();
-            Verify();
+            //Verify();
         }
 
         public void RemoveInstWrappers(IEnumerable<InstructionNode> instsToRemove)
@@ -337,6 +338,7 @@ namespace Dopple
             foreach (var nodeToRemove in instsToRemove.ToArray())
             {
                 nodeToRemove.SelfRemoveAndStitch();
+                var stillPointingToVirt = InstructionNodes.Where(x => x.DataFlowForwardRelated.Any(y => y.Argument is VirtualCallInstructionNode)).ToArray();
                 //Verify();
                 InstructionNodes.Remove(nodeToRemove);
                 var stillPointingToRemoved = InstructionNodes.Where(x => x.DataFlowBackRelated.Any(y => y.Argument == nodeToRemove)
@@ -390,9 +392,11 @@ namespace Dopple
                 SetInstructionIndexes();
                 isFirstRun = false;
             }
-            RemoveInstWrappers(InstructionNodes.Where(x => x.InliningProperties.Inlined && x is LdArgInstructionNode && x.DataFlowBackRelated.Count > 0 && !x.DataFlowBackRelated.SelfFeeding));
+            RemoveHelperCodes();
+            PostVirtualMethodResolveRemoveNodes();
             AddZeroNode();
             Verify();
+
             return InstructionNodes;
         }
 

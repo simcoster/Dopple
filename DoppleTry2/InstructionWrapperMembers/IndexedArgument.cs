@@ -23,5 +23,10 @@ namespace Dopple
         public InstructionNode Argument { get; set; }
         public CoupledIndexedArgList ContainingList { get; set; }
         public IndexedArgument MirrorArg { get; set; }
+
+        public override string ToString()
+        {
+            return "Index: " + ArgIndex + " InstructionIndex " + Argument.InstructionIndex + " Instruction " + Argument.Instruction;
+        }
     }
 }

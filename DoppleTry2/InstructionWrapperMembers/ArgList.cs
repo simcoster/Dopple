@@ -156,7 +156,8 @@ namespace Dopple
             CoupledIndexedArgList mergedNodeSameArgList = GetSameList(nodeToMergeInto);
             foreach (var arg in this.ToArray())
             {
-                mergedNodeSameArgList.AddTwoWay(arg);
+                this should have solved the bug with the virtuals, check it
+                mergedNodeSameArgList.AddTwoWay(arg.Argument,arg.ArgIndex);
                 if (!KeepOriginal)
                 {
                     RemoveTwoWay(arg);
