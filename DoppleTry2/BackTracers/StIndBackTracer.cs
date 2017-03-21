@@ -17,15 +17,14 @@ namespace Dopple.BackTracers
                 return CodeGroups.StIndCodes;
             }
         }
-        protected override void BackTraceDataFlowSingle(InstructionNode currentInst)
+        public override void BackTraceDataFlowSingle(InstructionNode currentInst)
         {
             StIndInstructionNode stIndInst = (StIndInstructionNode) currentInst;
             var addressNodes = currentInst.DataFlowBackRelated.Where(x => x.ArgIndex == 0)
                                 .SelectMany(x => TraceBackwardsLdStLocs(x.Argument));
             if (addressNodes.Any(x => !GetAddressType(x).HasValue))
             {
-                //TODO
-                //throw new Exception("some args don't provide address");
+                throw new Exception("some args don't provide address");
             }
             //stIndInst.AddressType = GetAddressType(addressNodes.First()).Value;
             //stIndInst.AddressProvidingArgs = addressNodes.ToList();

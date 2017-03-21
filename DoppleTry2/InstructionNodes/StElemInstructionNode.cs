@@ -11,7 +11,7 @@ using System.Runtime.Serialization;
 namespace Dopple.InstructionNodes
 {
     [DataContract]
-    class StElemInstructionNode : InstructionNode, IDataTransferingNode
+    class StElemInstructionNode : InstructionNode, IDataTransferingNode, IObjectOrAddressRequiringNode
     {
         public StElemInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
@@ -22,6 +22,27 @@ namespace Dopple.InstructionNodes
             get
             {
                 return 2;
+            }
+        }
+
+        public int ObjectOrAddressArgIndex
+        {
+            get
+            {
+                return 0;
+            }
+        }
+
+        public bool ObjectOrAddressArgsResolved
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+
+            set
+            {
+                throw new NotImplementedException();
             }
         }
     }

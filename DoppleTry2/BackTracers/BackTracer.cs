@@ -12,7 +12,7 @@ namespace Dopple.BackTracers
     public abstract class BackTracer
     {
         protected InstructionNode Instruction;
-        protected abstract void BackTraceDataFlowSingle(InstructionNode currentInst);
+        public abstract void BackTraceDataFlowSingle(InstructionNode currentInst);
         public void AddBackDataflowConnections(List<InstructionNode> nodes)
         {
             foreach (var node in nodes.Where(x => HandlesCodes.Contains(x.Instruction.OpCode.Code)).OrderByDescending(x => x.InstructionIndex))

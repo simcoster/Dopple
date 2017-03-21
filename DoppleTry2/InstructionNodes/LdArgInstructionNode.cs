@@ -7,7 +7,7 @@ using System.Runtime.Serialization;
 namespace Dopple.InstructionNodes
 {
     [DataContract]
-    public class LdArgInstructionNode : FunctionArgInstNode
+    public class LdArgInstructionNode : FunctionArgNodeBase
     {
         public LdArgInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {

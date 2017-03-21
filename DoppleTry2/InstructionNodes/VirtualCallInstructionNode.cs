@@ -10,9 +10,20 @@ using System.Threading.Tasks;
 namespace Dopple.InstructionNodes
 {
     [DataContract]
-    internal class VirtualCallInstructionNode : NonInlineableCallInstructionNode
+    internal class VirtualCallInstructionNode : NonInlineableCallInstructionNode, IObjectOrAddressRequiringNode
     {
         public bool ResolveAttempted { get; set; } = false;
+
+        public int ObjectOrAddressArgIndex
+        {
+            get
+            {
+                return 0;
+            }
+        }
+
+        public bool ObjectOrAddressArgsResolved {get;set;}
+
         public List<InstructionNode> ResolvedObjectArgs = new List<InstructionNode>();
         internal VirtualCallInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {

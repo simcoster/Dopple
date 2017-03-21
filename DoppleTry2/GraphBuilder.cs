@@ -86,6 +86,7 @@ namespace Dopple
             }
             RemoveHelperCodes();
             PostVirtualMethodResolveRemoveNodes();
+            MergeSimilarInstructions();
             AddZeroNode();
             //Verify();
 
@@ -95,7 +96,6 @@ namespace Dopple
         private void PostVirtualMethodResolveRemoveNodes()
         {
             RemoveInstWrappers(InstructionNodes.Where(x => x.InliningProperties.Inlined && x is LdArgInstructionNode && x.DataFlowBackRelated.Count > 0 && !x.DataFlowBackRelated.SelfFeeding));
-            var stillPointingToVirt = InstructionNodes.Where(x => x.DataFlowForwardRelated.Any(y => y.Argument is VirtualCallInstructionNode)).ToArray();
             InstructionNodes.Where(x => x is InlineableCallNode).ToList().ForEach(x => { x.SelfRemove(); InstructionNodes.Remove(x); });
             RemoveInstWrappers(InstructionNodes.Where(x => x is RetInstructionNode && x.InliningProperties.Inlined && !x.DataFlowBackRelated.SelfFeeding));
         }
@@ -190,7 +190,7 @@ namespace Dopple
             RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.LdLocCodes.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(InstructionNodes.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code)));
             //RemoveInstWrappers(InstructionNodes.Where(x => x is StIndInstructionNode && ((StIndInstructionNode) x).AddressType == AddressType.LocalVar));
-            //RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Dup));
+            RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Dup));
         }
 
         private void AddZeroNode()
@@ -261,7 +261,7 @@ namespace Dopple
         {
             var doneWrappers = new List<InstructionNode>();
             var ldArgGroups = InstructionNodes.Where(x => x is LdArgInstructionNode)
-                                                 .Cast<FunctionArgInstNode>()
+                                                 .Cast<FunctionArgNodeBase>()
                                                  .GroupBy(x => new { x.ArgIndex, x.Method })
                                                  .Where(x => x.Count() >1)
                                                  .ToList();

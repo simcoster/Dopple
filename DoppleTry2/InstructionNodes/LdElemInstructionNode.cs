@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Dopple.InstructionNodes
 {
     [DataContract]
-    public class LdElemInstructionNode : InstructionNode , IDataTransferingNode
+    public class LdElemInstructionNode : ObjectOrAddressRequiringNode, IDataTransferingNode
     {
         public LdElemInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {

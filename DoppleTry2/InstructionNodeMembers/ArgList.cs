@@ -97,7 +97,7 @@ namespace Dopple
             {
                 return;
             }
-            var toAddClone = new IndexedArgument(toAdd.ArgIndex, toAdd.Argument, toAdd.ContainingList);
+            var toAddClone = new IndexedArgument(toAdd.ArgIndex, toAdd.Argument, this);
             Add(toAddClone);
             var mirrorList = GetMirrorList(toAddClone.Argument);
             var mirrorArg = new IndexedArgument(toAddClone.ArgIndex, containingNode, mirrorList);
@@ -156,8 +156,7 @@ namespace Dopple
             CoupledIndexedArgList mergedNodeSameArgList = GetSameList(nodeToMergeInto);
             foreach (var arg in this.ToArray())
             {
-                this should have solved the bug with the virtuals, check it
-                mergedNodeSameArgList.AddTwoWay(arg.Argument,arg.ArgIndex);
+                mergedNodeSameArgList.AddTwoWay(arg);
                 if (!KeepOriginal)
                 {
                     RemoveTwoWay(arg);

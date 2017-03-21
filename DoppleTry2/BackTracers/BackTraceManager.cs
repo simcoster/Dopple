@@ -11,6 +11,12 @@ namespace Dopple.BackTracers
 {
     public class BackTraceManager
     {
+        BackTracer[] _BackTracers;
+        public BackTraceManager()
+        {
+            _BackTracers = new BackTracer[]{ _LdStaticFieldBackTracer, _LdStaticFieldBackTracer , _LoadFieldByStackBackTracer
+                            ,_LoadMemoryByOperandBackTracer ,_TypedReferenceBackTracer, _LdArgBacktracer, _StIndAddressBackTracer };
+        }
         private readonly Verifier[] verifiers;
 
         private readonly StackForwardTracer _StackForwardTracer = new StackForwardTracer();
@@ -41,6 +47,13 @@ namespace Dopple.BackTracers
             _LoadFieldByStackBackTracer.AddBackDataflowConnections(instructionNodes);
             _LoadMemoryByOperandBackTracer.AddBackDataflowConnections(instructionNodes);
             _TypedReferenceBackTracer.AddBackDataflowConnections(instructionNodes);
+        }
+
+
+        public void BackTraceSingleNode(InstructionNode instructionNode)
+        {
+            var relevantBackTracer = _BackTracers.First(x => x.HandlesCodes.Contains(instructionNode.Instruction.OpCode.Code));
+            relevantBackTracer.BackTraceDataFlowSingle(instructionNode);
         }
     }
 }

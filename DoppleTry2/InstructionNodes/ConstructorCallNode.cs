@@ -2,6 +2,7 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using System.Runtime.Serialization;
+using Dopple.InstructionNodeMembers;
 
 namespace Dopple.InstructionNodes
 {
@@ -22,20 +23,6 @@ namespace Dopple.InstructionNodes
             {
                 return 0;
             }
-        }
-    }
-
-    public class ConstructorCallDataFlowBackArgList : DataFlowBackArgList
-    {
-        public ConstructorCallDataFlowBackArgList(InstructionNode instructionWrapper) : base(instructionWrapper)
-        {
-        }
-
-        public override void AddTwoWay(InstructionNode toAdd)
-        {
-            var indexedToAdd = new IndexedArgument(CurrentIndex + 1, toAdd, this);
-            AddTwoWay(indexedToAdd);
-            CurrentIndex--;
-        }
+        }      
     }
 }
