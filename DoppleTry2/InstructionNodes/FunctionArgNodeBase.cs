@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 namespace Dopple.InstructionNodes
 {
     [DataContract]
-    public abstract class FunctionArgInstNode : InstructionNode, IDataTransferingNode
+    public abstract class FunctionArgNodeBase : InstructionNode, IDataTransferingNode
     {
-        public FunctionArgInstNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
+        public FunctionArgNodeBase(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
             ArgIndex = GetArgIndex(instruction, method);
             string argNameTemp;

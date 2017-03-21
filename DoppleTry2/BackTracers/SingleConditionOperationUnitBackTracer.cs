@@ -21,7 +21,7 @@ namespace Dopple.BackTracers
             }
         }
 
-        protected override void BackTraceDataFlowSingle(InstructionNode currentInst)
+        public override void BackTraceDataFlowSingle(InstructionNode currentInst)
         {
             Queue<InstructionNode> toCheck = new Queue<InstructionNode>();
             toCheck.Enqueue(currentInst);

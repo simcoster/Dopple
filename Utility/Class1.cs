@@ -15,19 +15,21 @@ namespace Utility
         //{
         //    return Enumerable.Sum(array,x => x ++);
         //}
-        public static int RegularSum(int[] array)
+        public static void RegularSum(Helper helper)
         {
-            int sum = 0;
-            foreach (int a in array)
-            {
-                sum += a;
-            }
-            return sum;
+            helper.Text = "blah";
+            helper.Text2 = helper.Text;
+            helper.Text2 = "beep";
+            int a = 6;
+            a = a * 5;
+            helper.Number = a;
         }
     }
 
     public class Helper
     {
         public int Number;
+        public string Text;
+        public string Text2;
     }
 }

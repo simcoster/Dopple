@@ -4,7 +4,7 @@ using System;
 
 namespace Dopple.InstructionNodes
 {
-    internal abstract class FieldManipulationNode : InstructionNode, IDataTransferingNode
+    internal abstract class FieldManipulationNode : ObjectOrAddressRequiringNode, IDataTransferingNode
     {
         public FieldDefinition FieldDefinition;
         public FieldManipulationNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
@@ -29,7 +29,7 @@ namespace Dopple.InstructionNodes
             {
                 return 1;
             }
-        }
+        }      
     }
 
     internal class LoadFieldNode : FieldManipulationNode

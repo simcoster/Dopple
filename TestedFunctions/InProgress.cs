@@ -8,9 +8,23 @@ namespace TestedFunctions
 {
     public class InProgress
     {
-        public static int SumMe(int[] array)
+
+        public static string SumMe(int index)
         {
-            return Enumerable.Sum(array, x => x++);
+            Helper[] helpers = new Helper[5];
+            var tempHelper = new Helper();
+            tempHelper.Number = 3;
+            helpers[4] = tempHelper;
+            tempHelper.Text = "blah";
+            helpers[4].Text = "bleep";
+            return tempHelper.Text;
         }
+    }
+
+    public class Helper
+    {
+        public int Number;
+        public string Text;
+        public string Text2;
     }
 }

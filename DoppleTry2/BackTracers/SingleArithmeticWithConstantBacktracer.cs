@@ -18,7 +18,7 @@ namespace Dopple.BackTracers
             }
         }
 
-        protected override void BackTraceDataFlowSingle(InstructionNode currentInst)
+        public override void BackTraceDataFlowSingle(InstructionNode currentInst)
         {
             if (currentInst.DataFlowBackRelated.SelfFeeding)
             {

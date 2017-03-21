@@ -547,7 +547,7 @@ namespace DoppleGraph
                 {
                    // goNodeWrapper.Node.Text += ((MethodReference) goNodeWrapper.InstructionNode.Instruction.Operand).FullName ?? " ";
                 }
-                else if (goNodeWrapper.InstructionNode is FunctionArgInstNode)
+                else if (goNodeWrapper.InstructionNode is FunctionArgNodeBase)
                 {
                     //TODO remove
                     //var ArgInstWrapper = (FunctionArgInstNode) goNodeWrapper.InstructionNode;
