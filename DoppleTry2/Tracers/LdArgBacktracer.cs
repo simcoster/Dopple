@@ -8,7 +8,7 @@ using Dopple.InstructionNodes;
 
 namespace Dopple.BackTracers
 {
-    class LdArgBacktracer : SingeIndexBackTracer
+    class LdArgBacktracer : DataflowBacktracer
     {
         protected override IEnumerable<InstructionNode> GetDataflowBackRelatedArgGroup(InstructionNode instNode)
         {
@@ -21,7 +21,8 @@ namespace Dopple.BackTracers
             }
             else
             {
-                return SingleIndexBackSearcher.SafeSearchBackwardsForDataflowInstrcutions(x => x is StArgInstructionNode && ((StArgInstructionNode)x).ArgIndex == ((LdArgInstructionNode)instNode).ArgIndex, instNode);
+                //TODO, need to implement STARG as well (even though it's not that commonly used)
+                return new List<InstructionNode>();
             }
         }
 

@@ -74,30 +74,28 @@ namespace Dopple
                 }
                 InlineFunctionCalls();
                 SetInstructionIndexes();
-                _backTraceManager.BackTraceOutsideFunctionBounds(InstructionNodes);
-                RemoveHelperCodes();
+                BackTraceOutsideFuncBoundry();
                 //MergeSingleOperationNodes();
-                MergeSimilarInstructions();
-                LdElemBackTrace();
-                RecursionFix();
-                ResolveVirtualMethods(out shouldRerun);
-                SetInstructionIndexes();
-                isFirstRun = false;
+                //PostMergeBackTrace();
+                //RecursionFix();
+                //ResolveVirtualMethods(out shouldRerun);
+                //SetInstructionIndexes();
+                //isFirstRun = false;
+                shouldRerun = false;
+
             }
-            RemoveHelperCodes();
-            PostVirtualMethodResolveRemoveNodes();
-            MergeSimilarInstructions();
+            //RemoveHelperCodes();
             AddZeroNode();
             //Verify();
 
             return InstructionNodes;
         }
 
-        private void PostVirtualMethodResolveRemoveNodes()
+        private void BackTraceOutsideFuncBoundry()
         {
-            RemoveInstWrappers(InstructionNodes.Where(x => x.InliningProperties.Inlined && x is LdArgInstructionNode && x.DataFlowBackRelated.Count > 0 && !x.DataFlowBackRelated.SelfFeeding));
-            InstructionNodes.Where(x => x is InlineableCallNode).ToList().ForEach(x => { x.SelfRemove(); InstructionNodes.Remove(x); });
-            RemoveInstWrappers(InstructionNodes.Where(x => x is RetInstructionNode && x.InliningProperties.Inlined && !x.DataFlowBackRelated.SelfFeeding));
+            RemoveHelperCodes();
+            MergeSimilarInstructions();
+            _backTraceManager.BackTraceOutsideFunctionBounds(InstructionNodes);
         }
 
         private void ResolveVirtualMethods(out bool inliningWasDone)
@@ -114,30 +112,25 @@ namespace Dopple
 
         private void MergeSingleOperationNodes()
         {
-            new SingleConditionOperationUnitBackTracer().AddBackDataflowConnections(InstructionNodes);
-            new SingleArithmeticWithConstantBacktracer().AddBackDataflowConnections(InstructionNodes);
+            //TODO deal with this inside backtrace manager
+            //new SingleConditionOperationUnitBackTracer().AddBackDataflowConnections(InstructionNodes);
+            //new SingleArithmeticWithConstantBacktracer().AddBackDataflowConnections(InstructionNodes);
 
-            var blah = InstructionNodes.Where(x => x.SingleUnitBackRelated.Count > 0);
-            var frontMostNodes = InstructionNodes.Where(x => x.SingleUnitBackRelated.Count > 0 && x.SingleUnitForwardRelated.Count == 0);
-            foreach (var frontMostNode in frontMostNodes.ToArray())
-            {
-                Queue<InstructionNode> singleUnitBackNodes = new Queue<InstructionNode>();
-                frontMostNode.SingleUnitBackRelated.ForEach(x => singleUnitBackNodes.Enqueue(x));
-                while(singleUnitBackNodes.Count >0)
-                {
-                    var currNode = singleUnitBackNodes.Dequeue();
-                    currNode.SingleUnitBackRelated.ForEach(x => singleUnitBackNodes.Enqueue(x));
-                    currNode.MergeInto(frontMostNode,false);
-                    InstructionNodes.Remove(currNode);
-                    frontMostNode.SingleUnitNodes.Add(currNode);
-                }
-            }
-        }
-
-        private void LdElemBackTrace()
-        {
-            new LdElemBacktracer().AddBackDataflowConnections(InstructionNodes);
-            new LdFldBacktracer().AddBackDataflowConnections(InstructionNodes);
+            //var blah = InstructionNodes.Where(x => x.SingleUnitBackRelated.Count > 0);
+            //var frontMostNodes = InstructionNodes.Where(x => x.SingleUnitBackRelated.Count > 0 && x.SingleUnitForwardRelated.Count == 0);
+            //foreach (var frontMostNode in frontMostNodes.ToArray())
+            //{
+            //    Queue<InstructionNode> singleUnitBackNodes = new Queue<InstructionNode>();
+            //    frontMostNode.SingleUnitBackRelated.ForEach(x => singleUnitBackNodes.Enqueue(x));
+            //    while(singleUnitBackNodes.Count >0)
+            //    {
+            //        var currNode = singleUnitBackNodes.Dequeue();
+            //        currNode.SingleUnitBackRelated.ForEach(x => singleUnitBackNodes.Enqueue(x));
+            //        currNode.MergeInto(frontMostNode,false);
+            //        InstructionNodes.Remove(currNode);
+            //        frontMostNode.SingleUnitNodes.Add(currNode);
+            //    }
+            //}
         }
 
         private void MergeSimilarInstructions()
@@ -186,11 +179,15 @@ namespace Dopple
 
         private void RemoveHelperCodes()
         {
+            RemoveInstWrappers(InstructionNodes.Where(x => x is ConstructorCallNode));
             RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.StLocCodes.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.LdLocCodes.Contains(x.Instruction.OpCode.Code)));
             RemoveInstWrappers(InstructionNodes.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code)));
             //RemoveInstWrappers(InstructionNodes.Where(x => x is StIndInstructionNode && ((StIndInstructionNode) x).AddressType == AddressType.LocalVar));
             RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Dup));
+            RemoveInstWrappers(InstructionNodes.Where(x => x.InliningProperties.Inlined && x is LdArgInstructionNode && x.DataFlowBackRelated.Count > 0 && !x.DataFlowBackRelated.SelfFeeding));
+            InstructionNodes.Where(x => x is InlineableCallNode).ToList().ForEach(x => { x.SelfRemove(); InstructionNodes.Remove(x); });
+            RemoveInstWrappers(InstructionNodes.Where(x => x is RetInstructionNode && x.InliningProperties.Inlined && !x.DataFlowBackRelated.SelfFeeding));
         }
 
         private void AddZeroNode()
@@ -386,14 +383,12 @@ namespace Dopple
                 RemoveHelperCodes();
                 //MergeSingleOperationNodes();
                 MergeSimilarInstructions();
-                LdElemBackTrace();
                 RecursionFix();
                 ResolveVirtualMethods(out shouldRerun);
                 SetInstructionIndexes();
                 isFirstRun = false;
             }
             RemoveHelperCodes();
-            PostVirtualMethodResolveRemoveNodes();
             AddZeroNode();
             Verify();
 

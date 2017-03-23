@@ -7,7 +7,7 @@ using Dopple.InstructionNodes;
 
 namespace Dopple.BackTracers
 {
-    public class LdLocBackTracer : SingeIndexBackTracer
+    public class LdLocBackTracer : DataflowBacktracer
     {
         protected override IEnumerable<InstructionNode> GetDataflowBackRelatedArgGroup(InstructionNode instNode)
         {

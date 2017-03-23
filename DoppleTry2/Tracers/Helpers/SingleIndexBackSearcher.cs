@@ -12,8 +12,9 @@ namespace Dopple.BackTracers
         public static List<InstructionNode> SearchBackwardsForDataflowInstrcutions(Func<InstructionNode, bool> predicate,
        InstructionNode startInstruction)
         {
-            List<InstructionNode> foundBackInstructions = SafeSearchBackwardsForDataflowInstrcutions(predicate, startInstruction);
-            if (foundBackInstructions.Count == 0)
+            bool allPathsHaveAMatch;
+            List<InstructionNode> foundBackInstructions = SafeSearchBackwardsForDataflowInstrcutions(predicate, startInstruction,out allPathsHaveAMatch);
+            if (foundBackInstructions.Count == 0 || !allPathsHaveAMatch)
             {
                 throw new Exception("Reached first instWrapper without correct one found");
             }
@@ -21,41 +22,43 @@ namespace Dopple.BackTracers
         }
 
         public static List<InstructionNode> SafeSearchBackwardsForDataflowInstrcutions(Func<InstructionNode, bool> predicate,
-           InstructionNode startInstruction)
-        {
-            return startInstruction.ProgramFlowBackRoutes.SelectMany(x => SafeSearchBackwardsForDataflowInstrcutions(predicate, x, new List<InstructionNode>())).ToList();
-        }
-
-        public static List<InstructionNode> SafeSearchBackwardsForDataflowInstrcutions(Func<InstructionNode, bool> predicate,
-        InstructionNode startInstruction, List<InstructionNode> visitedInstructions)
+        InstructionNode startInstruction , out bool allPathsFoundAMatch,  List<InstructionNode> visitedInstructions = null)
         {
             if (visitedInstructions == null)
             {
                 visitedInstructions = new List<InstructionNode>();
             }
             var foundInstructions = new List<InstructionNode>();
-
-            if (visitedInstructions.Contains((InstructionNode) startInstruction))
+            if (visitedInstructions.Contains(startInstruction))
             {
+                allPathsFoundAMatch = false;
                 return new List<InstructionNode>();
             }
             else
             {
-                visitedInstructions.Add((InstructionNode) startInstruction);
+                visitedInstructions.Add(startInstruction);
             }
-
-            if (predicate.Invoke((InstructionNode) startInstruction))
+            allPathsFoundAMatch = true;
+            if (predicate.Invoke(startInstruction))
             {
-                foundInstructions.Add((InstructionNode) startInstruction);
+                foundInstructions.Add(startInstruction);
             }
-
             else
             {
+                if (startInstruction.ProgramFlowForwardRoutes.Count == 0)
+                {
+                    allPathsFoundAMatch = false;
+                }
                 foreach (var instructionWrapper in startInstruction.ProgramFlowBackRoutes)
                 {
+                    bool pathContainsAMatch;
                     IEnumerable<InstructionNode> branchindexes =
-                        SafeSearchBackwardsForDataflowInstrcutions(predicate, instructionWrapper, visitedInstructions);
+                        SafeSearchBackwardsForDataflowInstrcutions(predicate, instructionWrapper, out pathContainsAMatch, visitedInstructions);
                     foundInstructions.AddRange(branchindexes);
+                    if (!pathContainsAMatch)
+                    {
+                        allPathsFoundAMatch = false;
+                    }
                 }
             }
             return foundInstructions;

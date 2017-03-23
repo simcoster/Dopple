@@ -45,5 +45,11 @@ namespace GraphBuilderTests
         {
             HelperFuncs.TestFunction("SimpleRecursion");
         }
+
+        [TestMethod]
+        public void TestOutParam()
+        {
+            Assert.Fail("need to implement out param with LdLoc.a");
+        }
     }
 }

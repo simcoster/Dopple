@@ -26,5 +26,10 @@ namespace TestedFunctions
         public int Number;
         public string Text;
         public string Text2;
+        public Helper()
+        {
+            Number = 4;
+            Text2 = "Blaaa";
+        }
     }
 }

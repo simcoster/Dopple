@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Dopple.BackTracers
 {
-    public abstract class SingeIndexBackTracer : BackTracer
+    public abstract class DataflowBacktracer : BackTracer
     {
         protected IEnumerable<IEnumerable<InstructionNode>> GetDataflowBackRelated(InstructionNode instNode)
         {

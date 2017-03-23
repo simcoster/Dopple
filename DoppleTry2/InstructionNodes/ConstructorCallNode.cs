@@ -16,7 +16,7 @@ namespace Dopple.InstructionNodes
             StackPopCount--;
             StackPushCount = 1;
         }
-
+              
         public int DataFlowDataProdivderIndex
         {
             get

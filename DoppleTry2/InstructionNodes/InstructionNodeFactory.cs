@@ -125,6 +125,10 @@ namespace Dopple.InstructionNodes
             {
                 return new[] { new StoreFieldNode(instruction, method) };
             }
+            else if (CodeGroups.StElemCodes.Contains(nodeCode))
+            {
+                return new[] { new StElemInstructionNode(instruction, method) };
+            }
             return new[] {new InstructionNode(instruction, method)};
         }
 
