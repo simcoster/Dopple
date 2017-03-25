@@ -34,7 +34,12 @@ namespace Dopple.InstructionModifiers
             var callNodes = instructionNodes.Where(x => x is InlineableCallNode).Cast<InlineableCallNode>().Where(x => !x.CallWasInlined).ToArray();
             foreach (var callNode in callNodes)
             {
-                instructionNodes.InsertRange(instructionNodes.IndexOf(callNode), InlineRec(callNode));
+                instructionNodes.InsertRange(instructionNodes.IndexOf(callNode)+1, InlineRec(callNode));
+            }
+            foreach (var inlinedCallNode in instructionNodes.Where(x => x is InlineableCallNode && ((InlineableCallNode)x).CallWasInlined).ToList())
+            {
+                inlinedCallNode.SelfRemove();
+                instructionNodes.Remove(inlinedCallNode);
             }
         }
 
@@ -43,7 +48,7 @@ namespace Dopple.InstructionModifiers
             MethodDefinition calledMethodDef = callNode.TargetMethodDefinition;
             callNode.CallWasInlined = true;
             if (calledMethodDef.Body == null)
-            {  
+            {
                 return new List<InstructionNode>();
             }
             var isSecondLevelRecursiveCall = callNode.InliningProperties.CallSequence.Count(x => x.Method == callNode.TargetMethod) > 1;
@@ -52,7 +57,7 @@ namespace Dopple.InstructionModifiers
                 return new List<InstructionNode>();
             }
             //TODO check
-            if (callNode.InliningProperties.CallSequence.Count >20)
+            if (callNode.InliningProperties.CallSequence.Count > 20)
             {
                 callNode.CallWasInlined = true;
                 return new List<InstructionNode>();
@@ -60,7 +65,7 @@ namespace Dopple.InstructionModifiers
             callNode.StackPushCount = 0;
             List<InstructionNode> callNodeOriginalForwardRoutes = callNode.ProgramFlowForwardRoutes.ToList();
             List<InstructionNode> inlinedNodes = calledMethodDef.Body.Instructions.SelectMany(x => _InstructionNodeFactory.GetInstructionNodes(x, calledMethodDef)).ToList();
-            inlinedNodes.ForEach(x =>  SetNodeProps(x, inlinedNodes, callNode));
+            inlinedNodes.ForEach(x => SetNodeProps(x, inlinedNodes, callNode));
             programFlowHanlder.AddFlowConnections(inlinedNodes);
             _BackTraceManager.DataTraceInFunctionBounds(inlinedNodes);
             StitchProgramFlow(callNode, inlinedNodes[0]);
@@ -70,7 +75,7 @@ namespace Dopple.InstructionModifiers
             }
             foreach (InlineableCallNode secondLevelInlinedCallNode in inlinedNodes.Where(x => x is InlineableCallNode).ToList())
             {
-                inlinedNodes.InsertRange(inlinedNodes.IndexOf(secondLevelInlinedCallNode), InlineRec(secondLevelInlinedCallNode));
+                inlinedNodes.InsertRange(inlinedNodes.IndexOf(secondLevelInlinedCallNode)+1, InlineRec(secondLevelInlinedCallNode));
             }
             return inlinedNodes;
         }

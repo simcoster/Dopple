@@ -8,7 +8,7 @@ using Dopple.InstructionNodes;
 
 namespace Dopple.BackTracers
 {
-    class LoadMemoryByOperandBackTracer : DynamicDataBacktracer
+    class LindBacktracer : DynamicDataBacktracer
     {
         public override Code[] HandlesCodes => new[]
         {

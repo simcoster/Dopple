@@ -8,21 +8,19 @@ using Dopple.InstructionNodes;
 
 namespace Dopple.BackTracers
 {
-    class LdArgBacktracer : DataflowBacktracer
+    class LdArgBacktracer : BackTracer
     {
-        protected override IEnumerable<InstructionNode> GetDataflowBackRelatedArgGroup(InstructionNode instNode)
+        public override void BackTraceDataFlow(InstructionNode currentInst)
         {
-            if (instNode.InliningProperties.Inlined)
+            if (currentInst.InliningProperties.Inlined)
             {
-                InlineableCallNode inlinedCall = instNode.InliningProperties.CallNode;
-                var argSuppliers = new List<InstructionNode>();
-                argSuppliers.AddRange(inlinedCall.DataFlowBackRelated.Where(x => x.ArgIndex == ((LdArgInstructionNode) instNode).ArgIndex).Select(x => x.Argument));
-                return argSuppliers;          
+                InlineableCallNode inlinedCall = currentInst.InliningProperties.CallNode;
+                var argSuppliers = inlinedCall.DataFlowBackRelated.Where(x => x.ArgIndex == ((LdArgInstructionNode) currentInst).ArgIndex).Select(x => x.Argument).ToList();
+                currentInst.DataFlowBackRelated.AddTwoWaySingleIndex(argSuppliers);
             }
             else
             {
                 //TODO, need to implement STARG as well (even though it's not that commonly used)
-                return new List<InstructionNode>();
             }
         }
 

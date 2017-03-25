@@ -8,17 +8,21 @@ namespace TestedFunctions
 {
     public class InProgress
     {
-
-        public static string SumMe(int index)
+        public static int SumMe(int[] nums)
         {
-            Helper[] helpers = new Helper[5];
-            var tempHelper = new Helper();
-            tempHelper.Number = 3;
-            helpers[4] = tempHelper;
-            tempHelper.Text = "blah";
-            helpers[4].Text = "bleep";
-            return tempHelper.Text;
+            return Enumerable.Sum(nums);
         }
+
+        //public static string DynamicGames(int index)
+        //{
+        //    Helper[] helpers = new Helper[5];
+        //    var tempHelper = new Helper();
+        //    tempHelper.Number = 3;
+        //    helpers[4] = tempHelper;
+        //    tempHelper.Text = "blah";
+        //    helpers[4].Text = "bleep";
+        //    return tempHelper.Text;
+        //}
     }
 
     public class Helper

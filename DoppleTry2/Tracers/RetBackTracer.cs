@@ -18,7 +18,7 @@ namespace Dopple.BackTracers
             }
         }
 
-        public override void BackTraceDataFlowSingle(InstructionNode currentInst)
+        public override void BackTraceDataFlow(InstructionNode currentInst)
         {
             if (currentInst.InliningProperties.Inlined)
             {

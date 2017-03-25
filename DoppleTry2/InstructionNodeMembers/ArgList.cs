@@ -143,8 +143,7 @@ namespace Dopple
             {
                 if (!this.Any(x => x.ArgIndex == i))
                 {
-                    //TODO remove
-                    //throw new Exception("Index missing");
+                    throw new Exception("Index missing");
                 }
             }
         }
@@ -170,6 +169,9 @@ namespace Dopple
     {
         private DataFlowBackArgList() { }
         protected int CurrentIndex;
+
+        public bool DynamicDataFullyTraced { get; internal set; } = false;
+
         public DataFlowBackArgList(InstructionNode instructionWrapper) : base(instructionWrapper)
         {
             ResetIndex();
@@ -213,13 +215,7 @@ namespace Dopple
             {
                 CurrentIndex = this.Max(x => x.ArgIndex);
             }
-        }
-
-        internal void AddTwoWayWithNewIndex(InstructionNode node)
-        {
-            int newIndex = this.Count == 0?  0  : this.Max(x => x.ArgIndex) + 1;
-            base.AddTwoWay(node, newIndex);
-        }
+        } 
     }
 
  

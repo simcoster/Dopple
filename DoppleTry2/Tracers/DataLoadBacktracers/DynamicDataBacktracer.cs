@@ -16,7 +16,13 @@ namespace Dopple.BackTracers
     {
         protected override IEnumerable<InstructionNode> GetDataflowBackRelatedArgGroup(InstructionNode instructionNode)
         {
-            add the "dirty" pseudonode (dunno if i should present it or not)
+            bool allPathsHaveAMatch;
+            var foundInstructions = SingleIndexBackSearcher.SafeSearchBackwardsForDataflowInstrcutions(GetPredicate(instructionNode), instructionNode, out allPathsHaveAMatch);
+            if (allPathsHaveAMatch)
+            {
+                instructionNode.DataFlowBackRelated.DynamicDataFullyTraced = true;
+            }
+            return foundInstructions;           
         }
 
         protected abstract Predicate<InstructionNode> GetPredicate(InstructionNode instructionNode);

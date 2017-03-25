@@ -13,7 +13,7 @@ namespace Dopple.BackTracers
     {
         public BackTraceManager()
         {
-            _InFuncDataTransferBackTracers = new BackTracer[] { _LdArgBacktracer, _StIndAddressBackTracer, _LdLocBackTracer };
+            _InFuncDataTransferBackTracers = new BackTracer[] { _LdArgBacktracer, _LdLocBackTracer, _RetBackTracer };
 
             _OutFuncDataTransferBackTracers = new BackTracer[]{ _LdStaticFieldBackTracer, _LdStaticFieldBackTracer , _LoadFieldByStackBackTracer
                             ,_LoadMemoryByOperandBackTracer ,_TypedReferenceBackTracer,_LdElemBacktracer, _LdFldBacktracer};
@@ -22,7 +22,6 @@ namespace Dopple.BackTracers
 
         private readonly StackForwardTracer _StackForwardTracer = new StackForwardTracer();
         private readonly LdArgBacktracer _LdArgBacktracer = new LdArgBacktracer();
-        private readonly StIndAddressBackTracer _StIndAddressBackTracer = new StIndAddressBackTracer();
         private readonly LdLocBackTracer _LdLocBackTracer = new LdLocBackTracer();
         private readonly RetBackTracer _RetBackTracer = new RetBackTracer();
 
@@ -38,7 +37,7 @@ namespace Dopple.BackTracers
 
         private readonly LdStaticFieldBackTracer _LdStaticFieldBackTracer = new LdStaticFieldBackTracer();
         private readonly LoadFieldByStackBackTracer _LoadFieldByStackBackTracer = new LoadFieldByStackBackTracer();
-        private readonly LoadMemoryByOperandBackTracer _LoadMemoryByOperandBackTracer = new LoadMemoryByOperandBackTracer();
+        private readonly LindBacktracer _LoadMemoryByOperandBackTracer = new LindBacktracer();
         private readonly TypedReferenceBackTracer _TypedReferenceBackTracer = new TypedReferenceBackTracer();
         private readonly ConditionionalsTracer _ConditionalBacktracer = new ConditionionalsTracer();
 
@@ -60,12 +59,16 @@ namespace Dopple.BackTracers
                 return;
             }
             visited.Add(instructionNode);
-            while (instructionNode.ProgramFlowForwardRoutes.Count == 1)
+            while (instructionNode.ProgramFlowForwardRoutes.Count < 2)
             {
                 var relevantBackTracer = backTracers.FirstOrDefault(x => x.HandlesCodes.Contains(instructionNode.Instruction.OpCode.Code));
                 if (relevantBackTracer != null)
                 {
-                    relevantBackTracer.BackTraceDataFlowSingle(instructionNode);
+                    relevantBackTracer.BackTraceDataFlow(instructionNode);
+                }
+                if (instructionNode.ProgramFlowForwardRoutes.Count ==0)
+                {
+                    return;
                 }
                 instructionNode = instructionNode.ProgramFlowForwardRoutes[0];
                 if (visited.Contains(instructionNode))

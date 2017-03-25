@@ -74,14 +74,15 @@ namespace Dopple
                 }
                 InlineFunctionCalls();
                 SetInstructionIndexes();
-                BackTraceOutsideFuncBoundry();
+                //BackTraceOutsideFuncBoundry();
                 //MergeSingleOperationNodes();
+                //MergeSimilarInstructions();
+                //MergeEquivilentPairs();
                 //PostMergeBackTrace();
                 //RecursionFix();
-                //ResolveVirtualMethods(out shouldRerun);
+                ResolveVirtualMethods(out shouldRerun);
                 //SetInstructionIndexes();
-                //isFirstRun = false;
-                shouldRerun = false;
+                isFirstRun = false;
 
             }
             //RemoveHelperCodes();
@@ -133,12 +134,16 @@ namespace Dopple
             //}
         }
 
+        private void MarkNodesAsDataEquivilent()
+        {
+
+        }
+
         private void MergeSimilarInstructions()
         {
             MergeLdArgs();
             MergeImmediateValue();
             MergeLoadNulls();
-            MergeEquivilentPairs();
         }
 
         private void MergeLoadNulls()
@@ -197,7 +202,7 @@ namespace Dopple
 
             foreach (var firstNode in InstructionNodes.Where(x => x.DataFlowBackRelated.Count == 0))
             {
-                firstNode.DataFlowBackRelated.AddTwoWayWithNewIndex(nodeZero);
+                firstNode.DataFlowBackRelated.AddTwoWay(nodeZero, -1);
             }
             var firstOrderLdArgs = GetFirstOrderLdArgs();
             foreach (var firstOrderLdArg in firstOrderLdArgs)
@@ -256,7 +261,6 @@ namespace Dopple
 
         private void MergeLdArgs()
         {
-            var doneWrappers = new List<InstructionNode>();
             var ldArgGroups = InstructionNodes.Where(x => x is LdArgInstructionNode)
                                                  .Cast<FunctionArgNodeBase>()
                                                  .GroupBy(x => new { x.ArgIndex, x.Method })

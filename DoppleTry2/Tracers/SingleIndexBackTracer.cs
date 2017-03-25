@@ -13,7 +13,7 @@ namespace Dopple.BackTracers
         {
             return new List<List<InstructionNode>>() { { GetDataflowBackRelatedArgGroup(instNode).ToList() } };
         }
-        public override void BackTraceDataFlowSingle(InstructionNode currentInst)
+        public override void BackTraceDataFlow(InstructionNode currentInst)
         {        
             IEnumerable<IEnumerable<InstructionNode>> backRelatedGroups = GetDataflowBackRelated(currentInst);
 

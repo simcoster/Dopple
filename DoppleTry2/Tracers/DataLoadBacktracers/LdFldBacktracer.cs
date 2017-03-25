@@ -24,10 +24,9 @@ namespace Dopple.BackTracers
             var objectInstanceArgs = instructionNode.DataFlowBackRelated.Where(x => x.ArgIndex == 0).Select(x => x.Argument).ToArray();
             FieldReference fieldDefinitionArg = (FieldReference) instructionNode.Instruction.Operand;
             Predicate<InstructionNode> predicate = x => x.Instruction.OpCode.Code == Code.Stfld &&
-                                                             x.DataFlowBackRelated.Where(y => y.ArgIndex == 0).Select(y => y.Argument).SequenceEqual(objectInstanceArgs) &&
-                                                             ((FieldReference) x.Instruction.Operand).MetadataToken == fieldDefinitionArg.MetadataToken;
+                                                        x.DataFlowBackRelated.Where(y => y.ArgIndex == 0).Select(y => y.Argument).SequenceEqual(objectInstanceArgs) &&
+                                                        ((FieldReference) x.Instruction.Operand).MetadataToken == fieldDefinitionArg.MetadataToken;
             return predicate;
-
         }
     }
 }
