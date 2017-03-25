@@ -11,10 +11,18 @@ using System.Runtime.Serialization;
 namespace Dopple.InstructionNodes
 {
     [DataContract]
-    class StElemInstructionNode : InstructionNode, IDataTransferingNode, IObjectOrAddressRequiringNode
+    class StElemInstructionNode : InstructionNode, IDataTransferingNode, IArrayUsingNode , IIndexUsingNode
     {
         public StElemInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
+        }
+
+        public IEnumerable<InstructionNode> ArrayBackArgs
+        {
+            get
+            {
+                return DataFlowBackRelated.Where(x => x.ArgIndex == 0).Select(x => x.Argument);
+            }
         }
 
         public int DataFlowDataProdivderIndex
@@ -25,25 +33,20 @@ namespace Dopple.InstructionNodes
             }
         }
 
+        public IEnumerable<InstructionNode> IndexNodes
+        {
+            get
+            {
+                return DataFlowBackRelated.Where(x => x.ArgIndex == 1).Select(x => x.Argument);
+            }
+        }
+
         public int ObjectOrAddressArgIndex
         {
             get
             {
                 return 0;
             }
-        }
-
-        public bool ObjectOrAddressArgsResolved
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-
-            set
-            {
-                throw new NotImplementedException();
-            }
-        }
+        }       
     }
 }

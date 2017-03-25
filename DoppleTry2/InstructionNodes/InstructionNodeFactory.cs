@@ -129,6 +129,14 @@ namespace Dopple.InstructionNodes
             {
                 return new[] { new StElemInstructionNode(instruction, method) };
             }
+            else if (nodeCode == Code.Dup)
+            {
+                return new[] { new DataTransferNode(instruction, method) };
+            }
+            else if (nodeCode == Code.Ldelema)
+            {
+                return new[] { new LdElemAddressNode(instruction, method) };
+            }
             return new[] {new InstructionNode(instruction, method)};
         }
 

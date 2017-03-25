@@ -15,7 +15,7 @@ namespace Dopple.BackTracers
         {
             _InFuncDataTransferBackTracers = new BackTracer[] { _LdArgBacktracer, _LdLocBackTracer, _RetBackTracer };
 
-            _OutFuncDataTransferBackTracers = new BackTracer[]{ _LdStaticFieldBackTracer, _LdStaticFieldBackTracer , _LoadFieldByStackBackTracer
+            _OutFuncDataTransferBackTracers = new BackTracer[]{ _LdStaticFieldBackTracer, _LdStaticFieldBackTracer 
                             ,_LoadMemoryByOperandBackTracer ,_TypedReferenceBackTracer,_LdElemBacktracer, _LdFldBacktracer};
         }
         private readonly Verifier[] verifiers;
@@ -36,10 +36,11 @@ namespace Dopple.BackTracers
       
 
         private readonly LdStaticFieldBackTracer _LdStaticFieldBackTracer = new LdStaticFieldBackTracer();
-        private readonly LoadFieldByStackBackTracer _LoadFieldByStackBackTracer = new LoadFieldByStackBackTracer();
         private readonly LindBacktracer _LoadMemoryByOperandBackTracer = new LindBacktracer();
         private readonly TypedReferenceBackTracer _TypedReferenceBackTracer = new TypedReferenceBackTracer();
         private readonly ConditionionalsTracer _ConditionalBacktracer = new ConditionionalsTracer();
+        private readonly LdElemBacktracer _LdElemBacktracer = new LdElemBacktracer();
+        private readonly LdFldBacktracer _LdFldBacktracer = new LdFldBacktracer();
 
         BackTracer[] _OutFuncDataTransferBackTracers;
 
@@ -83,7 +84,6 @@ namespace Dopple.BackTracers
             }
         }
 
-        LdElemBacktracer _LdElemBacktracer = new LdElemBacktracer();
-        LdFldBacktracer _LdFldBacktracer = new LdFldBacktracer();
+       
     }
 }

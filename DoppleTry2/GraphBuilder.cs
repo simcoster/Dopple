@@ -74,7 +74,7 @@ namespace Dopple
                 }
                 InlineFunctionCalls();
                 SetInstructionIndexes();
-                //BackTraceOutsideFuncBoundry();
+                BackTraceOutsideFuncBoundry();
                 //MergeSingleOperationNodes();
                 //MergeSimilarInstructions();
                 //MergeEquivilentPairs();
@@ -94,8 +94,6 @@ namespace Dopple
 
         private void BackTraceOutsideFuncBoundry()
         {
-            RemoveHelperCodes();
-            MergeSimilarInstructions();
             _backTraceManager.BackTraceOutsideFunctionBounds(InstructionNodes);
         }
 

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Dopple.InstructionNodes
 {
     [DataContract]
-    internal class VirtualCallInstructionNode : NonInlineableCallInstructionNode, IObjectOrAddressRequiringNode
+    internal class VirtualCallInstructionNode : NonInlineableCallInstructionNode
     {
         public bool ResolveAttempted { get; set; } = false;
 

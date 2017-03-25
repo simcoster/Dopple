@@ -21,10 +21,10 @@ namespace Dopple.BackTracers
       
         protected override Predicate<InstructionNode> GetPredicate(InstructionNode instructionNode)
         {
-            var objectInstanceArgs = instructionNode.DataFlowBackRelated.Where(x => x.ArgIndex == 0).Select(x => x.Argument).ToArray();
+            var objectInstanceArgs = instructionNode.DataFlowBackRelated.Where(x => x.ArgIndex == 0).SelectMany(x => x.Argument.GetDataOriginNodes()).ToArray();
             FieldReference fieldDefinitionArg = (FieldReference) instructionNode.Instruction.Operand;
             Predicate<InstructionNode> predicate = x => x.Instruction.OpCode.Code == Code.Stfld &&
-                                                        x.DataFlowBackRelated.Where(y => y.ArgIndex == 0).Select(y => y.Argument).SequenceEqual(objectInstanceArgs) &&
+                                                        x.DataFlowBackRelated.Where(y => y.ArgIndex == 0).SelectMany(y => y.Argument.GetDataOriginNodes()).SequenceEqual(objectInstanceArgs) &&
                                                         ((FieldReference) x.Instruction.Operand).MetadataToken == fieldDefinitionArg.MetadataToken;
             return predicate;
         }

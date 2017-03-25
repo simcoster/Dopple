@@ -67,6 +67,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="InstructionNodes\DataTransferNode.cs" />
+    <Compile Include="InstructionNodes\IArrayUsingNode.cs" />
+    <Compile Include="InstructionNodes\IIndexUsingNode.cs" />
+    <Compile Include="InstructionNodes\LdElemAddressNode.cs" />
     <Compile Include="Tracers\BackTraceManager.cs" />
     <Compile Include="Tracers\DataLoadBacktracers\DynaymicLdArgBacktracer.cs" />
     <Compile Include="Tracers\ForwardTracers\ConditionionalsTracer.cs" />
@@ -85,7 +89,6 @@
     <Compile Include="InstructionNodes\CallNode.cs" />
     <Compile Include="InstructionNodes\ConstructorNewObjectNode.cs" />
     <Compile Include="InstructionNodes\FunctionArgNodeBase.cs" />
-    <Compile Include="InstructionNodes\Interfaces\IObjectRequiringNode.cs" />
     <Compile Include="InstructionNodes\LoadFieldNode.cs" />
     <Compile Include="InstructionNodes\ObjectRequiringNode.cs" />
     <Compile Include="InstructionNodes\StArgInstructionNode.cs" />
@@ -120,7 +123,6 @@
     <Compile Include="Tracers\LdArgBacktracer.cs" />
     <Compile Include="Tracers\DataLoadBacktracers\LdStaticFieldBackTracer.cs" />
     <Compile Include="Tracers\DataLoadBacktracers\LoadMemoryByOperandBackTracer.cs" />
-    <Compile Include="Tracers\DataLoadBacktracers\LoadFieldByStackBackTracer.cs" />
     <Compile Include="Tracers\SingleIndexBackTracer.cs" />
     <Compile Include="Tracers\LdLocBackTracer.cs" />
     <Compile Include="Tracers\TypedReferenceBackTracer.cs" />

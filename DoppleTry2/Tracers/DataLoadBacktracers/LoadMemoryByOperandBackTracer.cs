@@ -19,7 +19,30 @@ namespace Dopple.BackTracers
 
         protected override Predicate<InstructionNode> GetPredicate(InstructionNode instructionNode)
         {
-            throw new NotImplementedException();
+            var addressArgs = instructionNode.DataFlowBackRelated.Where(x => x.ArgIndex == 0).SelectMany(x => x.Argument.GetDataOriginNodes());
+            var specificCasesPredicates = new List<Predicate<InstructionNode>>();
+            foreach (var addressArg in addressArgs)
+            {
+                Code nodeCode = addressArg.Instruction.OpCode.Code;
+                Predicate<InstructionNode> specificCasePredicate;
+                LdElemAddressNode addressArgAsLdelema = addressArg as LdElemAddressNode;
+                if (addressArgAsLdelema != null)
+                {
+                    var arrayArgs = addressArgAsLdelema.ArrayBackArgs.SelectMany(y => y.GetDataOriginNodes()).ToArray();
+                    var indexArgs = addressArgAsLdelema.IndexNodes.SelectMany(y => y.GetDataOriginNodes()).ToArray();
+                    specificCasePredicate = x => x is StElemInstructionNode && LdElemBacktracer.ArrayAndIndexMatch((StElemInstructionNode) x, arrayArgs, indexArgs);
+                    specificCasesPredicates.Add(specificCasePredicate);
+                }
+            }
+
+            Predicate<InstructionNode> stindPredicate = x => x is StIndInstructionNode &&
+                                        x.DataFlowBackRelated.Where(y => y.ArgIndex == 0)
+                                        .SelectMany(y => y.Argument.GetDataOriginNodes())
+                                        .SequenceEqual(x.DataFlowBackRelated.Where(y => y.ArgIndex == 0)
+                                        .SelectMany(y => y.Argument.GetDataOriginNodes()));
+
+            return x => specificCasesPredicates.Any(predicate => predicate(x)) || stindPredicate(x);
+
         }
     }
 }
