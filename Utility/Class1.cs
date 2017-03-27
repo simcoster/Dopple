@@ -15,14 +15,12 @@ namespace Utility
         //{
         //    return Enumerable.Sum(array,x => x ++);
         //}
-        public static void RegularSum(Helper helper)
+        public static int RegularSum(Helper helper)
         {
-            helper.Text = "blah";
-            helper.Text2 = helper.Text;
-            helper.Text2 = "beep";
-            int a = 6;
-            a = a * 5;
+            var a = 6;
             helper.Number = a;
+            a = helper.Number;
+            return a;
         }
     }
 

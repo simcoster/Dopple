@@ -80,6 +80,15 @@ namespace Dopple
             var forwardArg = argToRemove.MirrorArg;
             GetMirrorList(argToRemove.Argument).Remove(forwardArg);
         }
+
+        internal void RemoveTwoWay(List<IndexedArgument> argsToRemove)
+        {
+            foreach(var indexedArg in argsToRemove)
+            {
+                RemoveTwoWay(indexedArg);
+            }
+        }
+
         public void RemoveAllTwoWay(Predicate<IndexedArgument> predicate)
         {
             foreach (var toRemove in this.Where(x => predicate(x)).ToList())
@@ -169,9 +178,6 @@ namespace Dopple
     {
         private DataFlowBackArgList() { }
         protected int CurrentIndex;
-
-        public bool DynamicDataFullyTraced { get; internal set; } = false;
-
         public DataFlowBackArgList(InstructionNode instructionWrapper) : base(instructionWrapper)
         {
             ResetIndex();
@@ -235,6 +241,8 @@ namespace Dopple
         {
             return nodeToMergeInto.DataFlowForwardRelated;
         }
+
+       
     }
 
     public class ProgramFlowBackAffectedArgList : CoupledIndexedArgList

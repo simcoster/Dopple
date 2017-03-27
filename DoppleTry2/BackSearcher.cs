@@ -58,12 +58,23 @@ namespace Dopple
             {
                 visited = new List<InstructionNode>();
             }
-            if (visited.Contains(startInst))
+            while(true)
             {
-                return new InstructionNode[0];
+                if (visited.Contains(startInst))
+                {
+                    return new InstructionNode[0];
+                }
+                visited.Add(startInst);
+                if (startInst.ProgramFlowBackRoutes.Count == 1)
+                {
+                    startInst = startInst.ProgramFlowBackRoutes[0];
+                }
+                else
+                {
+                    break;
+                }
             }
-            visited.Add(startInst);
-            visited.AddRange(startInst.ProgramFlowBackRoutes.SelectMany(x => GetBackFlowTree(x, visited)).ToArray());
+            visited.AddRange(startInst.ProgramFlowBackRoutes.SelectMany(x => GetBackFlowTree(x, new List<InstructionNode>(visited))).ToArray());
             return visited.Distinct();
         }
 

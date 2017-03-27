@@ -4,7 +4,7 @@ using System;
 
 namespace Dopple.InstructionNodes
 {
-    internal abstract class FieldManipulationNode : ObjectOrAddressRequiringNode, IDataTransferingNode
+    internal abstract class FieldManipulationNode : ObjectOrAddressRequiringNode 
     {
         public FieldDefinition FieldDefinition;
         public FieldManipulationNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
@@ -23,26 +23,38 @@ namespace Dopple.InstructionNodes
             }
         }
 
+
+         
+    }
+
+    internal class LoadFieldNode : FieldManipulationNode, IDynamicDataLoadNode
+    {
+        public LoadFieldNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
+        {
+        }
+        public bool AllPathsHaveAStoreNode { get; set; } = false;
+
         public int DataFlowDataProdivderIndex
         {
             get
             {
                 return 1;
             }
-        }      
+        }
     }
 
-    internal class LoadFieldNode : FieldManipulationNode
-    {
-        public LoadFieldNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
-        {
-        }        
-    }
-
-    internal class StoreFieldNode : FieldManipulationNode
+    internal class StoreFieldNode : FieldManipulationNode, IDynamicDataStoreNode
     {
         public StoreFieldNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
+        }
+
+        public int DataFlowDataProdivderIndex
+        {
+            get
+            {
+                return 1;
+            }
         }
     }
 }

@@ -52,7 +52,7 @@
             // 
             this.ShowProgramFlowLinks.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.ShowProgramFlowLinks.AutoSize = true;
-            this.ShowProgramFlowLinks.Location = new System.Drawing.Point(871, 12);
+            this.ShowProgramFlowLinks.Location = new System.Drawing.Point(814, 12);
             this.ShowProgramFlowLinks.Name = "ShowProgramFlowLinks";
             this.ShowProgramFlowLinks.Size = new System.Drawing.Size(76, 17);
             this.ShowProgramFlowLinks.TabIndex = 0;
@@ -66,7 +66,7 @@
             this.ShowDataFlowLinks.AutoSize = true;
             this.ShowDataFlowLinks.Checked = true;
             this.ShowDataFlowLinks.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.ShowDataFlowLinks.Location = new System.Drawing.Point(870, 35);
+            this.ShowDataFlowLinks.Location = new System.Drawing.Point(814, 35);
             this.ShowDataFlowLinks.Name = "ShowDataFlowLinks";
             this.ShowDataFlowLinks.Size = new System.Drawing.Size(77, 17);
             this.ShowDataFlowLinks.TabIndex = 1;
@@ -80,7 +80,7 @@
             this.ShowRightDataLinks.AutoSize = true;
             this.ShowRightDataLinks.Checked = true;
             this.ShowRightDataLinks.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.ShowRightDataLinks.Location = new System.Drawing.Point(842, 77);
+            this.ShowRightDataLinks.Location = new System.Drawing.Point(814, 77);
             this.ShowRightDataLinks.Name = "ShowRightDataLinks";
             this.ShowRightDataLinks.Size = new System.Drawing.Size(105, 17);
             this.ShowRightDataLinks.TabIndex = 2;
@@ -94,7 +94,7 @@
             this.ShowLeftDataLinks.AutoSize = true;
             this.ShowLeftDataLinks.Checked = true;
             this.ShowLeftDataLinks.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.ShowLeftDataLinks.Location = new System.Drawing.Point(849, 100);
+            this.ShowLeftDataLinks.Location = new System.Drawing.Point(814, 100);
             this.ShowLeftDataLinks.Name = "ShowLeftDataLinks";
             this.ShowLeftDataLinks.Size = new System.Drawing.Size(98, 17);
             this.ShowLeftDataLinks.TabIndex = 3;
@@ -105,7 +105,7 @@
             // minIndex
             // 
             this.minIndex.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.minIndex.Location = new System.Drawing.Point(851, 123);
+            this.minIndex.Location = new System.Drawing.Point(814, 123);
             this.minIndex.Name = "minIndex";
             this.minIndex.Size = new System.Drawing.Size(37, 20);
             this.minIndex.TabIndex = 4;
@@ -114,7 +114,7 @@
             // maxIndex
             // 
             this.maxIndex.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.maxIndex.Location = new System.Drawing.Point(910, 123);
+            this.maxIndex.Location = new System.Drawing.Point(877, 123);
             this.maxIndex.Name = "maxIndex";
             this.maxIndex.Size = new System.Drawing.Size(37, 20);
             this.maxIndex.TabIndex = 5;
@@ -124,7 +124,7 @@
             // 
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(894, 126);
+            this.label1.Location = new System.Drawing.Point(857, 126);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(10, 13);
             this.label1.TabIndex = 6;
@@ -136,7 +136,7 @@
             this.FlowAffectingChb.AutoSize = true;
             this.FlowAffectingChb.Checked = true;
             this.FlowAffectingChb.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.FlowAffectingChb.Location = new System.Drawing.Point(826, 57);
+            this.FlowAffectingChb.Location = new System.Drawing.Point(814, 57);
             this.FlowAffectingChb.Name = "FlowAffectingChb";
             this.FlowAffectingChb.Size = new System.Drawing.Size(121, 17);
             this.FlowAffectingChb.TabIndex = 7;
@@ -147,7 +147,7 @@
             // freeTextTextBox
             // 
             this.freeTextTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.freeTextTextBox.Location = new System.Drawing.Point(842, 158);
+            this.freeTextTextBox.Location = new System.Drawing.Point(814, 158);
             this.freeTextTextBox.Name = "freeTextTextBox";
             this.freeTextTextBox.Size = new System.Drawing.Size(100, 20);
             this.freeTextTextBox.TabIndex = 8;
@@ -157,7 +157,7 @@
             // 
             this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(771, 161);
+            this.label2.Location = new System.Drawing.Point(743, 161);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(65, 13);
             this.label2.TabIndex = 9;
@@ -167,7 +167,7 @@
             // 
             this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(756, 126);
+            this.label3.Location = new System.Drawing.Point(728, 126);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(80, 13);
             this.label3.TabIndex = 10;
@@ -176,7 +176,7 @@
             // SetWidthTxt
             // 
             this.SetWidthTxt.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.SetWidthTxt.Location = new System.Drawing.Point(842, 234);
+            this.SetWidthTxt.Location = new System.Drawing.Point(814, 234);
             this.SetWidthTxt.Name = "SetWidthTxt";
             this.SetWidthTxt.Size = new System.Drawing.Size(100, 20);
             this.SetWidthTxt.TabIndex = 11;
@@ -187,7 +187,7 @@
             // 
             this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(782, 234);
+            this.label4.Location = new System.Drawing.Point(754, 234);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(54, 13);
             this.label4.TabIndex = 12;
@@ -196,7 +196,7 @@
             // SetHightTxt
             // 
             this.SetHightTxt.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.SetHightTxt.Location = new System.Drawing.Point(842, 280);
+            this.SetHightTxt.Location = new System.Drawing.Point(814, 280);
             this.SetHightTxt.Name = "SetHightTxt";
             this.SetHightTxt.Size = new System.Drawing.Size(100, 20);
             this.SetHightTxt.TabIndex = 13;
@@ -207,7 +207,7 @@
             // 
             this.label5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(779, 280);
+            this.label5.Location = new System.Drawing.Point(751, 283);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(57, 13);
             this.label5.TabIndex = 14;
@@ -217,7 +217,7 @@
             // 
             this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(756, 198);
+            this.label6.Location = new System.Drawing.Point(728, 198);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(80, 13);
             this.label6.TabIndex = 16;
@@ -226,7 +226,7 @@
             // textBox1
             // 
             this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox1.Location = new System.Drawing.Point(842, 195);
+            this.textBox1.Location = new System.Drawing.Point(814, 195);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(100, 20);
             this.textBox1.TabIndex = 15;
@@ -235,7 +235,7 @@
             // exportToXmlBtn
             // 
             this.exportToXmlBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.exportToXmlBtn.Location = new System.Drawing.Point(842, 320);
+            this.exportToXmlBtn.Location = new System.Drawing.Point(814, 320);
             this.exportToXmlBtn.Name = "exportToXmlBtn";
             this.exportToXmlBtn.Size = new System.Drawing.Size(99, 33);
             this.exportToXmlBtn.TabIndex = 17;

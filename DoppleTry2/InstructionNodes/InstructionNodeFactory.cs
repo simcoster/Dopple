@@ -105,6 +105,10 @@ namespace Dopple.InstructionNodes
             {
                 return new[] { new StIndInstructionNode(instruction, method) };
             }
+            else if (CodeGroups.LdIndCodes.Contains(nodeCode))
+            {
+                return new[] { new LdindNode(instruction, method) };
+            }
             else if (nodeCode == Code.Ldftn)
             {
                 return new[] { new LoadFunctionNode(instruction, method) };

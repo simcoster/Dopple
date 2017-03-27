@@ -30,6 +30,7 @@ namespace Dopple
         public static Code[] StIndCodes = { Code.Stind_I, Code.Stind_I1, Code.Stind_I2, Code.Stind_I4, Code.Stind_I8, Code.Stind_R4, Code.Stind_R8 };
         public static Code[] LoadFieldCodes = { Code.Ldfld, Code.Ldsfld};
         public static Code[] StoreFieldCodes = { Code.Stfld, Code.Stsfld};
+        public static Code[] LdIndCodes = { Code.Ldind_I, Code.Ldind_I1, Code.Ldind_I2, Code.Ldind_I4, Code.Ldind_I8, Code.Ldind_R4 , Code.Ldind_R8, Code.Ldind_Ref, Code.Ldind_U1, Code.Ldind_U2, Code.Ldind_U4};
         public static Code[][] CodeGroupLists = typeof(CodeGroups).GetFields().Select(x => x.GetValue(null)).Where(x => x is Code[]).Cast<Code[]>().ToArray();
         public static bool AreSameGroup (Code firstCode, Code secondCode)
         {

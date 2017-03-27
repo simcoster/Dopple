@@ -140,12 +140,29 @@ namespace DoppleGraph
                     ObjectsToHide[DataBackTreeHideIndex].Clear();
                     var backTreeNodes = BackSearcher.GetBackFlowTree(GetNodeWrapper(myView.Selection.First(x => x is GoNode) as GoNode).InstructionNode)
                                                                                                           .Select(x => GetNodeWrapper(x).Node).ToList();
-                    ObjectsToHide[DataBackTreeHideIndex].AddRange(GetObjectsToHide(backTreeNodes));
+                    ObjectsToHide[DataBackTreeHideIndex].AddRange(myView.Document.Where(x => (x is GoNode)).Cast<GoNode>().Except(backTreeNodes));
+                    ObjectsToHide[DataBackTreeHideIndex].AddRange(myView.Document.Where(x => x is GoLink && (!backTreeNodes.Contains(((GoLink) x).FromNode) || !backTreeNodes.Contains(((GoLink) x).ToNode))));
                 }
             }
             else if (e.KeyChar == '*')
             {
                 ObjectsToHide.ForEach(x => ObjectsToHide[x.Key].Clear());
+            }
+            else if (e.KeyChar == '=')
+            {
+                foreach(GoTextNode gonode in myView.Selection.Where(x => x is GoNode))
+                {
+                    gonode.Shape.PenColor = Color.GreenYellow;
+                    gonode.Shape.PenWidth = 10;
+                }
+            }
+            else if (e.KeyChar == '-')
+            {
+                foreach (GoTextNode gonode in myView.Document.Where(x => x is GoNode))
+                {
+                    gonode.Shape.PenColor = Color.Blue;
+                    gonode.Shape.PenWidth = 3;
+                }
             }
             ReShow();
         }
@@ -402,15 +419,15 @@ namespace DoppleGraph
             }
         }
 
-        private void SetCoordinates(List<GoNodeWrapper> nodeWrappers, int totalHeight, int totalWidth)
+        private void SetCoordinates(List<GoNodeWrapper> nodeWrappers)
         {
             Dictionary<int, List<GoNodeWrapper>> nodeWrapperCols = new Dictionary<int, List<GoNodeWrapper>>();
             var firstNode = nodeWrappers.Where(x => x.InstructionNode.DataFlowBackRelated.Count == 0).ToList();
             SetLongestPathRec(firstNode);
             SetRowIndexes(nodeWrappers);
             FixDuplicateCoordinates(nodeWrappers);
-            float heightOffset = Convert.ToSingle(totalHeight / nodeWrappers.Select(x => x.DisplayRow).Max());
-            float widthOffset = Convert.ToSingle(totalWidth / nodeWrappers.Select(x => x.DisplayCol).Max());
+            float heightOffset = 100;
+            float widthOffset = 500;
             foreach (var nodeWrapper in nodeWrappers)
             {
                 nodeWrapper.Node.Location = new PointF(nodeWrapper.DisplayCol * widthOffset, (nodeWrapper.DisplayRow - 0.7f) * heightOffset);
@@ -567,7 +584,8 @@ namespace DoppleGraph
                 }
                 frontLayer.Add(goNodeWrapper.Node);
             }
-            SetCoordinates(nodeWrappers, int.Parse(SetHightTxt.Text), int.Parse(SetWidthTxt.Text));
+            //SetCoordinates(nodeWrappers, int.Parse(SetHightTxt.Text), int.Parse(SetWidthTxt.Text));
+            SetCoordinates(nodeWrappers);
             DrawLinks(myView);
         }
 
@@ -604,7 +622,7 @@ namespace DoppleGraph
             int newWidth;
             if (int.TryParse(SetHightTxt.Text, out newHeight) && int.TryParse(SetWidthTxt.Text, out newWidth))
             {
-                SetCoordinates(nodeWrappers, newHeight, newWidth);
+                //SetCoordinates(nodeWrappers, newHeight, newWidth);
             }
             myView.Refresh();
         }

@@ -11,7 +11,7 @@ using System.Runtime.Serialization;
 namespace Dopple.InstructionNodes
 {
     [DataContract]
-    class StElemInstructionNode : InstructionNode, IDataTransferingNode, IArrayUsingNode , IIndexUsingNode
+    class StElemInstructionNode : InstructionNode, IDynamicDataStoreNode, IArrayUsingNode , IIndexUsingNode
     {
         public StElemInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {

@@ -41,20 +41,27 @@ namespace Dopple
                         {
                             throw new Exception("Couldn't detect type of node" + dataOriginNode.Instruction);
                         }
-                        TypeDefinition objectTypeDefinition;
+                        TypeDefinition objectTypeDefinition = null;
                         if (objectTypeReference.IsArray)
                         {
                             objectTypeDefinition = ArrayTypeDefinition;
+                        }
+                        else
+                        {
+                            objectTypeDefinition = objectTypeReference.Resolve();
+                        }
+                        if (objectTypeDefinition == ArrayTypeDefinition)
+                        { 
                             //TODO redesign
                             //this is a special case, I want to be able to inline the native command of GetValue
                             if (virtualNodeCall.TargetMethod.FullName == "System.Object System.Array::GetValue(System.Int32)")
                             {
                                 AddLoadElemImplementation(instructionNodes, virtualNodeCall, objectArgument);
+                                continue;
                             }
                         }
                         else
                         {
-                            objectTypeDefinition = objectTypeReference.Resolve();
                             if (objectTypeDefinition.IsAbstract)
                             {
                                 unresolvedDataArgsExist = true;
@@ -175,6 +182,10 @@ namespace Dopple
             if (objectArg is RetInstructionNode)
             {
                 foundType = objectArg.Method.ReturnType;
+            }
+            if (objectArg is LoadFieldNode)
+            {
+                foundType = ((LoadFieldNode)objectArg).FieldDefinition.FieldType;
             }
             if (foundType == null)
             {

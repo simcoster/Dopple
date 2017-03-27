@@ -16,11 +16,16 @@ namespace Dopple.BackTracers
     {
         protected override IEnumerable<InstructionNode> GetDataflowBackRelatedArgGroup(InstructionNode instructionNode)
         {
+            var nodeAsDynamicLoad = instructionNode as IDynamicDataLoadNode;
+            if (nodeAsDynamicLoad == null)
+            {
+                throw new Exception("Node must be a dynamic load node");
+            }
             bool allPathsHaveAMatch;
             var foundInstructions = SingleIndexBackSearcher.SafeSearchBackwardsForDataflowInstrcutions(GetPredicate(instructionNode), instructionNode, out allPathsHaveAMatch);
             if (allPathsHaveAMatch)
             {
-                instructionNode.DataFlowBackRelated.DynamicDataFullyTraced = true;
+                nodeAsDynamicLoad.AllPathsHaveAStoreNode = true;
             }
             return foundInstructions;           
         }

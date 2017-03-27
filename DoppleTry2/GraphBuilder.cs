@@ -76,20 +76,27 @@ namespace Dopple
                 SetInstructionIndexes();
                 BackTraceOutsideFuncBoundry();
                 //MergeSingleOperationNodes();
-                //MergeSimilarInstructions();
                 //MergeEquivilentPairs();
-                //PostMergeBackTrace();
-                //RecursionFix();
                 ResolveVirtualMethods(out shouldRerun);
                 //SetInstructionIndexes();
                 isFirstRun = false;
 
             }
-            //RemoveHelperCodes();
+            //RecursionFix();
+            RemoveHelperCodes();
+            RemoveAndStitchDynamicDataConnections();
+            //MergeSimilarInstructions();
+            
             AddZeroNode();
             //Verify();
 
             return InstructionNodes;
+        }
+
+        private void RemoveAndStitchDynamicDataConnections()
+        {
+            DynamicDataConnector.DynamicStoreNodesRewire(InstructionNodes);
+            DynamicDataConnector.DynamicLoadNodesRewire(InstructionNodes);
         }
 
         private void BackTraceOutsideFuncBoundry()
@@ -182,15 +189,15 @@ namespace Dopple
 
         private void RemoveHelperCodes()
         {
-            RemoveInstWrappers(InstructionNodes.Where(x => x is ConstructorCallNode));
-            RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.StLocCodes.Contains(x.Instruction.OpCode.Code)));
-            RemoveInstWrappers(InstructionNodes.Where(x => CodeGroups.LdLocCodes.Contains(x.Instruction.OpCode.Code)));
-            RemoveInstWrappers(InstructionNodes.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code)));
+            RemoveAndStitchNodes(InstructionNodes.Where(x => x is ConstructorCallNode));
+            RemoveAndStitchNodes(InstructionNodes.Where(x => CodeGroups.StLocCodes.Contains(x.Instruction.OpCode.Code)));
+            RemoveAndStitchNodes(InstructionNodes.Where(x => CodeGroups.LdLocCodes.Contains(x.Instruction.OpCode.Code)));
+            RemoveAndStitchNodes(InstructionNodes.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code)));
             //RemoveInstWrappers(InstructionNodes.Where(x => x is StIndInstructionNode && ((StIndInstructionNode) x).AddressType == AddressType.LocalVar));
-            RemoveInstWrappers(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Dup));
-            RemoveInstWrappers(InstructionNodes.Where(x => x.InliningProperties.Inlined && x is LdArgInstructionNode && x.DataFlowBackRelated.Count > 0 && !x.DataFlowBackRelated.SelfFeeding));
+            RemoveAndStitchNodes(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Dup));
+            RemoveAndStitchNodes(InstructionNodes.Where(x => x.InliningProperties.Inlined && x is LdArgInstructionNode && x.DataFlowBackRelated.Count > 0 && !x.DataFlowBackRelated.SelfFeeding));
             InstructionNodes.Where(x => x is InlineableCallNode).ToList().ForEach(x => { x.SelfRemove(); InstructionNodes.Remove(x); });
-            RemoveInstWrappers(InstructionNodes.Where(x => x is RetInstructionNode && x.InliningProperties.Inlined && !x.DataFlowBackRelated.SelfFeeding));
+            RemoveAndStitchNodes(InstructionNodes.Where(x => x is RetInstructionNode && x.InliningProperties.Inlined && !x.DataFlowBackRelated.SelfFeeding));
         }
 
         private void AddZeroNode()
@@ -201,6 +208,10 @@ namespace Dopple
             foreach (var firstNode in InstructionNodes.Where(x => x.DataFlowBackRelated.Count == 0))
             {
                 firstNode.DataFlowBackRelated.AddTwoWay(nodeZero, -1);
+            }
+            foreach (var uninitilizedLoadNode in InstructionNodes.Where(x => x is IDynamicDataLoadNode && !((IDynamicDataLoadNode)x).AllPathsHaveAStoreNode))
+            {
+                uninitilizedLoadNode.DataFlowBackRelated.AddTwoWay(nodeZero, -1);
             }
             var firstOrderLdArgs = GetFirstOrderLdArgs();
             foreach (var firstOrderLdArg in firstOrderLdArgs)
@@ -332,7 +343,7 @@ namespace Dopple
             //Verify();
         }
 
-        public void RemoveInstWrappers(IEnumerable<InstructionNode> instsToRemove)
+        public void RemoveAndStitchNodes(IEnumerable<InstructionNode> instsToRemove)
         {
             foreach (var nodeToRemove in instsToRemove.ToArray())
             {

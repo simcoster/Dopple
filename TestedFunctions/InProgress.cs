@@ -13,15 +13,17 @@ namespace TestedFunctions
             return Enumerable.Sum(nums);
         }
 
-        //public static string DynamicGames(int index)
+        //public static int DynamicGames(int index)
         //{
-        //    Helper[] helpers = new Helper[5];
-        //    var tempHelper = new Helper();
-        //    tempHelper.Number = 3;
-        //    helpers[4] = tempHelper;
-        //    tempHelper.Text = "blah";
-        //    helpers[4].Text = "bleep";
-        //    return tempHelper.Text;
+        //    int a = 5;
+        //    Helper helper = new Helper();
+        //    while (a > 6)
+        //    {
+        //        a++;
+        //        helper.Number = a;
+        //        a = helper.Number;
+        //    }
+        //    return a;
         //}
     }
 
@@ -32,8 +34,8 @@ namespace TestedFunctions
         public string Text2;
         public Helper()
         {
-            Number = 4;
-            Text2 = "Blaaa";
+            //Number = 4;
+            //Text2 = "Blaaa";
         }
     }
 }

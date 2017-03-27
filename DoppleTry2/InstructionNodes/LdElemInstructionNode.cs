@@ -10,12 +10,14 @@ using System.Threading.Tasks;
 namespace Dopple.InstructionNodes
 {
     [DataContract]
-    public class LdElemInstructionNode : ObjectOrAddressRequiringNode, IDataTransferingNode, IArrayUsingNode, IIndexUsingNode
+    public class LdElemInstructionNode : ObjectOrAddressRequiringNode, IArrayUsingNode, IIndexUsingNode, IDynamicDataLoadNode
     {
         public LdElemInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
             DataFlowBackRelated.MaxArgIndex = 2;
         }
+        public bool AllPathsHaveAStoreNode { get; set; } = false;
+
 
         public IEnumerable<InstructionNode> ArrayBackArgs
         {

@@ -10,7 +10,7 @@ using System.Runtime.Serialization;
 namespace Dopple.InstructionNodes
 {
     [DataContract]
-    public class StIndInstructionNode : ObjectOrAddressRequiringNode, IDataTransferingNode
+    public class StIndInstructionNode : ObjectOrAddressRequiringNode, IDynamicDataStoreNode
     {
         public List<InstructionNode> AddressProvidingArgs = new List<InstructionNode>();
         public StIndInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
