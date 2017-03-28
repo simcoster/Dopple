@@ -28,9 +28,11 @@ namespace DoppleGraph
 
             var Graphs = new List<List<InstructionNode>>();
             //foreach (var method in type.Methods.Where(x => !x.IsConstructor))
+            var defaultCtor = typee.Methods.First(x => x.Name == ".ctor");
+            var typeInit = typee.Methods.First(x => x.Name == ".cctor");
             foreach (var method in typee.Methods.Where(x => !x.IsConstructor && !x.IsAbstract))
             {
-                var graphBuilder = new GraphBuilder(method);
+                var graphBuilder = new GraphBuilder(new FunctionFlowGraph(method, typeInit));
                 List<InstructionNode> instructionNodes = graphBuilder.Run();
                 Graphs.Add(instructionNodes);
                 var newForm = new Form2(instructionNodes);

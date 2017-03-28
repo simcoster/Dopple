@@ -26,20 +26,20 @@ namespace Dopple
         //ConditionionalsTracer _ConditionalBacktracer = new ConditionionalsTracer();
         Verifier[] verifiers;
 
-        public GraphBuilder(IEnumerable<InstructionNode> instNodes)
+        public GraphBuilder(FunctionFlowGraph functionFlowGraph)
         {
-            InstructionNodes = instNodes.ToList();
-            InitInliner();
-        }
-        public GraphBuilder(MethodDefinition methodDefinition)
-        {
-            metDef = methodDefinition;
+            List<Instruction> instructions = functionFlowGraph.Method.Body.Instructions.ToList();
+            if (instructions.Any(x => x.OpCode.Code == Code.Ldsfld))
+            {
+                //instructions = functionFlowGraph.TypeInitializer.Body.Instructions.Concat(instructions).ToList();
+            }
             InstructionNodes =
-                methodDefinition.Body.Instructions.SelectMany(x => _InstructionNodeFactory.GetInstructionNodes(x, methodDefinition)).ToList();
+                instructions.SelectMany(x => _InstructionNodeFactory.GetInstructionNodes(x, functionFlowGraph.Method)).ToList();
             foreach (var inst in InstructionNodes)
             {
                 inst.InstructionIndex = InstructionNodes.IndexOf(inst);
             }
+            metDef = functionFlowGraph.Method;
             InitInliner();
         }
         private void InitInliner()
@@ -72,6 +72,7 @@ namespace Dopple
                         return stackPopException.problematicRoute;
                     }
                 }
+
                 InlineFunctionCalls();
                 SetInstructionIndexes();
                 BackTraceOutsideFuncBoundry();
@@ -83,9 +84,10 @@ namespace Dopple
 
             }
             //RecursionFix();
-            RemoveHelperCodes();
-            RemoveAndStitchDynamicDataConnections();
+            //RemoveHelperCodes();
+            //RemoveAndStitchDynamicDataConnections();
             //MergeSimilarInstructions();
+            //MergeEquivilentPairs();
             
             AddZeroNode();
             //Verify();

@@ -67,6 +67,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FunctionFlowGraph.cs" />
     <Compile Include="InstructionModifiers\DynamicDataConnector.cs" />
     <Compile Include="InstructionNodes\DataTransferNode.cs" />
     <Compile Include="InstructionNodes\IArrayUsingNode.cs" />

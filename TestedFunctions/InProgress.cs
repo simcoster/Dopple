@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Dopple;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,10 +9,15 @@ namespace TestedFunctions
 {
     public class InProgress
     {
-        public static int SumMe(int[] nums)
+        static int blah =7;
+        public static List<int> UseDelegate(int[] nums)
         {
-            return Enumerable.Sum(nums);
+            return nums.Select(x => x++).ToList();
         }
+        //public static int SumMe(int[] nums)
+        //{
+        //    return nums.Sum(x => x * 6);
+        //}
 
         //public static int DynamicGames(int index)
         //{

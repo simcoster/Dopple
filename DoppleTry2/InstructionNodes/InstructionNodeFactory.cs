@@ -27,6 +27,10 @@ namespace Dopple.InstructionNodes
                     {
                         return new[] { new VirtualCallInstructionNode(instruction, method) };
                     }
+                    if (!targetMethodDef.HasBody)
+                    {
+                        return new[] { new NonInlineableCallInstructionNode(instruction, method) };
+                    }
                     return new[] { new InlineableCallNode(instruction, method) };
                 }
                 else if (systemMethodsLoader.TryGetSystemMethod(instruction, out systemMethodDef))

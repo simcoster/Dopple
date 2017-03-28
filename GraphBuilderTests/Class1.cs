@@ -18,8 +18,9 @@ namespace GraphBuilderTests
         {
             AssemblyDefinition utilityLibrary = AssemblyDefinition.ReadAssembly(@"C:\Users\Simco\Documents\Visual Studio 2015\Projects\Dopple\TestedFunctions\bin\Release\TestedFunctions.dll");
             TypeDefinition testClass = utilityLibrary.MainModule.Types.First(x => x.Name == "Class1");
+            var ctor = testClass.Methods.First(x => x.Name == ".ctor");
             List<InstructionNode> generatedNodes = null;
-            generatedNodes = new GraphBuilder(testClass.Methods.First(x => x.Name == funcName)).FullRunForTesting();
+            generatedNodes = new GraphBuilder(new FunctionFlowGraph(testClass.Methods.First(x => x.Name == funcName),null,null)).FullRunForTesting();
             List<InstructionNode> precomputedNodes = null;
             DataContractSerializer ser =
               new DataContractSerializer(typeof(List<InstructionNode>));
