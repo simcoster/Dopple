@@ -30,22 +30,26 @@ namespace Dopple.BackTracers
             {
                 throw new Exception("all should be null or none");
             }
-            if (!currentNode.StackBacktraceDone)
+            lock(currentNode)
             {
-                currentNode.DataFlowBackRelated.ResetIndex();
-                for (int i = 0; i < currentNode.StackPopCount; i++)
+                if (!currentNode.StackBacktraceDone)
                 {
-                    if (stackedNodes.Count ==0)
+                    currentNode.DataFlowBackRelated.ResetIndex();
+                    for (int i = 0; i < currentNode.StackPopCount; i++)
                     {
-                        throw new Exception("not enough stacked arguments");
+                        if (stackedNodes.Count == 0)
+                        {
+                            throw new Exception("not enough stacked arguments");
+                        }
+                        currentNode.DataFlowBackRelated.AddTwoWay(stackedNodes.Pop());
                     }
-                    currentNode.DataFlowBackRelated.AddTwoWay(stackedNodes.Pop());
-                }
-                for (int i = 0; i < currentNode.StackPushCount; i++)
-                {
-                    stackedNodes.Push(currentNode);
+                    for (int i = 0; i < currentNode.StackPushCount; i++)
+                    {
+                        stackedNodes.Push(currentNode);
+                    }
                 }
             }
+           
             int forwardRouteCount = currentNode.ProgramFlowForwardRoutes.Count;
             if (forwardRouteCount == 0 || visitedNodes.Contains(currentNode))
             {
@@ -64,12 +68,12 @@ namespace Dopple.BackTracers
             }
             else
             {
-                foreach(var forwardRoute in currentNode.ProgramFlowForwardRoutes)
-                {
-                    var stackedNodesClone = new Stack<InstructionNode>(stackedNodes.Reverse());
-                    var visitedNodesClone = new List<InstructionNode>(visitedNodes);
-                    TraceForwardRec(instructionNodes,forwardRoute, visitedNodesClone, stackedNodesClone);
-                }
+                Parallel.ForEach(currentNode.ProgramFlowForwardRoutes, (forwardRoute) =>
+                 {
+                     var stackedNodesClone = new Stack<InstructionNode>(stackedNodes.Reverse());
+                     var visitedNodesClone = new List<InstructionNode>(visitedNodes);
+                     TraceForwardRec(instructionNodes, forwardRoute, visitedNodesClone, stackedNodesClone);
+                 });
             }
         }
     }

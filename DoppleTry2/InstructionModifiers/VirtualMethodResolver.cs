@@ -20,6 +20,11 @@ namespace Dopple
                 .Where(x => x is VirtualCallInstructionNode)
                 .ToArray())
             {
+                //TODO remove
+                //if (virtualNodeCall.InliningProperties.CallSequence.Count > 5)
+                //{
+                //    return;
+                //}
                 var virtualMethodDeclaringTypeDefinition = virtualNodeCall.TargetMethod.DeclaringType.Resolve();
                 var virtualMethodDeclaringTypeReference = virtualNodeCall.TargetMethod.DeclaringType;
                 List<TypeDefinition> virtualMethodTypeInheritancePath = GetInheritancePath(virtualMethodDeclaringTypeReference);

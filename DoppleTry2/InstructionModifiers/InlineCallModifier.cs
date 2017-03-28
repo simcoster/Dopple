@@ -57,11 +57,11 @@ namespace Dopple.InstructionModifiers
                 return new List<InstructionNode>();
             }
             //TODO check
-            if (callNode.InliningProperties.CallSequence.Count > 20)
-            {
-                callNode.CallWasInlined = true;
-                return new List<InstructionNode>();
-            }
+            //if (callNode.InliningProperties.CallSequence.Count > 20)
+            //{
+            //    callNode.CallWasInlined = true;
+            //    return new List<InstructionNode>();
+            //}
             callNode.StackPushCount = 0;
             List<InstructionNode> callNodeOriginalForwardRoutes = callNode.ProgramFlowForwardRoutes.ToList();
             List<InstructionNode> inlinedNodes = calledMethodDef.Body.Instructions.SelectMany(x => _InstructionNodeFactory.GetInstructionNodes(x, calledMethodDef)).ToList();
