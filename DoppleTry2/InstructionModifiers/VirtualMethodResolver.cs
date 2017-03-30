@@ -43,9 +43,31 @@ namespace Dopple
                             virtualNodeCall.DataOriginNodeIsResolveable.Add(dataOriginNode, false);
                             continue;
                         }
+                        MethodDefinition methodImplementation;
                         if (virtualNodeCall.TargetMethod.Name == "Invoke")
                         {
-                            if (impelmenet invoke stuff here, just call the call node)
+                            bool allArgsResolved = true;
+                            if (dataOriginNode is NewObjectNode)
+                            {
+                                var loadFunctionArgs = dataOriginNode.DataFlowBackRelated.Where(x => x.ArgIndex == 1);
+                                foreach(var loadFtnArg in loadFunctionArgs)
+                                {
+                                    if (loadFtnArg.Argument is LoadFunctionNode)
+                                    {
+                                        AddVirtualCallImplementation(instructionNodes, virtualNodeCall, dataOriginNode, ((LoadFunctionNode) loadFtnArg.Argument).LoadedFunction);
+                                    }
+                                    else
+                                    {
+                                        allArgsResolved = false;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                allArgsResolved = false;
+                            }
+                            virtualNodeCall.DataOriginNodeIsResolveable.Add(dataOriginNode, allArgsResolved);
+                            continue;
                         }
                         TypeReference objectTypeReference;
                         bool typeFound = TryGetObjectType(dataOriginNode, out objectTypeReference);
@@ -82,7 +104,7 @@ namespace Dopple
                                 continue;
                             }
                         }
-                        var methodImplementation = GetImplementation(virtualMethodDeclaringTypeDefinition, objectTypeDefinition, virtualNodeCall.TargetMethod.Resolve());
+                        methodImplementation = GetImplementation(virtualMethodDeclaringTypeDefinition, objectTypeDefinition, virtualNodeCall.TargetMethod.Resolve());
                         if (methodImplementation != null)
                         {
                             AddVirtualCallImplementation(instructionNodes, virtualNodeCall, objectArgument.Argument, methodImplementation);
@@ -115,7 +137,6 @@ namespace Dopple
 
         private void AddVirtualCallImplementation(List<InstructionNode> instructionNodes, VirtualCallInstructionNode virtualNodeCall, InstructionNode objectArgument, MethodDefinition virtualMethodImpl)
         {
-            //                            speical deal with Invoke
             var callOpCode = Instruction.Create(CodeGroups.AllOpcodes.First(x => x.Code == Code.Call), virtualMethodImpl);
             CallNode virtualImplementationNode;
             if (!virtualMethodImpl.HasBody)
