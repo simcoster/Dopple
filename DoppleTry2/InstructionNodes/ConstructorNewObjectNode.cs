@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 namespace Dopple.InstructionNodes
 {
     [DataContract]
-    public class ConstructorNewObjectNode : InstructionNode
+    public class NewObjectNodeWithConstructor : InstructionNode
     {
-        public ConstructorNewObjectNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
+        public NewObjectNodeWithConstructor(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
             StackPopCount = 0;
             StackPushCount = 0;

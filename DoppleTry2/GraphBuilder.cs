@@ -29,9 +29,11 @@ namespace Dopple
         public GraphBuilder(FunctionFlowGraph functionFlowGraph)
         {
             List<Instruction> instructions = functionFlowGraph.Method.Body.Instructions.ToList();
+            List<InstructionNode> typeInitilizerNodes;
             if (instructions.Any(x => x.OpCode.Code == Code.Ldsfld))
             {
-                //instructions = functionFlowGraph.TypeInitializer.Body.Instructions.Concat(instructions).ToList();
+                //_InstructionNodeFactory.GetInstructionNodes(x, functionFlowGraph.Method);
+               // typeInitilizerNodes = functionFlowGraph.TypeInitializer.Body.Instructions.Concat(instructions).ToList();
             }
             InstructionNodes =
                 instructions.SelectMany(x => _InstructionNodeFactory.GetInstructionNodes(x, functionFlowGraph.Method)).ToList();
@@ -77,16 +79,15 @@ namespace Dopple
                 SetInstructionIndexes();
                 BackTraceOutsideFuncBoundry();
                 //MergeSingleOperationNodes();
-                //MergeEquivilentPairs();
                 ResolveVirtualMethods(out shouldRerun);
                 //SetInstructionIndexes();
                 isFirstRun = false;
 
             }
             //RecursionFix();
-            //RemoveHelperCodes();
+            RemoveHelperCodes();
             //RemoveAndStitchDynamicDataConnections();
-            //MergeSimilarInstructions();
+            MergeSimilarInstructions();
             //MergeEquivilentPairs();
             
             AddZeroNode();
@@ -198,7 +199,6 @@ namespace Dopple
             //RemoveInstWrappers(InstructionNodes.Where(x => x is StIndInstructionNode && ((StIndInstructionNode) x).AddressType == AddressType.LocalVar));
             RemoveAndStitchNodes(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Dup));
             RemoveAndStitchNodes(InstructionNodes.Where(x => x.InliningProperties.Inlined && x is LdArgInstructionNode && x.DataFlowBackRelated.Count > 0 && !x.DataFlowBackRelated.SelfFeeding));
-            InstructionNodes.Where(x => x is InlineableCallNode).ToList().ForEach(x => { x.SelfRemove(); InstructionNodes.Remove(x); });
             RemoveAndStitchNodes(InstructionNodes.Where(x => x is RetInstructionNode && x.InliningProperties.Inlined && !x.DataFlowBackRelated.SelfFeeding));
         }
 

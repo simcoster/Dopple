@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Mono.Cecil.Cil;
 using Dopple.InstructionNodes;
+using Mono.Cecil;
 
 namespace Dopple.BackTracers
 {
@@ -12,8 +13,8 @@ namespace Dopple.BackTracers
     {
         protected override Predicate<InstructionNode> GetPredicate(InstructionNode instructionNode)
         {
-            Predicate<InstructionNode> predicate = (x => x.Instruction.OpCode.Code == Code.Stsfld && x.Instruction.Operand ==
-                                                                 instructionNode.Instruction.Operand);
+            Predicate<InstructionNode> predicate = (x => x.Instruction.OpCode.Code == Code.Stsfld);
+                                                   //   && ((FieldReference) x.Instruction.Operand).MetadataToken == ((FieldReference) instructionNode.Instruction.Operand).MetadataToken);
             return predicate;
         }
 

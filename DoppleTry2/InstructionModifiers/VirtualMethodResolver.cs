@@ -20,25 +20,32 @@ namespace Dopple
                 .Where(x => x is VirtualCallInstructionNode)
                 .ToArray())
             {
-                //TODO remove
-                //if (virtualNodeCall.InliningProperties.CallSequence.Count > 5)
-                //{
-                //    return;
-                //}
                 var virtualMethodDeclaringTypeDefinition = virtualNodeCall.TargetMethod.DeclaringType.Resolve();
                 var virtualMethodDeclaringTypeReference = virtualNodeCall.TargetMethod.DeclaringType;
                 List<TypeDefinition> virtualMethodTypeInheritancePath = GetInheritancePath(virtualMethodDeclaringTypeReference);
                 var objectArgs = virtualNodeCall.DataFlowBackRelated.Where(x => x.ArgIndex == 0).ToArray();
-                bool unresolvedDataArgsExist = false;
                 foreach (var objectArgument in objectArgs)
                 {
-                    foreach (var dataOriginNode in objectArgument.Argument.GetDataOriginNodes().Except(virtualNodeCall.ResolvedObjectArgs))
+                    var dataOriginNodes = objectArgument.Argument.GetDataOriginNodes();
+                    foreach(var originNodeNoLongerFound in virtualNodeCall.DataOriginNodeIsResolveable.Keys.Except(dataOriginNodes.ToList()).ToList())
                     {
-                        virtualNodeCall.ResolvedObjectArgs.Add(dataOriginNode);
+                        virtualNodeCall.DataOriginNodeIsResolveable.Remove(originNodeNoLongerFound);
+                    }
+                    foreach (var dataOriginNode in dataOriginNodes.Except(virtualNodeCall.DataOriginNodeIsResolveable.Keys))
+                    {
                         if (dataOriginNode is InlineableCallNode || dataOriginNode is VirtualCallInstructionNode)
                         {
-                            unresolvedDataArgsExist = true;
+                            virtualNodeCall.DataOriginNodeIsResolveable.Add(dataOriginNode, false);
                             continue;
+                        }
+                        if (dataOriginNode.Instruction.OpCode.Code == Code.Ldnull)
+                        {
+                            virtualNodeCall.DataOriginNodeIsResolveable.Add(dataOriginNode, false);
+                            continue;
+                        }
+                        if (virtualNodeCall.TargetMethod.Name == "Invoke")
+                        {
+                            if (impelmenet invoke stuff here, just call the call node)
                         }
                         TypeReference objectTypeReference;
                         bool typeFound = TryGetObjectType(dataOriginNode, out objectTypeReference);
@@ -62,6 +69,7 @@ namespace Dopple
                             if (virtualNodeCall.TargetMethod.FullName == "System.Object System.Array::GetValue(System.Int32)")
                             {
                                 AddLoadElemImplementation(instructionNodes, virtualNodeCall, objectArgument);
+                                virtualNodeCall.DataOriginNodeIsResolveable.Add(dataOriginNode, true);
                                 continue;
                             }
                         }
@@ -69,7 +77,8 @@ namespace Dopple
                         {
                             if (objectTypeDefinition.IsAbstract)
                             {
-                                unresolvedDataArgsExist = true;
+                                virtualNodeCall.DataOriginNodeIsResolveable.Add(dataOriginNode, false);
+                                inlinlingWasMade = true;
                                 continue;
                             }
                         }
@@ -77,21 +86,20 @@ namespace Dopple
                         if (methodImplementation != null)
                         {
                             AddVirtualCallImplementation(instructionNodes, virtualNodeCall, objectArgument.Argument, methodImplementation);
+                            virtualNodeCall.DataOriginNodeIsResolveable.Add(dataOriginNode, true);
                             inlinlingWasMade = true;
+                        }
+                        else
+                        {
+                            virtualNodeCall.DataOriginNodeIsResolveable.Add(dataOriginNode, true);
                         }
                     }
                 }
-                if (unresolvedDataArgsExist == false)
+                if (virtualNodeCall.DataOriginNodeIsResolveable.All(x => x.Value == true))
                 {
                     virtualNodeCall.SelfRemove();
                     instructionNodes.Remove(virtualNodeCall);
                 }
-            }
-            if (!inlinlingWasMade)
-            {
-                var stillLeft = instructionNodes
-                .Where(x => x.DataFlowForwardRelated.Any(y => y.Argument is VirtualCallInstructionNode))
-                .ToArray();
             }
         }
 
@@ -107,12 +115,22 @@ namespace Dopple
 
         private void AddVirtualCallImplementation(List<InstructionNode> instructionNodes, VirtualCallInstructionNode virtualNodeCall, InstructionNode objectArgument, MethodDefinition virtualMethodImpl)
         {
+            //                            speical deal with Invoke
             var callOpCode = Instruction.Create(CodeGroups.AllOpcodes.First(x => x.Code == Code.Call), virtualMethodImpl);
-            var virtualImplementationNode = new InlineableCallNode(callOpCode, virtualMethodImpl, virtualNodeCall.Method);
+            CallNode virtualImplementationNode;
+            if (!virtualMethodImpl.HasBody)
+            {
+                virtualImplementationNode = new NonInlineableCallInstructionNode(callOpCode, virtualNodeCall.Method);
+            }
+            else
+            {
+                virtualImplementationNode = new InlineableCallNode(callOpCode, virtualMethodImpl, virtualNodeCall.Method);
+            }
             virtualNodeCall.MergeInto(virtualImplementationNode,true);
             virtualImplementationNode.StackBacktraceDone = true;
             virtualImplementationNode.DataFlowBackRelated.RemoveAllTwoWay(x => x.ArgIndex == 0 && x.Argument != objectArgument);
             virtualImplementationNode.InliningProperties = virtualNodeCall.InliningProperties;
+            virtualImplementationNode.OriginalVirtualNode = virtualNodeCall;
             instructionNodes.Insert(instructionNodes.IndexOf(virtualNodeCall), virtualImplementationNode);
         }
 
@@ -180,7 +198,7 @@ namespace Dopple
             {
                 foundType = ((LdArgInstructionNode) objectArg).ArgType;
             }
-            if (objectArg is NewObjectNode || objectArg is ConstructorNewObjectNode)
+            if (objectArg is NewObjectNode || objectArg is NewObjectNodeWithConstructor)
             {
                 foundType = ((MethodReference) objectArg.Instruction.Operand).DeclaringType;
             }

@@ -10,6 +10,7 @@ namespace Dopple.InstructionNodes
 {
     public abstract class CallNode : InstructionNode
     {
+        internal VirtualCallInstructionNode OriginalVirtualNode { get; set; }
         public CallNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
             TargetMethod = (MethodReference) instruction.Operand;

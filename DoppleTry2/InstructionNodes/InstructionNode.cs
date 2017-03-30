@@ -34,6 +34,7 @@ namespace Dopple.InstructionNodes
             ProgramFlowForwardAffecting = new ProgramFlowForwardAffectingArgList(this);
             SingleUnitNodes = new List<InstructionNode>();
             MethodNameForSerilization = method.Name;
+            MyGuid = Guid.NewGuid();
         }
         
         public ProgramFlowBackRoutes ProgramFlowBackRoutes { get; set; }

@@ -57,9 +57,9 @@ namespace Dopple.InstructionNodes
                 {
                     constructorMethodDef = ((MethodReference) instruction.Operand).Resolve();
                 }
-                if (constructorMethodDef != null || systemMethodsLoader.TryGetSystemMethod(instruction, out constructorMethodDef))
+                if ((constructorMethodDef != null  || systemMethodsLoader.TryGetSystemMethod(instruction, out constructorMethodDef)) && constructorMethodDef.HasBody)
                 {
-                    var noArgsNewObject = new ConstructorNewObjectNode(instruction, method);
+                    var noArgsNewObject = new NewObjectNodeWithConstructor(instruction, method);
                     var constructorCallInst = Instruction.Create(CodeGroups.AllOpcodes.First(x => x.Code == Code.Call),(MethodReference)instruction.Operand);
                     constructorCallInst.Operand = instruction.Operand;
                     constructorCallInst.Next = instruction.Next;

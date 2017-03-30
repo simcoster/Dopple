@@ -26,7 +26,6 @@ namespace Dopple.BackTracers
                 {
                     currentInst.DataFlowBackRelated.AddTwoWaySingleIndex(currentInst.InliningProperties.CallNode.DataFlowBackRelated.Where(x => x.ArgIndex == 0).Select(x => x.Argument));
                 }
-                currentInst.DataFlowForwardRelated.AddTwoWay(currentInst.InliningProperties.CallNode.DataFlowForwardRelated);
             }
         }
     }

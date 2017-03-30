@@ -42,6 +42,10 @@ namespace Dopple.BackTracers
                         visitedInstructions.Add(currentNode);
                     }
                 }
+                if (currentNode is StoreFieldNode)
+                {
+                    var originNodes = currentNode.DataFlowBackRelated.Where(x => x.ArgIndex == 0).SelectMany(x => x.Argument.GetDataOriginNodes());
+                }
                 if (predicate.Invoke(currentNode))
                 {
                     foundNodes.Add(currentNode);

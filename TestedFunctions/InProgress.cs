@@ -9,10 +9,18 @@ namespace TestedFunctions
 {
     public class InProgress
     {
-        static int blah =7;
-        public static List<int> UseDelegate(int[] nums)
+        //public static List<int> UseDelegate(int[] nums)
+        //{
+        //    return nums.Select(x => x++).ToList();
+        //}
+        public static int testLinq(int[] nums)
         {
-            return nums.Select(x => x++).ToList();
+            int sum = 0;
+            foreach (var num in nums.Where(x => x > 6))
+            {
+                sum += num;
+            }
+            return sum;
         }
         //public static int SumMe(int[] nums)
         //{

@@ -22,9 +22,9 @@ namespace Dopple.InstructionNodes
             }
         }
 
-        public bool ObjectOrAddressArgsResolved {get;set;}
+        public bool MethodIsUnresolveable {get;set;}
 
-        public List<InstructionNode> ResolvedObjectArgs = new List<InstructionNode>();
+        public Dictionary<InstructionNode, bool> DataOriginNodeIsResolveable = new Dictionary<InstructionNode,bool>();
         internal VirtualCallInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
         }

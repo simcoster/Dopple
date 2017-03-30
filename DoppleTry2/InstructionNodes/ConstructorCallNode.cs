@@ -9,7 +9,7 @@ namespace Dopple.InstructionNodes
     [DataContract]
     public class ConstructorCallNode : InlineableCallNode , IDataTransferingNode
     {
-        public ConstructorCallNode(Instruction instruction, MethodDefinition targetMethod, MethodDefinition method, ConstructorNewObjectNode newObjectNode) : base(instruction, targetMethod, method)
+        public ConstructorCallNode(Instruction instruction, MethodDefinition targetMethod, MethodDefinition method, NewObjectNodeWithConstructor newObjectNode) : base(instruction, targetMethod, method)
         {
             DataFlowBackRelated = new ConstructorCallDataFlowBackArgList(this);
             DataFlowBackRelated.AddTwoWay(newObjectNode, 0);
