@@ -13,15 +13,15 @@ namespace TestedFunctions
         //{
         //    return nums.Select(x => x++).ToList();
         //}
-        public static int testLinq(int[] nums)
-        {
-            int sum = 0;
-            foreach (var num in nums.Where(x => x > 6))
-            {
-                sum += num;
-            }
-            return sum;
-        }
+        //public static int testLinq(int[] nums)
+        //{
+        //    int sum = 0;
+        //    foreach (var num in nums.Where(x => x > 6))
+        //    {
+        //        sum += num;
+        //    }
+        //    return sum;
+        //}
         //public static int SumMe(int[] nums)
         //{
         //    return nums.Sum(x => x * 6);
@@ -51,5 +51,7 @@ namespace TestedFunctions
             //Number = 4;
             //Text2 = "Blaaa";
         }
+        neeed to add a real exmaple
+        object with object field in it and with 2 inheriting implementing 2 a virtual method
     }
 }

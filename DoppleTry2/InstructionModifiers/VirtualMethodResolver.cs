@@ -12,9 +12,10 @@ namespace Dopple
     {
         TypeDefinition ArrayTypeDefinition = ModuleDefinition.ReadModule(typeof(object).Module.FullyQualifiedName).Types.First(x => x.FullName == "System.Array");
         InstructionNodeFactory _InstructionNodeFactory = new InstructionNodeFactory();
-        internal void ResolveVirtualMethods(List<InstructionNode> instructionNodes, out bool inlinlingWasMade)
+        internal void ResolveVirtualMethods(List<InstructionNode> instructionNodes, out bool inlinlingWasMade, out bool dynamicInMethods)
         {
             inlinlingWasMade = false;
+            dynamicInMethods = false;
 
             foreach (VirtualCallInstructionNode virtualNodeCall in instructionNodes
                 .Where(x => x is VirtualCallInstructionNode)
@@ -54,7 +55,8 @@ namespace Dopple
                                 {
                                     if (loadFtnArg.Argument is LoadFunctionNode)
                                     {
-                                        AddVirtualCallImplementation(instructionNodes, virtualNodeCall, dataOriginNode, ((LoadFunctionNode) loadFtnArg.Argument).LoadedFunction);
+                                        MethodDefinition loadedFunc = ((LoadFunctionNode) loadFtnArg.Argument).LoadedFunction;
+                                        AddVirtualCallImplementation(instructionNodes, virtualNodeCall, dataOriginNode, loadedFunc, out dynamicInMethods);
                                     }
                                     else
                                     {
@@ -107,7 +109,7 @@ namespace Dopple
                         methodImplementation = GetImplementation(virtualMethodDeclaringTypeDefinition, objectTypeDefinition, virtualNodeCall.TargetMethod.Resolve());
                         if (methodImplementation != null)
                         {
-                            AddVirtualCallImplementation(instructionNodes, virtualNodeCall, objectArgument.Argument, methodImplementation);
+                            AddVirtualCallImplementation(instructionNodes, virtualNodeCall, objectArgument.Argument, methodImplementation, out dynamicInMethods);
                             virtualNodeCall.DataOriginNodeIsResolveable.Add(dataOriginNode, true);
                             inlinlingWasMade = true;
                         }
@@ -135,8 +137,9 @@ namespace Dopple
             instructionNodes.Insert(instructionNodes.IndexOf(virtualNodeCall), loadElementNode);
         }
 
-        private void AddVirtualCallImplementation(List<InstructionNode> instructionNodes, VirtualCallInstructionNode virtualNodeCall, InstructionNode objectArgument, MethodDefinition virtualMethodImpl)
+        private void AddVirtualCallImplementation(List<InstructionNode> instructionNodes, VirtualCallInstructionNode virtualNodeCall, InstructionNode objectArgument, MethodDefinition virtualMethodImpl, out bool methodStoresDynamic)
         {
+            methodStoresDynamic = false;
             var callOpCode = Instruction.Create(CodeGroups.AllOpcodes.First(x => x.Code == Code.Call), virtualMethodImpl);
             CallNode virtualImplementationNode;
             if (!virtualMethodImpl.HasBody)
@@ -146,6 +149,7 @@ namespace Dopple
             else
             {
                 virtualImplementationNode = new InlineableCallNode(callOpCode, virtualMethodImpl, virtualNodeCall.Method);
+                methodStoresDynamic = IsStoringDynamicFromOutside(virtualNodeCall, virtualMethodImpl);
             }
             virtualNodeCall.MergeInto(virtualImplementationNode,true);
             virtualImplementationNode.StackBacktraceDone = true;
@@ -153,6 +157,20 @@ namespace Dopple
             virtualImplementationNode.InliningProperties = virtualNodeCall.InliningProperties;
             virtualImplementationNode.OriginalVirtualNode = virtualNodeCall;
             instructionNodes.Insert(instructionNodes.IndexOf(virtualNodeCall), virtualImplementationNode);
+        }
+
+        private bool IsStoringDynamicFromOutside(VirtualCallInstructionNode virtualNodeCall, MethodDefinition virtualMethodImpl)
+        {
+            Code[] storeDynamicCodes = CodeGroups.StElemCodes.Concat(CodeGroups.StoreFieldCodes).ToArray();
+            if (virtualMethodImpl.Body.Instructions.All(x => !storeDynamicCodes.Contains(x.OpCode.Code)))
+            {
+                return false;
+            }
+            if (!virtualNodeCall.TargetMethod.HasThis && virtualNodeCall.TargetMethod.Parameters.All(x => x.ParameterType.IsValueType))
+            {
+                return false;
+            }
+            return true;
         }
 
         private MethodDefinition GetImplementation(TypeDefinition virtualMethodDeclaringTypeDefinition, TypeDefinition objectTypeDefinition

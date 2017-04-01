@@ -8,6 +8,7 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Dopple.VerifierNs;
 using Dopple.InstructionNodes;
+using System.Diagnostics;
 
 namespace Dopple
 {
@@ -56,11 +57,15 @@ namespace Dopple
 
         public List<InstructionNode> Run()
         {
+            Stopwatch stopwach = Stopwatch.StartNew();
+            int runCounter = 0;
             bool shouldRerun = true;
             bool isFirstRun = true;
+            bool shouldRunDynamicTrace = true;
             SetInstructionIndexes();
             while (shouldRerun)
             {
+                Console.WriteLine("run counter is " + runCounter);
                 _programFlowManager.AddFlowConnections(InstructionNodes);
                 if (isFirstRun)
                 {
@@ -77,24 +82,29 @@ namespace Dopple
 
                 InlineFunctionCalls();
                 SetInstructionIndexes();
-                BackTraceOutsideFuncBoundry();
+                if (shouldRunDynamicTrace)
+                {
+                    stopwach.Start();
+                    BackTraceOutsideFuncBoundry();
+                    Console.WriteLine("Dynamic trace took " + stopwach.Elapsed.ToString());
+                    stopwach.Reset();
+                }
                 //MergeSingleOperationNodes();
-                ResolveVirtualMethods(out shouldRerun);
+                ResolveVirtualMethods(out shouldRerun, out shouldRunDynamicTrace);
                 //SetInstructionIndexes();
                 isFirstRun = false;
-
+                runCounter++;
             }
             //RecursionFix();
             RemoveHelperCodes();
             //RemoveAndStitchDynamicDataConnections();
             MergeSimilarInstructions();
             //MergeEquivilentPairs();
-            
             AddZeroNode();
             //Verify();
 
-            its still very slow, need to think of solution to optimize, maybe don't need to run tracing each  time, only when there's danger something will change
-            
+            //its still very slow, need to think of solution to optimize, maybe don't need to run tracing each  time, only when there's danger something will change
+            // okay, i'm only going to run it again if it contains stfld, stelem, or stsfld
             
             return InstructionNodes;
         }
@@ -110,9 +120,9 @@ namespace Dopple
             _backTraceManager.BackTraceOutsideFunctionBounds(InstructionNodes);
         }
 
-        private void ResolveVirtualMethods(out bool inliningWasDone)
+        private void ResolveVirtualMethods(out bool inliningWasDone, out bool dynamicStoreInMethods )
         {
-            _VirtualMethodResolver.ResolveVirtualMethods(InstructionNodes, out inliningWasDone);
+            _VirtualMethodResolver.ResolveVirtualMethods(InstructionNodes, out inliningWasDone, out dynamicStoreInMethods);
         }
 
         private void RecursionFix()
@@ -387,6 +397,7 @@ namespace Dopple
         {
             bool shouldRerun = true;
             bool isFirstRun = true;
+            bool shouldRunDynamicTrace = true;
             SetInstructionIndexes();
             while (shouldRerun)
             {
@@ -397,12 +408,15 @@ namespace Dopple
                 }
                 InlineFunctionCalls();
                 SetInstructionIndexes();
-                _backTraceManager.BackTraceOutsideFunctionBounds(InstructionNodes);
+                if (shouldRunDynamicTrace)
+                {
+                    _backTraceManager.BackTraceOutsideFunctionBounds(InstructionNodes);
+                }
                 RemoveHelperCodes();
                 //MergeSingleOperationNodes();
                 MergeSimilarInstructions();
                 RecursionFix();
-                ResolveVirtualMethods(out shouldRerun);
+                ResolveVirtualMethods(out shouldRerun, out shouldRunDynamicTrace);
                 SetInstructionIndexes();
                 isFirstRun = false;
             }
