@@ -42,11 +42,16 @@ namespace Dopple.BackTracers
         private readonly LdElemBacktracer _LdElemBacktracer = new LdElemBacktracer();
         private readonly LdFldBacktracer _LdFldBacktracer = new LdFldBacktracer();
 
+        public static int CountVisitedNodes = 0;
+
         BackTracer[] _OutFuncDataTransferBackTracers;
 
         internal void BackTraceOutsideFunctionBounds(List<InstructionNode> instructionNodes)
         {
+            CountVisitedNodes = 0;
             TraceDataTransferingNodeRec(instructionNodes[0], _OutFuncDataTransferBackTracers);
+            Console.WriteLine("Visited node count is " + CountVisitedNodes);
+            CountVisitedNodes = 0;
         }
 
         private void TraceDataTransferingNodeRec(InstructionNode instructionNode, IEnumerable<BackTracer> backTracers, List<InstructionNode> visited = null)
@@ -60,6 +65,7 @@ namespace Dopple.BackTracers
                 return;
             }
             visited.Add(instructionNode);
+            CountVisitedNodes++;
             while (instructionNode.ProgramFlowForwardRoutes.Count < 2)
             {
                 var relevantBackTracer = backTracers.FirstOrDefault(x => x.HandlesCodes.Contains(instructionNode.Instruction.OpCode.Code));
@@ -72,6 +78,8 @@ namespace Dopple.BackTracers
                     return;
                 }
                 instructionNode = instructionNode.ProgramFlowForwardRoutes[0];
+                CountVisitedNodes++;
+
                 if (visited.Contains(instructionNode))
                 {
                     return;
