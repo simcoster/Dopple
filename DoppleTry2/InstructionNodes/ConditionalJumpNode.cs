@@ -7,12 +7,15 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Dopple.BackTracers;
 using System.Runtime.Serialization;
+using Dopple.BranchPropertiesNS;
 
 namespace Dopple.InstructionNodes
 {
     [DataContract]
-    class ConditionalJumpNode : InstructionNode
+    public class ConditionalJumpNode : InstructionNode
     {
+        public List<BranchID> CreatedBranches= new List<BranchID>();
+        public List<InstructionNode> AffectedModes = new List<InstructionNode>();
         public ConditionalJumpNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
         }

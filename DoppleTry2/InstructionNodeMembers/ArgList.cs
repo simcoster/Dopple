@@ -244,39 +244,4 @@ namespace Dopple
 
        
     }
-
-    public class ProgramFlowBackAffectedArgList : CoupledIndexedArgList
-    {
-        public ProgramFlowBackAffectedArgList(InstructionNode instructionWrapper) : base(instructionWrapper)
-        {
-        }
-
-        protected override CoupledIndexedArgList GetMirrorList(InstructionNode node)
-        {
-            return node.ProgramFlowForwardAffecting;
-        }
-
-        internal override CoupledIndexedArgList GetSameList(InstructionNode nodeToMergeInto)
-        {
-            return nodeToMergeInto.ProgramFlowBackAffected;
-        }
-    }
-
-    public class ProgramFlowForwardAffectingArgList : CoupledIndexedArgList
-    {
-        private ProgramFlowForwardAffectingArgList() { }
-        public ProgramFlowForwardAffectingArgList(InstructionNode instructionWrapper) : base(instructionWrapper)
-        {
-        }
-
-        protected override CoupledIndexedArgList GetMirrorList(InstructionNode node)
-        {
-            return node.ProgramFlowBackAffected;
-        }
-
-        internal override CoupledIndexedArgList GetSameList(InstructionNode nodeToMergeInto)
-        {
-            return nodeToMergeInto.ProgramFlowForwardAffecting;
-        }
-    }
 }

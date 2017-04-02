@@ -39,7 +39,7 @@ namespace Dopple.BackTracers
                     }
                     else
                     {
-                        BackTraceManager.CountVisitedNodes++;
+                        TraceManager.CountVisitedNodes++;
                         visitedInstructions.Add(currentNode);
                     }
                 }

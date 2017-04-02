@@ -20,7 +20,7 @@ namespace Dopple
         private readonly ProgramFlowManager _programFlowManager = new ProgramFlowManager();
         private MethodDefinition metDef;
         public List<InstructionNode> InstructionNodes;
-        private readonly BackTraceManager _backTraceManager = new BackTraceManager();
+        private readonly TraceManager _backTraceManager = new TraceManager();
         private InstructionNodeFactory _InstructionNodeFactory = new InstructionNodeFactory();
         private VirtualMethodResolver _VirtualMethodResolver = new VirtualMethodResolver();
         private CallInliner _inlineCallModifier;
@@ -96,9 +96,9 @@ namespace Dopple
                 runCounter++;
             }
             //RecursionFix();
-            RemoveHelperCodes();
+            //RemoveHelperCodes();
             //RemoveAndStitchDynamicDataConnections();
-            MergeSimilarInstructions();
+            //MergeSimilarInstructions();
             //MergeEquivilentPairs();
             AddZeroNode();
             //Verify();
@@ -345,9 +345,7 @@ namespace Dopple
                 var stillPointingToRemoved = InstructionNodes.Where(x => x.DataFlowBackRelated.Any(y => y.Argument == nodeToRemove)
                                               || x.DataFlowForwardRelated.Any(y => y.Argument == nodeToRemove)
                                               || x.ProgramFlowBackRoutes.Any(y => y == nodeToRemove)
-                                              || x.ProgramFlowForwardRoutes.Any(y => y == nodeToRemove)
-                                              || x.ProgramFlowBackAffected.Any(y => y.Argument == nodeToRemove)
-                                              || x.ProgramFlowForwardAffecting.Any(y => y.Argument == nodeToRemove))
+                                              || x.ProgramFlowForwardRoutes.Any(y => y == nodeToRemove))
                                               .ToList();
                 if (stillPointingToRemoved.Count > 0)
                 {

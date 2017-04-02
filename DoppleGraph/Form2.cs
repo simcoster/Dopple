@@ -325,13 +325,13 @@ namespace DoppleGraph
                         Console.WriteLine("Failed to draw edge");
                     }
                 }
-                foreach (var indexedArg in nodeWrapper.InstructionNode.ProgramFlowBackAffected)
+                foreach (var branch in nodeWrapper.InstructionNode.BranchProperties.Branches)
                 {
                     try
                     {
-                        Color linkColor = GetPredefinedFlowAffectLinkColor(indexedArg.ArgIndex);
-                        GoLink edge = DrawEdge(nodeWrapper, myView, indexedArg.Argument, flowAffectingLinksLayer, new Pen(linkColor));
-                        edge.ToolTipText = indexedArg.ArgIndex.ToString() + " " + edge.PenColor.R;
+                        Color linkColor = GetPredefinedFlowAffectLinkColor((int) branch.PairedBranchesIndex);
+                        GoLink edge = DrawEdge(nodeWrapper, myView,branch.OriginatingNode, flowAffectingLinksLayer, new Pen(linkColor));
+                        edge.ToolTipText = branch.Index.ToString() + " " + edge.PenColor.R;
                     }
                     catch
                     {
@@ -409,9 +409,9 @@ namespace DoppleGraph
         {
             switch (argIndex)
             {
-                case 0:
-                    return Color.Pink;
                 case 1:
+                    return Color.Pink;
+                case 2:
                     return Color.Yellow;
 
                 default:

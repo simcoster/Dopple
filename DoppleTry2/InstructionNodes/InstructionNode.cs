@@ -6,6 +6,7 @@ using Mono.Cecil;
 using System;
 using Dopple.InstructionWrapperMembers;
 using System.Runtime.Serialization;
+using Dopple.BranchPropertiesNS;
 
 namespace Dopple.InstructionNodes
 {
@@ -26,12 +27,10 @@ namespace Dopple.InstructionNodes
             MemoryReadCount = MemoryProperties.GetMemReadCount(instruction.OpCode.Code);
             MemoryStoreCount = MemoryProperties.GetMemStoreCount(instruction.OpCode.Code);
             ProgramFlowBackRoutes = new ProgramFlowBackRoutes(this);
-            ProgramFlowBackAffected = new ProgramFlowBackAffectedArgList(this);
             ProgramFlowForwardRoutes = new ProgramFlowForwardRoutes(this);
             DataFlowForwardRelated = new DataFlowForwardArgList(this);
             SingleUnitBackRelated = new SingleUnitBackRelated(this);
             SingleUnitForwardRelated= new SingleUnitForwardRelated(this);
-            ProgramFlowForwardAffecting = new ProgramFlowForwardAffectingArgList(this);
             SingleUnitNodes = new List<InstructionNode>();
             MethodNameForSerilization = method.Name;
             MyGuid = Guid.NewGuid();
@@ -43,10 +42,9 @@ namespace Dopple.InstructionNodes
         [DataMember]
         public DataFlowBackArgList DataFlowBackRelated { get; protected set; }
         [DataMember]
-        public ProgramFlowForwardAffectingArgList ProgramFlowForwardAffecting { get; internal set; }
-        public ProgramFlowBackAffectedArgList ProgramFlowBackAffected { get; set; }
         public SingleUnitBackRelated SingleUnitBackRelated { get; set; }
         public SingleUnitForwardRelated SingleUnitForwardRelated { get; internal set; }
+        public BranchProperties BranchProperties { get; set; } = new BranchProperties();
 
         public Instruction Instruction { get; set; }
         [DataMember]
@@ -132,7 +130,7 @@ namespace Dopple.InstructionNodes
             {
                 throw new Exception("Can't merge into self");
             }
-            foreach (IMergable args in new IMergable[] { DataFlowBackRelated, DataFlowForwardRelated, ProgramFlowBackAffected, ProgramFlowForwardAffecting, ProgramFlowBackRoutes, ProgramFlowForwardRoutes })
+            foreach (IMergable args in new IMergable[] { DataFlowBackRelated, DataFlowForwardRelated, ProgramFlowBackRoutes, ProgramFlowForwardRoutes })
             {
                 args.MergeInto(nodeToMergeInto, keepOriginal);
             }
@@ -162,16 +160,22 @@ namespace Dopple.InstructionNodes
         {
             DataFlowForwardRelated.RemoveAllTwoWay();
             DataFlowBackRelated.RemoveAllTwoWay();
-            ProgramFlowBackAffected.RemoveAllTwoWay();
-            ProgramFlowForwardAffecting.RemoveAllTwoWay();
             foreach (var forwardRoute in ProgramFlowForwardRoutes)
             {
                 forwardRoute.ProgramFlowBackRoutes.AddTwoWay(ProgramFlowBackRoutes);
             }
+            RemoveFromBranches();
             ProgramFlowBackRoutes.RemoveAllTwoWay();
             ProgramFlowForwardRoutes.RemoveAllTwoWay();
         }
 
+        private void RemoveFromBranches()
+        {
+            foreach(var branch in BranchProperties.Branches)
+            {
+                branch.OriginatingNode.AffectedModes.Remove(this);
+            }
+        }
 
         internal virtual void SelfRemoveAndStitch()
         {
@@ -186,10 +190,8 @@ namespace Dopple.InstructionNodes
                 forwardPath.ProgramFlowBackRoutes.AddTwoWay(ProgramFlowBackRoutes.ToList());
                 ProgramFlowForwardRoutes.RemoveTwoWay(forwardPath);
             }
-            foreach (CoupledIndexedArgList args in new CoupledIndexedArgList[]{ DataFlowBackRelated, ProgramFlowBackAffected, ProgramFlowForwardAffecting})
-            {
-                args.RemoveAllTwoWay();
-            }
+            RemoveFromBranches();
+            DataFlowBackRelated.RemoveAllTwoWay();
             foreach (CoupledList related in new CoupledList[] { ProgramFlowBackRoutes, SingleUnitBackRelated, SingleUnitForwardRelated})
             {
                 related.RemoveAllTwoWay();

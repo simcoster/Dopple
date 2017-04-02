@@ -144,13 +144,13 @@ namespace GraphSimilarityByMatching
                         DestinationVertex = vertex
                     });
                 }
-                foreach (var programFlowBackVertex in instructionNode.ProgramFlowBackAffected)
+                foreach (var branch in instructionNode.BranchProperties.Branches)
                 {
                     vertex.BackEdges.Add(new LabeledEdge()
                     {
                         EdgeType = EdgeType.ProgramFlowAffecting,
-                        Index = programFlowBackVertex.ArgIndex,
-                        SourceVertex = labeledVertexes[programFlowBackVertex.Argument.InstructionIndex],
+                        Index = (int)branch.PairedBranchesIndex,
+                        SourceVertex = labeledVertexes[branch.OriginatingNode.InstructionIndex],
                         DestinationVertex = vertex
                     });
                 }
@@ -164,16 +164,7 @@ namespace GraphSimilarityByMatching
                         DestinationVertex = labeledVertexes[dataFlowBackVertex.Argument.InstructionIndex]
                     });
                 }
-                foreach (var programFlowForwardVertex in instructionNode.ProgramFlowForwardAffecting)
-                {
-                    vertex.ForwardEdges.Add(new LabeledEdge()
-                    {
-                        EdgeType = EdgeType.ProgramFlowAffecting,
-                        Index = programFlowForwardVertex.ArgIndex,
-                        SourceVertex = vertex,
-                        DestinationVertex = labeledVertexes[programFlowForwardVertex.Argument.InstructionIndex]
-                    });
-                }
+                
                 //foreach (var singleUnitBack in instructionNode.SingleUnitBackRelated)
                 //{
                 //    vertex.BackEdges.Add(new LabeledEdge()

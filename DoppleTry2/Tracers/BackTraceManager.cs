@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Dopple.BackTracers
 {
-    public class BackTraceManager
+    public class TraceManager
     {
-        public BackTraceManager()
+        public TraceManager()
         {
             _InFuncDataTransferBackTracers = new BackTracer[] { _LdArgBacktracer, _LdLocBackTracer, _RetBackTracer };
 
@@ -49,9 +49,14 @@ namespace Dopple.BackTracers
         internal void BackTraceOutsideFunctionBounds(List<InstructionNode> instructionNodes)
         {
             CountVisitedNodes = 0;
-            TraceDataTransferingNodeRec(instructionNodes[0], _OutFuncDataTransferBackTracers);
+            BackTraceOutsideFunctionBoundsRec(instructionNodes[0]);
             Console.WriteLine("Visited node count is " + CountVisitedNodes);
             CountVisitedNodes = 0;
+        }
+
+        private void BackTraceOutsideFunctionBoundsRec(InstructionNode instructionNode)
+        {
+            need to implemenmt
         }
 
         private void TraceDataTransferingNodeRec(InstructionNode instructionNode, IEnumerable<BackTracer> backTracers, List<InstructionNode> visited = null)

@@ -67,6 +67,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BranchProperties\BranchID.cs" />
+    <Compile Include="BranchProperties\BranchProperties.cs" />
+    <Compile Include="BranchProperties\BranchType.cs" />
+    <Compile Include="BranchProperties\MergingNodeProperties.cs" />
     <Compile Include="FunctionFlowGraph.cs" />
     <Compile Include="InstructionModifiers\DynamicDataConnector.cs" />
     <Compile Include="InstructionNodes\DataTransferNode.cs" />
@@ -77,10 +81,15 @@
     <Compile Include="InstructionNodes\LdElemAddressNode.cs" />
     <Compile Include="InstructionNodes\LdindNode.cs" />
     <Compile Include="Tracers\BackTraceManager.cs" />
-    <Compile Include="Tracers\DataLoadBacktracers\DynaymicLdArgBacktracer.cs" />
+    <Compile Include="BranchProperties\PairedBranchIndex.cs" />
+    <Compile Include="Tracers\PredciateProviders\PredicateAndNode.cs" />
+    <Compile Include="Tracers\PredciateProviders\StElemPredicateProvider.cs" />
+    <Compile Include="Tracers\PredciateProviders\StFldPredicateProvider.cs" />
+    <Compile Include="Tracers\PredciateProviders\StoreDynamicDataPredicateProvider.cs" />
+    <Compile Include="Tracers\DynaymicLdArgBacktracer.cs" />
     <Compile Include="Tracers\ForwardTracers\ConditionionalsTracer.cs" />
-    <Compile Include="Tracers\DataLoadBacktracers\DynamicDataBacktracer.cs" />
-    <Compile Include="Tracers\DataLoadBacktracers\LdFldBacktracer.cs" />
+    <Compile Include="Tracers\LegacyDataLoadBacktracers\DynamicDataBacktracer.cs" />
+    <Compile Include="Tracers\LegacyDataLoadBacktracers\LdFldBacktracer.cs" />
     <Compile Include="Tracers\RecursiveBacktracer.cs" />
     <Compile Include="Tracers\RetBackTracer.cs" />
     <Compile Include="Tracers\SingleUnitBacktracers\SingleArithmeticWithConstantBacktracer.cs" />
@@ -112,7 +121,6 @@
     <Compile Include="InstructionNodeMembers\SingleUnitForwardRelated.cs" />
     <Compile Include="InstructionNodeMembers\SingleUnitBackRelated.cs" />
     <Compile Include="InstructionNodeMembers\ProgramFlowForwardRoutes.cs" />
-    <Compile Include="InstructionNodeMembers\ProgramFlowBackAffected.cs" />
     <Compile Include="InstructionNodeMembers\ProgramFlowBackRoutes.cs" />
     <Compile Include="InstructionNodeMembers\RelatedList.cs" />
     <Compile Include="InstructionNodes\NonInlineableCallInstructionNode.cs" />
@@ -122,12 +130,12 @@
     <Compile Include="InstructionNodeMembers\ArgList.cs" />
     <Compile Include="BackSearcher.cs" />
     <Compile Include="Tracers\BackTracer.cs" />
-    <Compile Include="Tracers\DataLoadBacktracers\LdElemBacktracer.cs" />
+    <Compile Include="Tracers\LegacyDataLoadBacktracers\LdElemBacktracer.cs" />
     <Compile Include="Tracers\Helpers\SingleIndexBackSearcher.cs" />
     <Compile Include="GraphBuilder.cs" />
     <Compile Include="Tracers\LdArgBacktracer.cs" />
-    <Compile Include="Tracers\DataLoadBacktracers\LdStaticFieldBackTracer.cs" />
-    <Compile Include="Tracers\DataLoadBacktracers\LoadMemoryByOperandBackTracer.cs" />
+    <Compile Include="Tracers\LegacyDataLoadBacktracers\LdStaticFieldBackTracer.cs" />
+    <Compile Include="Tracers\LegacyDataLoadBacktracers\LoadMemoryByOperandBackTracer.cs" />
     <Compile Include="Tracers\SingleIndexBackTracer.cs" />
     <Compile Include="Tracers\LdLocBackTracer.cs" />
     <Compile Include="Tracers\TypedReferenceBackTracer.cs" />

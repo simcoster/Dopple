@@ -18,7 +18,7 @@ namespace Dopple.InstructionModifiers
         readonly ProgramFlowManager programFlowHanlder = new ProgramFlowManager();
         private readonly Dictionary<MethodDefinition, int> inlinedInstancesCountPerMethod = new Dictionary<MethodDefinition, int>();
         private InstructionNodeFactory _InstructionNodeFactory;
-        private BackTraceManager _BackTraceManager = new BackTraceManager();
+        private TraceManager _BackTraceManager = new TraceManager();
         
         //TODO remove
         public Verifier[] Verifiers { get; set; }
@@ -119,7 +119,7 @@ namespace Dopple.InstructionModifiers
             inlinedNode.InliningProperties.Inlined = true;
             inlinedNode.InliningProperties.CallNode = callNode;
             inlinedNode.InliningProperties.CallSequence = callNode.InliningProperties.CallSequence.ToList();
-            inlinedNode.ProgramFlowBackAffected.AddTwoWay(callNode.ProgramFlowBackAffected);
+            inlinedNode.BranchProperties.Branches.AddRange(callNode.BranchProperties.Branches);
             inlinedNode.InliningProperties.CallSequence.Add(new MethodAndNode() { Method = callNode.TargetMethodDefinition, MethodsNodes = new List<InstructionNode>(nodes) });
             SetRecursionIndex(inlinedNode, nodes);
         }
