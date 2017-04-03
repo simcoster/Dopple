@@ -3,28 +3,56 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Dopple.BranchPropertiesNS;
 using Dopple.InstructionNodes;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
 namespace Dopple.Tracers.PredciateProviders
 {
-    class StFldPredicateProvider : StoreDynamicDataPredicateProvider
+    class StoreFieldStateProvider : StoreDynamicDataStateProvider
     {
-        public override PredicateAndNode GetMatchingLoadPredicate(InstructionNode storeNode)
+        public StoreFieldStateProvider(InstructionNode storeNode) : base(storeNode)
         {
-            var objectInstanceArgs = storeNode.DataFlowBackRelated.Where(x => x.ArgIndex == 0).SelectMany(x => x.Argument.GetDataOriginNodes()).ToArray();
-            FieldReference fieldDefinitionArg = (FieldReference) storeNode.Instruction.Operand;
-            Predicate<InstructionNode> predicate = x => x is LoadFieldNode &&
-                                                        x.DataFlowBackRelated.Where(y => y.ArgIndex == 0).SelectMany(y => y.Argument.GetDataOriginNodes()).Intersect(objectInstanceArgs).Count() >0 &&
-                                                        ((FieldReference) x.Instruction.Operand).MetadataToken == fieldDefinitionArg.MetadataToken;
-            return new PredicateAndNode() { Predicate = predicate, StoreNode = storeNode };
-
         }
 
-        public override bool IsRelevant(InstructionNode storeNode)
+        private FieldDefinition _FieldDefinition { get; set; }
+
+        public override bool IsLoadNodeMatching(InstructionNode loadNode)
         {
-            return storeNode is StoreFieldNode;
+            LoadFieldNode loadFieldNode = loadNode as LoadFieldNode;
+            if (loadFieldNode == null)
+            {
+                return false;
+            }
+            if (loadFieldNode.FieldDefinition.MetadataToken !=_FieldDefinition.MetadataToken)
+            {
+                return false;
+            }
+            if (loadNode.DataFlowBackRelated.Where(x => x.ArgIndex == 0).Select(x => x.Argument).Intersect(ObjectNodes).Any() == false)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public override bool ShareNonObjectArgs(StoreDynamicDataStateProvider newStore)
+        {
+            StoreFieldStateProvider newStateProvider = newStore as StoreFieldStateProvider;
+            if (newStateProvider == null)
+            {
+                return false;
+            }
+            if (newStateProvider._FieldDefinition.MetadataToken != _FieldDefinition.MetadataToken)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        internal override List<InstructionNode> GetObjectArgs(InstructionNode storeNode)
+        {
+            return StoreNode.DataFlowBackRelated.Where(x => x.ArgIndex == 0).SelectMany(x => x.Argument.GetDataOriginNodes()).ToList();
         }
     }
 }

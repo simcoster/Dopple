@@ -59,10 +59,6 @@ namespace Dopple.BackTracers
             CountVisitedNodes = 0;
         }
 
-        private List<StoreDynamicDataPredicateProvider> DynamicStorePredicateProviders = new List<StoreDynamicDataPredicateProvider>()
-        {
-            new StFldPredicateProvider(), new StElemPredicateProvider()
-        };
         private BackTracer[] _OutFuncDataTransferBackTracers;
 
         private void BackTraceOutsideFunctionBoundsRec(InstructionNode currentNode, Dictionary<InstructionNode, MergeNodeTraceData> mergingNodesData, InstructionNode lastNode = null, List<PredicateAndNode> predicatesAndNodes =null, List<InstructionNode> visited = null )
@@ -75,6 +71,7 @@ namespace Dopple.BackTracers
             }
             if (visited.Contains(currentNode))
             {
+                need to travel loops twice to know if anything is affected due to last run
                 return;
             }
             if (currentNode.BranchProperties.MergingNodeProperties.IsMergingNode)
@@ -88,22 +85,22 @@ namespace Dopple.BackTracers
                 }
                 predicatesAndNodes.AddRange(mergingNodesData[currentNode].AccumelatedPredicates);
             }
-            var predicateProvider = DynamicStorePredicateProviders.FirstOrDefault(x => x.IsRelevant(currentNode));
-            if (predicateProvider != null)
-            {
-                predicatesAndNodes.Add(predicateProvider.GetMatchingLoadPredicate(currentNode));
-            }
-            else
-            {
-                foreach(var predicateAndNode in predicatesAndNodes)
-                {
-                    if (predicateAndNode.Predicate(currentNode))
-                    {
-                        int dataTransferIndex = ((IDynamicDataLoadNode) currentNode).DataFlowDataProdivderIndex;
-                    }
-                }
-            }
-            lastNode = currentNode;
+            //var predicateProvider = DynamicStorePredicateProviders.FirstOrDefault(x => x.IsRelevant(currentNode));
+            //if (predicateProvider != null)
+            //{
+            //    predicatesAndNodes.Add(predicateProvider.GetMatchingLoadPredicate(currentNode));
+            //}
+            //else
+            //{
+            //    foreach(var predicateAndNode in predicatesAndNodes)
+            //    {
+            //        if (predicateAndNode.Predicate(currentNode))
+            //        {
+            //            int dataTransferIndex = ((IDynamicDataLoadNode) currentNode).DataFlowDataProdivderIndex;
+            //        }
+            //    }
+            //}
+            //lastNode = currentNode;
         }
 
         private void TraceDataTransferingNodeRec(InstructionNode instructionNode, IEnumerable<BackTracer> backTracers, List<InstructionNode> visited = null)

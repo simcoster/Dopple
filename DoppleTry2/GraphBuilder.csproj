@@ -84,10 +84,9 @@
     <Compile Include="Tracers\DynamicTracing\PredicateProviders.cs" />
     <Compile Include="Tracers\TraceManager.cs" />
     <Compile Include="BranchProperties\PairedBranchIndex.cs" />
-    <Compile Include="Tracers\PredciateProviders\PredicateAndNode.cs" />
     <Compile Include="Tracers\PredciateProviders\StElemPredicateProvider.cs" />
     <Compile Include="Tracers\PredciateProviders\StFldPredicateProvider.cs" />
-    <Compile Include="Tracers\PredciateProviders\StoreDynamicDataPredicateProvider.cs" />
+    <Compile Include="Tracers\PredciateProviders\StoreDynamicDataStateProvider.cs" />
     <Compile Include="Tracers\DynaymicLdArgBacktracer.cs" />
     <Compile Include="Tracers\ForwardTracers\ConditionionalsTracer.cs" />
     <Compile Include="Tracers\LegacyDataLoadBacktracers\DynamicDataBacktracer.cs" />

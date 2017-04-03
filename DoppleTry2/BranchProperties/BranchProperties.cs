@@ -8,7 +8,8 @@ namespace Dopple.BranchPropertiesNS
 {
     public class BranchProperties
     {
-        public List<BranchID> Branches { get; private set; } = new List<BranchID>();
+        private static BranchID BaseBranch = new BranchID(null);
+        public List<BranchID> Branches { get; private set; } = new List<BranchID>() { BaseBranch };
         public MergingNodeProperties MergingNodeProperties { get; private set; } = new MergingNodeProperties();
     }
 }
