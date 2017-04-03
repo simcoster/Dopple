@@ -1,5 +1,6 @@
 ﻿using Dopple.BackTracers;
 using Dopple.InstructionNodes;
+using Dopple.Tracers.PredciateProviders;
 using Dopple.VerifierNs;
 using System;
 using System.Collections.Generic;
@@ -44,19 +45,65 @@ namespace Dopple.BackTracers
 
         public static int CountVisitedNodes = 0;
 
-        BackTracer[] _OutFuncDataTransferBackTracers;
 
         internal void BackTraceOutsideFunctionBounds(List<InstructionNode> instructionNodes)
         {
             CountVisitedNodes = 0;
-            BackTraceOutsideFunctionBoundsRec(instructionNodes[0]);
+            var mergingNodesData = new Dictionary<InstructionNode, MergeNodeTraceData>();
+            foreach (var mergingNode in instructionNodes.Where(x => x.BranchProperties.MergingNodeProperties.IsMergingNode))
+            {
+                mergingNodesData.Add(mergingNode, new MergeNodeTraceData());
+            }
+            BackTraceOutsideFunctionBoundsRec(instructionNodes[0], mergingNodesData);
             Console.WriteLine("Visited node count is " + CountVisitedNodes);
             CountVisitedNodes = 0;
         }
 
-        private void BackTraceOutsideFunctionBoundsRec(InstructionNode instructionNode)
+        private List<StoreDynamicDataPredicateProvider> DynamicStorePredicateProviders = new List<StoreDynamicDataPredicateProvider>()
         {
-            need to implemenmt
+            new StFldPredicateProvider(), new StElemPredicateProvider()
+        };
+        private BackTracer[] _OutFuncDataTransferBackTracers;
+
+        private void BackTraceOutsideFunctionBoundsRec(InstructionNode currentNode, Dictionary<InstructionNode, MergeNodeTraceData> mergingNodesData, InstructionNode lastNode = null, List<PredicateAndNode> predicatesAndNodes =null, List<InstructionNode> visited = null )
+        {
+            if (visited == null)
+            {
+                visited = new List<InstructionNode>();
+                predicatesAndNodes = new List<PredicateAndNode>();
+                lastNode = currentNode;
+            }
+            if (visited.Contains(currentNode))
+            {
+                return;
+            }
+            if (currentNode.BranchProperties.MergingNodeProperties.IsMergingNode)
+            {
+                mergingNodesData[currentNode].ReachedBranches.AddRange(lastNode.BranchProperties.Branches);
+                mergingNodesData[currentNode].AccumelatedPredicates.AddRange(predicatesAndNodes);
+                bool allBranchesReached = !currentNode.BranchProperties.MergingNodeProperties.MergedBranches.Except(mergingNodesData[currentNode].ReachedBranches).Any();
+                if (!allBranchesReached)
+                {
+                    return;
+                }
+                predicatesAndNodes.AddRange(mergingNodesData[currentNode].AccumelatedPredicates);
+            }
+            var predicateProvider = DynamicStorePredicateProviders.FirstOrDefault(x => x.IsRelevant(currentNode));
+            if (predicateProvider != null)
+            {
+                predicatesAndNodes.Add(predicateProvider.GetMatchingLoadPredicate(currentNode));
+            }
+            else
+            {
+                foreach(var predicateAndNode in predicatesAndNodes)
+                {
+                    if (predicateAndNode.Predicate(currentNode))
+                    {
+                        int dataTransferIndex = ((IDynamicDataLoadNode) currentNode).DataFlowDataProdivderIndex;
+                    }
+                }
+            }
+            lastNode = currentNode;
         }
 
         private void TraceDataTransferingNodeRec(InstructionNode instructionNode, IEnumerable<BackTracer> backTracers, List<InstructionNode> visited = null)

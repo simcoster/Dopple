@@ -9,7 +9,7 @@ namespace Dopple.Tracers.PredciateProviders
 {
     class StElemPredicateProvider : StoreDynamicDataPredicateProvider
     {
-        public override PredicateAndNode GetMatchingLoadPredicate(InstructionNode instructionNode)
+        public override Predicate<InstructionNode> GetMatchingLoadPredicate(InstructionNode instructionNode)
         {
             var arrayArgs = instructionNode.DataFlowBackRelated.Where(x => x.ArgIndex == 0).SelectMany(x => x.Argument.GetDataOriginNodes()).ToArray();
             var indexArgs = instructionNode.DataFlowBackRelated.Where(x => x.ArgIndex == 1).SelectMany(x => x.Argument.GetDataOriginNodes()).ToArray();

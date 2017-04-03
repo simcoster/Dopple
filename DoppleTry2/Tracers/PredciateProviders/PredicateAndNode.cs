@@ -11,5 +11,6 @@ namespace Dopple.Tracers.PredciateProviders
     {
         public Predicate<InstructionNode> Predicate { get; set; }
         public InstructionNode StoreNode { get; set; }
+        public 
     }
 }

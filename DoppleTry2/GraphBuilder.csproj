@@ -80,7 +80,9 @@
     <Compile Include="InstructionNodes\Interfaces\IDynamicDataStoreNode.cs" />
     <Compile Include="InstructionNodes\LdElemAddressNode.cs" />
     <Compile Include="InstructionNodes\LdindNode.cs" />
-    <Compile Include="Tracers\BackTraceManager.cs" />
+    <Compile Include="Tracers\DynamicTracing\MergeNodeTraceData.cs" />
+    <Compile Include="Tracers\DynamicTracing\PredicateProviders.cs" />
+    <Compile Include="Tracers\TraceManager.cs" />
     <Compile Include="BranchProperties\PairedBranchIndex.cs" />
     <Compile Include="Tracers\PredciateProviders\PredicateAndNode.cs" />
     <Compile Include="Tracers\PredciateProviders\StElemPredicateProvider.cs" />
