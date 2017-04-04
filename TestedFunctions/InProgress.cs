@@ -9,30 +9,34 @@ namespace TestedFunctions
 {
     public class InProgress
     {
-        public static void TestConditionals(int a, int b)
-        {
-
-            while (a == 1)
-            {
-                a++;
-                b++;
-            }
-            a--;
-            b--;
-        }
+        //public static int TestConditionals(int a, int b)
+        //{
+        //    Helper helper = new Helper();
+        //    if (a==b)
+        //    {
+        //        helper.Number = 4;
+        //    }
+        //    else
+        //    {
+        //        helper.Number = 1;
+        //    }
+        //    helper.Number = 5;
+        //    helper.Text = "blah";
+        //    return helper.Number;
+        //}
         //public static List<int> UseDelegate(int[] nums)
         //{
         //    return nums.Select(x => x++).ToList();
         //}
-        //public static int testLinq(int[] nums)
-        //{
-        //    int sum = 0;
-        //    foreach (var num in nums.Where(x => x > 6))
-        //    {
-        //        sum += num;
-        //    }
-        //    return sum;
-        //}
+        public static int testLinq(int[] nums)
+        {
+            int sum = 0;
+            foreach (var num in nums.Where(x => x > 6))
+            {
+                sum += num;
+            }
+            return sum;
+        }
         //public static int SumMe(int[] nums)
         //{
         //    return nums.Sum(x => x * 6);

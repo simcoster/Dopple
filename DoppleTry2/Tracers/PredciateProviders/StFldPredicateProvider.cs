@@ -14,6 +14,7 @@ namespace Dopple.Tracers.PredciateProviders
     {
         public StoreFieldStateProvider(InstructionNode storeNode) : base(storeNode)
         {
+            _FieldDefinition = ((StoreFieldNode) storeNode).FieldDefinition;
         }
 
         private FieldDefinition _FieldDefinition { get; set; }
@@ -29,7 +30,7 @@ namespace Dopple.Tracers.PredciateProviders
             {
                 return false;
             }
-            if (loadNode.DataFlowBackRelated.Where(x => x.ArgIndex == 0).Select(x => x.Argument).Intersect(ObjectNodes).Any() == false)
+            if (!ShareObejctArgs(loadNode)) 
             {
                 return false;
             }

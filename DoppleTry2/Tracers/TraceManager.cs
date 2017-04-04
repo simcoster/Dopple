@@ -1,5 +1,6 @@
 ﻿using Dopple.BackTracers;
 using Dopple.InstructionNodes;
+using Dopple.Tracers.DynamicTracing;
 using Dopple.Tracers.PredciateProviders;
 using Dopple.VerifierNs;
 using System;
@@ -54,53 +55,85 @@ namespace Dopple.BackTracers
             {
                 mergingNodesData.Add(mergingNode, new MergeNodeTraceData());
             }
-            BackTraceOutsideFunctionBoundsRec(instructionNodes[0], mergingNodesData);
+            TraceOutsideFunctionBoundsRec(instructionNodes[0], mergingNodesData);
             Console.WriteLine("Visited node count is " + CountVisitedNodes);
             CountVisitedNodes = 0;
         }
 
         private BackTracer[] _OutFuncDataTransferBackTracers;
 
-        private void BackTraceOutsideFunctionBoundsRec(InstructionNode currentNode, Dictionary<InstructionNode, MergeNodeTraceData> mergingNodesData, InstructionNode lastNode = null, List<PredicateAndNode> predicatesAndNodes =null, List<InstructionNode> visited = null )
+        private void TraceOutsideFunctionBoundsRec(InstructionNode currentNode, Dictionary<InstructionNode, MergeNodeTraceData> mergingNodesData, InstructionNode lastNode = null, StateProviders stateProviders = null, List<InstructionNode> visited = null )
         {
             if (visited == null)
             {
                 visited = new List<InstructionNode>();
-                predicatesAndNodes = new List<PredicateAndNode>();
                 lastNode = currentNode;
+                stateProviders = new StateProviders();
             }
-            if (visited.Contains(currentNode))
+            while (true)
             {
-                need to travel loops twice to know if anything is affected due to last run
-                return;
-            }
-            if (currentNode.BranchProperties.MergingNodeProperties.IsMergingNode)
-            {
-                mergingNodesData[currentNode].ReachedBranches.AddRange(lastNode.BranchProperties.Branches);
-                mergingNodesData[currentNode].AccumelatedPredicates.AddRange(predicatesAndNodes);
-                bool allBranchesReached = !currentNode.BranchProperties.MergingNodeProperties.MergedBranches.Except(mergingNodesData[currentNode].ReachedBranches).Any();
-                if (!allBranchesReached)
+                if (visited.Count(x => x == currentNode) > 1)
                 {
                     return;
                 }
-                predicatesAndNodes.AddRange(mergingNodesData[currentNode].AccumelatedPredicates);
+                bool reachedMergeNodeNotLast;
+                ActOnCurrentNode(currentNode, mergingNodesData, lastNode, ref stateProviders, out reachedMergeNodeNotLast);
+                if (reachedMergeNodeNotLast)
+                {
+                    return;
+                }
+                lastNode = currentNode;
+                if (currentNode.ProgramFlowForwardRoutes.Count == 1)
+                {
+                    currentNode = currentNode.ProgramFlowForwardRoutes[0];
+                }
+                else
+                {
+                    break;
+                }
             }
-            //var predicateProvider = DynamicStorePredicateProviders.FirstOrDefault(x => x.IsRelevant(currentNode));
-            //if (predicateProvider != null)
-            //{
-            //    predicatesAndNodes.Add(predicateProvider.GetMatchingLoadPredicate(currentNode));
-            //}
-            //else
-            //{
-            //    foreach(var predicateAndNode in predicatesAndNodes)
-            //    {
-            //        if (predicateAndNode.Predicate(currentNode))
-            //        {
-            //            int dataTransferIndex = ((IDynamicDataLoadNode) currentNode).DataFlowDataProdivderIndex;
-            //        }
-            //    }
-            //}
-            //lastNode = currentNode;
+            foreach(var nextNode in currentNode.ProgramFlowForwardRoutes)
+            {
+                TraceOutsideFunctionBoundsRec(nextNode, mergingNodesData, lastNode, stateProviders.Clone(), new List<InstructionNode>(visited));
+            }
+
+        }
+
+        private static void ActOnCurrentNode(InstructionNode currentNode, Dictionary<InstructionNode, MergeNodeTraceData> mergingNodesData, InstructionNode lastNode, ref StateProviders stateProviders, out bool reachedMergeNodeNotLast)
+        {
+            if (currentNode.BranchProperties.MergingNodeProperties.IsMergingNode)
+            {
+                lock (mergingNodesData)
+                {
+                    mergingNodesData[currentNode].ReachedBranches.AddRange(lastNode.BranchProperties.Branches);
+                    mergingNodesData[currentNode].AccumelatedStateProviders.AddNewProviders(stateProviders);
+                    bool allBranchesReached = !currentNode.BranchProperties.MergingNodeProperties.MergedBranches.Except(mergingNodesData[currentNode].ReachedBranches).Any();
+                    if (allBranchesReached)
+                    {
+                        mergingNodesData[currentNode].AccumelatedStateProviders.MergeBranches(currentNode);
+                        stateProviders = mergingNodesData[currentNode].AccumelatedStateProviders;
+                    }
+                    else
+                    {
+                        reachedMergeNodeNotLast = true;
+                        return;
+                    }
+                }
+            }
+            var newStoreState = StoreDynamicDataStateProvider.GetMatchingStateProvider(currentNode);
+            if (newStoreState != null)
+            {
+                stateProviders.AddNewProvider(newStoreState);
+            }
+            IDynamicDataLoadNode loadNode = currentNode as IDynamicDataLoadNode;
+            if (loadNode != null)
+            {
+                foreach (var storeNode in stateProviders.MatchLoadToStore(currentNode))
+                {
+                    currentNode.DataFlowBackRelated.AddTwoWay(storeNode, loadNode.DataFlowDataProdivderIndex);
+                }
+            }
+            reachedMergeNodeNotLast = false;
         }
 
         private void TraceDataTransferingNodeRec(InstructionNode instructionNode, IEnumerable<BackTracer> backTracers, List<InstructionNode> visited = null)

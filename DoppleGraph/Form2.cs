@@ -1,4 +1,5 @@
 ﻿using Dopple;
+using Dopple.BranchPropertiesNS;
 using Dopple.InstructionNodes;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
@@ -325,7 +326,7 @@ namespace DoppleGraph
                         Console.WriteLine("Failed to draw edge");
                     }
                 }
-                foreach (var branch in nodeWrapper.InstructionNode.BranchProperties.Branches)
+                foreach (var branch in nodeWrapper.InstructionNode.BranchProperties.Branches.Where(x => !(x is BaseBranch)))
                 {
                     try
                     {

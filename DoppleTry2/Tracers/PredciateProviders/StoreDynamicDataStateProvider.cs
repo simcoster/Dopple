@@ -2,6 +2,7 @@
 using Dopple.InstructionNodes;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Dopple.Tracers.PredciateProviders
 {
@@ -11,7 +12,6 @@ namespace Dopple.Tracers.PredciateProviders
         {
             StoreNode = storeNode;
             ObjectNodes = GetObjectArgs(storeNode);
-
         }
 
         internal abstract List<InstructionNode> GetObjectArgs(InstructionNode storeNode);
@@ -19,8 +19,13 @@ namespace Dopple.Tracers.PredciateProviders
         public InstructionNode StoreNode { get; private set; }
         public List<InstructionNode> ObjectNodes { get; set; }
         public abstract bool ShareNonObjectArgs(StoreDynamicDataStateProvider newStore);
+        protected bool ShareObejctArgs(InstructionNode loadNode)
+        {
+            var loadNodeNodeObjects = loadNode.DataFlowBackRelated.Where(x => x.ArgIndex == 0).SelectMany(x => x.Argument.GetDataOriginNodes());
+            return ObjectNodes.Intersect(loadNodeNodeObjects).Any();
+        }
 
-        public StoreDynamicDataStateProvider GetMatchingStateProvider(InstructionNode storeNode)
+        public static StoreDynamicDataStateProvider GetMatchingStateProvider(InstructionNode storeNode)
         {
             if (storeNode is StElemInstructionNode)
             {

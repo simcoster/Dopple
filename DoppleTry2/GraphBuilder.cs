@@ -84,10 +84,8 @@ namespace Dopple
                 SetInstructionIndexes();
                 if (shouldRunDynamicTrace)
                 {
-                    stopwach.Start();
                     BackTraceOutsideFuncBoundry();
                     Console.WriteLine("Dynamic trace took " + stopwach.Elapsed.ToString());
-                    stopwach.Reset();
                 }
                 //MergeSingleOperationNodes();
                 ResolveVirtualMethods(out shouldRerun, out shouldRunDynamicTrace);
@@ -96,13 +94,13 @@ namespace Dopple
                 runCounter++;
             }
             //RecursionFix();
-            //RemoveHelperCodes();
+            RemoveHelperCodes();
             //RemoveAndStitchDynamicDataConnections();
             //MergeSimilarInstructions();
             //MergeEquivilentPairs();
             AddZeroNode();
             //Verify();
-
+            stopwach.Stop();
             //its still very slow, need to think of solution to optimize, maybe don't need to run tracing each  time, only when there's danger something will change
             // okay, i'm only going to run it again if it contains stfld, stelem, or stsfld
             

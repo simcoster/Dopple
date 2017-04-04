@@ -37,12 +37,6 @@ namespace Dopple.Tracers.PredciateProviders
             return true;
         }
 
-        public static bool ArrayAndIndexMatch(LdElemInstructionNode ldEelemToCheck, IEnumerable<InstructionNode> arrayArgs, IEnumerable<InstructionNode> indexArgs)
-        {
-            return ldEelemToCheck.DataFlowBackRelated.Where(y => y.ArgIndex == 0).SelectMany(y => y.Argument.GetDataOriginNodes()).SequenceEqual(arrayArgs) &&
-                     
-        }
-
         public static bool HaveEquivilentIndexNode(InstructionNode indexNodeToMatch, IEnumerable<InstructionNode> indexArgs)
         {
             if (indexNodeToMatch is LdImmediateInstNode)

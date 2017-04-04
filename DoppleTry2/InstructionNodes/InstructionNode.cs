@@ -173,7 +173,9 @@ namespace Dopple.InstructionNodes
         {
             foreach(var branch in BranchProperties.Branches)
             {
-                branch.OriginatingNode.AffectedModes.Remove(this);
+                //treat the zero branch
+                //treat the fake uninitilzed data store node
+                branch.RemoveNode(this);
             }
         }
 
