@@ -7,7 +7,7 @@ namespace Dopple.BackTracers
 {
     internal class MergeNodeTraceData
     {
-        public List<BranchID> ReachedBranches = new List<BranchID>();
+        public BranchList ReachedBranches = new BranchList();
         public StateProviders AccumelatedStateProviders = new StateProviders();
     }
 }

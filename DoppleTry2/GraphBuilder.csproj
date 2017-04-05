@@ -68,6 +68,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BranchProperties\BranchID.cs" />
+    <Compile Include="BranchProperties\BranchList.cs" />
     <Compile Include="BranchProperties\BranchProperties.cs" />
     <Compile Include="BranchProperties\BranchType.cs" />
     <Compile Include="BranchProperties\MergingNodeProperties.cs" />

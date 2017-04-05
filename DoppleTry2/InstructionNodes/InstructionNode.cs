@@ -173,9 +173,15 @@ namespace Dopple.InstructionNodes
         {
             foreach(var branch in BranchProperties.Branches)
             {
-                //treat the zero branch
-                //treat the fake uninitilzed data store node
                 branch.RemoveNode(this);
+            }
+            if (BranchProperties.MergingNodeProperties.IsMergingNode)
+            {
+                foreach(var nextNode in ProgramFlowForwardRoutes)
+                {
+                    nextNode.BranchProperties.MergingNodeProperties.IsMergingNode = true;
+                    nextNode.BranchProperties.MergingNodeProperties.MergedBranches.AddRange(this.BranchProperties.MergingNodeProperties.MergedBranches);
+                }
             }
         }
 

@@ -56,6 +56,7 @@ namespace Dopple.BackTracers
                 mergingNodesData.Add(mergingNode, new MergeNodeTraceData());
             }
             TraceOutsideFunctionBoundsRec(instructionNodes[0], mergingNodesData);
+            var nonPassedThrough = mergingNodesData.Keys.Where(x => !x.BranchProperties.MergingNodeProperties.MergedBranches.SequenceEqual(mergingNodesData[x].ReachedBranches));
             Console.WriteLine("Visited node count is " + CountVisitedNodes);
             CountVisitedNodes = 0;
         }
@@ -105,7 +106,14 @@ namespace Dopple.BackTracers
             {
                 lock (mergingNodesData)
                 {
-                    mergingNodesData[currentNode].ReachedBranches.AddRange(lastNode.BranchProperties.Branches);
+                    mergingNodesData[currentNode].ReachedBranches.AddRangeDistinct(lastNode.BranchProperties.Branches);
+                    if (!lastNode.BranchProperties.Branches.Any(x => currentNode.BranchProperties.MergingNodeProperties.MergedBranches.Contains(x)))
+                    {
+                        if (!(lastNode is ConditionalJumpNode && ((ConditionalJumpNode) lastNode).CreatedBranches.SequenceEqual(currentNode.BranchProperties.MergingNodeProperties.MergedBranches)))
+                        {
+                            throw new Exception("Reached from unmerged branch");
+                        }
+                    }
                     mergingNodesData[currentNode].AccumelatedStateProviders.AddNewProviders(stateProviders);
                     bool allBranchesReached = !currentNode.BranchProperties.MergingNodeProperties.MergedBranches.Except(mergingNodesData[currentNode].ReachedBranches).Any();
                     if (allBranchesReached)

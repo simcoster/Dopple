@@ -82,11 +82,12 @@ namespace Dopple
 
                 InlineFunctionCalls();
                 SetInstructionIndexes();
-                if (shouldRunDynamicTrace)
-                {
+                //if (shouldRunDynamicTrace)
+                //{
+                //TODO remove for tests;
                     BackTraceOutsideFuncBoundry();
                     Console.WriteLine("Dynamic trace took " + stopwach.Elapsed.ToString());
-                }
+               // }
                 //MergeSingleOperationNodes();
                 ResolveVirtualMethods(out shouldRerun, out shouldRunDynamicTrace);
                 //SetInstructionIndexes();

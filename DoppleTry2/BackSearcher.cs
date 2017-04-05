@@ -74,7 +74,7 @@ namespace Dopple
                     break;
                 }
             }
-            visited.AddRange(startInst.ProgramFlowBackRoutes.SelectMany(x => GetBackFlowTree(x, new List<InstructionNode>(visited))).ToArray());
+            visited.AddRange(startInst.ProgramFlowBackRoutes.SelectMany(x => GetBackFlowTree(x, visited.ToList())));
             return visited.Distinct();
         }
 

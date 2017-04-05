@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Dopple.BranchPropertiesNS
+﻿namespace Dopple.BranchPropertiesNS
 {
     public class BranchProperties
     {
         private static BaseBranch BaseBranch = new BaseBranch();
-        public List<BranchID> Branches { get; private set; } = new List<BranchID>() { BaseBranch };
+        public BranchList Branches { get; private set; } = new BranchList() { BaseBranch };
         public MergingNodeProperties MergingNodeProperties { get; private set; } = new MergingNodeProperties();
     }
 }

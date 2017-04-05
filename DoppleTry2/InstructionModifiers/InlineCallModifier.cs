@@ -38,8 +38,8 @@ namespace Dopple.InstructionModifiers
             }
             foreach (var inlinedCallNode in instructionNodes.Where(x => x is InlineableCallNode && ((InlineableCallNode)x).CallWasInlined).ToList())
             {
-                inlinedCallNode.SelfRemove();
-                instructionNodes.Remove(inlinedCallNode);
+                //inlinedCallNode.SelfRemove();
+                //instructionNodes.Remove(inlinedCallNode);
             }
         }
 
@@ -119,7 +119,7 @@ namespace Dopple.InstructionModifiers
             inlinedNode.InliningProperties.Inlined = true;
             inlinedNode.InliningProperties.CallNode = callNode;
             inlinedNode.InliningProperties.CallSequence = callNode.InliningProperties.CallSequence.ToList();
-            inlinedNode.BranchProperties.Branches.AddRange(callNode.BranchProperties.Branches);
+            inlinedNode.BranchProperties.Branches.AddRangeDistinct(callNode.BranchProperties.Branches);
             inlinedNode.InliningProperties.CallSequence.Add(new MethodAndNode() { Method = callNode.TargetMethodDefinition, MethodsNodes = new List<InstructionNode>(nodes) });
             SetRecursionIndex(inlinedNode, nodes);
         }
