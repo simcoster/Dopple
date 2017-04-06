@@ -47,7 +47,7 @@ namespace Dopple.InstructionModifiers
         private List<InstructionNode> InlineRec(InlineableCallNode callNode)
         {
             //var tempStop = Stopwatch.StartNew();
-            if (callNode.InliningProperties.CallSequence.Count > 5)
+            if (callNode.InliningProperties.CallSequence.Count > 6)
             {
                 return new List<InstructionNode>();
             }

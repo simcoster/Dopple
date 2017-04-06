@@ -20,7 +20,7 @@ namespace Dopple.BackTracers
             foreach (var conditionalJumpNode in conditionalJumpNodes)
             {
                 PairedBranchIndex pairedBranchIndex = PairedBranchIndex.First;
-                foreach (var forwardNode in conditionalJumpNode.ProgramFlowForwardRoutes)
+                foreach (var forwardNode in conditionalJumpNode.ProgramFlowForwardRoutes.ToList())
                 {
                     var branch = new BranchID(conditionalJumpNode) { BranchType = BranchType.Exit, PairedBranchesIndex = pairedBranchIndex };
                     conditionalJumpNode.CreatedBranches.Add(branch);

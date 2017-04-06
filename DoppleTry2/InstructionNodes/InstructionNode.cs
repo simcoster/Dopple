@@ -182,8 +182,9 @@ namespace Dopple.InstructionNodes
                     nextNode.BranchProperties.MergingNodeProperties.IsMergingNode = true;
                     nextNode.BranchProperties.MergingNodeProperties.MergedBranches.AddRange(this.BranchProperties.MergingNodeProperties.MergedBranches);
                 }
-                foreach(var branch in BranchProperties.MergingNodeProperties.MergedBranches)
+                foreach(var branchGroup in BranchProperties.MergingNodeProperties.MergedBranches.GroupBy(x => x.OriginatingNode))
                 {
+                    var branch = branchGroup.First();
                     if (ProgramFlowBackRoutes.Contains(branch.OriginatingNode))
                     {
                         var myBranch = branch.OriginatingNode.ForwardBranchedPaths.First(x => x.Item1 == this).Item2;
