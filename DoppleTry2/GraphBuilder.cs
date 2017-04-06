@@ -57,7 +57,6 @@ namespace Dopple
 
         public List<InstructionNode> Run()
         {
-            Stopwatch stopwach = Stopwatch.StartNew();
             int runCounter = 0;
             bool shouldRerun = true;
             bool isFirstRun = true;
@@ -65,6 +64,7 @@ namespace Dopple
             SetInstructionIndexes();
             while (shouldRerun)
             {
+
                 Console.WriteLine("run counter is " + runCounter);
                 _programFlowManager.AddFlowConnections(InstructionNodes);
                 if (isFirstRun)
@@ -80,16 +80,21 @@ namespace Dopple
                     }
                 }
 
+                Stopwatch stopwach = Stopwatch.StartNew();
+
                 InlineFunctionCalls();
+                stopwach.Stop();
                 SetInstructionIndexes();
+            
                 //if (shouldRunDynamicTrace)
                 //{
                 //TODO remove for tests;
-                    BackTraceOutsideFuncBoundry();
-                    Console.WriteLine("Dynamic trace took " + stopwach.Elapsed.ToString());
-               // }
+                BackTraceOutsideFuncBoundry();
+              
+                // }
                 //MergeSingleOperationNodes();
                 ResolveVirtualMethods(out shouldRerun, out shouldRunDynamicTrace);
+             
                 //SetInstructionIndexes();
                 isFirstRun = false;
                 runCounter++;
@@ -101,7 +106,6 @@ namespace Dopple
             //MergeEquivilentPairs();
             AddZeroNode();
             //Verify();
-            stopwach.Stop();
             //its still very slow, need to think of solution to optimize, maybe don't need to run tracing each  time, only when there's danger something will change
             // okay, i'm only going to run it again if it contains stfld, stelem, or stsfld
             

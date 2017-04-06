@@ -11,22 +11,22 @@ namespace Dopple.ProgramFlowHanlder
     {
         public SimpleProgramFlowHandler()
         {
-            HandledCodes = CodeGroups.AllOpcodes.Select(x => x.Code).Except(_unhandledCodes).ToArray();
+            HandledCodes = CodeGroups.AllOpcodes.Select(x => x.Code).ToArray();
         }
 
+        //TODO check, why is this here?
         private readonly Code[] _unhandledCodes = new[] { Code.Br, Code.Br_S, Code.Ret };
 
         public override Code[] HandledCodes { get; }
 
-        public override void SetForwardExecutionFlowInsts(InstructionNode wrapperToModify, List<InstructionNode> instructionWrappers)
+        public override void SetForwardExecutionFlowInsts(InstructionNode node, List<InstructionNode> instructionWrappers)
         {
-            InstructionNode nextInstructionWrapper =
-               instructionWrappers.FirstOrDefault(x => x.Instruction == wrapperToModify.Instruction.Next);
-            if (nextInstructionWrapper == null)
+            var nodesPointingToMe =
+               instructionWrappers.Where(x => x.Instruction.Next == node.Instruction);
+           foreach(var nodePointingToMe in nodesPointingToMe)
             {
-                return;
+                node.ProgramFlowBackRoutes.AddTwoWay(nodesPointingToMe);
             }
-            nextInstructionWrapper.ProgramFlowBackRoutes.AddTwoWay(wrapperToModify);
         }
     }
 }

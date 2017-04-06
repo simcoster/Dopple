@@ -64,7 +64,8 @@ namespace Dopple.InstructionNodes
                     constructorCallInst.Operand = instruction.Operand;
                     constructorCallInst.Next = instruction.Next;
                     var constructorCall = new ConstructorCallNode(constructorCallInst, constructorMethodDef, method, noArgsNewObject);
-                    noArgsNewObject.Instruction.Next = constructorCallInst;
+                    constructorCall.ProgramFlowBackRoutes.AddTwoWay(noArgsNewObject);
+                    constructorCall.ProgramFlowResolveDone = true;
                    
                     return new InstructionNode[] { noArgsNewObject, constructorCall };
                 }

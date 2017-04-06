@@ -16,7 +16,7 @@ namespace Dopple.InstructionWrapperMembers
         InstructionNode _ContainingNode;
         public void RemoveTwoWay (InstructionNode backArgToRemove)
         {
-            base.Remove(backArgToRemove);
+            Remove(backArgToRemove);
             var forwardArg = GetPartnerList(backArgToRemove).First(x => x == _ContainingNode);
             GetPartnerList(backArgToRemove).Remove(forwardArg);
         }

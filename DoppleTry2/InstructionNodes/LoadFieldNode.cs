@@ -21,10 +21,7 @@ namespace Dopple.InstructionNodes
             {
                 throw new Exception("Operand must be a field reference");
             }
-        }
-
-
-         
+        }    
     }
 
     internal class LoadFieldNode : FieldManipulationNode, IDynamicDataLoadNode

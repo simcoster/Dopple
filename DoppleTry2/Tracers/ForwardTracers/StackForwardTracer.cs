@@ -18,7 +18,7 @@ namespace Dopple.BackTracers
                 node.StackBacktraceDone = true;
             }
         }
-        public void TraceForwardRec(List<InstructionNode> instructionNodes, InstructionNode currentNode = null, List<InstructionNode> visitedNodes = null , Stack<InstructionNode> stackedNodes =null)
+        public void TraceForwardRec(List<InstructionNode> instructionNodes, InstructionNode currentNode = null, List<InstructionNode> visitedNodes = null, Stack<InstructionNode> stackedNodes = null)
         {
             if (stackedNodes == null && visitedNodes == null)
             {
@@ -26,55 +26,60 @@ namespace Dopple.BackTracers
                 visitedNodes = new List<InstructionNode>();
                 currentNode = instructionNodes[0];
             }
-            else if (!(stackedNodes !=null && visitedNodes != null))
+            else if (!(stackedNodes != null && visitedNodes != null))
             {
                 throw new Exception("all should be null or none");
             }
-            lock(currentNode)
+            while (true)
             {
-                if (!currentNode.StackBacktraceDone)
+                lock (currentNode)
                 {
-                    currentNode.DataFlowBackRelated.ResetIndex();
-                    for (int i = 0; i < currentNode.StackPopCount; i++)
+                    if (!currentNode.StackBacktraceDone)
                     {
-                        if (stackedNodes.Count == 0)
+                        currentNode.DataFlowBackRelated.ResetIndex();
+                        for (int i = 0; i < currentNode.StackPopCount; i++)
                         {
-                            throw new Exception("not enough stacked arguments");
+                            if (stackedNodes.Count == 0)
+                            {
+                                throw new Exception("not enough stacked arguments");
+                            }
+                            currentNode.DataFlowBackRelated.AddTwoWay(stackedNodes.Pop());
                         }
-                        currentNode.DataFlowBackRelated.AddTwoWay(stackedNodes.Pop());
-                    }
-                    for (int i = 0; i < currentNode.StackPushCount; i++)
-                    {
-                        stackedNodes.Push(currentNode);
+                        for (int i = 0; i < currentNode.StackPushCount; i++)
+                        {
+                            stackedNodes.Push(currentNode);
+                        }
                     }
                 }
-            }
-           
-            int forwardRouteCount = currentNode.ProgramFlowForwardRoutes.Count;
-            if (forwardRouteCount == 0 || visitedNodes.Contains(currentNode))
-            {
-                if (stackedNodes.Count > 1)
-                {
-                    //TODO remove
-                    //throw new StackPopException("Finished with extra nodes", visitedNodes.Concat(new[] { currentNode }).ToList());
-                }
-                return;
-            }
-            visitedNodes.Add(currentNode);
 
-            if (forwardRouteCount == 1)
-            {
-                TraceForwardRec(instructionNodes, currentNode.ProgramFlowForwardRoutes[0], visitedNodes, stackedNodes);
+                int forwardRouteCount = currentNode.ProgramFlowForwardRoutes.Count;
+                if (forwardRouteCount == 0 || visitedNodes.Contains(currentNode))
+                {
+                    if (stackedNodes.Count > 1)
+                    {
+                        //TODO remove
+                        //throw new StackPopException("Finished with extra nodes", visitedNodes.Concat(new[] { currentNode }).ToList());
+                    }
+                    return;
+                }
+                visitedNodes.Add(currentNode);
+                if (forwardRouteCount == 1)
+                {
+                    currentNode = currentNode.ProgramFlowForwardRoutes[0];
+                }
+                else
+                {
+                    break;
+                }
             }
-            else
-            {
-                Parallel.ForEach(currentNode.ProgramFlowForwardRoutes, (forwardRoute) =>
-                 {
-                     var stackedNodesClone = new Stack<InstructionNode>(stackedNodes.Reverse());
-                     var visitedNodesClone = new List<InstructionNode>(visitedNodes);
-                     TraceForwardRec(instructionNodes, forwardRoute, visitedNodesClone, stackedNodesClone);
-                 });
-            }
+
+            Parallel.ForEach(currentNode.ProgramFlowForwardRoutes, (forwardRoute) =>
+             {
+                 var stackedNodesClone = new Stack<InstructionNode>(stackedNodes.Reverse());
+                 var visitedNodesClone = new List<InstructionNode>(visitedNodes);
+                 TraceForwardRec(instructionNodes, forwardRoute, visitedNodesClone, stackedNodesClone);
+             });
+
         }
     }
 }

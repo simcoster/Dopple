@@ -35,6 +35,7 @@ namespace Dopple.InstructionModifiers
             foreach (var callNode in callNodes)
             {
                 instructionNodes.InsertRange(instructionNodes.IndexOf(callNode)+1, InlineRec(callNode));
+               
             }
             foreach (var inlinedCallNode in instructionNodes.Where(x => x is InlineableCallNode && ((InlineableCallNode)x).CallWasInlined).ToList())
             {
@@ -45,6 +46,7 @@ namespace Dopple.InstructionModifiers
 
         private List<InstructionNode> InlineRec(InlineableCallNode callNode)
         {
+            var tempStop = Stopwatch.StartNew();
             MethodDefinition calledMethodDef = callNode.TargetMethodDefinition;
             callNode.CallWasInlined = true;
             if (calledMethodDef.Body == null)
@@ -58,10 +60,14 @@ namespace Dopple.InstructionModifiers
             }
             callNode.StackPushCount = 0;
             List<InstructionNode> callNodeOriginalForwardRoutes = callNode.ProgramFlowForwardRoutes.ToList();
+
             List<InstructionNode> inlinedNodes = calledMethodDef.Body.Instructions.SelectMany(x => _InstructionNodeFactory.GetInstructionNodes(x, calledMethodDef)).ToList();
+          
             inlinedNodes.ForEach(x => SetNodeProps(x, inlinedNodes, callNode));
+
             programFlowHanlder.AddFlowConnections(inlinedNodes);
             _BackTraceManager.DataTraceInFunctionBounds(inlinedNodes);
+
             StitchProgramFlow(callNode, inlinedNodes[0]);
 
             var retNodes = inlinedNodes.Where(x => x is RetInstructionNode).ToArray();
@@ -78,6 +84,12 @@ namespace Dopple.InstructionModifiers
             {
                 inlinedNodes.InsertRange(inlinedNodes.IndexOf(secondLevelInlinedCallNode)+1, InlineRec(secondLevelInlinedCallNode));
             }
+            if (!inlinedNodes.Where(x => x is InlineableCallNode).Any())
+            {
+                Console.WriteLine(callNode.TargetMethod.FullName + " is the last of the chain");
+            }
+            tempStop.Stop();
+            Console.WriteLine("inlinling " + callNode.TargetMethod.FullName + " with " + inlinedNodes.Count + " nodes, took " + tempStop.Elapsed);
             return inlinedNodes;
         }
 

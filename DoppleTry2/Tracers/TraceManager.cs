@@ -5,6 +5,7 @@ using Dopple.Tracers.PredciateProviders;
 using Dopple.VerifierNs;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,9 +30,16 @@ namespace Dopple.BackTracers
 
         internal void DataTraceInFunctionBounds(List<InstructionNode> instructionNodes)
         {
+            Stopwatch stopwatch = Stopwatch.StartNew();
             _StackForwardTracer.TraceForward(instructionNodes);
+            Console.WriteLine("Stack forward took" + stopwatch.Elapsed);
+            stopwatch.Reset();
             _ConditionalBacktracer.TraceConditionals(instructionNodes);
+            Console.WriteLine("conditional tool forward took" + stopwatch.Elapsed);
+            stopwatch.Reset();
             TraceDataTransferingNodeRec(instructionNodes[0], _InFuncDataTransferBackTracers);
+            Console.WriteLine("Data transfer took" + stopwatch.Elapsed);
+            stopwatch.Reset();
         }
 
         BackTracer[] _InFuncDataTransferBackTracers;
@@ -57,12 +65,13 @@ namespace Dopple.BackTracers
             }
             TraceOutsideFunctionBoundsRec(instructionNodes[0], mergingNodesData);
             var nonPassedThrough = mergingNodesData.Keys.Where(x => !x.BranchProperties.MergingNodeProperties.MergedBranches.SequenceEqual(mergingNodesData[x].ReachedBranches));
-            Console.WriteLine("Visited node count is " + CountVisitedNodes);
+            Console.WriteLine("Visited node count is " + GlobalVisited.Count);
             CountVisitedNodes = 0;
         }
 
         private BackTracer[] _OutFuncDataTransferBackTracers;
 
+        private List<InstructionNode> GlobalVisited = new List<InstructionNode>();
         private void TraceOutsideFunctionBoundsRec(InstructionNode currentNode, Dictionary<InstructionNode, MergeNodeTraceData> mergingNodesData, InstructionNode lastNode = null, StateProviders stateProviders = null, List<InstructionNode> visited = null )
         {
             if (visited == null)
@@ -70,13 +79,16 @@ namespace Dopple.BackTracers
                 visited = new List<InstructionNode>();
                 lastNode = currentNode;
                 stateProviders = new StateProviders();
+                GlobalVisited.Clear();
             }
             while (true)
             {
-                if (visited.Count(x => x == currentNode) > 1)
+                if (visited.Contains(currentNode) && !currentNode.BranchProperties.MergingNodeProperties.IsMergingNode)
                 {
                     return;
                 }
+                visited.Add(currentNode);
+                GlobalVisited.Add(currentNode);
                 bool reachedMergeNodeNotLast;
                 ActOnCurrentNode(currentNode, mergingNodesData, lastNode, ref stateProviders, out reachedMergeNodeNotLast);
                 if (reachedMergeNodeNotLast)
@@ -93,11 +105,14 @@ namespace Dopple.BackTracers
                     break;
                 }
             }
+            if (currentNode.ProgramFlowForwardRoutes.Count ==0)
+            {
+
+            }
             foreach(var nextNode in currentNode.ProgramFlowForwardRoutes)
             {
-                TraceOutsideFunctionBoundsRec(nextNode, mergingNodesData, lastNode, stateProviders.Clone(), new List<InstructionNode>(visited));
+                TraceOutsideFunctionBoundsRec(nextNode, mergingNodesData, lastNode, stateProviders.Clone(), visited);
             }
-
         }
 
         private static void ActOnCurrentNode(InstructionNode currentNode, Dictionary<InstructionNode, MergeNodeTraceData> mergingNodesData, InstructionNode lastNode, ref StateProviders stateProviders, out bool reachedMergeNodeNotLast)
@@ -106,12 +121,18 @@ namespace Dopple.BackTracers
             {
                 lock (mergingNodesData)
                 {
-                    mergingNodesData[currentNode].ReachedBranches.AddRangeDistinct(lastNode.BranchProperties.Branches);
-                    if (!lastNode.BranchProperties.Branches.Any(x => currentNode.BranchProperties.MergingNodeProperties.MergedBranches.Contains(x)))
+                    ConditionalJumpNode lastAsConditional = lastNode as ConditionalJumpNode;
+                    if (lastAsConditional != null)
                     {
-                        if (!(lastNode is ConditionalJumpNode && ((ConditionalJumpNode) lastNode).CreatedBranches.SequenceEqual(currentNode.BranchProperties.MergingNodeProperties.MergedBranches)))
+                        //TODO if last was conditional and the merging is a call node and was removed need to deal with
+                        mergingNodesData[currentNode].ReachedBranches.AddDistinct(lastAsConditional.ForwardBranchedPaths[currentNode]);
+                    }
+                    else
+                    {
+                        mergingNodesData[currentNode].ReachedBranches.AddRangeDistinct(lastNode.BranchProperties.Branches);
+                        if (!lastNode.BranchProperties.Branches.Any(x => currentNode.BranchProperties.MergingNodeProperties.MergedBranches.Contains(x)))
                         {
-                            throw new Exception("Reached from unmerged branch");
+                            //throw new Exception("Reached from unmerged branch");
                         }
                     }
                     mergingNodesData[currentNode].AccumelatedStateProviders.AddNewProviders(stateProviders);
