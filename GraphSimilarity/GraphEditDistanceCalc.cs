@@ -27,7 +27,6 @@ namespace GraphSimilarity
                  //step 3 = concider for each one, deleting
                  //continue until no more nodes left of the first graph
 
-            var watch = System.Diagnostics.Stopwatch.StartNew();
             // the code that you want to measure comes here
 
             int index = 0;
@@ -64,8 +63,6 @@ namespace GraphSimilarity
                 cheapestPath = pathsToConcider.First().Value[0];
                 if (cheapestPath.HeuristicCost == 0)
                 {
-                    watch.Stop();
-                    var elapsedMs = watch.ElapsedMilliseconds;
                     return cheapestPath;
                 }
             }

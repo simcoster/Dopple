@@ -32,8 +32,8 @@ namespace Dopple.BackTracers
             }
             while (true)
             {
-                lock (currentNode)
-                {
+                //lock (currentNode)
+                //{
                     if (!currentNode.StackBacktraceDone)
                     {
                         currentNode.DataFlowBackRelated.ResetIndex();
@@ -49,7 +49,7 @@ namespace Dopple.BackTracers
                         {
                             stackedNodes.Push(currentNode);
                         }
-                    }
+                    //}
                 }
 
                 int forwardRouteCount = currentNode.ProgramFlowForwardRoutes.Count;
@@ -73,12 +73,18 @@ namespace Dopple.BackTracers
                 }
             }
 
-            Parallel.ForEach(currentNode.ProgramFlowForwardRoutes, (forwardRoute) =>
+            //Parallel.ForEach(currentNode.ProgramFlowForwardRoutes, (forwardRoute) =>
+            // {
+            //     var stackedNodesClone = new Stack<InstructionNode>(stackedNodes.Reverse());
+            //     var visitedNodesClone = new List<InstructionNode>(visitedNodes);
+            //     TraceForwardRec(instructionNodes, forwardRoute, visitedNodesClone, stackedNodesClone);
+            // });
+            foreach(var forwardRoute in currentNode.ProgramFlowForwardRoutes)
              {
                  var stackedNodesClone = new Stack<InstructionNode>(stackedNodes.Reverse());
                  var visitedNodesClone = new List<InstructionNode>(visitedNodes);
                  TraceForwardRec(instructionNodes, forwardRoute, visitedNodesClone, stackedNodesClone);
-             });
+             }
 
         }
     }

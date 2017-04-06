@@ -30,16 +30,16 @@ namespace Dopple.BackTracers
 
         internal void DataTraceInFunctionBounds(List<InstructionNode> instructionNodes)
         {
-            Stopwatch stopwatch = Stopwatch.StartNew();
+            //Stopwatch stopwatch = Stopwatch.StartNew();
             _StackForwardTracer.TraceForward(instructionNodes);
-            Console.WriteLine("Stack forward took" + stopwatch.Elapsed);
-            stopwatch.Reset();
+            //Console.WriteLine("Stack forward took" + stopwatch.Elapsed);
+            //stopwatch.Reset();
             _ConditionalBacktracer.TraceConditionals(instructionNodes);
-            Console.WriteLine("conditional tool forward took" + stopwatch.Elapsed);
-            stopwatch.Reset();
+            //Console.WriteLine("conditional tool forward took" + stopwatch.Elapsed);
+            //stopwatch.Reset();
             TraceDataTransferingNodeRec(instructionNodes[0], _InFuncDataTransferBackTracers);
-            Console.WriteLine("Data transfer took" + stopwatch.Elapsed);
-            stopwatch.Reset();
+            //Console.WriteLine("Data transfer took" + stopwatch.Elapsed);
+            //stopwatch.Reset();
         }
 
         BackTracer[] _InFuncDataTransferBackTracers;
@@ -125,7 +125,7 @@ namespace Dopple.BackTracers
                     if (lastAsConditional != null)
                     {
                         //TODO if last was conditional and the merging is a call node and was removed need to deal with
-                        mergingNodesData[currentNode].ReachedBranches.AddDistinct(lastAsConditional.ForwardBranchedPaths[currentNode]);
+                        mergingNodesData[currentNode].ReachedBranches.AddDistinct(lastAsConditional.ForwardBranchedPaths.First(x => x.Item1 == currentNode).Item2);
                     }
                     else
                     {

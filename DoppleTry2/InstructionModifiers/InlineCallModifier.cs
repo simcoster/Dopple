@@ -39,14 +39,18 @@ namespace Dopple.InstructionModifiers
             }
             foreach (var inlinedCallNode in instructionNodes.Where(x => x is InlineableCallNode && ((InlineableCallNode)x).CallWasInlined).ToList())
             {
-                //inlinedCallNode.SelfRemove();
-                //instructionNodes.Remove(inlinedCallNode);
+                inlinedCallNode.SelfRemove();
+                instructionNodes.Remove(inlinedCallNode);
             }
         }
 
         private List<InstructionNode> InlineRec(InlineableCallNode callNode)
         {
-            var tempStop = Stopwatch.StartNew();
+            //var tempStop = Stopwatch.StartNew();
+            if (callNode.InliningProperties.CallSequence.Count > 5)
+            {
+                return new List<InstructionNode>();
+            }
             MethodDefinition calledMethodDef = callNode.TargetMethodDefinition;
             callNode.CallWasInlined = true;
             if (calledMethodDef.Body == null)
@@ -88,8 +92,8 @@ namespace Dopple.InstructionModifiers
             {
                 Console.WriteLine(callNode.TargetMethod.FullName + " is the last of the chain");
             }
-            tempStop.Stop();
-            Console.WriteLine("inlinling " + callNode.TargetMethod.FullName + " with " + inlinedNodes.Count + " nodes, took " + tempStop.Elapsed);
+            //tempStop.Stop();
+            //Console.WriteLine("inlinling " + callNode.TargetMethod.FullName + " with " + inlinedNodes.Count + " nodes, took " + tempStop.Elapsed);
             return inlinedNodes;
         }
 

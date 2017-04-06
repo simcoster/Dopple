@@ -24,7 +24,7 @@ namespace Dopple.BackTracers
                 {
                     var branch = new BranchID(conditionalJumpNode) { BranchType = BranchType.Exit, PairedBranchesIndex = pairedBranchIndex };
                     conditionalJumpNode.CreatedBranches.Add(branch);
-                    conditionalJumpNode.ForwardBranchedPaths.Add(forwardNode, branch);
+                    conditionalJumpNode.ForwardBranchedPaths.Add(new Tuple<InstructionNode, BranchID>( forwardNode, branch));
                     MoveForwardAndMarkBranch(conditionalJumpNode, forwardNode,branch);
                     pairedBranchIndex = PairedBranchIndex.Second;
                 }

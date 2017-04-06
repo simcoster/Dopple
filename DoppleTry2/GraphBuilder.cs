@@ -79,11 +79,7 @@ namespace Dopple
                         return stackPopException.problematicRoute;
                     }
                 }
-
-                Stopwatch stopwach = Stopwatch.StartNew();
-
                 InlineFunctionCalls();
-                stopwach.Stop();
                 SetInstructionIndexes();
             
                 //if (shouldRunDynamicTrace)

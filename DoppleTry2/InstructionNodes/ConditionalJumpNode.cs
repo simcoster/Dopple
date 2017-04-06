@@ -16,7 +16,7 @@ namespace Dopple.InstructionNodes
     {
         public List<BranchID> CreatedBranches= new List<BranchID>();
         public List<InstructionNode> AffectedModes = new List<InstructionNode>();
-        public Dictionary<InstructionNode, BranchID> ForwardBranchedPaths = new Dictionary<InstructionNode, BranchID>();
+        public List<Tuple<InstructionNode, BranchID>> ForwardBranchedPaths = new List<Tuple<InstructionNode, BranchID>>();
         public ConditionalJumpNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
         }
