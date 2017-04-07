@@ -72,13 +72,13 @@ namespace Dopple.BackTracers
         private BackTracer[] _OutFuncDataTransferBackTracers;
 
         private List<InstructionNode> GlobalVisited = new List<InstructionNode>();
-        private void TraceOutsideFunctionBoundsRec(InstructionNode currentNode, Dictionary<InstructionNode, MergeNodeTraceData> mergingNodesData, InstructionNode lastNode = null, StateProviders stateProviders = null, List<InstructionNode> visited = null )
+        private void TraceOutsideFunctionBoundsRec(InstructionNode currentNode, Dictionary<InstructionNode, MergeNodeTraceData> mergingNodesData, InstructionNode lastNode = null, StateProviderCollection stateProviders = null, List<InstructionNode> visited = null )
         {
             if (visited == null)
             {
                 visited = new List<InstructionNode>();
                 lastNode = currentNode;
-                stateProviders = new StateProviders();
+                stateProviders = new StateProviderCollection();
                 GlobalVisited.Clear();
             }
             while (true)
@@ -90,7 +90,20 @@ namespace Dopple.BackTracers
                 visited.Add(currentNode);
                 GlobalVisited.Add(currentNode);
                 bool reachedMergeNodeNotLast;
-                ActOnCurrentNode(currentNode, mergingNodesData, lastNode, ref stateProviders, out reachedMergeNodeNotLast);
+                int stateProviderCount = stateProviders.Count;
+                ActOnCurrentNode(currentNode, mergingNodesData, lastNode, stateProviders, out reachedMergeNodeNotLast);
+                if (currentNode is LoadFieldNode)
+                {
+                    var storeVisited = visited.Where(x => x is StoreFieldNode && ((StoreFieldNode) x).FieldDefinition.Name == ((LoadFieldNode) currentNode).FieldDefinition.Name);
+                    if (storeVisited.Any())
+                    {
+
+                    }
+                }
+                if (stateProviders.Count <2)
+                {
+
+                }
                 if (reachedMergeNodeNotLast)
                 {
                     return;
@@ -115,7 +128,7 @@ namespace Dopple.BackTracers
             }
         }
 
-        private static void ActOnCurrentNode(InstructionNode currentNode, Dictionary<InstructionNode, MergeNodeTraceData> mergingNodesData, InstructionNode lastNode, ref StateProviders stateProviders, out bool reachedMergeNodeNotLast)
+        private static void ActOnCurrentNode(InstructionNode currentNode, Dictionary<InstructionNode, MergeNodeTraceData> mergingNodesData, InstructionNode lastNode, StateProviderCollection stateProviders, out bool reachedMergeNodeNotLast)
         {
             if (currentNode.BranchProperties.MergingNodeProperties.IsMergingNode)
             {
@@ -140,7 +153,7 @@ namespace Dopple.BackTracers
                     if (allBranchesReached)
                     {
                         mergingNodesData[currentNode].AccumelatedStateProviders.MergeBranches(currentNode);
-                        stateProviders = mergingNodesData[currentNode].AccumelatedStateProviders;
+                        stateProviders.AddNewProviders(mergingNodesData[currentNode].AccumelatedStateProviders);
                     }
                     else
                     {

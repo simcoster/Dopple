@@ -159,13 +159,35 @@ namespace DoppleGraph
             }
             else if (e.KeyChar == '-')
             {
-                foreach (GoTextNode gonode in myView.Document.Where(x => x is GoNode))
+                var selectedNode = myView.Selection.Where(x => x is GoTextNode).Cast<GoTextNode>().FirstOrDefault();
+                if (selectedNode == null)
                 {
-                    gonode.Shape.PenColor = Color.Blue;
-                    gonode.Shape.PenWidth = 3;
+                    return;
                 }
+                DrawCloser(selectedNode, selectedNode,2);
             }
             ReShow();
+        }
+
+        public void DrawCloser(GoTextNode originalNode,GoTextNode currentNode, double modifier, List<GoTextNode> visited = null)
+        {
+            if (visited == null)
+            {
+                visited = new List<GoTextNode>() { currentNode };
+            }
+          
+            foreach (GoTextNode backNode in currentNode.LeftPort.Links.Cast<GoLink>().Where(x => x.Layer == flowRoutesLinksLayer).Select(x => x.FromNode))
+            {
+                if (visited.Contains(backNode))
+                {
+                    continue;
+                }
+                visited.Add(backNode);
+                float xLoc = (backNode.Location.X + originalNode.Location.X) / (float)modifier;
+                float yLoc = (backNode.Location.Y + originalNode.Location.Y) / (float) modifier;
+                backNode.Location = new PointF(xLoc, yLoc);
+                DrawCloser(originalNode, backNode, modifier, visited);
+            }
         }
 
         IEnumerable<GoObject> GetObjectsToHide(IEnumerable<GoNode> nodesToShow)
@@ -465,10 +487,10 @@ namespace DoppleGraph
         {
             foreach (var node in colNodes)
             {
-                var nodesToUpdate = node.InstructionNode.DataFlowForwardRelated
-                //var nodesToUpdate = node.InstructionNode.ProgramFlowForwardRoutes
-               .Select(x => GetNodeWrapper(x.Argument))
-               //.Select(x => GetNodeWrapper(x))
+                //var nodesToUpdate = node.InstructionNode.DataFlowForwardRelated
+                var nodesToUpdate = node.InstructionNode.ProgramFlowForwardRoutes
+               //.Select(x => GetNodeWrapper(x.Argument))
+               .Select(x => GetNodeWrapper(x))
                //TODO remove, this hides a problem
                .Where(x => x.LongestPath.Count == 0 || !x.LongestPath.Intersect(node.LongestPath).SequenceEqual(x.LongestPath))
                .Where(x => x.LongestPath.Count < node.LongestPath.Count + 1)

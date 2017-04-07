@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Dopple.Tracers.DynamicTracing
 {
-    class StateProviders
+    class StateProviderCollection
     {
         private List<StoreDynamicDataStateProvider> _StateProviders = new List<StoreDynamicDataStateProvider>();
         public int Count
@@ -18,6 +18,10 @@ namespace Dopple.Tracers.DynamicTracing
             {
                 return _StateProviders.Count;
             }
+        }
+        public void Clear()
+        {
+            _StateProviders.Clear();
         }
         public void AddNewProvider(StoreDynamicDataStateProvider newStateProvider)
         {
@@ -36,7 +40,7 @@ namespace Dopple.Tracers.DynamicTracing
             _StateProviders.Add(newStateProvider);
         }
 
-        public void AddNewProviders(StateProviders stateProviders)
+        public void AddNewProviders(StateProviderCollection stateProviders)
         {
             foreach (var stateProvider in stateProviders._StateProviders)
             {
@@ -77,9 +81,9 @@ namespace Dopple.Tracers.DynamicTracing
             return _StateProviders.Where(x => x.IsLoadNodeMatching(loadNode)).Select(x => x.StoreNode);
         }
 
-        internal StateProviders Clone()
+        internal StateProviderCollection Clone()
         {
-            return new StateProviders() { _StateProviders = new List<StoreDynamicDataStateProvider>(this._StateProviders) };
+            return new StateProviderCollection() { _StateProviders = new List<StoreDynamicDataStateProvider>(this._StateProviders) };
         }
     }
 }
