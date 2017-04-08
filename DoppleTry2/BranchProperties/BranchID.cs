@@ -12,7 +12,7 @@ namespace Dopple.BranchPropertiesNS
     {
         private static object _LockGlobalIndex = new object();
         private static int GlobalIndex = 0;
-        public BranchID(ConditionalJumpNode originatingNode)
+        public BranchID(InstructionNode originatingNode)
         {
             lock(_LockGlobalIndex)
             {
@@ -23,12 +23,13 @@ namespace Dopple.BranchPropertiesNS
         }
         public int Index { get; private set; }
         public virtual BranchType BranchType { get; set; }
-        public ConditionalJumpNode OriginatingNode { get; set; }
+        public InstructionNode OriginatingNode { get; set; }
         public PairedBranchIndex PairedBranchesIndex { get; set; } = PairedBranchIndex.First;
+        public List<InstructionNode> BranchNodes { get; } = new List<InstructionNode>();
 
         public virtual void RemoveNode(InstructionNode instructionNode)
         {
-            OriginatingNode.AffectedModes.Remove(instructionNode);
+            OriginatingNode.BranchProperties.AffectedNodes.Remove(instructionNode);
         }
     }
 

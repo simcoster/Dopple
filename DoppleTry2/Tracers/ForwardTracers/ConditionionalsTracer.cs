@@ -15,44 +15,44 @@ namespace Dopple.BackTracers
     {
         public void TraceConditionals(List<InstructionNode> instructionNodes)
         {
-            var conditionalJumpNodes = instructionNodes.Where(x => x is ConditionalJumpNode).Cast<ConditionalJumpNode>();
-            var BranchPairs = new List<List<BranchID>>();
-            foreach (var conditionalJumpNode in conditionalJumpNodes)
+            var splitNodes = instructionNodes.Where(x => x.ProgramFlowForwardRoutes.Count >1);
+            var branchesSameOrigins = new List<List<BranchID>>();
+            foreach (var splitNode in splitNodes)
             {
                 PairedBranchIndex pairedBranchIndex = PairedBranchIndex.First;
-                foreach (var forwardNode in conditionalJumpNode.ProgramFlowForwardRoutes.ToList())
+                foreach (var forwardNode in splitNode.ProgramFlowForwardRoutes.ToList())
                 {
-                    var branch = new BranchID(conditionalJumpNode) { BranchType = BranchType.Exit, PairedBranchesIndex = pairedBranchIndex };
-                    conditionalJumpNode.CreatedBranches.Add(branch);
-                    conditionalJumpNode.ForwardBranchedPaths.Add(new Tuple<InstructionNode, BranchID>( forwardNode, branch));
-                    MoveForwardAndMarkBranch(conditionalJumpNode, forwardNode,branch);
+                    var branch = new BranchID(splitNode) { BranchType = BranchType.Exit, PairedBranchesIndex = pairedBranchIndex };
+                    splitNode.BranchProperties.CreatedBranches.Add(branch);
+                    MoveForwardAndMarkBranch(splitNode, forwardNode,branch);
                     pairedBranchIndex = PairedBranchIndex.Second;
                 }
-                BranchPairs.Add(conditionalJumpNode.CreatedBranches.ToList());
+                branchesSameOrigins.Add(splitNode.BranchProperties.CreatedBranches);
             }
             foreach(var node in instructionNodes)
             {
-                foreach(var branchPair in BranchPairs)
+                foreach(var branchesSameOrigin in branchesSameOrigins)
                 {
-                    if (branchPair.All(x => node.BranchProperties.Branches.Contains(x)))
+                    if (branchesSameOrigin.All(x => node.BranchProperties.Branches.Contains(x)))
                     {
-                        node.BranchProperties.Branches.RemoveAll(x => branchPair.Contains(x));
+                        node.BranchProperties.Branches.RemoveAll(x => branchesSameOrigin.Contains(x));
                     }
                 }
             }
         }
 
-        private void MoveForwardAndMarkBranch(ConditionalJumpNode conditionalJumpNode,InstructionNode currentNode, BranchID currentBranch, List<InstructionNode> visited = null)
+        private void MoveForwardAndMarkBranch(InstructionNode originNode,InstructionNode currentNode, BranchID currentBranch, List<InstructionNode> visited = null)
         {
             if (visited ==null)
             {
-                visited = new List<InstructionNode>() { conditionalJumpNode };
+                visited = new List<InstructionNode>() { originNode };
             }
             while(true)
             {
-                if (currentNode == conditionalJumpNode)
+                if (currentNode == originNode)
                 {
                     currentNode.BranchProperties.Branches.AddDistinct(currentBranch);
+                    currentBranch.BranchNodes.Add(currentNode);
                     currentBranch.BranchType = BranchType.Loop;
                     return;
                 }
@@ -61,7 +61,7 @@ namespace Dopple.BackTracers
                     return;
                 }
                 visited.Add(currentNode);
-                BranchID secondBranch = currentNode.BranchProperties.Branches.FirstOrDefault(x => x.OriginatingNode == conditionalJumpNode && x != currentBranch);
+                BranchID secondBranch = currentNode.BranchProperties.Branches.FirstOrDefault(x => x.OriginatingNode == originNode && x != currentBranch);
                 if (secondBranch != null)
                 {
                     MarkMergeNode(currentNode, currentBranch, secondBranch);
@@ -69,6 +69,7 @@ namespace Dopple.BackTracers
                     return;
                 }
                 currentNode.BranchProperties.Branches.AddDistinct(currentBranch);
+                currentBranch.BranchNodes.Add(currentNode);
                 if (currentNode.ProgramFlowForwardRoutes.Count == 0)
                 {
                     return;
@@ -81,7 +82,7 @@ namespace Dopple.BackTracers
             }
             foreach (var forwardNode in currentNode.ProgramFlowForwardRoutes)
             {
-                MoveForwardAndMarkBranch(conditionalJumpNode, forwardNode, currentBranch, visited);
+                MoveForwardAndMarkBranch(originNode, forwardNode, currentBranch, visited);
             }
         }
 

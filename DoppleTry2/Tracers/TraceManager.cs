@@ -125,15 +125,19 @@ namespace Dopple.BackTracers
             {
                 return;
             }
-            var nextLoopBranches = ((ConditionalJumpNode) currentNode).ForwardBranchedPaths.Where(x => x.Item2.BranchType == BranchPropertiesNS.BranchType.Loop);
-            foreach (var nextNode in nextLoopBranches)
+            if (currentNode.BranchProperties.CreatedBranches.Count <2)
             {
-                TraceOutsideFunctionBoundsRec(nextNode.Item1, mergingNodesData, lastNode, stateProviders.Clone(), visited);
+                throw new Exception("something went wrong");
             }
-            var nextRestBranches = ((ConditionalJumpNode) currentNode).ForwardBranchedPaths.Where(x => x.Item2.BranchType != BranchPropertiesNS.BranchType.Loop);
-            foreach (var nextNode in nextRestBranches)
+            var loopBranches = currentNode.BranchProperties.CreatedBranches.Where(x => x.BranchType == BranchPropertiesNS.BranchType.Loop);
+            foreach (var loopBranch in loopBranches)
             {
-                TraceOutsideFunctionBoundsRec(nextNode.Item1, mergingNodesData, lastNode, stateProviders.Clone(), visited);
+                TraceOutsideFunctionBoundsRec(loopBranch.BranchNodes.First(), mergingNodesData, lastNode, stateProviders.Clone(), visited);
+            }
+            var nonLoopBranches = currentNode.BranchProperties.CreatedBranches.Where(x => x.BranchType != BranchPropertiesNS.BranchType.Loop);
+            foreach (var nonLoopBranch in nonLoopBranches)
+            {
+                TraceOutsideFunctionBoundsRec(nonLoopBranch.BranchNodes.First(), mergingNodesData, lastNode, stateProviders.Clone(), visited);
             }
         }
 

@@ -24,7 +24,7 @@ namespace Dopple
         public static Code[] StLocCodes   =  { Code.Stloc, Code.Stloc_0, Code.Stloc_1, Code.Stloc_2, Code.Stloc_3, Code.Stloc_S };
         public static Code[] CondJumpCodes = { Code.Beq, Code.Beq_S, Code.Bge_S, Code.Bge_Un, Code.Bge_Un_S, Code.Bgt, Code.Bgt_S, Code.Bgt_Un, Code.Bgt_Un_S,
                                                Code.Ble, Code.Ble_S, Code.Ble_Un, Code.Ble_Un_S, Code.Blt, Code.Blt_S, Code.Blt_Un, Code.Blt_Un_S, Code.Bne_Un,
-                                               Code.Bne_Un_S, Code.Brfalse , Code.Brfalse_S, Code.Brtrue, Code.Brtrue_S };
+                                               Code.Bne_Un_S, Code.Brfalse , Code.Brfalse_S, Code.Brtrue, Code.Brtrue_S, Code.Switch };
         public static Code[] ArithmeticCodes = {Code.Add, Code.Add_Ovf, Code.Add_Ovf_Un, Code.Sub, Code.Sub_Ovf, Code.Sub_Ovf_Un, Code.Mul, Code.Mul_Ovf, Code.Mul_Ovf_Un,
                                                 Code.Div, Code.Div_Un};
         public static Code[] StIndCodes = { Code.Stind_I, Code.Stind_I1, Code.Stind_I2, Code.Stind_I4, Code.Stind_I8, Code.Stind_R4, Code.Stind_R8 };
