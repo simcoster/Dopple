@@ -17,8 +17,23 @@ namespace Dopple.Tracers.PredciateProviders
         internal abstract List<InstructionNode> GetObjectArgs(InstructionNode storeNode);
         public abstract bool IsLoadNodeMatching(InstructionNode loadNode);
         public InstructionNode StoreNode { get; private set; }
-        public List<InstructionNode> ObjectNodes { get; set; }
+        private List<InstructionNode> objectNodes;
         public abstract bool ShareNonObjectArgs(StoreDynamicDataStateProvider newStore);
+        public Guid MyGuid { get; set; } = Guid.NewGuid();
+
+        public List<InstructionNode> ObjectNodes
+        {
+            get
+            {
+                return objectNodes;
+            }
+
+            set
+            {
+                this.objectNodes = value;
+            }
+        }
+
         protected bool ShareObejctArgs(InstructionNode loadNode)
         {
             var loadNodeNodeObjects = loadNode.DataFlowBackRelated.Where(x => x.ArgIndex == 0).SelectMany(x => x.Argument.GetDataOriginNodes());

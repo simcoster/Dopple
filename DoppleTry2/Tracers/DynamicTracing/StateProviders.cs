@@ -27,6 +27,10 @@ namespace Dopple.Tracers.DynamicTracing
         {
             foreach (var overridedStore in _StateProviders.Where(x => newStateProvider.ShareNonObjectArgs(x)).ToList())
             {
+                if (overridedStore == newStateProvider)
+                {
+                    throw new Exception("new state provider is the same as the last");
+                }
                 bool overidedIsInSameBranch = newStateProvider.StoreNode.BranchProperties.Branches.Except(overridedStore.StoreNode.BranchProperties.Branches).Any() == false;
                 if (overidedIsInSameBranch)
                 {

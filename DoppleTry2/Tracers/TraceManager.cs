@@ -83,9 +83,12 @@ namespace Dopple.BackTracers
             }
             while (true)
             {
-                if (visited.Contains(currentNode) && !currentNode.BranchProperties.MergingNodeProperties.IsMergingNode)
+                if (visited.Contains(currentNode) )
                 {
-                    return;
+                    if (!currentNode.BranchProperties.MergingNodeProperties.IsMergingNode)
+                    {
+                        return;
+                    }
                 }
                 visited.Add(currentNode);
                 GlobalVisited.Add(currentNode);
