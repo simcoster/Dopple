@@ -123,11 +123,17 @@ namespace Dopple.BackTracers
             }
             if (currentNode.ProgramFlowForwardRoutes.Count ==0)
             {
-
+                return;
             }
-            foreach(var nextNode in currentNode.ProgramFlowForwardRoutes)
+            var nextLoopBranches = ((ConditionalJumpNode) currentNode).ForwardBranchedPaths.Where(x => x.Item2.BranchType == BranchPropertiesNS.BranchType.Loop);
+            foreach (var nextNode in nextLoopBranches)
             {
-                TraceOutsideFunctionBoundsRec(nextNode, mergingNodesData, lastNode, stateProviders.Clone(), visited);
+                TraceOutsideFunctionBoundsRec(nextNode.Item1, mergingNodesData, lastNode, stateProviders.Clone(), visited);
+            }
+            var nextRestBranches = ((ConditionalJumpNode) currentNode).ForwardBranchedPaths.Where(x => x.Item2.BranchType != BranchPropertiesNS.BranchType.Loop);
+            foreach (var nextNode in nextRestBranches)
+            {
+                TraceOutsideFunctionBoundsRec(nextNode.Item1, mergingNodesData, lastNode, stateProviders.Clone(), visited);
             }
         }
 

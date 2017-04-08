@@ -27,18 +27,22 @@ namespace Dopple.Tracers.DynamicTracing
         {
             foreach (var overridedStore in _StateProviders.Where(x => newStateProvider.ShareNonObjectArgs(x)).ToList())
             {
-                if (overridedStore == newStateProvider)
+                if (overridedStore.StoreNode == newStateProvider.StoreNode)
                 {
-                    throw new Exception("new state provider is the same as the last");
+                    _StateProviders.Remove(overridedStore);
                 }
-                bool overidedIsInSameBranch = newStateProvider.StoreNode.BranchProperties.Branches.Except(overridedStore.StoreNode.BranchProperties.Branches).Any() == false;
-                if (overidedIsInSameBranch)
+                else
                 {
-                    overridedStore.ObjectNodes = overridedStore.ObjectNodes.Except(newStateProvider.ObjectNodes).ToList();
-                    if (overridedStore.ObjectNodes.Any() == false)
+                    bool overidedIsInSameBranch = newStateProvider.StoreNode.BranchProperties.Branches.Except(overridedStore.StoreNode.BranchProperties.Branches).Any() == false;
+                    if (overidedIsInSameBranch)
                     {
-                        _StateProviders.Remove(overridedStore);
+                        overridedStore.ObjectNodes = overridedStore.ObjectNodes.Except(newStateProvider.ObjectNodes).ToList();
+                        if (overridedStore.ObjectNodes.Any() == false)
+                        {
+                            _StateProviders.Remove(overridedStore);
+                        }
                     }
+
                 }
             }
             _StateProviders.Add(newStateProvider);

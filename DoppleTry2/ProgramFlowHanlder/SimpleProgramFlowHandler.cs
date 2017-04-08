@@ -11,7 +11,7 @@ namespace Dopple.ProgramFlowHanlder
     {
         public SimpleProgramFlowHandler()
         {
-            HandledCodes = CodeGroups.AllOpcodes.Select(x => x.Code).ToArray();
+            HandledCodes = CodeGroups.AllOpcodes.Select(x => x.Code).Except(_unhandledCodes).ToArray();
         }
 
         //TODO check, why is this here?
@@ -21,12 +21,14 @@ namespace Dopple.ProgramFlowHanlder
 
         public override void SetForwardExecutionFlowInsts(InstructionNode node, List<InstructionNode> instructionWrappers)
         {
-            var nodesPointingToMe =
-               instructionWrappers.Where(x => x.Instruction.Next == node.Instruction);
-           foreach(var nodePointingToMe in nodesPointingToMe)
+            var pointedAtNode =
+               instructionWrappers.FirstOrDefault(x => x.Instruction == node.Instruction.Next);
+            if (pointedAtNode ==null)
             {
-                node.ProgramFlowBackRoutes.AddTwoWay(nodesPointingToMe);
+                Console.WriteLine("node "+ node.Instruction +" is pointing to no one, this shouldn't happen, investigate");
+                return;
             }
+            pointedAtNode.ProgramFlowBackRoutes.AddTwoWay(node);
         }
     }
 }

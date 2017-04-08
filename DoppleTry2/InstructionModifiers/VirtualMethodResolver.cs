@@ -152,6 +152,7 @@ namespace Dopple
                 methodStoresDynamic = IsStoringDynamicFromOutside(virtualNodeCall, virtualMethodImpl);
             }
             virtualNodeCall.MergeInto(virtualImplementationNode,true);
+            virtualImplementationNode.ProgramFlowResolveDone = true;
             virtualImplementationNode.StackBacktraceDone = true;
             virtualImplementationNode.DataFlowBackRelated.RemoveAllTwoWay(x => x.ArgIndex == 0 && x.Argument != objectArgument);
             virtualImplementationNode.InliningProperties = virtualNodeCall.InliningProperties;
