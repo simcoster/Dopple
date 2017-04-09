@@ -37,20 +37,20 @@ namespace Dopple.InstructionModifiers
                 instructionNodes.InsertRange(instructionNodes.IndexOf(callNode)+1, InlineRec(callNode));
                
             }
-            foreach (var inlinedCallNode in instructionNodes.Where(x => x is InlineableCallNode && ((InlineableCallNode)x).CallWasInlined).ToList())
-            {
-                inlinedCallNode.SelfRemove();
-                instructionNodes.Remove(inlinedCallNode);
-            }
+            //foreach (var inlinedCallNode in instructionNodes.Where(x => x is InlineableCallNode && ((InlineableCallNode)x).CallWasInlined).ToList())
+            //{
+            //    inlinedCallNode.SelfRemove();
+            //    instructionNodes.Remove(inlinedCallNode);
+            //}
         }
 
         private List<InstructionNode> InlineRec(InlineableCallNode callNode)
         {
             //var tempStop = Stopwatch.StartNew();
-            if (callNode.InliningProperties.CallSequence.Count > 6)
-            {
-                return new List<InstructionNode>();
-            }
+            //if (callNode.InliningProperties.CallSequence.Count > 8)
+            //{
+            //    //return new List<InstructionNode>();
+            //}
             MethodDefinition calledMethodDef = callNode.TargetMethodDefinition;
             callNode.CallWasInlined = true;
             if (calledMethodDef.Body == null)
@@ -68,6 +68,7 @@ namespace Dopple.InstructionModifiers
             List<InstructionNode> inlinedNodes = calledMethodDef.Body.Instructions.SelectMany(x => _InstructionNodeFactory.GetInstructionNodes(x, calledMethodDef)).ToList();
           
             inlinedNodes.ForEach(x => SetNodeProps(x, inlinedNodes, callNode));
+            callNode.BranchProperties.Branches.ForEach(x => x.BranchNodes.InsertRange(x.BranchNodes.IndexOf(callNode)+1, inlinedNodes));
 
             programFlowHanlder.AddFlowConnections(inlinedNodes);
             _BackTraceManager.DataTraceInFunctionBounds(inlinedNodes);

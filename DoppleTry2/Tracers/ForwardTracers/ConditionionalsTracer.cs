@@ -15,19 +15,19 @@ namespace Dopple.BackTracers
     {
         public void TraceConditionals(List<InstructionNode> instructionNodes)
         {
-            var splitNodes = instructionNodes.Where(x => x.ProgramFlowForwardRoutes.Count >1);
+            var splitNodes = instructionNodes.Where(x => x is ConditionalJumpNode).Cast<ConditionalJumpNode>();
             var branchesSameOrigins = new List<List<BranchID>>();
-            foreach (var splitNode in splitNodes)
+            foreach (ConditionalJumpNode splitNode in splitNodes)
             {
                 PairedBranchIndex pairedBranchIndex = PairedBranchIndex.First;
                 foreach (var forwardNode in splitNode.ProgramFlowForwardRoutes.ToList())
                 {
                     var branch = new BranchID(splitNode) { BranchType = BranchType.Exit, PairedBranchesIndex = pairedBranchIndex };
-                    splitNode.BranchProperties.CreatedBranches.Add(branch);
+                    splitNode.CreatedBranches.Add(branch);
                     MoveForwardAndMarkBranch(splitNode, forwardNode,branch);
                     pairedBranchIndex = PairedBranchIndex.Second;
                 }
-                branchesSameOrigins.Add(splitNode.BranchProperties.CreatedBranches);
+                branchesSameOrigins.Add(splitNode.CreatedBranches);
             }
             foreach(var node in instructionNodes)
             {
@@ -65,7 +65,6 @@ namespace Dopple.BackTracers
                 if (secondBranch != null)
                 {
                     MarkMergeNode(currentNode, currentBranch, secondBranch);
-                    //MoveForwardAndRemoveBranch(currentNode, secondBranch);
                     return;
                 }
                 currentNode.BranchProperties.Branches.AddDistinct(currentBranch);
@@ -96,6 +95,8 @@ namespace Dopple.BackTracers
             secondBranch.BranchType = BranchType.SplitMerge;
             currentBranch.PairedBranchesIndex = PairedBranchIndex.Second;
             currentBranch.BranchType = BranchType.SplitMerge;
+            currentBranch.MergingNode = currentNode;
+            secondBranch.MergingNode = currentNode;
         }
     }   
 }

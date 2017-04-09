@@ -64,7 +64,11 @@ namespace Dopple.BackTracers
                 mergingNodesData.Add(mergingNode, new MergeNodeTraceData());
             }
             TraceOutsideFunctionBoundsRec(instructionNodes[0], mergingNodesData);
-            var nonPassedThrough = mergingNodesData.Keys.Where(x => !x.BranchProperties.MergingNodeProperties.MergedBranches.SequenceEqual(mergingNodesData[x].ReachedBranches));
+            var nonPassedThrough = mergingNodesData.Any(x => x.Value.AllBranchesReached ==false);
+            if (nonPassedThrough)
+            {
+                //throw new Exception("some nodes not reached");
+            }
             Console.WriteLine("Visited node count is " + GlobalVisited.Count);
             CountVisitedNodes = 0;
         }
@@ -125,18 +129,27 @@ namespace Dopple.BackTracers
             {
                 return;
             }
-            if (currentNode.BranchProperties.CreatedBranches.Count <2)
+            if (!(currentNode is ConditionalJumpNode))
             {
-                throw new Exception("something went wrong");
+                throw new Exception("split without a conditional");
             }
-            var loopBranches = currentNode.BranchProperties.CreatedBranches.Where(x => x.BranchType == BranchPropertiesNS.BranchType.Loop);
+            ConditionalJumpNode nodeAsConditional = (ConditionalJumpNode) currentNode;
+            var loopBranches = nodeAsConditional.CreatedBranches.Where(x => x.BranchType == BranchPropertiesNS.BranchType.Loop);
             foreach (var loopBranch in loopBranches)
             {
+                if (!currentNode.ProgramFlowForwardRoutes.Contains(loopBranch.BranchNodes.First()))
+                {
+                    throw new Exception("Next in branch is not next here");
+                }
                 TraceOutsideFunctionBoundsRec(loopBranch.BranchNodes.First(), mergingNodesData, lastNode, stateProviders.Clone(), visited);
             }
-            var nonLoopBranches = currentNode.BranchProperties.CreatedBranches.Where(x => x.BranchType != BranchPropertiesNS.BranchType.Loop);
+            var nonLoopBranches = nodeAsConditional.CreatedBranches.Where(x => x.BranchType != BranchPropertiesNS.BranchType.Loop);
             foreach (var nonLoopBranch in nonLoopBranches)
             {
+                if (!currentNode.ProgramFlowForwardRoutes.Contains(nonLoopBranch.BranchNodes.First()))
+                {
+                    throw new Exception("Next in branch is not next here");
+                }
                 TraceOutsideFunctionBoundsRec(nonLoopBranch.BranchNodes.First(), mergingNodesData, lastNode, stateProviders.Clone(), visited);
             }
         }
@@ -147,11 +160,10 @@ namespace Dopple.BackTracers
             {
                 lock (mergingNodesData)
                 {
-                    ConditionalJumpNode lastAsConditional = lastNode as ConditionalJumpNode;
-                    if (lastAsConditional != null)
+                    if (lastNode is ConditionalJumpNode)
                     {
                         //TODO if last was conditional and the merging is a call node and was removed need to deal with
-                        mergingNodesData[currentNode].ReachedBranches.AddDistinct(lastAsConditional.ForwardBranchedPaths.First(x => x.Item1 == currentNode).Item2);
+                        mergingNodesData[currentNode].ReachedBranches.AddDistinct(((ConditionalJumpNode)lastNode).CreatedBranches.First(x => x.BranchNodes.First()== currentNode));
                     }
                     else
                     {
@@ -165,6 +177,7 @@ namespace Dopple.BackTracers
                     bool allBranchesReached = !currentNode.BranchProperties.MergingNodeProperties.MergedBranches.Except(mergingNodesData[currentNode].ReachedBranches).Any();
                     if (allBranchesReached)
                     {
+                        mergingNodesData[currentNode].AllBranchesReached = true;
                         mergingNodesData[currentNode].AccumelatedStateProviders.MergeBranches(currentNode);
                         stateProviders.AddNewProviders(mergingNodesData[currentNode].AccumelatedStateProviders);
                     }

@@ -14,8 +14,18 @@ namespace Dopple.InstructionNodes
     [DataContract]
     public class ConditionalJumpNode : InstructionNode
     {
+        public List<BranchID> CreatedBranches = new List<BranchID>();
+
         public ConditionalJumpNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
+        }
+    }
+
+    public class PseudoSplitNode : ConditionalJumpNode
+    {
+        public PseudoSplitNode(MethodDefinition method) : base(Instruction.Create(CodeGroups.AllOpcodes.First(x => x.Code == Code.Nop)), method)
+        {
+            ProgramFlowResolveDone = true;
         }
     }
 }

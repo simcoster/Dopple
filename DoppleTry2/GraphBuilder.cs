@@ -9,6 +9,7 @@ using Mono.Cecil.Cil;
 using Dopple.VerifierNs;
 using Dopple.InstructionNodes;
 using System.Diagnostics;
+using Dopple.BranchPropertiesNS;
 
 namespace Dopple
 {
@@ -61,10 +62,11 @@ namespace Dopple
             bool shouldRerun = true;
             bool isFirstRun = true;
             bool shouldRunDynamicTrace = true;
+            BranchProperties.BaseBranch.BranchNodes.AddRange(InstructionNodes);
             SetInstructionIndexes();
             while (shouldRerun)
             {
-
+                BranchID.Reset();
                 Console.WriteLine("run counter is " + runCounter);
                 _programFlowManager.AddFlowConnections(InstructionNodes);
                 if (isFirstRun)

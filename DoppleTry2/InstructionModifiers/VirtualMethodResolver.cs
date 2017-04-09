@@ -157,7 +157,23 @@ namespace Dopple
             virtualImplementationNode.DataFlowBackRelated.RemoveAllTwoWay(x => x.ArgIndex == 0 && x.Argument != objectArgument);
             virtualImplementationNode.InliningProperties = virtualNodeCall.InliningProperties;
             virtualImplementationNode.OriginalVirtualNode = virtualNodeCall;
+
+            AddPseudoSplitNode(virtualNodeCall, virtualImplementationNode, instructionNodes);
+
             instructionNodes.Insert(instructionNodes.IndexOf(virtualNodeCall), virtualImplementationNode);
+        }
+
+        private void AddPseudoSplitNode(VirtualCallInstructionNode virtualNodeCall, CallNode virtualImplementationNode, List<InstructionNode> instructionNodes)
+        {
+            if (virtualNodeCall.PseudoSplitNode == null)
+            {
+                virtualNodeCall.PseudoSplitNode = new PseudoSplitNode(virtualNodeCall.Method);
+                virtualNodeCall.PseudoSplitNode.ProgramFlowBackRoutes.AddTwoWay(virtualNodeCall.ProgramFlowBackRoutes);
+                virtualNodeCall.ProgramFlowBackRoutes.RemoveAllTwoWay();
+                virtualNodeCall.PseudoSplitNode.ProgramFlowForwardRoutes.AddTwoWay(virtualNodeCall);
+                instructionNodes.Insert(instructionNodes.IndexOf(virtualNodeCall), virtualNodeCall.PseudoSplitNode);
+            }
+            virtualNodeCall.PseudoSplitNode.ProgramFlowForwardRoutes.AddTwoWay(virtualImplementationNode);
         }
 
         private bool IsStoringDynamicFromOutside(VirtualCallInstructionNode virtualNodeCall, MethodDefinition virtualMethodImpl)

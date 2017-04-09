@@ -173,7 +173,7 @@ namespace Dopple.InstructionNodes
         {
             foreach(var branch in BranchProperties.Branches)
             {
-                branch.RemoveNode(this);
+                branch.BranchNodes.Remove(this);
             }
             if (BranchProperties.MergingNodeProperties.IsMergingNode)
             {

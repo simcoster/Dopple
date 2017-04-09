@@ -9,5 +9,6 @@ namespace Dopple.BackTracers
     {
         public BranchList ReachedBranches = new BranchList();
         public StateProviderCollection AccumelatedStateProviders = new StateProviderCollection();
+        public bool AllBranchesReached = false;
     }
 }

@@ -23,6 +23,7 @@ namespace Dopple.InstructionNodes
         }
 
         public bool MethodIsUnresolveable {get;set;}
+        public PseudoSplitNode PseudoSplitNode { get; internal set; }
 
         public Dictionary<InstructionNode, bool> DataOriginNodeIsResolveable = new Dictionary<InstructionNode,bool>();
         internal VirtualCallInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
