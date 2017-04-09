@@ -136,21 +136,21 @@ namespace Dopple.BackTracers
             }
             ConditionalJumpNode nodeAsConditional = (ConditionalJumpNode) currentNode;
             var loopBranches = nodeAsConditional.CreatedBranches.Where(x => x.BranchType == BranchPropertiesNS.BranchType.Loop);
-            ProgressNext(currentNode, mergingNodesData, lastNode, stateProviders, visited, nodeAsConditional, loopBranches);
+            ProgressNext(mergingNodesData, lastNode, stateProviders, visited, nodeAsConditional, loopBranches);
             var nonLoopBranches = nodeAsConditional.CreatedBranches.Where(x => x.BranchType != BranchPropertiesNS.BranchType.Loop);
-            ProgressNext(currentNode, mergingNodesData, lastNode, stateProviders, visited, nodeAsConditional, nonLoopBranches);
+            ProgressNext(mergingNodesData, lastNode, stateProviders, visited, nodeAsConditional, nonLoopBranches);
         }
 
-        private void ProgressNext(InstructionNode currentNode, Dictionary<InstructionNode, MergeNodeTraceData> mergingNodesData, InstructionNode lastNode, StateProviderCollection stateProviders, List<InstructionNode> visited, ConditionalJumpNode nodeAsConditional, IEnumerable<BranchPropertiesNS.BranchID> loopBranches)
+        private void ProgressNext(Dictionary<InstructionNode, MergeNodeTraceData> mergingNodesData, InstructionNode lastNode, StateProviderCollection stateProviders, List<InstructionNode> visited, ConditionalJumpNode currentNode, IEnumerable<BranchPropertiesNS.BranchID> branches)
         {
-            foreach (var loopBranch in loopBranches)
+            foreach (var branch in branches)
             {
                 InstructionNode nextNode;
-                if (loopBranch.BranchNodes.Count == 0)
+                if (branch.BranchNodes.Count == 0)
                 {
-                    if (nodeAsConditional.ProgramFlowForwardRoutes.Contains(loopBranch.MergingNode))
+                    if (currentNode.ProgramFlowForwardRoutes.Contains(branch.MergingNode))
                     {
-                        nextNode = loopBranch.MergingNode;
+                        nextNode = branch.MergingNode;
                     }
                     else
                     {
@@ -159,12 +159,12 @@ namespace Dopple.BackTracers
                 }
                 else
                 {
-                    if (!currentNode.ProgramFlowForwardRoutes.Contains(loopBranch.BranchNodes.First()))
+                    if (!currentNode.ProgramFlowForwardRoutes.Contains(branch.BranchNodes.First()))
                     {
                         throw new Exception("First node in branch is not next");
                     }
 
-                    nextNode = loopBranch.BranchNodes.First();
+                    nextNode = branch.BranchNodes.First();
                 }
 
                 TraceOutsideFunctionBoundsRec(nextNode, mergingNodesData, lastNode, stateProviders.Clone(), visited);
@@ -183,9 +183,9 @@ namespace Dopple.BackTracers
                 lock (mergingNodesData)
                 {
                     var lastNodeAsConditional = lastNode as ConditionalJumpNode;
-                    if (lastNodeAsConditional != null)
+                    if (lastNodeAsConditional != null && lastNodeAsConditional.CreatedBranches.Any(x => x.MergingNode == currentNode))
                     {
-                        var emptyBranchToMe = lastNodeAsConditional.CreatedBranches.Where(x => x.MergingNode == currentNode && x.BranchNodes.Count ==0);
+                        var emptyBranchToMe = lastNodeAsConditional.CreatedBranches.Where(x => x.MergingNode == currentNode && x.BranchNodes.SequenceEqual(new[] { currentNode }));
                         if (emptyBranchToMe.Count() !=1)
                         {
                             throw new Exception("Should only be 1 empty branch to me");

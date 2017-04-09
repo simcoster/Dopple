@@ -1,10 +1,5 @@
 ﻿using Dopple.InstructionNodes;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Dopple.Tracers.ForwardTracers;
 
 namespace Dopple.BranchPropertiesNS
 {
@@ -32,7 +27,7 @@ namespace Dopple.BranchPropertiesNS
         public int Index { get; protected set; }
         public virtual BranchType BranchType { get; set; }
         public InstructionNode OriginatingNode { get; set; }
-        public PairedBranchIndex PairedBranchesIndex { get; set; } = PairedBranchIndex.First;
+        public int PairedBranchesIndex { get; set; }
         public List<InstructionNode> BranchNodes { get { return _BranchNodes; } } 
         public InstructionNode MergingNode { get; set; }
 

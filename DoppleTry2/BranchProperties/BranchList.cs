@@ -27,5 +27,10 @@ namespace Dopple.BranchPropertiesNS
                 this.AddDistinct(branch);
             }
         }
+
+        new public void Remove(BranchID branch)
+        {
+            base.Remove(branch);
+        }
     }
 }

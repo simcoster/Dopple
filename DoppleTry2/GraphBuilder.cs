@@ -83,8 +83,8 @@ namespace Dopple
                 }
                 
                 InlineFunctionCalls();
-                _backTraceManager.TraceConditionals(InstructionNodes);
                 SetInstructionIndexes();
+                _backTraceManager.TraceConditionals(InstructionNodes);
             
                 //if (shouldRunDynamicTrace)
                 //{
