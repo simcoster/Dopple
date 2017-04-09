@@ -26,6 +26,10 @@ namespace Dopple.BackTracers
                     MoveForwardAndMarkBranch(splitNode, forwardNode,branch);
                 }
                 branchesSameOrigins.Add(splitNode.CreatedBranches);
+                foreach(var branch in splitNode.CreatedBranches.Where(x => x.MergingNode == null))
+                {
+
+                }
             }
             foreach(var node in instructionNodes)
             {
@@ -54,7 +58,6 @@ namespace Dopple.BackTracers
             {
                 if (currentNode == originNode)
                 {
-                    currentBranch.MergingNode = originNode;
                     currentNode.BranchProperties.Branches.AddDistinct(currentBranch);
                     currentBranch.BranchNodes.Add(currentNode);
                     currentBranch.BranchType = BranchType.Loop;
@@ -73,6 +76,7 @@ namespace Dopple.BackTracers
                         int i = 1;
                         foreach (var mergedBranch in otherBranches.Concat(new[] { currentBranch }).ToList())
                         {
+                            mergedBranch.BranchType = BranchType.SplitMerge;
                             MarkMergeNode(currentNode, mergedBranch);
                             mergedBranch.PairedBranchesIndex = i;
                             i++;

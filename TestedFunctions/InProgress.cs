@@ -31,7 +31,7 @@ namespace TestedFunctions
         public static int testLinq(int[] nums)
         {
             int sum = 0;
-            foreach (var num in nums.Where(x => x > 6))
+            foreach (var num in Enumerable.Where(nums,(x => x > 6)))
             {
                 sum += num;
             }

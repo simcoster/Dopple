@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Dopple.BranchPropertiesNS
 {
-    public class BranchList : List<BranchID>
+    public class BranchList : HashSet<BranchID>
     {
         public void AddDistinct(BranchID branch)
         {

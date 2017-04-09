@@ -432,6 +432,8 @@ namespace DoppleGraph
         {
             switch (argIndex)
             {
+                case 0:
+                    return Color.LightGreen;
                 case 1:
                     return Color.Pink;
                 case 2:
