@@ -37,11 +37,11 @@ namespace Dopple.InstructionModifiers
                 instructionNodes.InsertRange(instructionNodes.IndexOf(callNode)+1, InlineRec(callNode));
                
             }
-            //foreach (var inlinedCallNode in instructionNodes.Where(x => x is InlineableCallNode && ((InlineableCallNode)x).CallWasInlined).ToList())
-            //{
-            //    inlinedCallNode.SelfRemove();
-            //    instructionNodes.Remove(inlinedCallNode);
-            //}
+            foreach (var inlinedCallNode in instructionNodes.Where(x => x is InlineableCallNode && ((InlineableCallNode) x).CallWasInlined).ToList())
+            {
+                inlinedCallNode.SelfRemove();
+                instructionNodes.Remove(inlinedCallNode);
+            }
         }
 
         private List<InstructionNode> InlineRec(InlineableCallNode callNode)

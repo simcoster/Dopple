@@ -171,6 +171,7 @@ namespace Dopple
                 virtualNodeCall.PseudoSplitNode.ProgramFlowBackRoutes.AddTwoWay(virtualNodeCall.ProgramFlowBackRoutes);
                 virtualNodeCall.ProgramFlowBackRoutes.RemoveAllTwoWay();
                 virtualNodeCall.PseudoSplitNode.ProgramFlowForwardRoutes.AddTwoWay(virtualNodeCall);
+                virtualImplementationNode.ProgramFlowBackRoutes.RemoveAllTwoWay();
                 instructionNodes.Insert(instructionNodes.IndexOf(virtualNodeCall), virtualNodeCall.PseudoSplitNode);
             }
             virtualNodeCall.PseudoSplitNode.ProgramFlowForwardRoutes.AddTwoWay(virtualImplementationNode);

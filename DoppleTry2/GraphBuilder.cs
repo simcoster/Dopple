@@ -81,7 +81,9 @@ namespace Dopple
                         return stackPopException.problematicRoute;
                     }
                 }
+                
                 InlineFunctionCalls();
+                _backTraceManager.TraceConditionals(InstructionNodes);
                 SetInstructionIndexes();
             
                 //if (shouldRunDynamicTrace)

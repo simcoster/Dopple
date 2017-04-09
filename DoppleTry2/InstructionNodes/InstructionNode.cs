@@ -34,6 +34,7 @@ namespace Dopple.InstructionNodes
             SingleUnitNodes = new List<InstructionNode>();
             MethodNameForSerilization = method.Name;
             MyGuid = Guid.NewGuid();
+            _BranchProperties = new BranchProperties(this);
         }
         
         public ProgramFlowBackRoutes ProgramFlowBackRoutes { get; set; }
@@ -44,7 +45,13 @@ namespace Dopple.InstructionNodes
         [DataMember]
         public SingleUnitBackRelated SingleUnitBackRelated { get; set; }
         public SingleUnitForwardRelated SingleUnitForwardRelated { get; internal set; }
-        public BranchProperties BranchProperties { get; set; } = new BranchProperties();
+        private BranchProperties _BranchProperties;
+
+        public BranchProperties BranchProperties
+        {
+            get { return _BranchProperties; }
+            private set { _BranchProperties = value; }
+        }
 
         public Instruction Instruction { get; set; }
         [DataMember]
@@ -164,7 +171,7 @@ namespace Dopple.InstructionNodes
             {
                 forwardRoute.ProgramFlowBackRoutes.AddTwoWay(ProgramFlowBackRoutes);
             }
-            RemoveFromBranches();
+            //RemoveFromBranches();
             ProgramFlowBackRoutes.RemoveAllTwoWay();
             ProgramFlowForwardRoutes.RemoveAllTwoWay();
         }

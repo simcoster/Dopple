@@ -33,6 +33,11 @@ namespace Dopple.BackTracers
             {
                 foreach(var branchesSameOrigin in branchesSameOrigins)
                 {
+                    if (branchesSameOrigin[0].MergingNode == node)
+                    {
+                        test this
+                        continue;
+                    }
                     if (branchesSameOrigin.All(x => node.BranchProperties.Branches.Contains(x)))
                     {
                         node.BranchProperties.Branches.RemoveAll(x => branchesSameOrigin.Contains(x));
