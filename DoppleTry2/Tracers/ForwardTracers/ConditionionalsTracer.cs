@@ -67,15 +67,18 @@ namespace Dopple.BackTracers
                 visited.Add(currentNode);
                 if (currentBranch.MergingNode == null)
                 {
-                    IEnumerable<BranchID> otherBranches = currentNode.BranchProperties.Branches.Where(x => x.OriginatingNode == originNode && x != currentBranch && x.MergingNode == null);
-                    int i = 1;
-                    foreach (var mergedBranch in otherBranches.Concat(new[] { currentBranch }).ToList())
+                    List<BranchID> otherBranches = currentNode.BranchProperties.Branches.Where(x => x.OriginatingNode == originNode && x != currentBranch && x.MergingNode == null).ToList();
+                    if (otherBranches.Count > 0)
                     {
-                        MarkMergeNode(currentNode, mergedBranch);
-                        mergedBranch.PairedBranchesIndex = i;
-                        i++;
-                    }
+                        int i = 1;
+                        foreach (var mergedBranch in otherBranches.Concat(new[] { currentBranch }).ToList())
+                        {
+                            MarkMergeNode(currentNode, mergedBranch);
+                            mergedBranch.PairedBranchesIndex = i;
+                            i++;
+                        }
 
+                    }
                 }
                 currentNode.BranchProperties.Branches.AddDistinct(currentBranch);
                 currentBranch.BranchNodes.Add(currentNode);
@@ -97,9 +100,9 @@ namespace Dopple.BackTracers
 
         private static void MarkMergeNode(InstructionNode currentNode, BranchID mergedBranch)
         {
-            currentNode.BranchProperties.Branches.Remove(mergedBranch);
             currentNode.BranchProperties.MergingNodeProperties.IsMergingNode = true;
             currentNode.BranchProperties.MergingNodeProperties.MergedBranches.Add(mergedBranch);
+            mergedBranch.MergingNode = currentNode;
         }
     }   
 }

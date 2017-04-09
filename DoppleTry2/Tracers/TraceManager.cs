@@ -185,7 +185,7 @@ namespace Dopple.BackTracers
                     var lastNodeAsConditional = lastNode as ConditionalJumpNode;
                     if (lastNodeAsConditional != null && lastNodeAsConditional.CreatedBranches.Any(x => x.MergingNode == currentNode))
                     {
-                        var emptyBranchToMe = lastNodeAsConditional.CreatedBranches.Where(x => x.MergingNode == currentNode && x.BranchNodes.SequenceEqual(new[] { currentNode }));
+                        var emptyBranchToMe = lastNodeAsConditional.CreatedBranches.Where(x => x.MergingNode == currentNode && x.BranchNodes.Count ==0);
                         if (emptyBranchToMe.Count() !=1)
                         {
                             throw new Exception("Should only be 1 empty branch to me");
