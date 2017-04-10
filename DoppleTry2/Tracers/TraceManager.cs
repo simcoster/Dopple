@@ -100,18 +100,18 @@ namespace Dopple.BackTracers
                 bool reachedMergeNodeNotLast;
                 int stateProviderCount = stateProviders.Count;
                 ActOnCurrentNode(currentNode, mergingNodesData, lastNode, stateProviders, out reachedMergeNodeNotLast);
-                if (currentNode is LoadFieldNode)
-                {
-                    var storeVisited = visited.Where(x => x is StoreFieldNode && ((StoreFieldNode) x).FieldDefinition.Name == ((LoadFieldNode) currentNode).FieldDefinition.Name);
-                    if (storeVisited.Any())
-                    {
+                //if (currentNode is LoadFieldNode)
+                //{
+                //    var storeVisited = visited.Where(x => x is StoreFieldNode && ((StoreFieldNode) x).FieldDefinition.Name == ((LoadFieldNode) currentNode).FieldDefinition.Name);
+                //    if (storeVisited.Any())
+                //    {
 
-                    }
-                }
-                if (stateProviders.Count < 2)
-                {
+                //    }
+                //}
+                //if (stateProviders.Count < 2)
+                //{
 
-                }
+                //}
                 if (reachedMergeNodeNotLast)
                 {
                     return;

@@ -151,11 +151,12 @@ namespace DoppleGraph
             }
             else if (e.KeyChar == '=')
             {
-                foreach(GoTextNode gonode in myView.Selection.Where(x => x is GoNode))
+                var selectedNode = myView.Selection.Where(x => x is GoTextNode).Cast<GoTextNode>().FirstOrDefault();
+                if (selectedNode == null)
                 {
-                    gonode.Shape.PenColor = Color.GreenYellow;
-                    gonode.Shape.PenWidth = 10;
+                    return;
                 }
+                DrawCloser(selectedNode, selectedNode,dataLinksLayer, 2);
             }
             else if (e.KeyChar == '-')
             {
@@ -164,29 +165,33 @@ namespace DoppleGraph
                 {
                     return;
                 }
-                DrawCloser(selectedNode, selectedNode,2);
+                DrawCloser(selectedNode, selectedNode,flowRoutesLinksLayer,2);
             }
             ReShow();
         }
 
-        public void DrawCloser(GoTextNode originalNode,GoTextNode currentNode, double modifier, List<GoTextNode> visited = null)
+        public void DrawCloser(GoTextNode originalNode,GoTextNode currentNode, GoLayer layer, float modifier, List<GoTextNode> visited = null)
         {
             if (visited == null)
             {
                 visited = new List<GoTextNode>() { currentNode };
             }
           
-            foreach (GoTextNode backNode in currentNode.LeftPort.Links.Cast<GoLink>().Where(x => x.Layer == flowRoutesLinksLayer).Select(x => x.FromNode))
+            foreach (GoTextNode backNode in currentNode.LeftPort.Links.Cast<GoLink>().Where(x => x.Layer == layer).Select(x => x.FromNode))
             {
                 if (visited.Contains(backNode))
                 {
                     continue;
                 }
                 visited.Add(backNode);
-                float xLoc = (backNode.Location.X + originalNode.Location.X) / (float)modifier;
-                float yLoc = (backNode.Location.Y + originalNode.Location.Y) / (float) modifier;
+                float xLoc = backNode.Location.X;
+                float yLoc = (originalNode.Location.Y + backNode.Location.Y) / modifier;
                 backNode.Location = new PointF(xLoc, yLoc);
-                DrawCloser(originalNode, backNode, modifier, visited);
+                if (modifier <=1)
+                {
+                    modifier -= 0.1f;
+                }
+                DrawCloser(originalNode, backNode, layer, modifier, visited);
             }
         }
 

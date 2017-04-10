@@ -72,7 +72,8 @@ namespace Dopple
                 return true;
             }
             systemMethodDef = null;
-            return false;
+            systemMethodDef= metRef.Resolve();
+            return true;
         }
 
         private MethodDefinition TryGetMethodDifferentOptions(string nameToSearch)
