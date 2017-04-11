@@ -7,14 +7,16 @@ using Dopple.InstructionNodes;
 using Mono.Cecil.Cil;
 using System.Diagnostics;
 using Dopple.BranchPropertiesNS;
-
+using System.Collections.Concurrent;
 
 namespace Dopple.BackTracers
 {
     class ConditionionalsTracer
     {
+        private Dictionary<int,BranchID> AllBrances;
         public void TraceConditionals(List<InstructionNode> instructionNodes)
         {
+            AllBrances = new Dictionary<int, BranchID>();
             var splitNodes = instructionNodes.Where(x => x is ConditionalJumpNode).Cast<ConditionalJumpNode>();
             var branchesSameOrigins = new List<List<BranchID>>();
             foreach (ConditionalJumpNode splitNode in splitNodes)
@@ -22,30 +24,40 @@ namespace Dopple.BackTracers
                 foreach (var forwardNode in splitNode.ProgramFlowForwardRoutes.ToList())
                 {
                     var branch = new BranchID(splitNode) { BranchType = BranchType.Exit};
+                    AllBrances.Add(branch.Index, branch);
                     splitNode.CreatedBranches.Add(branch);
                     MoveForwardAndMarkBranch(splitNode, forwardNode,branch);
                 }
                 branchesSameOrigins.Add(splitNode.CreatedBranches);
-                foreach(var branch in splitNode.CreatedBranches.Where(x => x.MergingNode == null))
-                {
-
-                }
             }
-            foreach(var node in instructionNodes)
+            var nodesToRemoveFromBranches = new Dictionary<BranchID, ConcurrentBag<InstructionNode>>();
+            foreach(var branch in AllBrances.Values)
             {
-                foreach(var branchesSameOrigin in branchesSameOrigins)
+                nodesToRemoveFromBranches.Add(branch, new ConcurrentBag<InstructionNode>());
+            } 
+            Parallel.ForEach((instructionNodes), node =>
+            {
+                foreach (var branchesSameOrigin in branchesSameOrigins)
                 {
                     var nodeBranchesSameOrigin = branchesSameOrigin.Where(x => node.BranchProperties.Branches.Contains(x)).ToList();
                     if (nodeBranchesSameOrigin.Count > 1)
                     {
                         foreach (var nodeBranchToRemove in nodeBranchesSameOrigin)
                         {
-                            nodeBranchToRemove.BranchNodes.Remove(node);
+                            nodesToRemoveFromBranches[nodeBranchToRemove].Add(node);
+                            //nodeBranchToRemove.BranchNodes.Remove(node);
                             node.BranchProperties.Branches.Remove(nodeBranchToRemove);
-                        }                        
+                        }
                     }
                 }
-            }
+            });
+            Parallel.ForEach((nodesToRemoveFromBranches.Keys), branch =>
+            {
+                foreach(var node in nodesToRemoveFromBranches[branch])
+                {
+                    branch.BranchNodes.Remove(node);
+                }
+            });
         }
 
         private void MoveForwardAndMarkBranch(InstructionNode originNode,InstructionNode currentNode, BranchID currentBranch, HashSet<InstructionNode> visited = null)
