@@ -76,7 +76,7 @@ namespace Dopple.BackTracers
 
         public void ForwardDynamicData(List<InstructionNode> instructionNodes)
         {
-            foreach(var node in instructionNodes.Where(x => x is IDynamicDataLoadNode))
+            foreach(var node in instructionNodes.Where(x => x is LoadFieldNode).ToArray())
             {
                 var nodeAsDynamicLoad = ((IDynamicDataLoadNode) node);
                 var dynamicLoadedData = node.DataFlowBackRelated.Where(x => x.ArgIndex == nodeAsDynamicLoad.DataFlowDataProdivderIndex).Select(x => x.Argument);
@@ -85,6 +85,22 @@ namespace Dopple.BackTracers
                     forwardNode.Argument.DataFlowBackRelated.AddTwoWay(dynamicLoadedData, forwardNode.ArgIndex);
                 }
                 node.DataFlowBackRelated.RemoveAllTwoWay(x => x.ArgIndex == nodeAsDynamicLoad.DataFlowDataProdivderIndex);
+                node.SelfRemove();
+                instructionNodes.Remove(node);
+            }
+
+            foreach (var node in instructionNodes.Where(x => x is StoreFieldNode).ToArray())
+            {
+                var nodeAsDynamicLoad = ((IDynamicDataStoreNode) node);
+                var dynamicLoadedData = node.DataFlowBackRelated.Where(x => x.ArgIndex == nodeAsDynamicLoad.DataFlowDataProdivderIndex).Select(x => x.Argument);
+                foreach (var forwardNode in node.DataFlowForwardRelated)
+                {
+                    forwardNode.Argument.DataFlowBackRelated.AddTwoWay(dynamicLoadedData, forwardNode.ArgIndex);
+                }
+                node.DataFlowBackRelated.RemoveAllTwoWay(x => x.ArgIndex == nodeAsDynamicLoad.DataFlowDataProdivderIndex);
+                node.SelfRemove();
+                instructionNodes.Remove(node);
+
             }
         }
 

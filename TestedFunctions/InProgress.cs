@@ -9,34 +9,35 @@ namespace TestedFunctions
 {
     public class InProgress
     {
-        //public static int TestConditionals(int a, int b)
-        //{
-        //    Helper helper = new Helper();
-        //    if (a==b)
-        //    {
-        //        helper.Number = 4;
-        //    }
-        //    else
-        //    {
-        //        helper.Number = 1;
-        //    }
-        //    helper.Number = 5;
-        //    helper.Text = "blah";
-        //    return helper.Number;
-        //}
+        public static int TestConditionals(int[] a)
+        {
+            Helper helper1 = new Helper();
+            Helper helper2 = new Helper();
+            helper1.Number = 0;
+
+            int sum = 0;
+            helper1.anotherHelper = helper2;
+            while (helper2.Number < a.Length)
+            {
+                sum += a[helper1.anotherHelper.Number];
+                helper2.Number++;
+            }
+            this isn't working', load field didn't find store field number'
+            return sum;
+        }
         //public static List<int> UseDelegate(int[] nums)
         //{
         //    return nums.Select(x => x++).ToList();
         //}
-        public static int testLinq(List<int> nums)
-        {
-            int sum = 0;
-            foreach (var num in Enumerable.Where(nums,(x => x > 6)))
-            {
-                sum += num;
-            }
-            return sum;
-        }
+        //public static int testLinq(List<int> nums)
+        //{
+        //    int sum = 0;
+        //    foreach (var num in Enumerable.Where(nums,(x => x > 6)))
+        //    {
+        //        sum += num;
+        //    }
+        //    return sum;
+        //}
         //public static int SumMe(int[] nums)
         //{
         //    return nums.Sum(x => x * 6);
@@ -59,8 +60,7 @@ namespace TestedFunctions
     public class Helper
     {
         public int Number;
-        public string Text;
-        public string Text2;
+        public Helper anotherHelper;
         public Helper()
         {
             //Number = 4;
