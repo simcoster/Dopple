@@ -21,6 +21,7 @@ namespace Dopple.BackTracers
             var branchesSameOrigins = new List<List<BranchID>>();
             foreach (ConditionalJumpNode splitNode in splitNodes)
             {
+                do this once for better performance
                 foreach (var forwardNode in splitNode.ProgramFlowForwardRoutes.ToList())
                 {
                     var branch = new BranchID(splitNode) { BranchType = BranchType.Exit};
