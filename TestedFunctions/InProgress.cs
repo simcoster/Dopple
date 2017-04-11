@@ -28,7 +28,7 @@ namespace TestedFunctions
         //{
         //    return nums.Select(x => x++).ToList();
         //}
-        public static int testLinq(int[] nums)
+        public static int testLinq(List<int> nums)
         {
             int sum = 0;
             foreach (var num in Enumerable.Where(nums,(x => x > 6)))
