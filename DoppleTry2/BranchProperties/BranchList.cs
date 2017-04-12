@@ -22,7 +22,7 @@ namespace Dopple.BranchPropertiesNS
 
         public void AddRangeDistinct(IEnumerable<BranchID> branches)
         {
-            foreach(var branch in branches)
+            foreach(var branch in branches.Distinct())
             {
                 this.AddDistinct(branch);
             }

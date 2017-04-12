@@ -127,16 +127,13 @@ namespace Dopple
             }
         }
 
-        private static void AddLoadElemImplementation(List<InstructionNode> instructionNodes, VirtualCallInstructionNode virtualNodeCall, IndexedArgument objectArgument)
+        private void AddLoadElemImplementation(List<InstructionNode> instructionNodes, VirtualCallInstructionNode virtualNodeCall, IndexedArgument objectArgument)
         {
             var callOpCode = Instruction.Create(CodeGroups.AllOpcodes.First(x => x.Code == Code.Ldelem_Ref));
             var loadElementNode = new LdElemInstructionNode(callOpCode, virtualNodeCall.Method);
-            virtualNodeCall.MergeInto(loadElementNode, true);
-            loadElementNode.DataFlowBackRelated.RemoveAllTwoWay(x => x.ArgIndex == 0 && x.Argument != objectArgument.Argument);
-            loadElementNode.InliningProperties = virtualNodeCall.InliningProperties;
-            instructionNodes.Insert(instructionNodes.IndexOf(virtualNodeCall), loadElementNode);
+            AddImplementation(instructionNodes, virtualNodeCall, loadElementNode);
         }
-
+   
         private void AddVirtualCallImplementation(List<InstructionNode> instructionNodes, VirtualCallInstructionNode virtualNodeCall, InstructionNode objectArgument, MethodDefinition virtualMethodImpl, out bool methodStoresDynamic)
         {
             methodStoresDynamic = false;
@@ -151,19 +148,27 @@ namespace Dopple
                 virtualImplementationNode = new InlineableCallNode(callOpCode, virtualMethodImpl, virtualNodeCall.Method);
                 methodStoresDynamic = IsStoringDynamicFromOutside(virtualNodeCall, virtualMethodImpl);
             }
-            virtualNodeCall.MergeInto(virtualImplementationNode,true);
+            AddImplementation(instructionNodes, virtualNodeCall, virtualImplementationNode);
+            virtualImplementationNode.OriginalVirtualNode = virtualNodeCall;
+            virtualImplementationNode.DataFlowBackRelated.RemoveAllTwoWay(x => x.ArgIndex == 0 && x.Argument != objectArgument);
+
+        }
+        private void AddImplementation(List<InstructionNode> instructionNodes, VirtualCallInstructionNode virtualNodeCall, InstructionNode virtualImplementationNode)
+        {
+            AddPseudoSplitNode(virtualNodeCall, instructionNodes);
+
+            virtualNodeCall.MergeInto(virtualImplementationNode, true);
             virtualImplementationNode.ProgramFlowResolveDone = true;
             virtualImplementationNode.StackBacktraceDone = true;
-            virtualImplementationNode.DataFlowBackRelated.RemoveAllTwoWay(x => x.ArgIndex == 0 && x.Argument != objectArgument);
             virtualImplementationNode.InliningProperties = virtualNodeCall.InliningProperties;
-            virtualImplementationNode.OriginalVirtualNode = virtualNodeCall;
 
-            AddPseudoSplitNode(virtualNodeCall, virtualImplementationNode, instructionNodes);
+            virtualImplementationNode.ProgramFlowBackRoutes.RemoveAllTwoWay();
+            virtualImplementationNode.ProgramFlowBackRoutes.AddTwoWay(virtualNodeCall.PseudoSplitNode);
 
             instructionNodes.Insert(instructionNodes.IndexOf(virtualNodeCall), virtualImplementationNode);
         }
 
-        private void AddPseudoSplitNode(VirtualCallInstructionNode virtualNodeCall, CallNode virtualImplementationNode, List<InstructionNode> instructionNodes)
+        private void AddPseudoSplitNode(VirtualCallInstructionNode virtualNodeCall, List<InstructionNode> instructionNodes)
         {
             if (virtualNodeCall.PseudoSplitNode == null)
             {
@@ -171,10 +176,8 @@ namespace Dopple
                 virtualNodeCall.PseudoSplitNode.ProgramFlowBackRoutes.AddTwoWay(virtualNodeCall.ProgramFlowBackRoutes);
                 virtualNodeCall.ProgramFlowBackRoutes.RemoveAllTwoWay();
                 virtualNodeCall.PseudoSplitNode.ProgramFlowForwardRoutes.AddTwoWay(virtualNodeCall);
-                virtualImplementationNode.ProgramFlowBackRoutes.RemoveAllTwoWay();
                 instructionNodes.Insert(instructionNodes.IndexOf(virtualNodeCall), virtualNodeCall.PseudoSplitNode);
             }
-            virtualNodeCall.PseudoSplitNode.ProgramFlowForwardRoutes.AddTwoWay(virtualImplementationNode);
         }
 
         private bool IsStoringDynamicFromOutside(VirtualCallInstructionNode virtualNodeCall, MethodDefinition virtualMethodImpl)

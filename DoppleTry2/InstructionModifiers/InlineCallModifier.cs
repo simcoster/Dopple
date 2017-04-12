@@ -91,7 +91,7 @@ namespace Dopple.InstructionModifiers
             }
             if (!inlinedNodes.Where(x => x is InlineableCallNode).Any())
             {
-                Console.WriteLine(callNode.TargetMethod.FullName + " is the last of the chain");
+             //   Console.WriteLine(callNode.TargetMethod.FullName + " is the last of the chain");
             }
             //tempStop.Stop();
             //Console.WriteLine("inlinling " + callNode.TargetMethod.FullName + " with " + inlinedNodes.Count + " nodes, took " + tempStop.Elapsed);

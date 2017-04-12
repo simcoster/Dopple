@@ -21,7 +21,7 @@ namespace Dopple.InstructionWrapperMembers
             GetPartnerList(backArgToRemove).Remove(forwardArg);
         }
 
-        internal abstract List<InstructionNode> GetPartnerList(InstructionNode backArgToRemove);
+        internal abstract CoupledList GetPartnerList(InstructionNode backArgToRemove);
 
         public void RemoveAllTwoWay (Predicate<InstructionNode> predicate)
         {

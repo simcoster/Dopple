@@ -10,7 +10,7 @@ namespace Dopple.InstructionNodes
         {
         }
 
-        internal override List<InstructionNode> GetPartnerList(InstructionNode relatedNode)
+        internal override CoupledList GetPartnerList(InstructionNode relatedNode)
         {
             return relatedNode.SingleUnitBackRelated;
         }

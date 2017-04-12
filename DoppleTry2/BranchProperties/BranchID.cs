@@ -23,6 +23,7 @@ namespace Dopple.BranchPropertiesNS
             {
                 AllBranches.Add(this);
             }
+            BranchType = BranchType.Exit;
         }
         public int Index { get; protected set; }
         public virtual BranchType BranchType { get; set; }

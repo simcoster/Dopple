@@ -13,7 +13,7 @@ namespace Dopple.InstructionWrapperMembers
         {
         }
 
-        internal override List<InstructionNode> GetPartnerList(InstructionNode node)
+        internal override CoupledList GetPartnerList(InstructionNode node)
         {
             return node.ProgramFlowForwardRoutes;
         }

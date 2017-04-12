@@ -58,7 +58,7 @@ namespace Dopple.BackTracers
         {
             CountVisitedNodes = 0;
             var mergingNodesData = new Dictionary<InstructionNode, MergeNodeTraceData>();
-            foreach (var mergingNode in instructionNodes.Where(x => x.ProgramFlowBackRoutes.Count >1))
+            foreach (var mergingNode in instructionNodes.Where(x => x.BranchProperties.MergingNodeProperties.IsMergingNode))
             {
                 mergingNodesData.Add(mergingNode, new MergeNodeTraceData());
             }
