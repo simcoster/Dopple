@@ -156,6 +156,10 @@ namespace Dopple.BackTracers
             }
             var passedLoopStateProivders = stateProviders.Clone();
             var loopNodes = currentNode.ProgramFlowForwardRoutes.Where(x => x.BranchProperties.FirstInLoopOf != null && x.BranchProperties.FirstInLoopOf.BranchType == BranchPropertiesNS.BranchType.Loop).ToList();
+            if (loopNodes.Count >1)
+            {
+                throw new Exception("More than one originating loops");
+            }
             if (loopNodes.Count >0)
             {
                 var firstPassLoopStateProviders = new StateProviderCollection();

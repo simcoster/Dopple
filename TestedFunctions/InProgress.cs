@@ -33,19 +33,19 @@ namespace TestedFunctions
         //{
         //    blah.Add(5);
         //}
-        //public static int testLinq(List<int> nums)
-        //{
-        //    int sum = 0;
-        //    foreach (var num in Enumerable.Where(nums,(x => x > 6)))
-        //    {
-        //        sum += num;
-        //    }
-        //    return sum;
-        //}
-        public static int SumMe(int[] nums)
+        public static int testLinq(int[] nums)
         {
-            return nums.Sum(x => x * 6);
+            int sum = 0;
+            foreach (var num in Enumerable.Where(nums, (x => x > 6)))
+            {
+                sum += num;
+            }
+            return sum;
         }
+        //public static int SumMe(int[] nums)
+        //{
+        //    return nums.Sum(x => x * 6);
+        //}
 
         //public static int DynamicGames(int index)
         //{
