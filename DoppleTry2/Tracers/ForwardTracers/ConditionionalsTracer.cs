@@ -16,12 +16,14 @@ namespace Dopple.BackTracers
         private Dictionary<int,BranchID> AllBrances;
         public void TraceConditionals(List<InstructionNode> instructionNodes)
         {
+            instructionNodes.ForEach(x => x.BranchProperties.FirstInLoopOf = null);
             AllBrances = new Dictionary<int, BranchID>();
             var splitNodes = instructionNodes.Where(x => x is ConditionalJumpNode).Cast<ConditionalJumpNode>();
             var branchesSameOrigins = new List<List<BranchID>>();
             foreach (ConditionalJumpNode splitNode in splitNodes)
             {
-                do this once for better performance
+                //do this once for better performance
+                //TOOD remove
                 foreach (var forwardNode in splitNode.ProgramFlowForwardRoutes.ToList())
                 {
                     var branch = new BranchID(splitNode) { BranchType = BranchType.Exit};
@@ -46,7 +48,6 @@ namespace Dopple.BackTracers
                         foreach (var nodeBranchToRemove in nodeBranchesSameOrigin)
                         {
                             nodesToRemoveFromBranches[nodeBranchToRemove].Add(node);
-                            //nodeBranchToRemove.BranchNodes.Remove(node);
                             node.BranchProperties.Branches.Remove(nodeBranchToRemove);
                         }
                     }
@@ -74,6 +75,7 @@ namespace Dopple.BackTracers
                     currentNode.BranchProperties.Branches.AddDistinct(currentBranch);
                     currentBranch.BranchNodes.Add(currentNode);
                     currentBranch.BranchType = BranchType.Loop;
+                    currentBranch.BranchNodes[0].BranchProperties.FirstInLoopOf = currentBranch;
                     return;
                 }
                 if (visited.Contains(currentNode))

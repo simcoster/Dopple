@@ -9,25 +9,29 @@ namespace TestedFunctions
 {
     public class InProgress
     {
-        public static int TestConditionals(int[] a)
-        {
-            Helper helper1 = new Helper();
-            Helper helper2 = new Helper();
-            helper1.Number = 0;
+        //public static int TestConditionals(int[] a)
+        //{
+        //    Helper helper1 = new Helper();
+        //    Helper helper2 = new Helper();
 
-            int sum = 0;
-            helper1.anotherHelper = helper2;
-            while (helper2.Number < a.Length)
-            {
-                sum += a[helper1.anotherHelper.Number];
-                helper2.Number++;
-            }
-            this isn't working', load field didn't find store field number'
-            return sum;
-        }
+        //    int sum = 0;
+        //    helper1.anotherHelper = helper2;
+        //    helper2.Number = 5;
+        //    while (helper2.Number < a.Length)
+        //    {
+        //        sum += a[helper1.anotherHelper.Number];
+        //        helper2.Number++;
+        //    }
+        //    //this isn't working', load field didn't find store field number'
+        //    return sum;
+        //}
         //public static List<int> UseDelegate(int[] nums)
         //{
         //    return nums.Select(x => x++).ToList();
+        //}
+        //public static void AddToMe(List<int> blah)
+        //{
+        //    blah.Add(5);
         //}
         //public static int testLinq(List<int> nums)
         //{
@@ -38,10 +42,10 @@ namespace TestedFunctions
         //    }
         //    return sum;
         //}
-        //public static int SumMe(int[] nums)
-        //{
-        //    return nums.Sum(x => x * 6);
-        //}
+        public static int SumMe(int[] nums)
+        {
+            return nums.Sum(x => x * 6);
+        }
 
         //public static int DynamicGames(int index)
         //{

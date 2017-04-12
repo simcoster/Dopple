@@ -100,7 +100,7 @@ namespace Dopple
                 runCounter++;
             }
             //RecursionFix();
-           // RemoveHelperCodes();
+            RemoveHelperCodes();
             //RemoveAndStitchDynamicDataConnections();
             //MergeSimilarInstructions();
             //MergeEquivilentPairs();

@@ -85,8 +85,9 @@ namespace Dopple.BackTracers
                     forwardNode.Argument.DataFlowBackRelated.AddTwoWay(dynamicLoadedData, forwardNode.ArgIndex);
                 }
                 node.DataFlowBackRelated.RemoveAllTwoWay(x => x.ArgIndex == nodeAsDynamicLoad.DataFlowDataProdivderIndex);
-                node.SelfRemove();
-                instructionNodes.Remove(node);
+                //node.DataFlowForwardRelated.RemoveAllTwoWay(x => x.ArgIndex == nodeAsDynamicLoad.DataFlowDataProdivderIndex);
+                //node.SelfRemove();
+                //instructionNodes.Remove(node);
             }
 
             foreach (var node in instructionNodes.Where(x => x is StoreFieldNode).ToArray())
@@ -98,8 +99,9 @@ namespace Dopple.BackTracers
                     forwardNode.Argument.DataFlowBackRelated.AddTwoWay(dynamicLoadedData, forwardNode.ArgIndex);
                 }
                 node.DataFlowBackRelated.RemoveAllTwoWay(x => x.ArgIndex == nodeAsDynamicLoad.DataFlowDataProdivderIndex);
-                node.SelfRemove();
-                instructionNodes.Remove(node);
+                node.DataFlowForwardRelated.RemoveAllTwoWay(x => x.ArgIndex == nodeAsDynamicLoad.DataFlowDataProdivderIndex);
+                //node.SelfRemove();
+                //instructionNodes.Remove(node);
 
             }
         }
@@ -130,18 +132,6 @@ namespace Dopple.BackTracers
                 bool reachedMergeNodeNotLast;
                 int stateProviderCount = stateProviders.Count;
                 ActOnCurrentNode(currentNode, mergingNodesData, lastNode, stateProviders, out reachedMergeNodeNotLast);
-                //if (currentNode is LoadFieldNode)
-                //{
-                //    var storeVisited = visited.Where(x => x is StoreFieldNode && ((StoreFieldNode) x).FieldDefinition.Name == ((LoadFieldNode) currentNode).FieldDefinition.Name);
-                //    if (storeVisited.Any())
-                //    {
-
-                //    }
-                //}
-                //if (stateProviders.Count < 2)
-                //{
-
-                //}
                 if (reachedMergeNodeNotLast)
                 {
                     return;
@@ -162,11 +152,30 @@ namespace Dopple.BackTracers
             }
             if (!(currentNode is ConditionalJumpNode))
             {
-                //throw new Exception("split without a conditional");
+                throw new Exception("split without a conditional");
             }
-            foreach(var node in currentNode.ProgramFlowForwardRoutes)
+            var passedLoopStateProivders = stateProviders.Clone();
+            var loopNodes = currentNode.ProgramFlowForwardRoutes.Where(x => x.BranchProperties.FirstInLoopOf != null && x.BranchProperties.FirstInLoopOf.BranchType == BranchPropertiesNS.BranchType.Loop).ToList();
+            if (loopNodes.Count >0)
             {
-                TraceOutsideFunctionBoundsRec(node, mergingNodesData, currentNode, stateProviders, visited);
+                var firstPassLoopStateProviders = new StateProviderCollection();
+                foreach(var loopNode in loopNodes)
+                {
+                    var stateProvidersLoopClone = stateProviders.Clone();
+                    TraceOutsideFunctionBoundsRec(loopNodes[0], mergingNodesData, currentNode, stateProvidersLoopClone, visited);
+                    firstPassLoopStateProviders.AddNewProviders(stateProvidersLoopClone);
+                }
+
+                foreach (var loopNode in loopNodes)
+                {
+                    var secondPassStateProvidersClone = firstPassLoopStateProviders.Clone();
+                    TraceOutsideFunctionBoundsRec(loopNodes[0], mergingNodesData, currentNode, secondPassStateProvidersClone, visited);
+                    passedLoopStateProivders.AddNewProviders(secondPassStateProvidersClone);
+                }
+            }
+            foreach (var node in currentNode.ProgramFlowForwardRoutes.Except(loopNodes))
+            {
+                TraceOutsideFunctionBoundsRec(node, mergingNodesData, currentNode, passedLoopStateProivders.Clone(), visited);
             }
         }
 
