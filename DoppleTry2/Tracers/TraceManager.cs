@@ -85,9 +85,9 @@ namespace Dopple.BackTracers
                 {
                     forwardNode.Argument.DataFlowBackRelated.AddTwoWay(dynamicLoadedData, forwardNode.ArgIndex);
                 }
-                node.DataFlowBackRelated.RemoveAllTwoWay(x => x.ArgIndex == nodeAsDynamicLoad.DataFlowDataProdivderIndex);
-                node.SelfRemove();
-                instructionNodes.Remove(node);
+                //node.DataFlowBackRelated.RemoveAllTwoWay(x => x.ArgIndex == nodeAsDynamicLoad.DataFlowDataProdivderIndex);
+               // node.SelfRemove();
+                //instructionNodes.Remove(node);
             }
 
             foreach (var node in instructionNodes.Where(x => x is StoreFieldNode).ToArray())
@@ -98,9 +98,9 @@ namespace Dopple.BackTracers
                 {
                     forwardNode.Argument.DataFlowBackRelated.AddTwoWay(dynamicLoadedData, forwardNode.ArgIndex);
                 }
-                node.DataFlowBackRelated.RemoveAllTwoWay(x => x.ArgIndex == nodeAsDynamicLoad.DataFlowDataProdivderIndex);
-                node.SelfRemove();
-                instructionNodes.Remove(node);
+                //node.DataFlowBackRelated.RemoveAllTwoWay(x => x.ArgIndex == nodeAsDynamicLoad.DataFlowDataProdivderIndex);
+               // node.SelfRemove();
+               // instructionNodes.Remove(node);
 
             }
         }
@@ -142,7 +142,7 @@ namespace Dopple.BackTracers
                     }
                     if (loopBranch.Any())
                     {
-                        if (visited.Count(x => x == loopBranch.First()) < 2)
+                        if (visited.Count(x => x == loopBranch.First()) <2)
                         {
                             currentNode = loopBranch.First();
                             continue;
