@@ -149,7 +149,7 @@ namespace Dopple.BackTracers
                         }
                         else
                         {
-
+                            break;
                         }
                     }
                     else
