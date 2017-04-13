@@ -12,6 +12,16 @@ namespace Dopple.Tracers.DynamicTracing
     class StateProviderCollection
     {
         private List<StoreDynamicDataStateProvider> _StateProviders = new List<StoreDynamicDataStateProvider>();
+
+        public StateProviderCollection(List<StoreDynamicDataStateProvider> stateProviders)
+        {
+            _StateProviders = stateProviders.GroupBy(x => x.StoreNode).Select(x => x.First()).ToList();
+        }
+
+        public StateProviderCollection()
+        {
+        }
+
         public int Count
         {
             get
@@ -49,7 +59,7 @@ namespace Dopple.Tracers.DynamicTracing
 
         internal StateProviderCollection Clone()
         {
-            return new StateProviderCollection() { _StateProviders = new List<StoreDynamicDataStateProvider>(this._StateProviders) };
+            return new StateProviderCollection(this._StateProviders);
         }
         
         public List<StoreDynamicDataStateProvider> ToList()

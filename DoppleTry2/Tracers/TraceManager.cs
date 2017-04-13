@@ -121,7 +121,7 @@ namespace Dopple.BackTracers
             {
                 GlobalVisited.Add(currentNode);
                 bool reachedMergeNodeNotLast;
-                ActOnCurrentNode(currentNode, mergingNodesData, lastNode, stateProviders, out reachedMergeNodeNotLast);
+                ActOnCurrentNode(currentNode, mergingNodesData, lastNode, ref stateProviders, out reachedMergeNodeNotLast);
                 if (reachedMergeNodeNotLast)
                 {
                     return;
@@ -149,7 +149,12 @@ namespace Dopple.BackTracers
             {
                 //throw new Exception("split without a conditional");
             }
-            foreach(var node in currentNode.ProgramFlowForwardRoutes)
+            var loopBranchesFirst = currentNode.ProgramFlowForwardRoutes.Where(x => x.BranchProperties.Branches.Any(y => y.BranchType == BranchPropertiesNS.BranchType.Loop)).ToList() ;
+            foreach (var node in loopBranchesFirst)
+            {
+                TraceOutsideFunctionBoundsRec(node, mergingNodesData, currentNode, stateProviders.Clone(), visited);
+            }
+            foreach (var node in currentNode.ProgramFlowForwardRoutes.Except(loopBranchesFirst).ToList())
             {
                 TraceOutsideFunctionBoundsRec(node, mergingNodesData, currentNode, stateProviders.Clone(), visited);
             }
@@ -160,7 +165,7 @@ namespace Dopple.BackTracers
             _Conditionalstracer.TraceConditionals(instructionNodes);
         }
 
-        private static void ActOnCurrentNode(InstructionNode currentNode, Dictionary<InstructionNode, MergeNodeTraceData> mergingNodesData, InstructionNode lastNode, StateProviderCollection stateProviders, out bool reachedMergeNodeNotLast)
+        private static void ActOnCurrentNode(InstructionNode currentNode, Dictionary<InstructionNode, MergeNodeTraceData> mergingNodesData, InstructionNode lastNode,ref StateProviderCollection stateProviders, out bool reachedMergeNodeNotLast)
         {
             if (currentNode.BranchProperties.MergingNodeProperties.IsMergingNode)
             {
@@ -171,7 +176,7 @@ namespace Dopple.BackTracers
                     bool allBranchesReached = !currentNode.ProgramFlowBackRoutes.Except(mergingNodesData[currentNode].ReachedNodes).Any();
                     if (allBranchesReached)
                     {
-                        stateProviders.AddNewProviders(mergingNodesData[currentNode].AccumelatedStateProviders);
+                        stateProviders = new StateProviderCollection(mergingNodesData[currentNode].AccumelatedStateProviders);
                         //prepare for next run (for loops)
                         mergingNodesData[currentNode].ReachedNodes.Clear();
                     }

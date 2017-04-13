@@ -13,10 +13,18 @@ namespace TestedFunctions
         {
             Helper helper1 = new Helper();
             Helper helper2 = new Helper();
+            Helper helper3 = new Helper();
             helper1.Number = 0;
 
             int sum = 0;
-            helper1.anotherHelper = helper2;
+            if (a.Length > 7)
+            {
+                helper1.anotherHelper = helper2;
+            }
+            else
+            {
+                helper1.anotherHelper = helper3;
+            }
             while (helper2.Number < a.Length)
             {
                 if (sum > 20)
@@ -26,7 +34,7 @@ namespace TestedFunctions
                 }
                 else
                 {
-                    sum += a[helper2.Number];
+                    sum *= a[helper2.Number];
                     helper1.anotherHelper.Number--;
                 }
                 helper2.Number /= 2;
@@ -41,7 +49,7 @@ namespace TestedFunctions
         //public static int testLinq(List<int> nums)
         //{
         //    int sum = 0;
-        //    foreach (var num in Enumerable.Where(nums,(x => x > 6)))
+        //    foreach (var num in Enumerable.Where(nums, (x => x > 6)))
         //    {
         //        sum += num;
         //    }

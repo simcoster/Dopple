@@ -71,7 +71,11 @@ namespace Dopple.BackTracers
             if (instructionNodes[0].InliningProperties.Inlined)
             {
                 var returnNodes = instructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Ret);
-                var retNodeToKeep = returnNodes.First();
+                var retNodeToKeep = returnNodes.FirstOrDefault();
+                if (retNodeToKeep == null)
+                {
+                    return;
+                }
                 foreach (var returnNodeToMerge in returnNodes.Skip(1).ToList())
                 {
                     returnNodeToMerge.MergeInto(retNodeToKeep, false);
