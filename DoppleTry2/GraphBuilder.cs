@@ -66,7 +66,6 @@ namespace Dopple
             SetInstructionIndexes();
             while (shouldRerun)
             {
-                BranchID.Reset();
                 Console.WriteLine("run counter is " + runCounter);
                 _programFlowManager.AddFlowConnections(InstructionNodes);
                 if (isFirstRun)
@@ -98,7 +97,7 @@ namespace Dopple
                 runCounter++;
             }
             //RecursionFix();
-            RemoveHelperCodes();
+            //RemoveHelperCodes();
             //RemoveAndStitchDynamicDataConnections();
             //MergeSimilarInstructions();
             //MergeEquivilentPairs();

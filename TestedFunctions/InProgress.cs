@@ -29,15 +29,13 @@ namespace TestedFunctions
             {
                 if (sum > 20)
                 {
-                    sum += a[helper1.anotherHelper.Number];
                     helper2.Number++;
                 }
                 else
                 {
-                    sum *= a[helper2.Number];
                     helper1.anotherHelper.Number--;
                 }
-                helper2.Number /= 2;
+                helper3.Number /= 2;
             }
             sum += 5;
             return sum;

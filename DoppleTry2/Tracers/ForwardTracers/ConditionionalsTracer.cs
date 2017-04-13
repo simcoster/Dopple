@@ -104,6 +104,7 @@ namespace Dopple.BackTracers
                     currentNode.BranchProperties.Branches.AddDistinct(currentBranch);
                     currentBranch.BranchNodes.Add(currentNode);
                     currentBranch.BranchType = BranchType.Loop;
+                    currentBranch.BranchNodes[0].BranchProperties.FirstInLoop = true;
                     return;
                 }
                 if (visited.Contains(currentNode))
@@ -119,6 +120,7 @@ namespace Dopple.BackTracers
                         int i = 1;
                         foreach (var mergedBranch in otherBranches.Concat(new[] { currentBranch }).ToList())
                         {
+                            mergedBranch.BranchNodes[0].BranchProperties.FirstInLoop = false;
                             mergedBranch.BranchType = BranchType.SplitMerge;
                             MarkMergeNode(currentNode, mergedBranch);
                             mergedBranch.PairedBranchesIndex = i;
