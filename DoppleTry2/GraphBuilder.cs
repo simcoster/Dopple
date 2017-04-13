@@ -25,7 +25,7 @@ namespace Dopple
         private InstructionNodeFactory _InstructionNodeFactory = new InstructionNodeFactory();
         private VirtualMethodResolver _VirtualMethodResolver = new VirtualMethodResolver();
         private CallInliner _inlineCallModifier;
-        //ConditionionalsTracer _ConditionalBacktracer = new ConditionionalsTracer();
+        ConditionionalsTracer _ConditionionalsTracer = new ConditionionalsTracer();
         Verifier[] verifiers;
 
         public GraphBuilder(FunctionFlowGraph functionFlowGraph)
@@ -73,7 +73,6 @@ namespace Dopple
                 {
                     try
                     {
-
                         _backTraceManager.DataTraceInFunctionBounds(InstructionNodes);
                     }
                     catch (StackPopException stackPopException)

@@ -19,10 +19,19 @@ namespace TestedFunctions
             helper1.anotherHelper = helper2;
             while (helper2.Number < a.Length)
             {
-                sum += a[helper1.anotherHelper.Number];
-                helper2.Number++;
+                if (sum > 20)
+                {
+                    sum += a[helper1.anotherHelper.Number];
+                    helper2.Number++;
+                }
+                else
+                {
+                    sum += a[helper2.Number];
+                    helper1.anotherHelper.Number++;
+                }
+                helper2.Number /= 2;
             }
-            this isn't working', load field didn't find store field number'
+            sum += 5;
             return sum;
         }
         //public static List<int> UseDelegate(int[] nums)

@@ -19,9 +19,12 @@ namespace Dopple.BackTracers
             AllBrances = new Dictionary<int, BranchID>();
             var splitNodes = instructionNodes.Where(x => x is ConditionalJumpNode).Cast<ConditionalJumpNode>();
             var branchesSameOrigins = new List<List<BranchID>>();
+            foreach(var startBranch in instructionNodes.SelectMany(x => x.BranchProperties.Branches).Distinct())
+            {
+                AllBrances.Add(startBranch.Index, startBranch);
+            }
             foreach (ConditionalJumpNode splitNode in splitNodes)
             {
-                do this once for better performance
                 foreach (var forwardNode in splitNode.ProgramFlowForwardRoutes.ToList())
                 {
                     var branch = new BranchID(splitNode) { BranchType = BranchType.Exit};
@@ -36,22 +39,23 @@ namespace Dopple.BackTracers
             {
                 nodesToRemoveFromBranches.Add(branch, new ConcurrentBag<InstructionNode>());
             } 
-            Parallel.ForEach((instructionNodes), node =>
+            //Parallel.ForEach((instructionNodes), node =>
+            foreach(var node in instructionNodes)
             {
                 foreach (var branchesSameOrigin in branchesSameOrigins)
                 {
-                    var nodeBranchesSameOrigin = branchesSameOrigin.Where(x => node.BranchProperties.Branches.Contains(x)).ToList();
-                    if (nodeBranchesSameOrigin.Count > 1)
+                    var branchesSameOriginOfNode = branchesSameOrigin.Where(x => node.BranchProperties.Branches.Contains(x)).ToList();
+                    if (branchesSameOriginOfNode.Count > 1)
                     {
-                        foreach (var nodeBranchToRemove in nodeBranchesSameOrigin)
+                        foreach (var branchSameOriginOfNode in branchesSameOriginOfNode)
                         {
-                            nodesToRemoveFromBranches[nodeBranchToRemove].Add(node);
+                            nodesToRemoveFromBranches[branchSameOriginOfNode].Add(node);
                             //nodeBranchToRemove.BranchNodes.Remove(node);
-                            node.BranchProperties.Branches.Remove(nodeBranchToRemove);
+                            node.BranchProperties.Branches.Remove(branchSameOriginOfNode);
                         }
                     }
                 }
-            });
+            }
             Parallel.ForEach((nodesToRemoveFromBranches.Keys), branch =>
             {
                 foreach(var node in nodesToRemoveFromBranches[branch])
@@ -59,8 +63,30 @@ namespace Dopple.BackTracers
                     branch.BranchNodes.Remove(node);
                 }
             });
+            RetMergeHack(instructionNodes, AllBrances);
         }
 
+        private void RetMergeHack(List<InstructionNode> instructionNodes, Dictionary<int, BranchID> allBrances)
+        {
+            if (instructionNodes[0].InliningProperties.Inlined)
+            {
+                var returnNodes = instructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Ret);
+                var retNodeToKeep = returnNodes.First();
+                foreach (var returnNodeToMerge in returnNodes.Skip(1).ToList())
+                {
+                    returnNodeToMerge.MergeInto(retNodeToKeep, false);
+                    instructionNodes.Remove(returnNodeToMerge);
+                }
+                foreach(var exitBranch in allBrances.Where(x => x.Value.BranchType == BranchType.Exit))
+                {
+                    exitBranch.Value.BranchType = BranchType.SplitMerge;
+                    exitBranch.Value.MergingNode = retNodeToKeep;
+                    retNodeToKeep.BranchProperties.MergingNodeProperties.IsMergingNode = true;
+                    retNodeToKeep.BranchProperties.MergingNodeProperties.MergedBranches.Add(exitBranch.Value);
+                }
+            }
+        }
+     
         private void MoveForwardAndMarkBranch(InstructionNode originNode,InstructionNode currentNode, BranchID currentBranch, HashSet<InstructionNode> visited = null)
         {
             if (visited ==null)

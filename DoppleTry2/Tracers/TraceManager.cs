@@ -34,6 +34,7 @@ namespace Dopple.BackTracers
             _StackForwardTracer.TraceForward(instructionNodes);
             //Console.WriteLine("Stack forward took" + stopwatch.Elapsed);
             //stopwatch.Reset();
+            _Conditionalstracer.TraceConditionals(instructionNodes);
             //Console.WriteLine("conditional tool forward took" + stopwatch.Elapsed);
             //stopwatch.Reset();
             TraceDataTransferingNodeRec(instructionNodes[0], _InFuncDataTransferBackTracers);
@@ -47,7 +48,7 @@ namespace Dopple.BackTracers
         private readonly LdStaticFieldBackTracer _LdStaticFieldBackTracer = new LdStaticFieldBackTracer();
         private readonly LindBacktracer _LoadMemoryByOperandBackTracer = new LindBacktracer();
         private readonly TypedReferenceBackTracer _TypedReferenceBackTracer = new TypedReferenceBackTracer();
-        private readonly ConditionionalsTracer _ConditionalBacktracer = new ConditionionalsTracer();
+        private readonly ConditionionalsTracer _Conditionalstracer = new ConditionionalsTracer();
         private readonly LdElemBacktracer _LdElemBacktracer = new LdElemBacktracer();
         private readonly LdFldBacktracer _LdFldBacktracer = new LdFldBacktracer();
 
@@ -58,7 +59,7 @@ namespace Dopple.BackTracers
         {
             CountVisitedNodes = 0;
             var mergingNodesData = new Dictionary<InstructionNode, MergeNodeTraceData>();
-            foreach (var mergingNode in instructionNodes.Where(x => x.ProgramFlowBackRoutes.Count >1))
+            foreach (var mergingNode in instructionNodes.Where(x => x.BranchProperties.MergingNodeProperties.IsMergingNode))
             {
                 mergingNodesData.Add(mergingNode, new MergeNodeTraceData());
             }
@@ -172,7 +173,7 @@ namespace Dopple.BackTracers
 
         internal void TraceConditionals(List<InstructionNode> instructionNodes)
         {
-            _ConditionalBacktracer.TraceConditionals(instructionNodes);
+            _Conditionalstracer.TraceConditionals(instructionNodes);
         }
 
         private static void ActOnCurrentNode(InstructionNode currentNode, Dictionary<InstructionNode, MergeNodeTraceData> mergingNodesData, InstructionNode lastNode, StateProviderCollection stateProviders, out bool reachedMergeNodeNotLast)
