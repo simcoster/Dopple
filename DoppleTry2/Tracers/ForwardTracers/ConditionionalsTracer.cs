@@ -13,45 +13,45 @@ namespace Dopple.BackTracers
 {
     class ConditionionalsTracer
     {
+        private Dictionary<int,BranchID> AllBrances;
         public void TraceConditionals(List<InstructionNode> instructionNodes)
         {
+            AllBrances = new Dictionary<int, BranchID>();
+            var splitNodes = instructionNodes.Where(x => x is ConditionalJumpNode).Cast<ConditionalJumpNode>();
+            var branchesSameOrigins = new List<List<BranchID>>();
+            foreach (ConditionalJumpNode splitNode in splitNodes)
+            {
+                do this once for better performance
+                foreach (var forwardNode in splitNode.ProgramFlowForwardRoutes.ToList())
+                {
+                    var branch = new BranchID(splitNode) { BranchType = BranchType.Exit};
+                    AllBrances.Add(branch.Index, branch);
+                    splitNode.CreatedBranches.Add(branch);
+                    MoveForwardAndMarkBranch(splitNode, forwardNode,branch);
+                }
+                branchesSameOrigins.Add(splitNode.CreatedBranches);
+            }
             var nodesToRemoveFromBranches = new Dictionary<BranchID, ConcurrentBag<InstructionNode>>();
-            MoveForwardAndMarkBranch(instructionNodes[0]);
-            foreach (var branch in BranchID.AllBranches)
+            foreach(var branch in AllBrances.Values)
             {
                 nodesToRemoveFromBranches.Add(branch, new ConcurrentBag<InstructionNode>());
-            }
-            //Parallel.ForEach((instructionNodes), node =>
-            //{
-            //    foreach (var branchesSameOriginGroup in node.BranchProperties.Branches.GroupBy(x => x.OriginatingNode).Where(x => x.Count()>1).ToList())
-            //    {
-            //        if (node.BranchProperties.MergingNodeProperties.MergedBranches.Contains(branchesSameOriginGroup.First()))
-            //        {
-            //            continue;
-            //        }
-            //        foreach(var branchToRemove in branchesSameOriginGroup)
-            //        {
-            //            nodesToRemoveFromBranches[branchToRemove].Add(node);
-            //            node.BranchProperties.Branches.Remove(branchToRemove);
-            //        }
-            //    }
-            //});
-            foreach(var node in instructionNodes)
+            } 
+            Parallel.ForEach((instructionNodes), node =>
             {
-                foreach (var branchesSameOriginGroup in node.BranchProperties.Branches.GroupBy(x => x.OriginatingNode).Where(x => x.Count() > 1).ToList())
+                foreach (var branchesSameOrigin in branchesSameOrigins)
                 {
-                    if (node.BranchProperties.MergingNodeProperties.MergedBranches.Contains(branchesSameOriginGroup.First()))
+                    var nodeBranchesSameOrigin = branchesSameOrigin.Where(x => node.BranchProperties.Branches.Contains(x)).ToList();
+                    if (nodeBranchesSameOrigin.Count > 1)
                     {
-                        continue;
-                    }
-                    foreach (var branchToRemove in branchesSameOriginGroup)
-                    {
-                        nodesToRemoveFromBranches[branchToRemove].Add(node);
-                        node.BranchProperties.Branches.Remove(branchToRemove);
+                        foreach (var nodeBranchToRemove in nodeBranchesSameOrigin)
+                        {
+                            nodesToRemoveFromBranches[nodeBranchToRemove].Add(node);
+                            //nodeBranchToRemove.BranchNodes.Remove(node);
+                            node.BranchProperties.Branches.Remove(nodeBranchToRemove);
+                        }
                     }
                 }
-            }
-
+            });
             Parallel.ForEach((nodesToRemoveFromBranches.Keys), branch =>
             {
                 foreach(var node in nodesToRemoveFromBranches[branch])
@@ -61,33 +61,44 @@ namespace Dopple.BackTracers
             });
         }
 
-        private void MoveForwardAndMarkBranch(InstructionNode currentNode, List<BranchID> accumelatedBrances =null, HashSet<InstructionNode> visited = null)
+        private void MoveForwardAndMarkBranch(InstructionNode originNode,InstructionNode currentNode, BranchID currentBranch, HashSet<InstructionNode> visited = null)
         {
             if (visited ==null)
             {
-                visited = new HashSet<InstructionNode>();
-                accumelatedBrances = new List<BranchID>();
+                visited = new HashSet<InstructionNode>() { originNode };
             }
             while(true)
             {
-                currentNode.BranchProperties.Branches.AddRangeDistinct(accumelatedBrances);
+                if (currentNode == originNode)
+                {
+                    currentNode.BranchProperties.Branches.AddDistinct(currentBranch);
+                    currentBranch.BranchNodes.Add(currentNode);
+                    currentBranch.BranchType = BranchType.Loop;
+                    return;
+                }
                 if (visited.Contains(currentNode))
                 {
-                    if (currentNode is ConditionalJumpNode && accumelatedBrances.Any(x => ((ConditionalJumpNode) currentNode).CreatedBranches.Contains(x)))
-                    {
-                        var loopingBranch = accumelatedBrances.First(x => ((ConditionalJumpNode) currentNode).CreatedBranches.Contains(x));
-                        loopingBranch.BranchType = BranchType.Loop;
-                        loopingBranch.BranchNodes[0].BranchProperties.FirstInLoopOf = loopingBranch;
-                    }
-                    foreach (var branchSameOriginGroup in currentNode.BranchProperties.Branches.AsParallel().Where(x => x.MergingNode == null).GroupBy(x => x.OriginatingNode).Where(x => x.Count() > 1))
-                    {
-                        branchSameOriginGroup.ForEach(x => { x.MergingNode = currentNode; x.BranchType = BranchType.SplitMerge; });
-                        currentNode.BranchProperties.MergingNodeProperties.IsMergingNode = true;
-                        currentNode.BranchProperties.MergingNodeProperties.MergedBranches.AddRange(branchSameOriginGroup);
-                    }
                     return;
                 }
                 visited.Add(currentNode);
+                if (currentBranch.MergingNode == null)
+                {
+                    List<BranchID> otherBranches = currentNode.BranchProperties.Branches.Where(x => x.OriginatingNode == originNode && x != currentBranch && x.MergingNode == null).ToList();
+                    if (otherBranches.Count > 0)
+                    {
+                        int i = 1;
+                        foreach (var mergedBranch in otherBranches.Concat(new[] { currentBranch }).ToList())
+                        {
+                            mergedBranch.BranchType = BranchType.SplitMerge;
+                            MarkMergeNode(currentNode, mergedBranch);
+                            mergedBranch.PairedBranchesIndex = i;
+                            i++;
+                        }
+
+                    }
+                }
+                currentNode.BranchProperties.Branches.AddDistinct(currentBranch);
+                currentBranch.BranchNodes.Add(currentNode);
                 if (currentNode.ProgramFlowForwardRoutes.Count == 0)
                 {
                     return;
@@ -100,7 +111,7 @@ namespace Dopple.BackTracers
             }
             foreach (var forwardNode in currentNode.ProgramFlowForwardRoutes)
             {
-                MoveForwardAndMarkBranch(forwardNode,accumelatedBrances.Concat(new[] { new BranchID(currentNode) }).ToList(), visited);
+                MoveForwardAndMarkBranch(originNode, forwardNode, currentBranch, visited);
             }
         }
 

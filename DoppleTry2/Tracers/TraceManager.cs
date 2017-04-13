@@ -58,7 +58,7 @@ namespace Dopple.BackTracers
         {
             CountVisitedNodes = 0;
             var mergingNodesData = new Dictionary<InstructionNode, MergeNodeTraceData>();
-            foreach (var mergingNode in instructionNodes.Where(x => x.BranchProperties.MergingNodeProperties.IsMergingNode))
+            foreach (var mergingNode in instructionNodes.Where(x => x.ProgramFlowBackRoutes.Count >1))
             {
                 mergingNodesData.Add(mergingNode, new MergeNodeTraceData());
             }
@@ -85,9 +85,8 @@ namespace Dopple.BackTracers
                     forwardNode.Argument.DataFlowBackRelated.AddTwoWay(dynamicLoadedData, forwardNode.ArgIndex);
                 }
                 node.DataFlowBackRelated.RemoveAllTwoWay(x => x.ArgIndex == nodeAsDynamicLoad.DataFlowDataProdivderIndex);
-                //node.DataFlowForwardRelated.RemoveAllTwoWay(x => x.ArgIndex == nodeAsDynamicLoad.DataFlowDataProdivderIndex);
-                //node.SelfRemove();
-                //instructionNodes.Remove(node);
+                node.SelfRemove();
+                instructionNodes.Remove(node);
             }
 
             foreach (var node in instructionNodes.Where(x => x is StoreFieldNode).ToArray())
@@ -99,9 +98,8 @@ namespace Dopple.BackTracers
                     forwardNode.Argument.DataFlowBackRelated.AddTwoWay(dynamicLoadedData, forwardNode.ArgIndex);
                 }
                 node.DataFlowBackRelated.RemoveAllTwoWay(x => x.ArgIndex == nodeAsDynamicLoad.DataFlowDataProdivderIndex);
-                node.DataFlowForwardRelated.RemoveAllTwoWay(x => x.ArgIndex == nodeAsDynamicLoad.DataFlowDataProdivderIndex);
-                //node.SelfRemove();
-                //instructionNodes.Remove(node);
+                node.SelfRemove();
+                instructionNodes.Remove(node);
 
             }
         }
@@ -132,6 +130,18 @@ namespace Dopple.BackTracers
                 bool reachedMergeNodeNotLast;
                 int stateProviderCount = stateProviders.Count;
                 ActOnCurrentNode(currentNode, mergingNodesData, lastNode, stateProviders, out reachedMergeNodeNotLast);
+                //if (currentNode is LoadFieldNode)
+                //{
+                //    var storeVisited = visited.Where(x => x is StoreFieldNode && ((StoreFieldNode) x).FieldDefinition.Name == ((LoadFieldNode) currentNode).FieldDefinition.Name);
+                //    if (storeVisited.Any())
+                //    {
+
+                //    }
+                //}
+                //if (stateProviders.Count < 2)
+                //{
+
+                //}
                 if (reachedMergeNodeNotLast)
                 {
                     return;
@@ -152,34 +162,11 @@ namespace Dopple.BackTracers
             }
             if (!(currentNode is ConditionalJumpNode))
             {
-                throw new Exception("split without a conditional");
+                //throw new Exception("split without a conditional");
             }
-            var passedLoopStateProivders = stateProviders.Clone();
-            var loopNodes = currentNode.ProgramFlowForwardRoutes.Where(x => x.BranchProperties.FirstInLoopOf != null && x.BranchProperties.FirstInLoopOf.BranchType == BranchPropertiesNS.BranchType.Loop).ToList();
-            if (loopNodes.Count >1)
+            foreach(var node in currentNode.ProgramFlowForwardRoutes)
             {
-                throw new Exception("More than one originating loops");
-            }
-            if (loopNodes.Count >0)
-            {
-                var firstPassLoopStateProviders = new StateProviderCollection();
-                foreach(var loopNode in loopNodes)
-                {
-                    var stateProvidersLoopClone = stateProviders.Clone();
-                    TraceOutsideFunctionBoundsRec(loopNodes[0], mergingNodesData, currentNode, stateProvidersLoopClone, visited);
-                    firstPassLoopStateProviders.AddNewProviders(stateProvidersLoopClone);
-                }
-
-                foreach (var loopNode in loopNodes)
-                {
-                    var secondPassStateProvidersClone = firstPassLoopStateProviders.Clone();
-                    TraceOutsideFunctionBoundsRec(loopNodes[0], mergingNodesData, currentNode, secondPassStateProvidersClone, visited);
-                    passedLoopStateProivders.AddNewProviders(secondPassStateProvidersClone);
-                }
-            }
-            foreach (var node in currentNode.ProgramFlowForwardRoutes.Except(loopNodes))
-            {
-                TraceOutsideFunctionBoundsRec(node, mergingNodesData, currentNode, passedLoopStateProivders.Clone(), visited);
+                TraceOutsideFunctionBoundsRec(node, mergingNodesData, currentNode, stateProviders, visited);
             }
         }
 

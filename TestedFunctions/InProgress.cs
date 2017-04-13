@@ -9,39 +9,35 @@ namespace TestedFunctions
 {
     public class InProgress
     {
-        //public static int TestConditionals(int[] a)
-        //{
-        //    Helper helper1 = new Helper();
-        //    Helper helper2 = new Helper();
+        public static int TestConditionals(int[] a)
+        {
+            Helper helper1 = new Helper();
+            Helper helper2 = new Helper();
+            helper1.Number = 0;
 
-        //    int sum = 0;
-        //    helper1.anotherHelper = helper2;
-        //    helper2.Number = 5;
-        //    while (helper2.Number < a.Length)
-        //    {
-        //        sum += a[helper1.anotherHelper.Number];
-        //        helper2.Number++;
-        //    }
-        //    //this isn't working', load field didn't find store field number'
-        //    return sum;
-        //}
+            int sum = 0;
+            helper1.anotherHelper = helper2;
+            while (helper2.Number < a.Length)
+            {
+                sum += a[helper1.anotherHelper.Number];
+                helper2.Number++;
+            }
+            this isn't working', load field didn't find store field number'
+            return sum;
+        }
         //public static List<int> UseDelegate(int[] nums)
         //{
         //    return nums.Select(x => x++).ToList();
         //}
-        //public static void AddToMe(List<int> blah)
+        //public static int testLinq(List<int> nums)
         //{
-        //    blah.Add(5);
+        //    int sum = 0;
+        //    foreach (var num in Enumerable.Where(nums,(x => x > 6)))
+        //    {
+        //        sum += num;
+        //    }
+        //    return sum;
         //}
-        public static int testLinq(int[] nums)
-        {
-            int sum = 0;
-            foreach (var num in Enumerable.Where(nums, (x => x > 6)))
-            {
-                sum += num;
-            }
-            return sum;
-        }
         //public static int SumMe(int[] nums)
         //{
         //    return nums.Sum(x => x * 6);

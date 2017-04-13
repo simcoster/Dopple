@@ -36,7 +36,7 @@ namespace Dopple.BranchPropertiesNS
         {
             foreach(var branch in AllBranches)
             {
-                branch.BranchNodes.ForEach(x => { x.BranchProperties.Branches.Remove(branch); });
+                branch.BranchNodes.ForEach(x => x.BranchProperties.Branches.Remove(branch));
                 if (branch.MergingNode != null)
                 {
                     branch.MergingNode.BranchProperties.MergingNodeProperties.IsMergingNode = false;
