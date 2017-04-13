@@ -97,11 +97,11 @@ namespace Dopple
                 runCounter++;
             }
             //RecursionFix();
-            //RemoveHelperCodes();
+            RemoveHelperCodes();
             //RemoveAndStitchDynamicDataConnections();
             //MergeSimilarInstructions();
             //MergeEquivilentPairs();
-            //_backTraceManager.ForwardDynamicData(InstructionNodes);
+            _backTraceManager.ForwardDynamicData(InstructionNodes);
             AddZeroNode();
             //Verify();
             //its still very slow, need to think of solution to optimize, maybe don't need to run tracing each  time, only when there's danger something will change
