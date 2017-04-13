@@ -51,7 +51,7 @@ namespace Dopple.Tracers.PredciateProviders
             return true;
         }
 
-        internal override List<InstructionNode> GetObjectArgs(InstructionNode storeNode)
+        internal override List<InstructionNode> GetObjectArgs()
         {
             return StoreNode.DataFlowBackRelated.Where(x => x.ArgIndex == 0).SelectMany(x => x.Argument.GetDataOriginNodes()).ToList();
         }

@@ -25,64 +25,22 @@ namespace Dopple.Tracers.DynamicTracing
         }
         public void AddNewProvider(StoreDynamicDataStateProvider newStateProvider)
         {
-            foreach (var overridedStore in _StateProviders.Where(x => newStateProvider.ShareNonObjectArgs(x)).ToList())
+            var newStateProviderObjects = newStateProvider.GetObjectArgs();
+            foreach (var overridedStore in _StateProviders.Where(x => newStateProvider.ShareNonObjectArgs(x) && x.GetObjectArgs().SequenceEqual(newStateProviderObjects)).ToList())
             {
-                if (overridedStore.StoreNode == newStateProvider.StoreNode)
-                {
-                    _StateProviders.Remove(overridedStore);
-                }
-                else
-                {
-                    bool overidedIsInSameBranch = newStateProvider.StoreNode.BranchProperties.Branches.Except(overridedStore.StoreNode.BranchProperties.Branches).Any() == false;
-                    if (overidedIsInSameBranch)
-                    {
-                        overridedStore.ObjectNodes = overridedStore.ObjectNodes.Except(newStateProvider.ObjectNodes).ToList();
-                        if (overridedStore.ObjectNodes.Any() == false)
-                        {
-                            _StateProviders.Remove(overridedStore);
-                        }
-                    }
-
-                }
+                _StateProviders.Remove(overridedStore);
             }
             _StateProviders.Add(newStateProvider);
+
         }
 
-        public void AddNewProviders(StateProviderCollection stateProviders)
+        public void AddNewProviders(IEnumerable<StoreDynamicDataStateProvider> stateProviders)
         {
-            foreach (var stateProvider in stateProviders._StateProviders)
+            foreach (var stateProvider in stateProviders)
             {
                 AddNewProvider(stateProvider);
             }
-        }
-
-        public void MergeBranches (InstructionNode mergeNode)
-        {
-            if (!mergeNode.BranchProperties.MergingNodeProperties.IsMergingNode)
-            {
-                throw new Exception("Node must be a branch merging node");
-            }
-            var GroupedProviders = new List<List<StoreDynamicDataStateProvider>>();
-            foreach (var stateProvider in _StateProviders)
-            {
-                if (GroupedProviders.SelectMany(x => x).Contains(stateProvider))
-                {
-                    continue;
-                }
-                GroupedProviders.Add(_StateProviders.Where(x => stateProvider.ShareNonObjectArgs(x)).ToList());
-            }
-            foreach(var providerGroup in GroupedProviders)
-            {
-                if (mergeNode.BranchProperties.MergingNodeProperties.MergedBranches.All(x => providerGroup.Any(y => y.StoreNode.BranchProperties.Branches.Contains(x))))
-                {
-                    var overriddenProviders =  providerGroup.Where(x => x.StoreNode.BranchProperties.Branches.SequenceEqual(mergeNode.BranchProperties.Branches));
-                    foreach (var overridenProvider in  overriddenProviders)
-                    {
-                        _StateProviders.Remove(overridenProvider);
-                    }
-                }
-            }
-        }
+        }      
 
         public IEnumerable<InstructionNode> MatchLoadToStore(InstructionNode loadNode)
         {
@@ -92,6 +50,11 @@ namespace Dopple.Tracers.DynamicTracing
         internal StateProviderCollection Clone()
         {
             return new StateProviderCollection() { _StateProviders = new List<StoreDynamicDataStateProvider>(this._StateProviders) };
+        }
+        
+        public List<StoreDynamicDataStateProvider> ToList()
+        {
+            return _StateProviders;
         }
     }
 }

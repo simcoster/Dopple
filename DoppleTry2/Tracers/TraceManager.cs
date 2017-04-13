@@ -119,34 +119,18 @@ namespace Dopple.BackTracers
             }
             while (true)
             {
-                if (visited.Contains(currentNode))
-                {
-                    if (!currentNode.BranchProperties.MergingNodeProperties.IsMergingNode)
-                    {
-                        return;
-                    }
-                }
-                visited.Add(currentNode);
                 GlobalVisited.Add(currentNode);
                 bool reachedMergeNodeNotLast;
-                int stateProviderCount = stateProviders.Count;
                 ActOnCurrentNode(currentNode, mergingNodesData, lastNode, stateProviders, out reachedMergeNodeNotLast);
-                //if (currentNode is LoadFieldNode)
-                //{
-                //    var storeVisited = visited.Where(x => x is StoreFieldNode && ((StoreFieldNode) x).FieldDefinition.Name == ((LoadFieldNode) currentNode).FieldDefinition.Name);
-                //    if (storeVisited.Any())
-                //    {
-
-                //    }
-                //}
-                //if (stateProviders.Count < 2)
-                //{
-
-                //}
                 if (reachedMergeNodeNotLast)
                 {
                     return;
                 }
+                if (!currentNode.BranchProperties.MergingNodeProperties.IsMergingNode && visited.Count(x => x == currentNode) > 1)
+                {
+                    return;
+                }
+                visited.Add(currentNode);
                 lastNode = currentNode;
                 if (currentNode.ProgramFlowForwardRoutes.Count == 1)
                 {
@@ -167,7 +151,7 @@ namespace Dopple.BackTracers
             }
             foreach(var node in currentNode.ProgramFlowForwardRoutes)
             {
-                TraceOutsideFunctionBoundsRec(node, mergingNodesData, currentNode, stateProviders, visited);
+                TraceOutsideFunctionBoundsRec(node, mergingNodesData, currentNode, stateProviders.Clone(), visited);
             }
         }
 
@@ -183,13 +167,13 @@ namespace Dopple.BackTracers
                 lock (mergingNodesData)
                 {
                     mergingNodesData[currentNode].ReachedNodes.Add(lastNode);
-                    mergingNodesData[currentNode].AccumelatedStateProviders.AddNewProviders(stateProviders);
+                    mergingNodesData[currentNode].AccumelatedStateProviders.AddRange(stateProviders.ToList());
                     bool allBranchesReached = !currentNode.ProgramFlowBackRoutes.Except(mergingNodesData[currentNode].ReachedNodes).Any();
                     if (allBranchesReached)
                     {
-                        mergingNodesData[currentNode].AllBranchesReached = true;
-                        mergingNodesData[currentNode].AccumelatedStateProviders.MergeBranches(currentNode);
                         stateProviders.AddNewProviders(mergingNodesData[currentNode].AccumelatedStateProviders);
+                        //prepare for next run (for loops)
+                        mergingNodesData[currentNode].ReachedNodes.Clear();
                     }
                     else
                     {

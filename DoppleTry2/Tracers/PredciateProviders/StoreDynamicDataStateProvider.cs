@@ -11,10 +11,10 @@ namespace Dopple.Tracers.PredciateProviders
         internal StoreDynamicDataStateProvider(InstructionNode storeNode)
         {
             StoreNode = storeNode;
-            ObjectNodes = GetObjectArgs(storeNode);
+            ObjectNodes = GetObjectArgs();
         }
 
-        internal abstract List<InstructionNode> GetObjectArgs(InstructionNode storeNode);
+        internal abstract List<InstructionNode> GetObjectArgs();
         public abstract bool IsLoadNodeMatching(InstructionNode loadNode);
         public InstructionNode StoreNode { get; private set; }
         private List<InstructionNode> objectNodes;

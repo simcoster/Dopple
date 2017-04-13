@@ -9,7 +9,6 @@ namespace Dopple.BackTracers
     internal class MergeNodeTraceData
     {
         public List<InstructionNode> ReachedNodes = new List<InstructionNode>();
-        public StateProviderCollection AccumelatedStateProviders = new StateProviderCollection();
-        public bool AllBranchesReached = false;
+        public List<StoreDynamicDataStateProvider> AccumelatedStateProviders = new List<StoreDynamicDataStateProvider>();
     }
 }

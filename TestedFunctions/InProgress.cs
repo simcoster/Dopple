@@ -27,7 +27,7 @@ namespace TestedFunctions
                 else
                 {
                     sum += a[helper2.Number];
-                    helper1.anotherHelper.Number++;
+                    helper1.anotherHelper.Number--;
                 }
                 helper2.Number /= 2;
             }

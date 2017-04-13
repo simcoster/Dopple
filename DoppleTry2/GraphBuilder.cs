@@ -83,7 +83,6 @@ namespace Dopple
                 
                 InlineFunctionCalls();
                 SetInstructionIndexes();
-                _backTraceManager.TraceConditionals(InstructionNodes);
             
                 //if (shouldRunDynamicTrace)
                 //{
@@ -99,7 +98,7 @@ namespace Dopple
                 runCounter++;
             }
             //RecursionFix();
-           // RemoveHelperCodes();
+            //RemoveHelperCodes();
             //RemoveAndStitchDynamicDataConnections();
             //MergeSimilarInstructions();
             //MergeEquivilentPairs();
