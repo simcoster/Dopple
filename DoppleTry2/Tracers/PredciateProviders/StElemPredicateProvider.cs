@@ -8,7 +8,7 @@ using Dopple.InstructionNodes;
 
 namespace Dopple.Tracers.PredciateProviders
 {
-    class StElemStateProvider : StoreDynamicDataStateProvider
+    class StElemStateProvider : ObjectUsingStateProvider
     {
         internal StElemStateProvider(InstructionNode storeNode) : base(storeNode)
         {
@@ -29,8 +29,8 @@ namespace Dopple.Tracers.PredciateProviders
             {
                 return false;
             }
-            var loadArrayArgs = loadNode.DataFlowBackRelated.Where(x => x.ArgIndex == 1).SelectMany(x => x.Argument.GetDataOriginNodes()).ToArray();
-            if (!loadIndexArgs.Intersect(ObjectNodes).Any())
+            var loadArrayArgs = loadNode.DataFlowBackRelated.Where(x => x.ArgIndex == 0).SelectMany(x => x.Argument.GetDataOriginNodes()).ToArray();
+            if (!loadArrayArgs.Intersect(ObjectNodes).Any())
             {
                 return false;
             }
@@ -50,23 +50,30 @@ namespace Dopple.Tracers.PredciateProviders
             }
         }
 
-        public override bool ShareNonObjectArgs(StoreDynamicDataStateProvider storeStateProvider)
-        {
-            StElemStateProvider stElemStateProvider = storeStateProvider as StElemStateProvider;
-            if (stElemStateProvider == null)
-            { 
-                return false;
-            }
-            if (!stElemStateProvider._IndexArgs.SequenceEqual(_IndexArgs))
-            {
-                return false;
-            }
-            return true;
-        }
-
         internal override List<InstructionNode> GetObjectArgs()
         {
             return StoreNode.DataFlowBackRelated.Where(x => x.ArgIndex == 0).SelectMany(x => x.Argument.GetDataOriginNodes()).ToList();
+        }
+
+        internal override void OverrideAnother(StoreDynamicDataStateProvider partiallyOverrided, out bool completelyOverrides)
+        {
+            var stElemProivder = partiallyOverrided as StElemStateProvider;
+            if (stElemProivder == null)
+            {
+                completelyOverrides = false;
+                return;
+            }
+            if (!stElemProivder._IndexArgs.SequenceEqual(this._IndexArgs))
+            {
+                completelyOverrides = false;
+                return;
+            }
+            stElemProivder.ObjectNodes = stElemProivder.ObjectNodes.Except(ObjectNodes).ToList();
+            if (stElemProivder.ObjectNodes.Count ==0)
+            {
+                completelyOverrides = true;
+            }
+            completelyOverrides =  false;
         }
     }
 }

@@ -146,6 +146,14 @@ namespace Dopple.InstructionNodes
             {
                 return new[] { new LdElemAddressNode(instruction, method) };
             }
+            else if (nodeCode == Code.Ldsfld)
+            {
+                return new[] { new LoadStaticFieldNode(instruction, method) };
+            }
+            else if (nodeCode == Code.Stsfld)
+            {
+                return new[] { new StoreStaticFieldNode(instruction, method) };
+            }
             return new[] {new InstructionNode(instruction, method)};
         }
 

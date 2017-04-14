@@ -11,35 +11,10 @@ namespace Dopple.Tracers.PredciateProviders
         internal StoreDynamicDataStateProvider(InstructionNode storeNode)
         {
             StoreNode = storeNode;
-            ObjectNodes = GetObjectArgs();
         }
-
-        internal abstract List<InstructionNode> GetObjectArgs();
         public abstract bool IsLoadNodeMatching(InstructionNode loadNode);
         public InstructionNode StoreNode { get; private set; }
-        private List<InstructionNode> objectNodes;
-        public abstract bool ShareNonObjectArgs(StoreDynamicDataStateProvider newStore);
         public Guid MyGuid { get; set; } = Guid.NewGuid();
-
-        public List<InstructionNode> ObjectNodes
-        {
-            get
-            {
-                return objectNodes;
-            }
-
-            set
-            {
-                this.objectNodes = value;
-            }
-        }
-
-        protected bool ShareObejctArgs(InstructionNode loadNode)
-        {
-            var loadNodeNodeObjects = loadNode.DataFlowBackRelated.Where(x => x.ArgIndex == 0).SelectMany(x => x.Argument.GetDataOriginNodes());
-            return ObjectNodes.Intersect(loadNodeNodeObjects).Any();
-        }
-
         public static StoreDynamicDataStateProvider GetMatchingStateProvider(InstructionNode storeNode)
         {
             if (storeNode is StElemInstructionNode)
@@ -50,8 +25,15 @@ namespace Dopple.Tracers.PredciateProviders
             {
                 return new StoreFieldStateProvider(storeNode);
             }
+            if (storeNode is StoreStaticFieldNode)
+            {
+                return new StoreStaticFieldStateProvider(storeNode);
+            }
             return null;
         }
-
+        internal abstract void OverrideAnother(StoreDynamicDataStateProvider partiallyOverrided, out bool completelyOverrides);
     }
+
+
+  
 }

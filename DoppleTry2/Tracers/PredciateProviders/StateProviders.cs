@@ -35,13 +35,15 @@ namespace Dopple.Tracers.DynamicTracing
         }
         public void AddNewProvider(StoreDynamicDataStateProvider newStateProvider)
         {
-            var newStateProviderObjects = newStateProvider.GetObjectArgs();
-            foreach (var overridedStore in _StateProviders.Where(x => newStateProvider.ShareNonObjectArgs(x) && x.GetObjectArgs().SequenceEqual(newStateProviderObjects)).ToList())
+            foreach (var overridedStore in _StateProviders.ToList())
             {
-                _StateProviders.Remove(overridedStore);
+                bool completelyOverrides;
+                newStateProvider.OverrideAnother(overridedStore, out completelyOverrides);
+                if (completelyOverrides)
+                {
+                    _StateProviders.Remove(overridedStore);
+                }
             }
-            _StateProviders.Add(newStateProvider);
-
         }
 
         public void AddNewProviders(IEnumerable<StoreDynamicDataStateProvider> stateProviders)

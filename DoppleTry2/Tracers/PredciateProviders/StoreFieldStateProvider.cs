@@ -10,7 +10,7 @@ using Mono.Cecil.Cil;
 
 namespace Dopple.Tracers.PredciateProviders
 {
-    class StoreFieldStateProvider : StoreDynamicDataStateProvider
+    class StoreFieldStateProvider : ObjectUsingStateProvider
     {
         public StoreFieldStateProvider(InstructionNode storeNode) : base(storeNode)
         {
@@ -30,21 +30,17 @@ namespace Dopple.Tracers.PredciateProviders
             {
                 return false;
             }
-            if (!ShareObejctArgs(loadNode)) 
+            var loadFieldObjectNodes = loadFieldNode.DataFlowBackRelated.Where(x => x.ArgIndex == 0).SelectMany(x => x.Argument.GetDataOriginNodes());
+            if (!loadFieldObjectNodes.Intersect(ObjectNodes).Any()) 
             {
                 return false;
             }
             return true;
         }
 
-        public override bool ShareNonObjectArgs(StoreDynamicDataStateProvider newStore)
+        private bool ShareNonObjectArgs(LoadFieldNode loadFieldNode)
         {
-            StoreFieldStateProvider newStateProvider = newStore as StoreFieldStateProvider;
-            if (newStateProvider == null)
-            {
-                return false;
-            }
-            if (newStateProvider._FieldDefinition.MetadataToken != _FieldDefinition.MetadataToken)
+            if (this._FieldDefinition.MetadataToken != _FieldDefinition.MetadataToken)
             {
                 return false;
             }
@@ -54,6 +50,23 @@ namespace Dopple.Tracers.PredciateProviders
         internal override List<InstructionNode> GetObjectArgs()
         {
             return StoreNode.DataFlowBackRelated.Where(x => x.ArgIndex == 0).SelectMany(x => x.Argument.GetDataOriginNodes()).ToList();
+        }
+
+        internal override void OverrideAnother(StoreDynamicDataStateProvider overridedProvider, out bool CompletelyOverrides)
+        {
+            var otherStoreFieldProvider = overridedProvider as StoreFieldStateProvider;
+            if (otherStoreFieldProvider == null)
+            {
+                CompletelyOverrides = false;
+                return;
+            }
+            if (otherStoreFieldProvider._FieldDefinition.MetadataToken != _FieldDefinition.MetadataToken)
+            {
+                CompletelyOverrides = false;
+                return; 
+            }
+            otherStoreFieldProvider.ObjectNodes = otherStoreFieldProvider.ObjectNodes.Except(this.ObjectNodes).ToList();
+            CompletelyOverrides = otherStoreFieldProvider.ObjectNodes.Count == 0;
         }
     }
 }

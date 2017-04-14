@@ -81,11 +81,15 @@
     <Compile Include="InstructionNodes\Interfaces\IDynamicDataStoreNode.cs" />
     <Compile Include="InstructionNodes\LdElemAddressNode.cs" />
     <Compile Include="InstructionNodes\LdindNode.cs" />
+    <Compile Include="InstructionNodes\LoadStaticFieldNode.cs" />
     <Compile Include="Tracers\DynamicTracing\MergeNodeTraceData.cs" />
-    <Compile Include="Tracers\DynamicTracing\StateProviders.cs" />
+    <Compile Include="Tracers\PredciateProviders\ObjectUsingStateProvider.cs" />
+    <Compile Include="Tracers\PredciateProviders\StateProviders.cs" />
+    <Compile Include="InstructionNodes\StoreStaticFieldNode.cs" />
+    <Compile Include="Tracers\PredciateProviders\StoreStaticFieldStateProvider.cs" />
     <Compile Include="Tracers\TraceManager.cs" />
     <Compile Include="Tracers\PredciateProviders\StElemPredicateProvider.cs" />
-    <Compile Include="Tracers\PredciateProviders\StFldPredicateProvider.cs" />
+    <Compile Include="Tracers\PredciateProviders\StoreFieldStateProvider.cs" />
     <Compile Include="Tracers\PredciateProviders\StoreDynamicDataStateProvider.cs" />
     <Compile Include="Tracers\DynaymicLdArgBacktracer.cs" />
     <Compile Include="Tracers\ForwardTracers\ConditionionalsTracer.cs" />

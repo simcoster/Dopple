@@ -17,6 +17,5 @@ namespace Dopple.InstructionNodes
                 return 0;
             }
         }
-        public bool ObjectOrAddressArgsResolved { get; set; }
     }
 }
