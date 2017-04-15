@@ -138,7 +138,7 @@ namespace Dopple.BackTracers
                     var loopBranch = currentNode.ProgramFlowForwardRoutes.Where(x => x.BranchProperties.FirstInLoop).ToList();
                     if (loopBranch.Count > 1)
                     {
-                        //throw new Exception("Can't deal with 2 loops from the same place (too many combinations)");
+                        throw new Exception("Can't deal with 2 loops from the same place (too many combinations)");
                     }
                     if (loopBranch.Any())
                     {
@@ -165,7 +165,7 @@ namespace Dopple.BackTracers
             }
             if (!(currentNode is ConditionalJumpNode))
             {
-                //throw new Exception("split without a conditional");
+                throw new Exception("split without a conditional");
             }
             foreach (var node in currentNode.ProgramFlowForwardRoutes.Except(currentNode.ProgramFlowForwardRoutes.Where(x => x.BranchProperties.FirstInLoop)).ToList())
             {

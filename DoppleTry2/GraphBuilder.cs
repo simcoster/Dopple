@@ -31,11 +31,9 @@ namespace Dopple
         public GraphBuilder(FunctionFlowGraph functionFlowGraph)
         {
             List<Instruction> instructions = functionFlowGraph.Method.Body.Instructions.ToList();
-            List<InstructionNode> typeInitilizerNodes;
             if (instructions.Any(x => x.OpCode.Code == Code.Ldsfld))
             {
-                //_InstructionNodeFactory.GetInstructionNodes(x, functionFlowGraph.Method);
-               // typeInitilizerNodes = functionFlowGraph.TypeInitializer.Body.Instructions.Concat(instructions).ToList();
+                //instructions = functionFlowGraph.TypeInitializer.Body.Instructions.Where(x => x.OpCode.Code != Code.Ret).Concat(instructions).ToList();
             }
             InstructionNodes =
                 instructions.SelectMany(x => _InstructionNodeFactory.GetInstructionNodes(x, functionFlowGraph.Method)).ToList();
@@ -99,9 +97,10 @@ namespace Dopple
             //RecursionFix();
             RemoveHelperCodes();
             //RemoveAndStitchDynamicDataConnections();
-            //MergeSimilarInstructions();
+
+            //_backTraceManager.ForwardDynamicData(InstructionNodes);
+            MergeSimilarInstructions();
             //MergeEquivilentPairs();
-            _backTraceManager.ForwardDynamicData(InstructionNodes);
             AddZeroNode();
             //Verify();
             //its still very slow, need to think of solution to optimize, maybe don't need to run tracing each  time, only when there's danger something will change

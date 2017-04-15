@@ -28,9 +28,10 @@ namespace Dopple.Tracers.PredciateProviders
             return loadStaticFieldNode.FieldDefinition.MetadataToken == _FieldDefinition.MetadataToken;
         }
 
-        internal override void OverrideAnother(StoreDynamicDataStateProvider partiallyOverrided, out bool completelyOverrides)
+        protected override void OverrideAnotherInternal(StoreDynamicDataStateProvider overrideCandidate, out bool completelyOverrides)
         {
-            throw new NotImplementedException();
+            var otherStoreStaticField = (StoreStaticFieldStateProvider) overrideCandidate;
+            completelyOverrides = this._FieldDefinition.MetadataToken == otherStoreStaticField._FieldDefinition.MetadataToken;
         }
     }
 }

@@ -46,11 +46,6 @@ namespace Dopple.InstructionModifiers
 
         private List<InstructionNode> InlineRec(InlineableCallNode callNode)
         {
-            //var tempStop = Stopwatch.StartNew();
-            //if (callNode.InliningProperties.CallSequence.Count > 8)
-            //{
-            //    //return new List<InstructionNode>();
-            //}
             MethodDefinition calledMethodDef = callNode.TargetMethodDefinition;
             callNode.CallWasInlined = true;
             if (calledMethodDef.Body == null)
@@ -93,8 +88,6 @@ namespace Dopple.InstructionModifiers
             {
              //   Console.WriteLine(callNode.TargetMethod.FullName + " is the last of the chain");
             }
-            //tempStop.Stop();
-            //Console.WriteLine("inlinling " + callNode.TargetMethod.FullName + " with " + inlinedNodes.Count + " nodes, took " + tempStop.Elapsed);
             return inlinedNodes;
         }
 

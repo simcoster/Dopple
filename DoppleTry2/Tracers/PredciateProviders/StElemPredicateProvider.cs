@@ -55,14 +55,9 @@ namespace Dopple.Tracers.PredciateProviders
             return StoreNode.DataFlowBackRelated.Where(x => x.ArgIndex == 0).SelectMany(x => x.Argument.GetDataOriginNodes()).ToList();
         }
 
-        internal override void OverrideAnother(StoreDynamicDataStateProvider partiallyOverrided, out bool completelyOverrides)
+        protected override void OverrideAnotherInternal(StoreDynamicDataStateProvider overrideCandidate, out bool completelyOverrides)
         {
-            var stElemProivder = partiallyOverrided as StElemStateProvider;
-            if (stElemProivder == null)
-            {
-                completelyOverrides = false;
-                return;
-            }
+            var stElemProivder = (StElemStateProvider)overrideCandidate;
             if (!stElemProivder._IndexArgs.SequenceEqual(this._IndexArgs))
             {
                 completelyOverrides = false;

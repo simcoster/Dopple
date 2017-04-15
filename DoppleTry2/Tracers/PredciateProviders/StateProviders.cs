@@ -44,6 +44,7 @@ namespace Dopple.Tracers.DynamicTracing
                     _StateProviders.Remove(overridedStore);
                 }
             }
+            _StateProviders.Add(newStateProvider);
         }
 
         public void AddNewProviders(IEnumerable<StoreDynamicDataStateProvider> stateProviders)

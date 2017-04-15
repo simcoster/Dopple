@@ -31,7 +31,22 @@ namespace Dopple.Tracers.PredciateProviders
             }
             return null;
         }
-        internal abstract void OverrideAnother(StoreDynamicDataStateProvider partiallyOverrided, out bool completelyOverrides);
+        internal void OverrideAnother(StoreDynamicDataStateProvider partiallyOverrided, out bool completelyOverrides)
+        {
+            if (partiallyOverrided.GetType() != this.GetType())
+            {
+                completelyOverrides = false;
+                return;
+            }
+            if (partiallyOverrided.StoreNode == StoreNode)
+            {
+                completelyOverrides = true;
+                return;
+            }
+            OverrideAnotherInternal(partiallyOverrided, out completelyOverrides);
+        }
+        protected abstract void OverrideAnotherInternal(StoreDynamicDataStateProvider overrideCandidate, out bool completelyOverrides);
+
     }
 
 
