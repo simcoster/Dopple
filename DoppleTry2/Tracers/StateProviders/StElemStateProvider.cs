@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Dopple.BranchPropertiesNS;
 using Dopple.InstructionNodes;
 
-namespace Dopple.Tracers.PredciateProviders
+namespace Dopple.Tracers.StateProviders
 {
     class StElemStateProvider : ObjectUsingStateProvider
     {
@@ -55,20 +55,11 @@ namespace Dopple.Tracers.PredciateProviders
             return StoreNode.DataFlowBackRelated.Where(x => x.ArgIndex == 0).SelectMany(x => x.Argument.GetDataOriginNodes()).ToList();
         }
 
-        protected override void OverrideAnotherInternal(StoreDynamicDataStateProvider overrideCandidate, out bool completelyOverrides)
+
+        protected override bool IsRelatedToOtherStore(StoreDynamicDataStateProvider otherStateProvider)
         {
-            var stElemProivder = (StElemStateProvider)overrideCandidate;
-            if (!stElemProivder._IndexArgs.SequenceEqual(this._IndexArgs))
-            {
-                completelyOverrides = false;
-                return;
-            }
-            stElemProivder.ObjectNodes = stElemProivder.ObjectNodes.Except(ObjectNodes).ToList();
-            if (stElemProivder.ObjectNodes.Count ==0)
-            {
-                completelyOverrides = true;
-            }
-            completelyOverrides =  false;
+            var stElemProivder = (StElemStateProvider) otherStateProvider;
+            return !stElemProivder._IndexArgs.SequenceEqual(this._IndexArgs);
         }
     }
 }

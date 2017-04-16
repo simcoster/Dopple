@@ -19,7 +19,7 @@ namespace Dopple.InstructionNodes
         public bool AllPathsHaveAStoreNode { get; set; } = false;
 
 
-        public IEnumerable<InstructionNode> ArrayBackArgs
+        public IEnumerable<InstructionNode> ArrayArgs
         {
             get
             {

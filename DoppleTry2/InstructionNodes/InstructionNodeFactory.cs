@@ -90,6 +90,10 @@ namespace Dopple.InstructionNodes
             {
                 return new[] { new LocationStoreInstructionNode(instruction, method) };
             }
+            else if (CodeGroups.LdLocAddressCodes.Contains(nodeCode))
+            {
+                return new[] { new LocationAddressLoadInstructionNode(instruction, method) };
+            }
             else if (CodeGroups.LdImmediateFromOperandCodes.Concat(CodeGroups.LdImmediateValueCodes).Contains(nodeCode))
             {
                 return new[] { new LdImmediateInstNode(instruction, method) };

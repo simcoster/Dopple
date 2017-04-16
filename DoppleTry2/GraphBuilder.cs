@@ -95,7 +95,7 @@ namespace Dopple
                 runCounter++;
             }
             //RecursionFix();
-            RemoveHelperCodes();
+            //RemoveHelperCodes();
             //RemoveAndStitchDynamicDataConnections();
 
             //_backTraceManager.ForwardDynamicData(InstructionNodes);

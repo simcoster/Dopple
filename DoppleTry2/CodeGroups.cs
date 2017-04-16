@@ -21,6 +21,7 @@ namespace Dopple
         public static Code[] LdImmediateValueCodes = { Code.Ldc_I4_0, Code.Ldc_I4_1, Code.Ldc_I4_2, Code.Ldc_I4_3, Code.Ldc_I4_4, Code.Ldc_I4_5,
                                                Code.Ldc_I4_6, Code.Ldc_I4_7, Code.Ldc_I4_8};
         public static Code[] LdLocCodes   =  { Code.Ldloc_0, Code.Ldloc_1, Code.Ldloc_2, Code.Ldloc_3, Code.Ldloc, Code.Ldloc_S};
+        public static Code[] LdLocAddressCodes = { Code.Ldloca, Code.Ldloca_S};
         public static Code[] StLocCodes   =  { Code.Stloc, Code.Stloc_0, Code.Stloc_1, Code.Stloc_2, Code.Stloc_3, Code.Stloc_S };
         public static Code[] CondJumpCodes = { Code.Beq, Code.Beq_S, Code.Bge_S, Code.Bge_Un, Code.Bge_Un_S, Code.Bgt, Code.Bgt_S, Code.Bgt_Un, Code.Bgt_Un_S,
                                                Code.Ble, Code.Ble_S, Code.Ble_Un, Code.Ble_Un_S, Code.Blt, Code.Blt_S, Code.Blt_Un, Code.Blt_Un_S, Code.Bne_Un,
@@ -28,7 +29,7 @@ namespace Dopple
         public static Code[] ArithmeticCodes = {Code.Add, Code.Add_Ovf, Code.Add_Ovf_Un, Code.Sub, Code.Sub_Ovf, Code.Sub_Ovf_Un, Code.Mul, Code.Mul_Ovf, Code.Mul_Ovf_Un,
                                                 Code.Div, Code.Div_Un};
         public static Code[] StIndCodes = { Code.Stind_I, Code.Stind_I1, Code.Stind_I2, Code.Stind_I4, Code.Stind_I8, Code.Stind_R4, Code.Stind_R8 };
-        public static Code[] LoadFieldCodes = { Code.Ldfld, Code.Ldsfld};
+        public static Code[] LoadFieldCodes = { Code.Ldfld};
         public static Code[] StoreFieldCodes = { Code.Stfld, Code.Stsfld};
         public static Code[] LdIndCodes = { Code.Ldind_I, Code.Ldind_I1, Code.Ldind_I2, Code.Ldind_I4, Code.Ldind_I8, Code.Ldind_R4 , Code.Ldind_R8, Code.Ldind_Ref, Code.Ldind_U1, Code.Ldind_U2, Code.Ldind_U4};
         public static Code[][] CodeGroupLists = typeof(CodeGroups).GetFields().Select(x => x.GetValue(null)).Where(x => x is Code[]).Cast<Code[]>().ToArray();

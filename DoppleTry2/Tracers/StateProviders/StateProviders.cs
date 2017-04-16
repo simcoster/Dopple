@@ -1,6 +1,6 @@
 ﻿using Dopple.BranchPropertiesNS;
 using Dopple.InstructionNodes;
-using Dopple.Tracers.PredciateProviders;
+using Dopple.Tracers.StateProviders;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -17,7 +17,7 @@ namespace Dopple.InstructionNodes
         {
         }
 
-        public IEnumerable<InstructionNode> ArrayBackArgs
+        public IEnumerable<InstructionNode> ArrayArgs
         {
             get
             {

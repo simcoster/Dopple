@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Dopple.InstructionNodes;
 using Mono.Cecil;
 
-namespace Dopple.Tracers.PredciateProviders
+namespace Dopple.Tracers.StateProviders
 {
     class StoreStaticFieldStateProvider : StoreDynamicDataStateProvider
     {

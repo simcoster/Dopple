@@ -28,7 +28,7 @@ namespace Dopple.BackTracers
                 LdElemAddressNode addressArgAsLdelema = addressArg as LdElemAddressNode;
                 if (addressArgAsLdelema != null)
                 {
-                    var arrayArgs = addressArgAsLdelema.ArrayBackArgs.SelectMany(y => y.GetDataOriginNodes()).ToArray();
+                    var arrayArgs = addressArgAsLdelema.ArrayArgs.SelectMany(y => y.GetDataOriginNodes()).ToArray();
                     var indexArgs = addressArgAsLdelema.IndexNodes.SelectMany(y => y.GetDataOriginNodes()).ToArray();
                     specificCasePredicate = x => x is StElemInstructionNode && LdElemBacktracer.ArrayAndIndexMatch((StElemInstructionNode) x, arrayArgs, indexArgs);
                     specificCasesPredicates.Add(specificCasePredicate);

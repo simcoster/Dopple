@@ -1,10 +1,11 @@
 ﻿using Dopple.BranchPropertiesNS;
 using Dopple.InstructionNodes;
+using Mono.Cecil.Cil;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Dopple.Tracers.PredciateProviders
+namespace Dopple.Tracers.StateProviders
 {
     abstract class StoreDynamicDataStateProvider
     {
@@ -15,7 +16,21 @@ namespace Dopple.Tracers.PredciateProviders
         public abstract bool IsLoadNodeMatching(InstructionNode loadNode);
         public InstructionNode StoreNode { get; private set; }
         public Guid MyGuid { get; set; } = Guid.NewGuid();
-        public static StoreDynamicDataStateProvider GetMatchingStateProvider(InstructionNode storeNode)
+        public static IEnumerable<StoreDynamicDataStateProvider> GetMatchingStateProvider(InstructionNode storeNode)
+        {
+            StoreDynamicDataStateProvider singleStateProvider = GetSingleMatchingStateProvider(storeNode);
+            if (singleStateProvider != null)
+            {
+                return new[] { singleStateProvider };
+            }
+            if (CodeGroups.StIndCodes.Contains(storeNode.Instruction.OpCode.Code))
+            {
+                return StoreToAddressFactory.GetStoreToAddressStateProvider(storeNode);
+            }
+            return null;
+        }
+
+        private static StoreDynamicDataStateProvider GetSingleMatchingStateProvider (InstructionNode storeNode)
         {
             if (storeNode is StElemInstructionNode)
             {
@@ -28,6 +43,10 @@ namespace Dopple.Tracers.PredciateProviders
             if (storeNode is StoreStaticFieldNode)
             {
                 return new StoreStaticFieldStateProvider(storeNode);
+            }
+            if (storeNode is LocationStoreInstructionNode)
+            {
+                return new StoreLocationStateProvider(storeNode);
             }
             return null;
         }
@@ -44,6 +63,11 @@ namespace Dopple.Tracers.PredciateProviders
                 return;
             }
             OverrideAnotherInternal(partiallyOverrided, out completelyOverrides);
+        }
+
+        public virtual void ConnectToLoadNode(InstructionNode loadNode)
+        {
+            loadNode.DataFlowBackRelated.AddTwoWay(StoreNode, ((IDynamicDataLoadNode) loadNode).DataFlowDataProdivderIndex);
         }
         protected abstract void OverrideAnotherInternal(StoreDynamicDataStateProvider overrideCandidate, out bool completelyOverrides);
 

@@ -16,6 +16,12 @@ namespace Dopple.InstructionNodes
     }
 
     [DataContract]
+    public class LocationAddressLoadInstructionNode : LocationInstructionNode
+    {
+        public LocationAddressLoadInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method) { }
+    }
+
+    [DataContract]
     public class LocationLoadInstructionNode : LocationInstructionNode
     {
         public LocationLoadInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method) { }

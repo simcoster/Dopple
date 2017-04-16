@@ -8,13 +8,13 @@ using Dopple.InstructionNodes;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
-namespace Dopple.Tracers.PredciateProviders
+namespace Dopple.Tracers.StateProviders
 {
     class StoreFieldStateProvider : ObjectUsingStateProvider
     {
         public StoreFieldStateProvider(InstructionNode storeNode) : base(storeNode)
         {
-            _FieldDefinition = ((StoreFieldNode) storeNode).FieldDefinition;
+            _FieldDefinition = ((FieldManipulationNode) storeNode).FieldDefinition;
         }
 
         private FieldDefinition _FieldDefinition { get; set; }
@@ -62,6 +62,11 @@ namespace Dopple.Tracers.PredciateProviders
             }
             otherStoreFieldProvider.ObjectNodes = otherStoreFieldProvider.ObjectNodes.Except(this.ObjectNodes).ToList();
             CompletelyOverrides = otherStoreFieldProvider.ObjectNodes.Count == 0;
+        }
+
+        protected override bool IsRelatedToOtherStore(StoreDynamicDataStateProvider otherStateProvider)
+        {
+            return ((StoreFieldStateProvider) otherStateProvider)._FieldDefinition.MetadataToken == _FieldDefinition.MetadataToken;
         }
     }
 }

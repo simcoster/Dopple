@@ -1,7 +1,7 @@
 ﻿using Dopple.BackTracers;
 using Dopple.InstructionNodes;
 using Dopple.Tracers.DynamicTracing;
-using Dopple.Tracers.PredciateProviders;
+using Dopple.Tracers.StateProviders;
 using Dopple.VerifierNs;
 using System;
 using System.Collections.Generic;
@@ -203,16 +203,20 @@ namespace Dopple.BackTracers
                     }
                 }
             }
-            var newStoreState = StoreDynamicDataStateProvider.GetMatchingStateProvider(currentNode);
-            if (newStoreState != null)
+            var newStoreStateProviders = StoreDynamicDataStateProvider.GetMatchingStateProvider(currentNode);
+            if (newStoreStateProviders != null)
             {
-                stateProviders.AddNewProvider(newStoreState);
+                foreach(var newStateProvider in newStoreStateProviders)
+                {
+                    stateProviders.AddNewProvider(newStateProvider);
+                }
             }
             IDynamicDataLoadNode loadNode = currentNode as IDynamicDataLoadNode;
             if (loadNode != null)
             {
                 foreach (var storeNode in stateProviders.MatchLoadToStore(currentNode))
                 {
+                    //have to change this to abstract
                     currentNode.DataFlowBackRelated.AddTwoWay(storeNode, loadNode.DataFlowDataProdivderIndex);
                 }
             }

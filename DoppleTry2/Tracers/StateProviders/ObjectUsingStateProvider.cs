@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dopple.Tracers.PredciateProviders
+namespace Dopple.Tracers.StateProviders
 {
     abstract class ObjectUsingStateProvider : StoreDynamicDataStateProvider
     {
@@ -31,5 +31,19 @@ namespace Dopple.Tracers.PredciateProviders
                 this.objectNodes = value;
             }
         }
+
+        protected override void OverrideAnotherInternal(StoreDynamicDataStateProvider overrideCandidate, out bool completelyOverrides)
+        {
+            if (!IsRelatedToOtherStore(overrideCandidate))
+            {
+                completelyOverrides = false;
+                return;
+            }
+            ObjectUsingStateProvider overrideCandidateAsObjectUsing = (ObjectUsingStateProvider) overrideCandidate;
+            overrideCandidateAsObjectUsing.ObjectNodes = overrideCandidateAsObjectUsing.ObjectNodes.Except(ObjectNodes).ToList();
+            completelyOverrides = overrideCandidateAsObjectUsing.objectNodes.Count == 0;
+        }
+
+        protected abstract bool IsRelatedToOtherStore(StoreDynamicDataStateProvider otherStateProvider);
     }
 }

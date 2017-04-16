@@ -5,6 +5,6 @@ namespace Dopple.InstructionNodes
 {
     internal interface IArrayUsingNode
     {
-        IEnumerable<InstructionNode> ArrayBackArgs { get; }
+        IEnumerable<InstructionNode> ArrayArgs { get; }
     }
 }

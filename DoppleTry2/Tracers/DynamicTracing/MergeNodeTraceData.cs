@@ -1,7 +1,7 @@
 ﻿using Dopple.BranchPropertiesNS;
 using Dopple.InstructionNodes;
 using Dopple.Tracers.DynamicTracing;
-using Dopple.Tracers.PredciateProviders;
+using Dopple.Tracers.StateProviders;
 using System.Collections.Generic;
 
 namespace Dopple.BackTracers
