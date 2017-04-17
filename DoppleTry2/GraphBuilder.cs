@@ -64,8 +64,10 @@ namespace Dopple
             SetInstructionIndexes();
             while (shouldRerun)
             {
+                need to think about running order - loops and merges and such
                 Console.WriteLine("run counter is " + runCounter);
                 _programFlowManager.AddFlowConnections(InstructionNodes);
+                return InstructionNodes;
                 if (isFirstRun)
                 {
                     try
@@ -81,14 +83,13 @@ namespace Dopple
                 InlineFunctionCalls();
                 SetInstructionIndexes();
             
-                //if (shouldRunDynamicTrace)
-                //{
                 //TODO remove for tests;
                 BackTraceOutsideFuncBoundry();
-              
-                // }
+
                 //MergeSingleOperationNodes();
-                ResolveVirtualMethods(out shouldRerun, out shouldRunDynamicTrace);
+                //TODO remove
+                //ResolveVirtualMethods(out shouldRerun, out shouldRunDynamicTrace);
+                shouldRerun = false;
              
                 //SetInstructionIndexes();
                 isFirstRun = false;

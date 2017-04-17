@@ -9,17 +9,17 @@ namespace TestedFunctions
 {
     public class InProgress
     {
-        public static int TestOutParams(int a, int b)
-        {
-            int answer;
-            OutParams(a, b, out answer);
-            return answer;
-        }
+        //public static int TestOutParams(int a, int b)
+        //{
+        //    int answer;
+        //    OutParams(a, b, out answer);
+        //    return answer;
+        //}
 
-        private static void OutParams(int a, int b, out int answer)
-        {
-            answer = a + b;
-        }
+        //private static void OutParams(int a, int b, out int answer)
+        //{
+        //    answer = a + b;
+        //}
         //public static int TestConditionals(int[] a)
         //{
         //    Helper helper1 = new Helper();
@@ -60,18 +60,18 @@ namespace TestedFunctions
         //    return nums.Where(x => x > 6).Sum();
         //}
 
-        //public static int TestSumRegular(List<int> nums)
-        //{
-        //    int sum = 0;
-        //    foreach (var num in nums)
-        //    {
-        //        if (num > 6)
-        //        {
-        //            sum += num;
-        //        }
-        //    }
-        //    return sum;
-        //}
+        public static int TestSumRegular(List<int> nums)
+        {
+            int sum = 0;
+            foreach (var num in nums)
+            {
+                if (num > 6)
+                {
+                    sum += num;
+                }
+            }
+            return sum;
+        }
         //public static int SumMe(int[] nums)
         //{
         //    return nums.Sum(x => x * 6);
