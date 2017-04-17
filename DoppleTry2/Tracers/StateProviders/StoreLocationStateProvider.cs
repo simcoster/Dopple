@@ -11,10 +11,10 @@ namespace Dopple.Tracers.StateProviders
 {
     class StoreLocationStateProvider : StoreDynamicDataStateProvider
     {
-        LocationStoreInstructionNode LocStoreNode;
+        LocationInstructionNode LocStoreNode;
         public StoreLocationStateProvider(InstructionNode storeNode) : base(storeNode)
         {
-            LocStoreNode = (LocationStoreInstructionNode) storeNode;
+            LocStoreNode = (LocationInstructionNode) storeNode;
         }
 
         Code[] LoadLocationCodes = CodeGroups.LdLocCodes.Concat(new[] { Code.Ldloca, Code.Ldloca_S }).ToArray();

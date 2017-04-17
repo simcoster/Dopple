@@ -21,7 +21,7 @@ namespace Dopple.Tracers.StateProviders
             }
             if (groupContainingFirstArg == LoadLocAddress)
             {
-                throw new NotImplementedException("need to impelement stloc");
+                return AddressNodes.Select(x => new StoreToLocationByAddress(storeInderectNode, x));
             }
             if (groupContainingFirstArg == LoadEelemAddress)
             {
@@ -29,7 +29,7 @@ namespace Dopple.Tracers.StateProviders
             }
             if (groupContainingFirstArg == LoadArgAddress)
             {
-                throw new NotImplementedException("need to impelement starg");
+                return AddressNodes.Select(x => new StoreArgumentByAddressStateProvider(storeInderectNode, x));
             }
             if (groupContainingFirstArg == LoadFieldAddress)
             {

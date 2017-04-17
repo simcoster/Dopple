@@ -14,6 +14,7 @@ namespace Dopple.Tracers.StateProviders
             StoreNode = storeNode;
         }
         public abstract bool IsLoadNodeMatching(InstructionNode loadNode);
+        public virtual bool IsLimitedToFunc { get; private set; } = false;
         public InstructionNode StoreNode { get; private set; }
         public Guid MyGuid { get; set; } = Guid.NewGuid();
         public static IEnumerable<StoreDynamicDataStateProvider> GetMatchingStateProvider(InstructionNode storeNode)
@@ -47,6 +48,10 @@ namespace Dopple.Tracers.StateProviders
             if (storeNode is LocationStoreInstructionNode)
             {
                 return new StoreLocationStateProvider(storeNode);
+            }
+            if (storeNode is StoreArgumentNode)
+            {
+                return new StoreArgumentStateProvider(storeNode);
             }
             return null;
         }

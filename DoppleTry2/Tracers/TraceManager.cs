@@ -214,10 +214,10 @@ namespace Dopple.BackTracers
             IDynamicDataLoadNode loadNode = currentNode as IDynamicDataLoadNode;
             if (loadNode != null)
             {
-                foreach (var storeNode in stateProviders.MatchLoadToStore(currentNode))
+                foreach (var stateProvider in stateProviders.MatchLoadToStore(currentNode))
                 {
+                    stateProvider.ConnectToLoadNode((InstructionNode)loadNode);
                     //have to change this to abstract
-                    currentNode.DataFlowBackRelated.AddTwoWay(storeNode, loadNode.DataFlowDataProdivderIndex);
                 }
             }
             reachedMergeNodeNotLast = false;

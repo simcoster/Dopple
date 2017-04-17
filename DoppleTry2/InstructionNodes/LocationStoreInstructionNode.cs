@@ -22,9 +22,11 @@ namespace Dopple.InstructionNodes
     }
 
     [DataContract]
-    public class LocationLoadInstructionNode : LocationInstructionNode
+    public class LocationLoadInstructionNode : LocationInstructionNode , IDynamicDataLoadNode
     {
         public LocationLoadInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method) { }
+
+        public bool AllPathsHaveAStoreNode { get; set; }
     }
 
     [DataContract]

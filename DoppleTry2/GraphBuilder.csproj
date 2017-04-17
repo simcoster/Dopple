@@ -87,12 +87,15 @@
     <Compile Include="Tracers\StateProviders\ObjectUsingStateProvider.cs" />
     <Compile Include="Tracers\StateProviders\StateProviders.cs" />
     <Compile Include="InstructionNodes\StoreStaticFieldNode.cs" />
+    <Compile Include="Tracers\StateProviders\StoreArguemntStateProvider.cs" />
     <Compile Include="Tracers\StateProviders\StoreLocationStateProvider.cs" />
     <Compile Include="Tracers\StateProviders\StoreStaticFieldStateProvider.cs" />
+    <Compile Include="Tracers\StateProviders\StoreToAddressStateProviders\StoreArgumentByAddress.cs" />
     <Compile Include="Tracers\StateProviders\StoreToAddressStateProviders\StoreElementByAddressNode.cs" />
     <Compile Include="Tracers\StateProviders\StoreToAddressStateProviders\StoreFieldByAddressStateProvider.cs" />
     <Compile Include="Tracers\StateProviders\StoreToAddressStateProviders\StoreStaticFieldByAddressStateProvider.cs" />
     <Compile Include="Tracers\StateProviders\StoreToAddressStateProviders\StoreToAddressFactory.cs" />
+    <Compile Include="Tracers\StateProviders\StoreToAddressStateProviders\StoreToLocationByAddress.cs" />
     <Compile Include="Tracers\TraceManager.cs" />
     <Compile Include="Tracers\StateProviders\StElemStateProvider.cs" />
     <Compile Include="Tracers\StateProviders\StoreFieldStateProvider.cs" />

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Dopple.InstructionNodes
 {
     [DataContract]
-    public class StThisArgInstructionNode : StArgInstructionNode
+    public class StThisArgInstructionNode : StoreArgumentNode
     {
         public StThisArgInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {

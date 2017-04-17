@@ -80,7 +80,7 @@ namespace Dopple.InstructionNodes
             }
             else if (CodeGroups.StArgCodes.Contains(nodeCode))
             {
-                return new[] { new StArgInstructionNode(instruction, method) };
+                return new[] { new StoreArgumentNode(instruction, method) };
             }
             else if (CodeGroups.LdLocCodes.Contains(nodeCode))
             {

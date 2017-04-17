@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 namespace Dopple.InstructionNodes
 {
     [DataContract]
-    public class StArgInstructionNode : FunctionArgNodeBase
+    public class StoreArgumentNode : FunctionArgNodeBase
     {
-        public StArgInstructionNode(Instruction instruction, MethodDefinition method) : base(instruction, method) { }
+        public StoreArgumentNode(Instruction instruction, MethodDefinition method) : base(instruction, method) { }
 
         public override int DataFlowDataProdivderIndex
         {

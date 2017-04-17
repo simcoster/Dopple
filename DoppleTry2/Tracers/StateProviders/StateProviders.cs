@@ -53,11 +53,11 @@ namespace Dopple.Tracers.DynamicTracing
             {
                 AddNewProvider(stateProvider);
             }
-        }      
+        }
 
-        public IEnumerable<InstructionNode> MatchLoadToStore(InstructionNode loadNode)
+        public IEnumerable<StoreDynamicDataStateProvider> MatchLoadToStore(InstructionNode loadNode)
         {
-            return _StateProviders.Where(x => x.IsLoadNodeMatching(loadNode)).Select(x => x.StoreNode);
+            return _StateProviders.Where(x => x.IsLoadNodeMatching(loadNode));
         }
 
         internal StateProviderCollection Clone()

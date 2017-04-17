@@ -16,7 +16,7 @@ namespace Dopple.BackTracers
 
         protected override Predicate<InstructionNode> GetPredicate(InstructionNode instructionNode)
         {
-            Predicate<InstructionNode> predicate = (x => x is StArgInstructionNode && ((StArgInstructionNode) x).ArgIndex == ((LdArgInstructionNode) instructionNode).ArgIndex);
+            Predicate<InstructionNode> predicate = (x => x is StoreArgumentNode && ((StoreArgumentNode) x).ArgIndex == ((LdArgInstructionNode) instructionNode).ArgIndex);
             return predicate;
         }
     }
