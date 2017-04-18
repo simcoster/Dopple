@@ -59,15 +59,12 @@ namespace Dopple
             int runCounter = 0;
             bool shouldRerun = true;
             bool isFirstRun = true;
-            bool shouldRunDynamicTrace = true;
             BranchProperties.BaseBranch.BranchNodes.AddRange(InstructionNodes);
             SetInstructionIndexes();
             while (shouldRerun)
             {
-                need to think about running order - loops and merges and such
                 Console.WriteLine("run counter is " + runCounter);
                 _programFlowManager.AddFlowConnections(InstructionNodes);
-                return InstructionNodes;
                 if (isFirstRun)
                 {
                     try
@@ -84,7 +81,7 @@ namespace Dopple
                 SetInstructionIndexes();
             
                 //TODO remove for tests;
-                BackTraceOutsideFuncBoundry();
+                TraceDynamicData();
 
                 //MergeSingleOperationNodes();
                 //TODO remove
@@ -116,9 +113,9 @@ namespace Dopple
             DynamicDataConnector.DynamicLoadNodesRewire(InstructionNodes);
         }
 
-        private void BackTraceOutsideFuncBoundry()
+        private void TraceDynamicData()
         {
-            _backTraceManager.BackTraceOutsideFunctionBounds(InstructionNodes);
+            _backTraceManager.TraceDynamicData(InstructionNodes);
         }
 
         private void ResolveVirtualMethods(out bool inliningWasDone, out bool dynamicStoreInMethods )
@@ -409,7 +406,7 @@ namespace Dopple
                 SetInstructionIndexes();
                 if (shouldRunDynamicTrace)
                 {
-                    _backTraceManager.BackTraceOutsideFunctionBounds(InstructionNodes);
+                    _backTraceManager.TraceDynamicData(InstructionNodes);
                 }
                 RemoveHelperCodes();
                 //MergeSingleOperationNodes();
