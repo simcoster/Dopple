@@ -101,13 +101,6 @@ namespace Dopple
             //MergeEquivilentPairs();
             //AddZeroNode();
             //Verify();
-
-            //Cut for debugging
-            foreach(var node in InstructionNodes.Where(x => (x.InstructionIndex < 250 || x.InstructionIndex > 260) && x.ProgramFlowBackRoutes.Count == 1 && x.ProgramFlowForwardRoutes.Count == 1 && x.ProgramFlowForwardRoutes.All(y => !(y.ProgramFlowBackRoutes.Count >1))).ToList())
-            {
-                //node.SelfRemoveAndStitch();
-            }
-            
             return InstructionNodes;
         }
 

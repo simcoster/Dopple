@@ -494,10 +494,10 @@ namespace DoppleGraph
         {
             foreach (var node in colNodes)
             {
-                var nodesToUpdate = node.InstructionNode.DataFlowForwardRelated
-                //var nodesToUpdate = node.InstructionNode.ProgramFlowForwardRoutes
-               .Select(x => GetNodeWrapper(x.Argument))
-               //.Select(x => GetNodeWrapper(x))
+                //var nodesToUpdate = node.InstructionNode.DataFlowForwardRelated
+                var nodesToUpdate = node.InstructionNode.ProgramFlowForwardRoutes
+               //.Select(x => GetNodeWrapper(x.Argument))
+               .Select(x => GetNodeWrapper(x))
                //TODO remove, this hides a problem
                .Where(x => x.LongestPath.Count == 0 || !x.LongestPath.Intersect(node.LongestPath).SequenceEqual(x.LongestPath))
                .Where(x => x.LongestPath.Count < node.LongestPath.Count + 1)
@@ -592,18 +592,18 @@ namespace DoppleGraph
                 if (new[] { Code.Call, Code.Calli, Code.Callvirt }.Contains(
                         goNodeWrapper.InstructionNode.Instruction.OpCode.Code))
                 {
-                    //goNodeWrapper.Node.Text += ((MethodReference) goNodeWrapper.InstructionNode.Instruction.Operand).FullName ?? " ";
+                    goNodeWrapper.Node.Text += ((MethodReference) goNodeWrapper.InstructionNode.Instruction.Operand).FullName ?? " ";
                 }
                 else if (goNodeWrapper.InstructionNode is FunctionArgNodeBase)
                 {
                     //TODO remove
                     var ArgInstWrapper = (FunctionArgNodeBase) goNodeWrapper.InstructionNode;
-                    //goNodeWrapper.Node.Text += " " + ArgInstWrapper.ArgName + " " + ArgInstWrapper.ArgIndex;
+                    goNodeWrapper.Node.Text += " " + ArgInstWrapper.ArgName + " " + ArgInstWrapper.ArgIndex;
                 }
                 else if (goNodeWrapper.InstructionNode.Instruction.Operand != null)
                 {
                     //TODO remove
-                    //goNodeWrapper.Node.Text += goNodeWrapper.InstructionNode.Instruction.Operand.ToString();
+                    goNodeWrapper.Node.Text += goNodeWrapper.InstructionNode.Instruction.Operand.ToString();
                 }
 
                 if (goNodeWrapper.InstructionNode.InliningProperties.Recursive)

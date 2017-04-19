@@ -108,7 +108,7 @@ namespace Dopple.BackTracers
             while (true)
             {
                 GlobalVisited.Add(currentNode);
-                bool reachedMergeNodeNotLast;
+                bool reachedMergeNodeNotLast;          
                 ActOnCurrentNode(currentNode, mergingNodesData, lastNode, ref stateProviders, out reachedMergeNodeNotLast);
                 if (reachedMergeNodeNotLast)
                 {
