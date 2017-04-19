@@ -26,7 +26,8 @@ namespace Dopple.Tracers.StateProviders
             {
                 return false;
             }
-            if (loadFieldNode.FieldDefinition.MetadataToken !=_FieldDefinition.MetadataToken)
+            //TOOD comparing strings is not great
+            if (loadFieldNode.FieldDefinition.Name !=_FieldDefinition.Name)
             {
                 return false;
             }

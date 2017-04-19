@@ -63,10 +63,21 @@ namespace Dopple.BackTracers
                     branch.BranchNodes.Remove(node);
                 }
             });
-            RetMergeHack(instructionNodes, AllBrances);
+            Parallel.ForEach((instructionNodes.Where(x => x.BranchProperties.MergingNodeProperties.IsMergingNode)), mergingNode=>
+            {
+                foreach(var mergedBranch in mergingNode.BranchProperties.MergingNodeProperties.MergedBranches)
+                {
+                    mergedBranch.AddTwoWay(mergingNode);
+                }
+            });
+            if (instructionNodes.Any(x => x.BranchProperties.MergingNodeProperties.MergedBranches.Any(y => y.BranchType != BranchType.SplitMerge)))
+            {
+                throw new Exception("Should merge only split merge branches");
+            }
+            MergeReturnNodes(instructionNodes, AllBrances);
         }
 
-        private void RetMergeHack(List<InstructionNode> instructionNodes, Dictionary<int, BranchID> allBrances)
+        private void MergeReturnNodes(List<InstructionNode> instructionNodes, Dictionary<int, BranchID> allBrances)
         {
             if (instructionNodes[0].InliningProperties.Inlined)
             {
@@ -103,8 +114,11 @@ namespace Dopple.BackTracers
                 {
                     currentNode.BranchProperties.Branches.AddDistinct(currentBranch);
                     currentBranch.BranchNodes.Add(currentNode);
-                    currentBranch.BranchType = BranchType.Loop;
-                    currentBranch.BranchNodes[0].BranchProperties.FirstInLoop = true;
+                    if (currentBranch.BranchType  != BranchType.SplitMerge)
+                    {
+                        currentBranch.BranchType = BranchType.Loop;
+                        currentBranch.BranchNodes[0].BranchProperties.FirstInLoop = true;
+                    }
                     return;
                 }
                 if (visited.Contains(currentNode))

@@ -178,9 +178,9 @@ namespace Dopple.InstructionNodes
 
         private void RemoveFromBranches()
         {
-            foreach(var branch in BranchProperties.Branches)
+            foreach(var branch in BranchProperties.Branches.ToList())
             {
-                branch.BranchNodes.Remove(this);
+                branch.RemoveTwoWay(this);
             }
             if (BranchProperties.MergingNodeProperties.IsMergingNode)
             {

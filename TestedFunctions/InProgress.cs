@@ -20,37 +20,7 @@ namespace TestedFunctions
         //{
         //    answer = a + b;
         //}
-        //public static int TestConditionals(int[] a)
-        //{
-        //    Helper helper1 = new Helper();
-        //    Helper helper2 = new Helper();
-        //    Helper helper3 = new Helper();
-        //    helper1.Number = 0;
 
-        //    int sum = 0;
-        //    if (a.Length > 7)
-        //    {
-        //        helper1.anotherHelper = helper2;
-        //    }
-        //    else
-        //    {
-        //        helper1.anotherHelper = helper3;
-        //    }
-        //    while (helper2.Number < a.Length)
-        //    {
-        //        if (sum > 20)
-        //        {
-        //            helper2.Number++;
-        //        }
-        //        else
-        //        {
-        //            helper1.anotherHelper.Number--;
-        //        }
-        //        helper3.Number /= 2;
-        //    }
-        //    sum += 5;
-        //    return sum;
-        //}
         //public static List<int> UseDelegate(int[] nums)
         //{
         //    return nums.Select(x => x++).ToList();

@@ -59,7 +59,7 @@ namespace Dopple
             int runCounter = 0;
             bool shouldRerun = true;
             bool isFirstRun = true;
-            BranchProperties.BaseBranch.BranchNodes.AddRange(InstructionNodes);
+            BranchProperties.BaseBranch.AddTwoWay(InstructionNodes);
             SetInstructionIndexes();
             while (shouldRerun)
             {
@@ -80,13 +80,13 @@ namespace Dopple
                 InlineFunctionCalls();
                 SetInstructionIndexes();
             
-                //TODO remove for tests;
                 TraceDynamicData();
 
+                bool shouldRunDynamicTrace;
                 //MergeSingleOperationNodes();
                 //TODO remove
-                //ResolveVirtualMethods(out shouldRerun, out shouldRunDynamicTrace);
-                shouldRerun = false;
+                ResolveVirtualMethods(out shouldRerun, out shouldRunDynamicTrace);
+                //shouldRerun = false;
              
                 //SetInstructionIndexes();
                 isFirstRun = false;
@@ -97,12 +97,16 @@ namespace Dopple
             //RemoveAndStitchDynamicDataConnections();
 
             //_backTraceManager.ForwardDynamicData(InstructionNodes);
-            MergeSimilarInstructions();
+            //MergeSimilarInstructions();
             //MergeEquivilentPairs();
-            AddZeroNode();
+            //AddZeroNode();
             //Verify();
-            //its still very slow, need to think of solution to optimize, maybe don't need to run tracing each  time, only when there's danger something will change
-            // okay, i'm only going to run it again if it contains stfld, stelem, or stsfld
+
+            //Cut for debugging
+            foreach(var node in InstructionNodes.Where(x => (x.InstructionIndex < 250 || x.InstructionIndex > 260) && x.ProgramFlowBackRoutes.Count == 1 && x.ProgramFlowForwardRoutes.Count == 1 && x.ProgramFlowForwardRoutes.All(y => !(y.ProgramFlowBackRoutes.Count >1))).ToList())
+            {
+                //node.SelfRemoveAndStitch();
+            }
             
             return InstructionNodes;
         }

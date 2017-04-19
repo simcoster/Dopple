@@ -11,7 +11,7 @@ namespace Dopple.Tracers.DynamicTracing
 {
     class StateProviderCollection
     {
-        private List<StoreDynamicDataStateProvider> _StateProviders = new List<StoreDynamicDataStateProvider>();
+        public List<StoreDynamicDataStateProvider> _StateProviders = new List<StoreDynamicDataStateProvider>();
 
         public StateProviderCollection(List<StoreDynamicDataStateProvider> stateProviders)
         {
@@ -62,7 +62,7 @@ namespace Dopple.Tracers.DynamicTracing
 
         internal StateProviderCollection Clone()
         {
-            return new StateProviderCollection(this._StateProviders);
+            return new StateProviderCollection() { _StateProviders = new List<StoreDynamicDataStateProvider>(this._StateProviders)};
         }
         
         public List<StoreDynamicDataStateProvider> ToList()
