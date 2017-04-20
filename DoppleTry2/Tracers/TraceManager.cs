@@ -96,6 +96,7 @@ namespace Dopple.BackTracers
 
         private BackTracer[] _OutFuncDataTransferBackTracers;
 
+        int[] watntedPath = new[] { 61, 62, 63, 288, 23, 24, 25, 26, 27, 28, 29, 30, 35, 36, 37, 38, 39, 40, 41, 42, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53 };
         private List<InstructionNode> GlobalVisited = new List<InstructionNode>();
         private void TraceOutsideFunctionBoundsRec(InstructionNode currentNode,  Dictionary<InstructionNode,int> visitCount, Dictionary<InstructionNode, MergeNodeTraceData> mergingNodesData, InstructionNode lastNode = null, StateProviderCollection stateProviders = null)
         {
@@ -128,10 +129,10 @@ namespace Dopple.BackTracers
                 {
                     // a loop
                     var loopBranch = currentNode.ProgramFlowForwardRoutes.Where(x => x.BranchProperties.FirstInLoop).ToList();
-                    if (loopBranch.Count ==0 && currentNode.ProgramFlowForwardRoutes.Any(x => x.BranchProperties.Branches.First().BranchType == BranchPropertiesNS.BranchType.Loop))
-                    {
+                    //if (loopBranch.Count ==0 && currentNode.ProgramFlowForwardRoutes.Any(x => x.BranchProperties.Branches.First().BranchType == BranchPropertiesNS.BranchType.Loop))
+                    //{
 
-                    }
+                    //}
                     if (loopBranch.Count > 1)
                     {
                         throw new Exception("Can't deal with 2 loops from the same place (too many combinations)");

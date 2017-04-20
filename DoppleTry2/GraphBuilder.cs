@@ -84,19 +84,17 @@ namespace Dopple
 
                 bool shouldRunDynamicTrace;
                 //MergeSingleOperationNodes();
-                //TODO remove
                 ResolveVirtualMethods(out shouldRerun, out shouldRunDynamicTrace);
-                //shouldRerun = false;
              
                 //SetInstructionIndexes();
                 isFirstRun = false;
                 runCounter++;
             }
             //RecursionFix();
-            //RemoveHelperCodes();
+            RemoveHelperCodes();
             //RemoveAndStitchDynamicDataConnections();
 
-            //_backTraceManager.ForwardDynamicData(InstructionNodes);
+            _backTraceManager.ForwardDynamicData(InstructionNodes);
             //MergeSimilarInstructions();
             //MergeEquivilentPairs();
             //AddZeroNode();

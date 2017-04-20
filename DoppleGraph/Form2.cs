@@ -134,6 +134,30 @@ namespace DoppleGraph
 
                 }                
             }
+            else if (e.KeyChar == '\\')
+            {
+                if (myView.Selection.Count > 0)
+                {
+                    ObjectsToHide[FlowBackTreeHideIndex].Clear();
+                    var forwardFlowNodes = BackSearcher.GetForwardFlowTree(GetNodeWrapper(myView.Selection.First(x => x is GoNode) as GoNode).InstructionNode)
+                                                                                                          .Select(x => GetNodeWrapper(x).Node).ToList();
+                    ObjectsToHide[DataBackTreeHideIndex].AddRange(myView.Document.Where(x => (x is GoNode)).Cast<GoNode>().Except(forwardFlowNodes));
+                   // ObjectsToHide[DataBackTreeHideIndex].AddRange(myView.Document.Where(x => x is GoLink && (!forwardFlowNodes.Contains(((GoLink) x).FromNode) || !forwardFlowNodes.Contains(((GoLink) x).ToNode))));
+
+                }
+            }
+            else if (e.KeyChar == '`')
+            {
+                if (myView.Selection.Count > 0)
+                {
+                    ObjectsToHide[FlowBackTreeHideIndex].Clear();
+                    var selectedNode = GetNodeWrapper(myView.Selection.First(x => x is GoNode) as GoNode).InstructionNode;
+                    var hiddenMethodNodes = myView.Document.Where(x => x is GoNode).Cast<GoNode>().Where(x => GetNodeWrapper(x).InstructionNode.Method == selectedNode.Method);
+                    ObjectsToHide[DataBackTreeHideIndex].AddRange(hiddenMethodNodes);
+                    ObjectsToHide[DataBackTreeHideIndex].AddRange(myView.Document.Where(x => x is GoLink && (hiddenMethodNodes.Contains(((GoLink) x).FromNode) || hiddenMethodNodes.Contains(((GoLink) x).ToNode))));
+
+                }
+            }
             else if (e.KeyChar == '+')
             {
                 if (myView.Selection.Count > 0)
@@ -494,10 +518,10 @@ namespace DoppleGraph
         {
             foreach (var node in colNodes)
             {
-                //var nodesToUpdate = node.InstructionNode.DataFlowForwardRelated
-                var nodesToUpdate = node.InstructionNode.ProgramFlowForwardRoutes
-               //.Select(x => GetNodeWrapper(x.Argument))
-               .Select(x => GetNodeWrapper(x))
+                var nodesToUpdate = node.InstructionNode.DataFlowForwardRelated
+                //var nodesToUpdate = node.InstructionNode.ProgramFlowForwardRoutes
+               .Select(x => GetNodeWrapper(x.Argument))
+               //.Select(x => GetNodeWrapper(x))
                //TODO remove, this hides a problem
                .Where(x => x.LongestPath.Count == 0 || !x.LongestPath.Intersect(node.LongestPath).SequenceEqual(x.LongestPath))
                .Where(x => x.LongestPath.Count < node.LongestPath.Count + 1)

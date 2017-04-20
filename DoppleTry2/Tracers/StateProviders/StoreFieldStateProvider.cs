@@ -32,6 +32,7 @@ namespace Dopple.Tracers.StateProviders
                 return false;
             }
             var loadFieldObjectNodes = loadFieldNode.DataFlowBackRelated.Where(x => x.ArgIndex == 0).SelectMany(x => x.Argument.GetDataOriginNodes());
+            var currentLoadNodes = StoreNode.DataFlowBackRelated.Where(x => x.ArgIndex == 0).SelectMany(x => x.Argument.GetDataOriginNodes());
             if (!loadFieldObjectNodes.Intersect(ObjectNodes).Any()) 
             {
                 return false;

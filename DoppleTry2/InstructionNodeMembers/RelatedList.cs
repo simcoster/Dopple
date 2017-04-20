@@ -16,7 +16,6 @@ namespace Dopple.InstructionWrapperMembers
         InstructionNode _ContainingNode;
         public void RemoveTwoWay (InstructionNode backArgToRemove)
         {
-            why split node 19 is only left with 1 forward route??!
             Remove(backArgToRemove);
             var forwardArg = GetPartnerList(backArgToRemove).First(x => x == _ContainingNode);
             GetPartnerList(backArgToRemove).Remove(forwardArg);
