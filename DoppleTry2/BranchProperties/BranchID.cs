@@ -43,6 +43,13 @@ namespace Dopple.BranchPropertiesNS
             node.BranchProperties.Branches.Remove(this);
             BranchNodes.Remove(node);
         }
+        internal void RemoveAllTwoWay()
+        {
+            foreach (var node in BranchNodes.ToArray())
+            {
+                RemoveTwoWay(node);
+            }
+        }
         public int Index { get; protected set; }
         public virtual BranchType BranchType { get; set; }
         public InstructionNode OriginatingNode { get; set; }
@@ -69,6 +76,6 @@ namespace Dopple.BranchPropertiesNS
             }
         }
 
-
+        
     }
 }

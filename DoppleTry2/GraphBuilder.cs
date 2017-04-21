@@ -65,6 +65,11 @@ namespace Dopple
             {
                 Console.WriteLine("run counter is " + runCounter);
                 _programFlowManager.AddFlowConnections(InstructionNodes);
+                if (runCounter ==3)
+                {
+                    //return InstructionNodes;
+
+                }
                 if (isFirstRun)
                 {
                     try
@@ -95,9 +100,10 @@ namespace Dopple
             //RemoveAndStitchDynamicDataConnections();
 
             _backTraceManager.ForwardDynamicData(InstructionNodes);
-            //MergeSimilarInstructions();
+            MergeSimilarInstructions();
             //MergeEquivilentPairs();
-            //AddZeroNode();
+            AddZeroNode();
+            BranchProperties.BaseBranch.RemoveAllTwoWay();
             //Verify();
             return InstructionNodes;
         }
