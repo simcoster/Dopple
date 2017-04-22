@@ -13,7 +13,7 @@ namespace Dopple.BranchPropertiesNS
         }
         private InstructionNode ContainingNodeForDebugging;
         public static BaseBranch BaseBranch = new BaseBranch();
-        public BranchList Branches { get; private set; } = new BranchList() { BaseBranch };
+        public BranchList Branches { get; private set; } = new BranchList() ;
         public MergingNodeProperties MergingNodeProperties { get; private set; }
         //public bool FirstInLoop { get; internal set; }
         private bool firstInLoop = false;

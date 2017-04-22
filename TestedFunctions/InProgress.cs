@@ -25,20 +25,17 @@ namespace TestedFunctions
         //{
         //    return nums.Select(x => x++).ToList();
         //}
-        //public static int testLinq(List<int> nums)
-        //{
-        //    return nums.Where(x => x > 6).Sum();
-        //}
+        public static int testLinq(List<Helper> nums)
+        {
+            return nums.Sum(x => x.Number);
+        }
 
-        public static int TestSumRegular(List<int> nums)
+        public static int TestSumRegular(List<Helper> nums)
         {
             int sum = 0;
             foreach (var num in nums)
             {
-                if (num > 6)
-                {
-                    sum += num;
-                }
+                sum += num.Number;
             }
             return sum;
         }

@@ -101,7 +101,7 @@ namespace Dopple
 
             _backTraceManager.ForwardDynamicData(InstructionNodes);
             MergeSimilarInstructions();
-            //MergeEquivilentPairs();
+            MergeEquivilentPairs();
             AddZeroNode();
             BranchProperties.BaseBranch.RemoveAllTwoWay();
             //Verify();
@@ -154,11 +154,6 @@ namespace Dopple
             //}
         }
 
-        private void MarkNodesAsDataEquivilent()
-        {
-
-        }
-
         private void MergeSimilarInstructions()
         {
             MergeLdArgs();
@@ -193,6 +188,7 @@ namespace Dopple
                         var secondInstBackRelated = secondInstOption.DataFlowBackRelated.Where(x => x.Argument != secondInstOption);
                         if (CoupledIndexedArgList.SequenceEqualsWithIndexes(secondInstBackRelated,firstInstBackRelated) && firstInst.DataFlowBackRelated.SelfFeeding == secondInstOption.DataFlowBackRelated.SelfFeeding)
                         {
+                            Console.WriteLine("merging " + firstInst.InstructionIndex + " " + secondInstOption.InstructionIndex);
                             MergeNodes(new[] { firstInst, secondInstOption });
                             mergesWereDone = true;
                             break;
@@ -208,7 +204,8 @@ namespace Dopple
             RemoveAndStitchNodes(InstructionNodes.Where(x => CodeGroups.StLocCodes.Contains(x.Instruction.OpCode.Code)));
             RemoveAndStitchNodes(InstructionNodes.Where(x => CodeGroups.LdLocCodes.Contains(x.Instruction.OpCode.Code)));
             RemoveAndStitchNodes(InstructionNodes.Where(x => new[] { Code.Starg, Code.Starg_S }.Contains(x.Instruction.OpCode.Code)));
-            //RemoveInstWrappers(InstructionNodes.Where(x => x is StIndInstructionNode && ((StIndInstructionNode) x).AddressType == AddressType.LocalVar));
+            RemoveAndStitchNodes(InstructionNodes.Where(x => new[] { Code.Br, Code.Br_S }.Contains(x.Instruction.OpCode.Code)));
+            RemoveAndStitchNodes(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Nop));
             RemoveAndStitchNodes(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Dup));
             RemoveAndStitchNodes(InstructionNodes.Where(x => x.InliningProperties.Inlined && x is LdArgInstructionNode && x.DataFlowBackRelated.Count > 0 && !x.DataFlowBackRelated.SelfFeeding));
             RemoveAndStitchNodes(InstructionNodes.Where(x => x is RetInstructionNode && x.InliningProperties.Inlined && !x.DataFlowBackRelated.SelfFeeding));

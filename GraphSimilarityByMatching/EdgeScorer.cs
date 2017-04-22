@@ -88,9 +88,12 @@ namespace GraphSimilarityByMatching
             {
                 edgeMatchScore += EdgeScorePoints.IndexMatch;
             }
-            if (usePastPairings && pairings.Pairings[secondEdgeVertex].Any(x => x.PairedVertex ==firstEdgeVertex))
+            lock(pairings)
             {
-                edgeMatchScore += EdgeScorePoints.TargetVertexArePaired;
+                if (usePastPairings && pairings.Pairings[secondEdgeVertex].Any(x => x.PairedVertex == firstEdgeVertex))
+                {
+                    edgeMatchScore += EdgeScorePoints.TargetVertexArePaired;
+                }
             }
             if (firstEdgeVertex.Opcode == secondEdgeVertex.Opcode)
             {

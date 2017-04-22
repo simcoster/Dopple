@@ -16,6 +16,16 @@ namespace Dopple.InstructionNodes
     {
         public List<BranchID> CreatedBranches = new List<BranchID>();
 
+        protected override void TypeSpecificMerge(InstructionNode nodeToMergeInto)
+        {
+            var otherAsConditional = (ConditionalJumpNode) nodeToMergeInto;
+            foreach(var branch in CreatedBranches)
+            {
+                otherAsConditional.CreatedBranches.Add(branch);
+                branch.OriginatingNode = nodeToMergeInto;
+            }
+        }
+
         public ConditionalJumpNode(Instruction instruction, MethodDefinition method) : base(instruction, method)
         {
         }

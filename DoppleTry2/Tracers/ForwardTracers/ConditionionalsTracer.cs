@@ -134,7 +134,10 @@ namespace Dopple.BackTracers
                         int i = 1;
                         foreach (var mergedBranch in otherBranches.Concat(new[] { currentBranch }).ToList())
                         {
-                            mergedBranch.BranchNodes[0].BranchProperties.FirstInLoop = false;
+                            if (mergedBranch.BranchNodes.Any())
+                            {
+                                mergedBranch.BranchNodes[0].BranchProperties.FirstInLoop = false;
+                            }
                             mergedBranch.BranchType = BranchType.SplitMerge;
                             MarkMergeNode(currentNode, mergedBranch);
                             mergedBranch.PairedBranchesIndex = i;

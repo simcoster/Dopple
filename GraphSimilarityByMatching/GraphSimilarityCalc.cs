@@ -21,7 +21,8 @@ namespace GraphSimilarityByMatching
             List<LabeledVertex> firstGraphLabeled = GetLabeled(firstGraph);
             List<LabeledVertex> secondGraphLabeled = GetLabeled(secondGraph);
             NodePairings bestMatch = GetPairings(firstGraphLabeled, secondGraphLabeled);
-            for (int i = 0; i < 10; i++)
+            //TODO change back to 10
+            for (int i = 0; i < 1; i++)
             {
                 NodePairings pairing = GetPairings(firstGraphLabeled, secondGraphLabeled);
                 if (pairing.TotalScore > bestMatch.TotalScore)
@@ -40,7 +41,7 @@ namespace GraphSimilarityByMatching
             nodePairings.SecondGraph = secondGraphLabeled;
 
             Random rnd = new Random();
-            foreach (var firstGraphVertex in firstGraphLabeled.OrderBy(x => rnd.Next()))
+            Parallel.ForEach(firstGraphLabeled.OrderBy(x => rnd.Next()).ToList(), (firstGraphVertex) =>
             {
                 var vertexPossiblePairings = new Dictionary<LabeledVertex, int>();
                 var secondGraphCandidates = secondGraphLabeled.Where(x => CodeGroups.AreSameGroup(x.Opcode, firstGraphVertex.Opcode)).ToList();
@@ -48,7 +49,7 @@ namespace GraphSimilarityByMatching
                 {
                     vertexPossiblePairings.Add(secondGraphCandidate, GetScore(firstGraphVertex, secondGraphCandidate, nodePairings));
                 }
-                var winningPairs = vertexPossiblePairings.Where(x=> x.Value >0).GroupBy(x => x.Value).OrderByDescending(x => x.Key).FirstOrDefault();
+                var winningPairs = vertexPossiblePairings.Where(x => x.Value > 0).GroupBy(x => x.Value).OrderByDescending(x => x.Key).FirstOrDefault();
                 if (winningPairs != null)
                 {
                     KeyValuePair<LabeledVertex, int> winningPair = winningPairs.ElementAt(rnd.Next(0, winningPairs.Count()));
@@ -58,14 +59,17 @@ namespace GraphSimilarityByMatching
                         winningPairScore *= ImportantCodeMultiplier;
                     }
                     nodePairings.TotalScore += winningPairScore;
-                    pairings[winningPair.Key].Add(new SingleNodePairing(firstGraphVertex, winningPairScore));
+                    lock (pairings)
+                    {
+                        pairings[winningPair.Key].Add(new SingleNodePairing(firstGraphVertex, winningPairScore));
+                    }
                 }
                 else
                 {
                     var selfPairing = GetSelfPairingScore(firstGraphVertex);
                     nodePairings.TotalScore -= selfPairing;
                 }
-            }
+            });
             return nodePairings;
         }
 
@@ -87,9 +91,12 @@ namespace GraphSimilarityByMatching
             var backEdgeScore = EdgeScorer.ScoreEdges(firstGraphVertex.BackEdges, secondGraphVertex.BackEdges, pairings, SharedSourceOrDest.Dest);
             var forwardEdgeScore = EdgeScorer.ScoreEdges(firstGraphVertex.ForwardEdges, secondGraphVertex.ForwardEdges, pairings, SharedSourceOrDest.Source);
             score += backEdgeScore + forwardEdgeScore;
-            if (pairings.Pairings[secondGraphVertex].Count > 0)
+            lock(pairings)
             {
-                score -= VertexScorePoints.SingleToMultipleVertexMatchPenalty;
+                if (pairings.Pairings[secondGraphVertex].Count > 0)
+                {
+                    score -= VertexScorePoints.SingleToMultipleVertexMatchPenalty;
+                }
             }
             return score;
         }

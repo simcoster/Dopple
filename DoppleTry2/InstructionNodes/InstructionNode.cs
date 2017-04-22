@@ -35,6 +35,7 @@ namespace Dopple.InstructionNodes
             MethodNameForSerilization = method.Name;
             MyGuid = Guid.NewGuid();
             _BranchProperties = new BranchProperties(this);
+            BranchProperties.BaseBranch.AddTwoWay(this);
         }
         
         public ProgramFlowBackRoutes ProgramFlowBackRoutes { get; set; }
@@ -141,6 +142,12 @@ namespace Dopple.InstructionNodes
             {
                 args.MergeInto(nodeToMergeInto, keepOriginal);
             }
+            TypeSpecificMerge(nodeToMergeInto);
+        }
+
+        protected virtual void TypeSpecificMerge(InstructionNode nodeToMergeInto)
+        {
+            return;
         }
 
         public IEnumerable<InstructionNode> GetDataOriginNodes()

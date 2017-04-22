@@ -39,7 +39,6 @@ namespace DoppleGraph
                 newForm.Show();
             }
 
-
             var csv = new StringBuilder();
             csv.Append(',');
             for (int i = 0; i < Graphs.Count ; i++)

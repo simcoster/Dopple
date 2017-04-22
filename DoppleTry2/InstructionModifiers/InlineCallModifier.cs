@@ -46,6 +46,10 @@ namespace Dopple.InstructionModifiers
 
         private List<InstructionNode> InlineRec(InlineableCallNode callNode)
         {
+         //if (callNode.InliningProperties.CallSequence.Count >2)
+         //   {
+         //       return new List<InstructionNode>();
+         //   }   
             MethodDefinition calledMethodDef = callNode.TargetMethodDefinition;
             callNode.CallWasInlined = true;
             if (calledMethodDef.Body == null)
