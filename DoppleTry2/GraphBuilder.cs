@@ -99,7 +99,7 @@ namespace Dopple
             RemoveHelperCodes();
             //RemoveAndStitchDynamicDataConnections();
 
-            _backTraceManager.ForwardDynamicData(InstructionNodes);
+            //_backTraceManager.ForwardDynamicData(InstructionNodes);
             MergeSimilarInstructions();
             MergeEquivilentPairs();
             AddZeroNode();

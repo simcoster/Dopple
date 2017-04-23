@@ -55,7 +55,7 @@ namespace DoppleGraph
                     {
                         csv.Append(Graphs[i][0].Method.Name);
                     }
-                    else
+                    else if (i!=j)
                     {
                         csv.Append(NewMethod(Graphs[i], Graphs[j]));
                     }
@@ -72,24 +72,26 @@ namespace DoppleGraph
             NodePairings pairing2 = GraphSimilarityCalc.GetDistance(Graph2, Graph1);
             if (Graph1 != Graph2)
             {
-                var newFormm = new NodePairingGraph(pairing2, GraphSimilarityCalc.GetSelfScore(pairing2.SecondGraph));
-                newFormm.Show();
-                var newFormmm = new NodePairingGraph(pairing1, GraphSimilarityCalc.GetSelfScore(pairing1.SecondGraph));
-                newFormmm.Show();
+                //var newFormm = new NodePairingGraph(pairing2, GraphSimilarityCalc.GetSelfScore(pairing2.SecondGraph));
+                //newFormm.Show();
+                //var newFormmm = new NodePairingGraph(pairing1, GraphSimilarityCalc.GetSelfScore(pairing1.SecondGraph));
+                //newFormmm.Show();
             }
-            double Score1 = pairing1.TotalScore;
-            double Score2 = pairing2.TotalScore;
-            Console.WriteLine("{0} = {1} {2}", Graph1[0].Method.Name, Graph2[0].Method.Name, (Score1 + Score2) / 2);
-            double selfScoreSum = GraphSimilarityCalc.GetSelfScore(pairing1.SecondGraph).TotalScore + GraphSimilarityCalc.GetSelfScore(pairing2.SecondGraph).TotalScore;
-            double normalizedScore =  Math.Round((Score1 +Score2) / selfScoreSum, 2);
-            if (normalizedScore < 0)
-            {
-                return 0;
-            }
-            else
-            {
-                return normalizedScore;
-            }
+
+            return 0;
+            //double Score1 = pairing1.TotalScore;
+            //double Score2 = pairing2.TotalScore;
+            //Console.WriteLine("{0} = {1} {2}", Graph1[0].Method.Name, Graph2[0].Method.Name, (Score1 + Score2) / 2);
+            //double selfScoreSum = GraphSimilarityCalc.GetSelfScore(pairing1.SecondGraph).TotalScore + GraphSimilarityCalc.GetSelfScore(pairing2.SecondGraph).TotalScore;
+            //double normalizedScore =  Math.Round((Score1 +Score2) / selfScoreSum, 2);
+            //if (normalizedScore < 0)
+            //{
+            //    return 0;
+            //}
+            //else
+            //{
+            //    return normalizedScore;
+            //}
         }
     }
 }

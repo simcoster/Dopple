@@ -6,14 +6,14 @@ namespace GraphSimilarityByMatching
 {
     public class NodePairings
     {
-        public NodePairings(List<LabeledVertex> firstGraph, List<LabeledVertex> secondGraph)
+        public NodePairings(List<LabeledVertex> imageGraph, List<LabeledVertex> sourceGraph)
         {
-            FirstGraph = firstGraph;
-            SecondGraph = secondGraph;
-            secondGraph.ForEach(x => Pairings.Add(x, new ConcurrentBag<SingleNodePairing>()));
+            imageGraph = ImageGraph;
+            SourceGraph = sourceGraph;
+            SourceGraph.ForEach(x => Pairings.Add(x, new ConcurrentBag<SingleNodePairing>()));
         }
-        public List<LabeledVertex> FirstGraph { get; set; }
-        public List<LabeledVertex> SecondGraph { get; set; }
+        public List<LabeledVertex> ImageGraph { get; set; }
+        public List<LabeledVertex> SourceGraph { get; set; }
         public Dictionary<LabeledVertex, ConcurrentBag<SingleNodePairing>> Pairings { get; set; } = new Dictionary<LabeledVertex, ConcurrentBag<SingleNodePairing>>();
         public double TotalScore { get; set; } = 0;
     }

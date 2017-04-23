@@ -30,8 +30,8 @@ namespace DoppleGraph
         {
             _selfPairings = selfPairing;
             _pairings = pairings;
-            FirstGraphNodes = pairings.SecondGraph.Select(x => new GoLabeledVertexWrapper(new GoTextNodeHoverable(), x)).ToList();
-            SecondGraphNodes = pairings.FirstGraph.Select(x => new GoLabeledVertexWrapper(new GoTextNodeHoverable(), x)).ToList();
+            FirstGraphNodes = pairings.SourceGraph.Select(x => new GoLabeledVertexWrapper(new GoTextNodeHoverable(), x)).ToList();
+            SecondGraphNodes = pairings.ImageGraph.Select(x => new GoLabeledVertexWrapper(new GoTextNodeHoverable(), x)).ToList();
             AllNodeWrappers = SecondGraphNodes.Concat(FirstGraphNodes).ToList();
             InitializeComponent();
             ScoreLbl.Text = ((double)pairings.TotalScore / (double)selfPairing.TotalScore).ToString();
@@ -121,8 +121,8 @@ namespace DoppleGraph
                 }
                 displayCol += 1;
             }
-            int totalHeight = 1000;
-            int totalWidth = 2000;
+            int totalHeight = 4000;
+            int totalWidth = 4000;
             float heightOffset = Convert.ToSingle(totalHeight / AllNodeWrappers.Select(x => x.DisplayRow).Max());
             float widthOffset = Convert.ToSingle(totalWidth / AllNodeWrappers.Select(x => x.DisplayCol).Max()) ;
             foreach (var nodeWrapper in AllNodeWrappers)
