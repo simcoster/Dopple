@@ -12,9 +12,7 @@ namespace GraphSimilarityByMatching
 {
     public class GraphSimilarityCalc
     {
-        private const int ImportantCodeMultiplier = 50;
         private static readonly CodeInfo opCodeInfo = new CodeInfo();
-        private static readonly List<Code> ImportantCodes = CodeGroups.LdElemCodes.Concat(CodeGroups.StElemCodes).Concat(CodeGroups.ArithmeticCodes).Concat(new[] { Code.Ret }).ToList();
 
 
         public static NodePairings GetDistance(List<InstructionNode> sourceGraph, List<InstructionNode> imageGraph)
@@ -45,70 +43,36 @@ namespace GraphSimilarityByMatching
             Parallel.ForEach(sourceGraphGrouped.Keys, (codeGroup) =>
             {
                 //not gonna lock for now
-                foreach(var sourceNode in sourceGraphGrouped[codeGroup])
+                foreach(var sourceGraphVertex in sourceGraphGrouped[codeGroup])
                 {
                     var vertexPossiblePairings = new ConcurrentBag<Tuple<LabeledVertex, int>>();
                     Parallel.ForEach(imageGraphGrouped[codeGroup].OrderBy(x => rnd.Next()).ToList(), (imageGraphCandidate) =>
                    {
-                       vertexPossiblePairings.Add(new Tuple<LabeledVertex, int>(imageGraphCandidate, GetScore(sourceNode, imageGraphCandidate, nodePairings)));
+                       vertexPossiblePairings.Add(new Tuple<LabeledVertex, int>(imageGraphCandidate, VertexScorer.GetScore(sourceGraphVertex, imageGraphCandidate, nodePairings)));
                    });
+                    var winningPair = vertexPossiblePairings.Where(x => x.Item2 > 0).OrderByDescending(x => x.Item2).ThenBy(x => rnd.Next()).FirstOrDefault();
+                    if (winningPair != null)
+                    {
+                        int winningPairScore = winningPair.Item2;
+                        lock (nodePairings.Pairings)
+                        {
+                            nodePairings.Pairings[winningPair.Item1].Add(new SingleNodePairing(sourceGraphVertex, winningPairScore));
+                        }
+                        nodePairings.TotalScore += winningPairScore;
+                    }
+                    else
+                    {
+                        var selfPairing = VertexScorer.GetSelfScore(sourceGraphVertex);
+                        nodePairings.TotalScore -= selfPairing;
+                    }
                 }
-            });
-            return nodePairings;
-            Parallel.ForEach(sourceGraphLabeled.OrderBy(x => rnd.Next()).ToList(), (sourceGraphVertex) =>
-            {
                 
-                var winningPairs = vertexPossiblePairings.Where(x => x.Value > 0).GroupBy(x => x.Value).OrderByDescending(x => x.Key).sourceOrDefault();
-                if (winningPairs != null)
-                {
-                    KeyValuePair<LabeledVertex, int> winningPair = winningPairs.ElementAt(rnd.Next(0, winningPairs.Count()));
-                    int winningPairScore = winningPair.Value;
-                    if (ImportantCodes.Contains(sourceGraphVertex.Opcode))
-                    {
-                        winningPairScore *= ImportantCodeMultiplier;
-                    }
-                    nodePairings.TotalScore += winningPairScore;
-                    lock (nodePairings.Pairings)
-                    {
-                        nodePairings.Pairings[winningPair.Key].Add(new SingleNodePairing(sourceGraphVertex, winningPairScore));
-                    }
-                }
-                else
-                {
-                    var selfPairing = GetSelfPairingScore(sourceGraphVertex);
-                    nodePairings.TotalScore -= selfPairing;
-                }
             });
+                
             return nodePairings;
         }
 
-        private static int GetScore(LabeledVertex sourceGraphVertex, LabeledVertex imageGraphVertex, NodePairings pairings)
-        {
-            int score = 0;
-            if (sourceGraphVertex.Opcode == imageGraphVertex.Opcode)
-            {
-                score += VertexScorePoints.CodeMatch;
-            }
-            else
-            {
-                score += VertexScorePoints.CodeFamilyMatch;
-            }
-            if (sourceGraphVertex.Operand == imageGraphVertex.Operand)
-            {
-                score += VertexScorePoints.OperandMatch;
-            }
-            var backEdgeScore = EdgeScorer.ScoreEdges(sourceGraphVertex.BackEdges, imageGraphVertex.BackEdges, pairings, SharedSourceOrDest.Dest);
-            var forwardEdgeScore = EdgeScorer.ScoreEdges(sourceGraphVertex.ForwardEdges, imageGraphVertex.ForwardEdges, pairings, SharedSourceOrDest.Source);
-            score += backEdgeScore + forwardEdgeScore;
-            lock(pairings)
-            {
-                if (pairings.Pairings[imageGraphVertex].Count > 0)
-                {
-                    score -= VertexScorePoints.SingleToMultipleVertexMatchPenalty;
-                }
-            }
-            return score;
-        }
+      
         private static List<LabeledVertex> GetLabeled(List<InstructionNode> graph)
         {
             var labeledVertexes = graph.AsParallel().Select(x => new LabeledVertex()
@@ -181,35 +145,19 @@ namespace GraphSimilarityByMatching
             }
         }
 
-        public static NodePairings GetSelfScore(List<InstructionNode> graph)
-        {
-            var labeledGraph = GetLabeled(graph);
-            return GetSelfScore(labeledGraph);
-        }
         public static NodePairings GetSelfScore(List<LabeledVertex> labeledGraph)
         {
             NodePairings nodePairings = new NodePairings(labeledGraph, labeledGraph);
             foreach (var node in labeledGraph)
             {
-                int score = GetSelfPairingScore(node);
-               
+                int score = VertexScorer.GetSelfScore(node);              
                 nodePairings.Pairings[node].Add(new SingleNodePairing(node, score));
                 nodePairings.TotalScore += score;
             }
             return nodePairings;
         }
 
-        private static int GetSelfPairingScore(LabeledVertex node)
-        {
-            int score = VertexScorePoints.ExactMatch;
-            score += node.BackEdges.Concat(node.ForwardEdges).Where(x => x.EdgeType == EdgeType.ProgramFlowAffecting).Sum(x => EdgeScorePoints.ExactMatch);
-            score += node.BackEdges.Concat(node.ForwardEdges).Where(x => x.EdgeType != EdgeType.ProgramFlowAffecting).Sum(x => EdgeScorePoints.ExactMatch * 3);
-            if (ImportantCodes.Contains(node.Opcode))
-            {
-                score *= ImportantCodeMultiplier;
-            }
-            return score;
-        }
+      
     }
 
     internal enum SharedSourceOrDest

@@ -70,6 +70,7 @@
     <Compile Include="PairingPenalty.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VertexScorePoints.cs" />
+    <Compile Include="VertexScorer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DoppleTry2\GraphBuilder.csproj">
