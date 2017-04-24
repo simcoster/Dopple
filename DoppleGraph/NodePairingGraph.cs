@@ -26,15 +26,15 @@ namespace DoppleGraph
 
         public IEnumerable<GoLabeledVertexWrapper> AllNodeWrappers { get; private set; }
 
-        public NodePairingGraph(NodePairings pairings, NodePairings selfPairing)
+        public NodePairingGraph(NodePairings pairings)
         {
-            _selfPairings = selfPairing;
+            _selfPairings = GraphSimilarityCalc.GetSelfScore(pairings.SourceGraph);
             _pairings = pairings;
             FirstGraphNodes = pairings.SourceGraph.Select(x => new GoLabeledVertexWrapper(new GoTextNodeHoverable(), x)).ToList();
             SecondGraphNodes = pairings.ImageGraph.Select(x => new GoLabeledVertexWrapper(new GoTextNodeHoverable(), x)).ToList();
             AllNodeWrappers = SecondGraphNodes.Concat(FirstGraphNodes).ToList();
             InitializeComponent();
-            ScoreLbl.Text = ((double)pairings.TotalScore / (double)selfPairing.TotalScore).ToString();
+            ScoreLbl.Text = ((double)pairings.TotalScore / (double) _selfPairings.TotalScore).ToString();
         }
 
         private void NodePairingGraph_Load(object sender, EventArgs e)

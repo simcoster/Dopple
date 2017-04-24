@@ -8,7 +8,7 @@ namespace GraphSimilarityByMatching
     {
         public NodePairings(List<LabeledVertex> imageGraph, List<LabeledVertex> sourceGraph)
         {
-            imageGraph = ImageGraph;
+            ImageGraph = imageGraph;
             SourceGraph = sourceGraph;
             SourceGraph.ForEach(x => Pairings.Add(x, new ConcurrentBag<SingleNodePairing>()));
         }

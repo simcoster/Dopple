@@ -20,13 +20,17 @@ namespace GraphSimilarityByMatching
             List<LabeledVertex> sourceGraphLabeled = GetLabeled(sourceGraph);
             List<LabeledVertex> imageGraphLabeled = GetLabeled(imageGraph);
             NodePairings bestMatch = GetPairings(sourceGraphLabeled, imageGraphLabeled);
+            object lockObject = new object();
             //TODO change back to 10
             Parallel.For(1, 2, (i) =>
             {
                 NodePairings pairing = GetPairings(sourceGraphLabeled, imageGraphLabeled);
-                if (pairing.TotalScore > bestMatch.TotalScore)
+                lock(lockObject)
                 {
-                    bestMatch = pairing;
+                    if (pairing.TotalScore > bestMatch.TotalScore)
+                    {
+                        bestMatch = pairing;
+                    }
                 }
             });
             return bestMatch ;
@@ -37,28 +41,42 @@ namespace GraphSimilarityByMatching
             NodePairings nodePairings = new NodePairings(sourceGraphLabeled, imageGraphLabeled);
 
             Random rnd = new Random();
-            var sourceGraphGrouped= CodeGroups.CodeGroupLists.AsParallel().ToDictionary(x =>x , x=> sourceGraphLabeled.Where(y => x.Contains(y.Opcode)).ToList());
-            var imageGraphGrouped = CodeGroups.CodeGroupLists.AsParallel().ToDictionary(x => x, x => imageGraphLabeled.Where(y => x.Contains(y.Opcode)).ToList());
+            Dictionary<Code[], IEnumerable<LabeledVertex>> sourceGraphGrouped;
+            Dictionary<Code[], IEnumerable<LabeledVertex>> imageGraphGrouped;
+            GetGrouped(sourceGraphLabeled, imageGraphLabeled, out sourceGraphGrouped, out imageGraphGrouped);
 
-            Parallel.ForEach(sourceGraphGrouped.Keys, (codeGroup) =>
+
+            //Parallel.ForEach(sourceGraphGrouped.Keys, (codeGroup) =>
+            foreach (var codeGroup in sourceGraphGrouped.Keys)
             {
                 //not gonna lock for now
-                foreach(var sourceGraphVertex in sourceGraphGrouped[codeGroup])
+                foreach (var sourceGraphVertex in sourceGraphGrouped[codeGroup])
                 {
-                    var vertexPossiblePairings = new ConcurrentBag<Tuple<LabeledVertex, int>>();
-                    Parallel.ForEach(imageGraphGrouped[codeGroup].OrderBy(x => rnd.Next()).ToList(), (imageGraphCandidate) =>
-                   {
-                       vertexPossiblePairings.Add(new Tuple<LabeledVertex, int>(imageGraphCandidate, VertexScorer.GetScore(sourceGraphVertex, imageGraphCandidate, nodePairings)));
-                   });
-                    var winningPair = vertexPossiblePairings.Where(x => x.Item2 > 0).OrderByDescending(x => x.Item2).ThenBy(x => rnd.Next()).FirstOrDefault();
+                    Tuple<LabeledVertex, int> winningPair;
+                    if (!imageGraphGrouped.ContainsKey(codeGroup))
+                    {
+                        winningPair = null;   
+                    }
+                    //Parallel.ForEach(imageGraphGrouped[codeGroup].OrderBy(x => rnd.Next()).ToList(), (imageGraphCandidate) =>
+                    
+                    else
+                    {
+                        var vertexPossiblePairings = new ConcurrentBag<Tuple<LabeledVertex, int>>();
+                        foreach (var imageGraphCandidate in imageGraphGrouped[codeGroup].OrderBy(x => rnd.Next()).ToList())
+                        {
+                            vertexPossiblePairings.Add(new Tuple<LabeledVertex, int>(imageGraphCandidate, VertexScorer.GetScore(sourceGraphVertex, imageGraphCandidate, nodePairings)));
+                        }
+                        winningPair = vertexPossiblePairings.Where(x => x.Item2 > 0).OrderByDescending(x => x.Item2).ThenBy(x => rnd.Next()).FirstOrDefault();
+                    }
+                    //});
                     if (winningPair != null)
                     {
                         int winningPairScore = winningPair.Item2;
                         lock (nodePairings.Pairings)
                         {
                             nodePairings.Pairings[winningPair.Item1].Add(new SingleNodePairing(sourceGraphVertex, winningPairScore));
+                            nodePairings.TotalScore += winningPairScore;
                         }
-                        nodePairings.TotalScore += winningPairScore;
                     }
                     else
                     {
@@ -66,13 +84,25 @@ namespace GraphSimilarityByMatching
                         nodePairings.TotalScore -= selfPairing;
                     }
                 }
-                
-            });
+            }   
+           // });
                 
             return nodePairings;
         }
 
-      
+        private static void GetGrouped(List<LabeledVertex> sourceGraphLabeled, List<LabeledVertex> imageGraphLabeled, out Dictionary<Code[],IEnumerable<LabeledVertex>> sourceGraphGrouped, out Dictionary<Code[], IEnumerable<LabeledVertex>> imageGraphGrouped)
+        {
+            sourceGraphGrouped = CodeGroups.CodeGroupLists.AsParallel().ToDictionary(x => x, x => sourceGraphLabeled.Where(y => x.Contains(y.Opcode)));
+            imageGraphGrouped = CodeGroups.CodeGroupLists.AsParallel().ToDictionary(x => x, x => imageGraphLabeled.Where(y => x.Contains(y.Opcode)));
+            foreach (var singleCode in sourceGraphLabeled.Except(sourceGraphGrouped.Values.SelectMany(x => x)).GroupBy(x => x.Opcode))
+            {
+                var singleCodeArray = new Code[] { singleCode.Key };
+                sourceGraphGrouped.Add(singleCodeArray, singleCode.ToList());
+                imageGraphGrouped.Add(singleCodeArray, imageGraphLabeled.Where(x => x.Opcode == singleCode.Key).ToList());
+            }
+            return;
+        }
+
         private static List<LabeledVertex> GetLabeled(List<InstructionNode> graph)
         {
             var labeledVertexes = graph.AsParallel().Select(x => new LabeledVertex()

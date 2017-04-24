@@ -48,8 +48,25 @@ namespace GraphSimilarityByMatching
 
         public static int GetSelfScore(LabeledVertex labeledVertex)
         {
-            int selfScore =  VertexScorePoints.ExactMatch + (labeledVertex.BackEdges.Count  + labeledVertex.ForwardEdges.Count ) *
-                                                             EdgeScorePoints.ExactMatch  ;
+            int selfScore = VertexScorePoints.ExactMatch;
+            object lockObject = new object();
+            Parallel.ForEach(labeledVertex.BackEdges, (edge) =>
+            {
+
+                int score = EdgeScorer.GetEdgeMatchScore(edge, edge, SharedSourceOrDest.Dest, null, IndexImportance.Important, false);
+                lock(lockObject)
+                {
+                    selfScore += score;
+                }
+            });
+            Parallel.ForEach(labeledVertex.ForwardEdges, (edge) =>
+            {
+                int score = EdgeScorer.GetEdgeMatchScore(edge, edge, SharedSourceOrDest.Source, null, IndexImportance.Important, false);
+                lock (lockObject)
+                {
+                    selfScore += score;
+                }
+            });
             if (ImportantCodes.Contains(labeledVertex.Opcode))
             {
                 selfScore *= ImportantCodeMultiplier;

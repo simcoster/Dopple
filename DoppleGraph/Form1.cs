@@ -55,7 +55,8 @@ namespace DoppleGraph
                     {
                         csv.Append(Graphs[i][0].Method.Name);
                     }
-                    else if (i!=j)
+                    //else if (i!=j)
+                    else if (true)
                     {
                         csv.Append(NewMethod(Graphs[i], Graphs[j]));
                     }
@@ -70,12 +71,13 @@ namespace DoppleGraph
         {
             NodePairings pairing1 = GraphSimilarityCalc.GetDistance(Graph1, Graph2);
             NodePairings pairing2 = GraphSimilarityCalc.GetDistance(Graph2, Graph1);
-            if (Graph1 != Graph2)
+            //if (Graph1 != Graph2)
+            if (true)
             {
-                //var newFormm = new NodePairingGraph(pairing2, GraphSimilarityCalc.GetSelfScore(pairing2.SecondGraph));
-                //newFormm.Show();
-                //var newFormmm = new NodePairingGraph(pairing1, GraphSimilarityCalc.GetSelfScore(pairing1.SecondGraph));
-                //newFormmm.Show();
+                var newFormm = new NodePairingGraph(pairing2);
+                newFormm.Show();
+                var newFormmm = new NodePairingGraph(pairing1);
+                newFormmm.Show();
             }
 
             return 0;

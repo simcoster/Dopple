@@ -51,7 +51,7 @@ namespace GraphSimilarityByMatching
                 }
                 var relevantSecondEdges = unmachedImageVertexEdges.Where(predicate);
                 relevantSecondEdges.ForEach(secondEdge => pairingScores.Add(new Tuple<LabeledEdge, int>(secondEdge, GetEdgeMatchScore(sourceVertexEdge, secondEdge, sharedSourceOrDest, pairings, indexImportance))));
-                var possiblePairings = pairingScores.Where(x => x.Item2 > 0).GroupBy(x => x.Item1).OrderByDescending(x => x.Key).FirstOrDefault();
+                var possiblePairings = pairingScores.Where(x => x.Item2 > 0).GroupBy(x => x.Item2).OrderByDescending(x => x.Key).FirstOrDefault();
                 if (possiblePairings == null)
                 {
                     edgePairings.Add(sourceVertexEdge, null);
@@ -89,11 +89,14 @@ namespace GraphSimilarityByMatching
             {
                 edgeMatchScore += EdgeScorePoints.IndexMatch;
             }
-            lock(pairings)
+            if (usePastPairings)
             {
-                if (usePastPairings && pairings.Pairings[secondEdgeVertex].Any(x => x.PairedVertex == firstEdgeVertex))
+                lock (pairings)
                 {
-                    edgeMatchScore += EdgeScorePoints.TargetVertexArePaired;
+                    if (pairings.Pairings[secondEdgeVertex].Any(x => x.PairedVertex == firstEdgeVertex))
+                    {
+                        edgeMatchScore += EdgeScorePoints.TargetVertexArePaired;
+                    }
                 }
             }
             if (firstEdgeVertex.Opcode == secondEdgeVertex.Opcode)

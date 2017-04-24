@@ -25,7 +25,6 @@ namespace GraphSimilarityByMatching
         readonly Dictionary<HashSet<Code>, IndexImportance> CodeIndexImportance;
         public CodeInfo ()
         {
-            var blah = CodeGroups.CodeGroupLists.SelectMany(x => x);
             UnimportantCodes = new HashSet<Code>(CodeGroups.AllOpcodes.Select(x => x.Code).Except(CriticalCodes).Except(ImportantCodes).ToArray());
             CodeIndexImportance = new Dictionary<HashSet<Code>, IndexImportance>() { { CriticalCodes, IndexImportance.Critical }, { ImportantCodes, IndexImportance.Important }, { UnimportantCodes, IndexImportance.NotImportant } };
         }
