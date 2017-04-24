@@ -25,10 +25,10 @@ namespace TestedFunctions
         //{
         //    return nums.Select(x => x++).ToList();
         //}
-        //public static int testLinq2(List<Helper> nums)
-        //{
-        //    return nums.Sum(x => x.Number);
-        //}
+        public static int testLinq2(List<Helper> nums)
+        {
+            return nums.Sum(x => x.Number);
+        }
         public static int TestSumForeachLoop(List<Helper> nums)
         {
             int sum = 0;
