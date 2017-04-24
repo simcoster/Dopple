@@ -19,6 +19,12 @@ namespace GraphSimilarityByMatching
         {
             List<LabeledVertex> sourceGraphLabeled = GetLabeled(sourceGraph);
             List<LabeledVertex> imageGraphLabeled = GetLabeled(imageGraph);
+            var retNodes = sourceGraph.Where(x => x.Instruction.OpCode.Code == Code.Ret);
+            var backRetTree = retNodes.SelectMany(x => BackSearcher.GetBackDataTree(x)).Distinct().Concat(retNodes).Select(x => x.InstructionIndex).ToList();
+            foreach(var backRetNode in sourceGraphLabeled.Where(x => backRetTree.Contains(x.Index)))
+            {
+                backRetNode.IsInReturnBackTree = true;
+            }
             NodePairings bestMatch = GetPairings(sourceGraphLabeled, imageGraphLabeled);
             object lockObject = new object();
             //TODO change back to 10
@@ -77,11 +83,6 @@ namespace GraphSimilarityByMatching
                             nodePairings.Pairings[winningPair.Item1].Add(new SingleNodePairing(sourceGraphVertex, winningPairScore/VertexScorer.GetSelfScore(sourceGraphVertex)));
                             nodePairings.TotalScore += winningPairScore;
                         }
-                    }
-                    else
-                    {
-                        var selfPairing = VertexScorer.GetSelfScore(sourceGraphVertex);
-                        nodePairings.TotalScore -= selfPairing;
                     }
                 }
             }   

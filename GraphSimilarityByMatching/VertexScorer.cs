@@ -11,6 +11,8 @@ namespace GraphSimilarityByMatching
     public static class VertexScorer
     {
         private const int ImportantCodeMultiplier = 50;
+        private const int RetBackTreeMultiplier = 2;
+
 
         private static readonly List<Code> ImportantCodes = CodeGroups.LdElemCodes.Concat(CodeGroups.StElemCodes).Concat(CodeGroups.ArithmeticCodes).Concat(new[] { Code.Ret }).ToList();
 
@@ -43,6 +45,10 @@ namespace GraphSimilarityByMatching
             {
                 score *= ImportantCodeMultiplier;
             }
+            if (sourceGraphVertex.IsInReturnBackTree)
+            {
+                score *= RetBackTreeMultiplier;
+            }
             return score;
         }
 
@@ -71,7 +77,10 @@ namespace GraphSimilarityByMatching
             {
                 selfScore *= ImportantCodeMultiplier;
             }
-
+            if (labeledVertex.IsInReturnBackTree)
+            {
+                selfScore *= RetBackTreeMultiplier;
+            }
             return selfScore;
         }
     }

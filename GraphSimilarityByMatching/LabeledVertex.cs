@@ -20,6 +20,7 @@ namespace GraphSimilarityByMatching
         public List<SmallBigLinkEdge> PairingEdges { get; set; } = new List<SmallBigLinkEdge>(); 
         public MethodDefinition Method { get; set; }
         public Guid Guid = Guid.NewGuid();
+        public bool IsInReturnBackTree { get; set; } = false;
     }
     public class CompoundedLabeledVertex : LabeledVertex
     {
