@@ -10,6 +10,8 @@ namespace GraphSimilarityByMatching
 {
     public class LabeledVertex
     {
+        public LabeledVertex()
+        { }
         public Code Opcode { get; set; }
         public object Operand { get; set; }
         public int Index { get; set; }
@@ -17,6 +19,7 @@ namespace GraphSimilarityByMatching
         public List<LabeledEdge> ForwardEdges { get; set; } = new List<LabeledEdge>();
         public List<SmallBigLinkEdge> PairingEdges { get; set; } = new List<SmallBigLinkEdge>(); 
         public MethodDefinition Method { get; set; }
+        public Guid Guid = Guid.NewGuid();
     }
     public class CompoundedLabeledVertex : LabeledVertex
     {

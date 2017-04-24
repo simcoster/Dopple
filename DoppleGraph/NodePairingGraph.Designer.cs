@@ -28,21 +28,21 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.FirstGraphMethodlbl = new System.Windows.Forms.Label();
+            this.ImageGraphMethodlbl = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
-            this.SecondGraphMethodLbl = new System.Windows.Forms.Label();
+            this.SourceGraphMethodLbl = new System.Windows.Forms.Label();
             this.ScoreLbl = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // SmallGraphMethodlbl
             // 
-            this.FirstGraphMethodlbl.AutoSize = true;
-            this.FirstGraphMethodlbl.Location = new System.Drawing.Point(121, 21);
-            this.FirstGraphMethodlbl.Name = "SmallGraphMethodlbl";
-            this.FirstGraphMethodlbl.Size = new System.Drawing.Size(35, 13);
-            this.FirstGraphMethodlbl.TabIndex = 1;
-            this.FirstGraphMethodlbl.Text = "fsafsa";
-            this.FirstGraphMethodlbl.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.ImageGraphMethodlbl.AutoSize = true;
+            this.ImageGraphMethodlbl.Location = new System.Drawing.Point(121, 21);
+            this.ImageGraphMethodlbl.Name = "SmallGraphMethodlbl";
+            this.ImageGraphMethodlbl.Size = new System.Drawing.Size(35, 13);
+            this.ImageGraphMethodlbl.TabIndex = 1;
+            this.ImageGraphMethodlbl.Text = "fsafsa";
+            this.ImageGraphMethodlbl.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // label4
             // 
@@ -55,13 +55,13 @@
             // 
             // BigGraphMethodLbl
             // 
-            this.SecondGraphMethodLbl.AutoSize = true;
-            this.SecondGraphMethodLbl.Location = new System.Drawing.Point(237, 21);
-            this.SecondGraphMethodLbl.Name = "BigGraphMethodLbl";
-            this.SecondGraphMethodLbl.Size = new System.Drawing.Size(35, 13);
-            this.SecondGraphMethodLbl.TabIndex = 3;
-            this.SecondGraphMethodLbl.Text = "fsafsa";
-            this.SecondGraphMethodLbl.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.SourceGraphMethodLbl.AutoSize = true;
+            this.SourceGraphMethodLbl.Location = new System.Drawing.Point(237, 21);
+            this.SourceGraphMethodLbl.Name = "BigGraphMethodLbl";
+            this.SourceGraphMethodLbl.Size = new System.Drawing.Size(35, 13);
+            this.SourceGraphMethodLbl.TabIndex = 3;
+            this.SourceGraphMethodLbl.Text = "fsafsa";
+            this.SourceGraphMethodLbl.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // ScoreLbl
             // 
@@ -78,9 +78,9 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(284, 261);
             this.Controls.Add(this.ScoreLbl);
-            this.Controls.Add(this.SecondGraphMethodLbl);
+            this.Controls.Add(this.SourceGraphMethodLbl);
             this.Controls.Add(this.label4);
-            this.Controls.Add(this.FirstGraphMethodlbl);
+            this.Controls.Add(this.ImageGraphMethodlbl);
             this.Name = "NodePairingGraph";
             this.Text = "NodePairingGraph";
             this.Load += new System.EventHandler(this.NodePairingGraph_Load);
@@ -90,9 +90,9 @@
         }
 
         #endregion
-        private System.Windows.Forms.Label FirstGraphMethodlbl;
+        private System.Windows.Forms.Label ImageGraphMethodlbl;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Label SecondGraphMethodLbl;
+        private System.Windows.Forms.Label SourceGraphMethodLbl;
         private System.Windows.Forms.Label ScoreLbl;
     }
 }

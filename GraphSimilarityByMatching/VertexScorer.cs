@@ -46,7 +46,7 @@ namespace GraphSimilarityByMatching
             return score;
         }
 
-        public static int GetSelfScore(LabeledVertex labeledVertex)
+        public static double GetSelfScore(LabeledVertex labeledVertex)
         {
             int selfScore = VertexScorePoints.ExactMatch;
             object lockObject = new object();

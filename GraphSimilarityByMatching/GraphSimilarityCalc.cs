@@ -22,7 +22,7 @@ namespace GraphSimilarityByMatching
             NodePairings bestMatch = GetPairings(sourceGraphLabeled, imageGraphLabeled);
             object lockObject = new object();
             //TODO change back to 10
-            Parallel.For(1, 2, (i) =>
+            Parallel.For(1, 1, (i) =>
             {
                 NodePairings pairing = GetPairings(sourceGraphLabeled, imageGraphLabeled);
                 lock(lockObject)
@@ -74,7 +74,7 @@ namespace GraphSimilarityByMatching
                         int winningPairScore = winningPair.Item2;
                         lock (nodePairings.Pairings)
                         {
-                            nodePairings.Pairings[winningPair.Item1].Add(new SingleNodePairing(sourceGraphVertex, winningPairScore));
+                            nodePairings.Pairings[winningPair.Item1].Add(new SingleNodePairing(sourceGraphVertex, winningPairScore/VertexScorer.GetSelfScore(sourceGraphVertex)));
                             nodePairings.TotalScore += winningPairScore;
                         }
                     }
@@ -175,12 +175,12 @@ namespace GraphSimilarityByMatching
             }
         }
 
-        public static NodePairings GetSelfScore(List<LabeledVertex> labeledGraph)
+        public static NodePairings GetGraphSelfScore(List<LabeledVertex> labeledGraph)
         {
             NodePairings nodePairings = new NodePairings(labeledGraph, labeledGraph);
             foreach (var node in labeledGraph)
             {
-                int score = VertexScorer.GetSelfScore(node);              
+                double score = VertexScorer.GetSelfScore(node);              
                 nodePairings.Pairings[node].Add(new SingleNodePairing(node, score));
                 nodePairings.TotalScore += score;
             }

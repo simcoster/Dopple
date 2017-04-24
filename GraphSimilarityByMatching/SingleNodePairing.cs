@@ -8,12 +8,12 @@ namespace GraphSimilarityByMatching
 {
     public class SingleNodePairing
     {
-        public SingleNodePairing(LabeledVertex pairedVertex, int pairingScore)
+        public SingleNodePairing(LabeledVertex pairedVertex, double pairingScore)
         {
             PairedVertex = pairedVertex;
             PairingScore = pairingScore;
         }
         public LabeledVertex PairedVertex { get; set; }
-        public int PairingScore { get; set; }
+        public double PairingScore { get; set; }
     }
 }

@@ -55,8 +55,8 @@ namespace DoppleGraph
                     {
                         csv.Append(Graphs[i][0].Method.Name);
                     }
-                    //else if (i!=j)
-                    else if (true)
+                    else if (i!=j)
+                    //else if (true)
                     {
                         csv.Append(NewMethod(Graphs[i], Graphs[j]));
                     }
