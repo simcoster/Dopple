@@ -38,15 +38,27 @@ namespace TestedFunctions
             }
             return sum;
         }
-        //public static int TestSumForLoop(List<Helper> nums)
-        //{
-        //    int sum = 0;
-        //    for (int i=0; i< nums.Count; i++)
-        //    {
-        //        sum += nums[i].Number;
-        //    }
-        //    return sum;
-        //}
+        public static int TestSumForLoop(List<Helper> nums)
+        {
+            int sum = 0;
+            for (int i = 0; i < nums.Count; i++)
+            {
+                sum += nums[i].Number;
+            }
+            return sum;
+        }
+
+        public static int TestNotRelated(List<Helper> nums)
+        {
+            for (int i = 0; i < nums.Count; i++)
+            {
+                if (nums[i].Number > nums[i-1].Number)
+                {
+                    Console.WriteLine("its bigger");
+                }
+            }
+            return nums.Count;
+        }
         //public static int SumMe(int[] nums)
         //{
         //    return nums.Sum(x => x * 6);

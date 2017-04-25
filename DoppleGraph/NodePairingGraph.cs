@@ -64,7 +64,7 @@ namespace DoppleGraph
                 imageNode.Node.Location = new PointF(column * ColumnOffset, row * RowOffset);
                 foreach(var sourceNodePairing in _pairings.Pairings[imageNode.LabledVertex])
                 {
-                    var sourceLabledVertex = new GoLabeledVertexWrapper(new GoTextNodeHoverable(), sourceNodePairing.ImageGraphVertex);
+                    var sourceLabledVertex = new GoLabeledVertexWrapper(new GoTextNodeHoverable(), sourceNodePairing.SourceGraphVertex);
                     SetShape(frontLayer,sourceLabledVertex);
                     frontLayer.Add(sourceLabledVertex.Node);
                     sourceLabledVertex.Node.Location = new PointF((column + 1) * ColumnOffset, row * RowOffset);
