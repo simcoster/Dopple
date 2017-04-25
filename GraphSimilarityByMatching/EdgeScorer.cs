@@ -15,12 +15,12 @@ namespace GraphSimilarityByMatching
         public static int ScoreEdges(List<LabeledEdge> sourceVertexEdges, List<LabeledEdge> imageVertexEdges, NodePairings pairings, SharedSourceOrDest sharedSourceOrDest)
         {
             int totalScore = 0;
-            var edgePairings = new Dictionary<LabeledEdge, LabeledEdge>();
+            var edgePairings = new List<EdgeMatch>();
             var unmachedImageVertexEdges = new List<LabeledEdge>(imageVertexEdges);
             Random rnd = new Random();
             foreach (var sourceVertexEdge in sourceVertexEdges.OrderBy(x => rnd.Next()))
             {
-                var pairingScores = new List<Tuple<LabeledEdge, int>>();
+                var pairingScores = new List<EdgeMatch>();
                 LabeledVertex vertexToMatch;
                 if (sharedSourceOrDest == SharedSourceOrDest.Source)
                 {
@@ -49,43 +49,43 @@ namespace GraphSimilarityByMatching
                 {
                     predicate = x => baseCondition(x);
                 }
-                var relevantSecondEdges = unmachedImageVertexEdges.Where(predicate);
-                relevantSecondEdges.ForEach(secondEdge => pairingScores.Add(new Tuple<LabeledEdge, int>(secondEdge, GetEdgeMatchScore(sourceVertexEdge, secondEdge, sharedSourceOrDest, pairings, indexImportance))));
-                var possiblePairings = pairingScores.Where(x => x.Item2 > 0).GroupBy(x => x.Item2).OrderByDescending(x => x.Key).FirstOrDefault();
-                if (possiblePairings == null)
+                var relevantImageVertexEdges = unmachedImageVertexEdges.Where(predicate);
+                relevantImageVertexEdges.ForEach(imageVertexEdge => pairingScores.Add(new EdgeMatch() { ImageGraphEdge = imageVertexEdge, SourceVertexEdge = sourceVertexEdge, Score = GetEdgeMatchScore(sourceVertexEdge, imageVertexEdge, sharedSourceOrDest, pairings, indexImportance) }));
+                var winningMatchGroup = pairingScores.Where(x => x.Score > 0).GroupBy(x => x.Score).OrderBy(x => rnd.Next()).FirstOrDefault();
+                if (winningMatchGroup == null || !winningMatchGroup.Any())
                 {
-                    edgePairings.Add(sourceVertexEdge, null);
+                    edgePairings.Add(new EdgeMatch() { SourceVertexEdge = sourceVertexEdge, ImageGraphEdge = null, Score = 0 });
                 }
                 else
                 {
-                    Tuple<LabeledEdge,int> winningPair = possiblePairings.ElementAt(rnd.Next(0, possiblePairings.Count()));
-                    edgePairings.Add(sourceVertexEdge, winningPair.Item1);
-                    unmachedImageVertexEdges.Remove(winningPair.Item1);
-                    var winningMatchScore = GetEdgeMatchScore(sourceVertexEdge, winningPair.Item1, sharedSourceOrDest, pairings, indexImportance, false);
-                    totalScore += winningMatchScore;
+                    var winningMatch = winningMatchGroup.First();
+                    unmachedImageVertexEdges.Remove(winningMatch.ImageGraphEdge);
+                    winningMatch.Score = GetEdgeMatchScore(sourceVertexEdge, winningMatch.ImageGraphEdge, sharedSourceOrDest, pairings, indexImportance, false);
+                    edgePairings.Add(winningMatch);
+                    totalScore += winningMatch.Score;
                 }
             }
-            totalScore -= unmachedImageVertexEdges.Count * EdgeScorePoints.ExactMatch;
+            //totalScore -= unmachedImageVertexEdges.Count * EdgeScorePoints.ExactMatch;
             return totalScore;
         }
 
-        public static int GetEdgeMatchScore(LabeledEdge firstEdge, LabeledEdge secondEdge, SharedSourceOrDest sharingSourceOrDest, NodePairings pairings, IndexImportance indexImportance, bool usePastPairings = true)
+        public static int GetEdgeMatchScore(LabeledEdge sourceEdge, LabeledEdge imageEdge, SharedSourceOrDest sharingSourceOrDest, NodePairings pairings, IndexImportance indexImportance, bool usePastPairings = true)
         {
             int edgeMatchScore = 0;
-            LabeledVertex firstEdgeVertex;
-            LabeledVertex secondEdgeVertex;
+            LabeledVertex sourceEdgeVertex;
+            LabeledVertex imageEdgeVertex;
             if (sharingSourceOrDest == SharedSourceOrDest.Source)
             {
-                firstEdgeVertex = firstEdge.DestinationVertex;
-                secondEdgeVertex = secondEdge.DestinationVertex;
+                sourceEdgeVertex = sourceEdge.DestinationVertex;
+                imageEdgeVertex = imageEdge.DestinationVertex;
             }
             else
             {
-                firstEdgeVertex = firstEdge.SourceVertex;
-                secondEdgeVertex = secondEdge.SourceVertex;
+                sourceEdgeVertex = sourceEdge.SourceVertex;
+                imageEdgeVertex = imageEdge.SourceVertex;
             }
 
-            if (secondEdge.Index == firstEdge.Index || indexImportance == IndexImportance.NotImportant)
+            if (imageEdge.Index == sourceEdge.Index || indexImportance == IndexImportance.NotImportant)
             {
                 edgeMatchScore += EdgeScorePoints.IndexMatch;
             }
@@ -93,21 +93,21 @@ namespace GraphSimilarityByMatching
             {
                 lock (pairings)
                 {
-                    if (pairings.Pairings[secondEdgeVertex].Any(x => x.PairedVertex == firstEdgeVertex))
+                    if (pairings.Pairings[imageEdgeVertex].Any(x => x.ImageGraphVertex == sourceEdgeVertex))
                     {
                         edgeMatchScore += EdgeScorePoints.TargetVertexArePaired;
                     }
                 }
             }
-            if (firstEdgeVertex.Opcode == secondEdgeVertex.Opcode)
+            if (sourceEdgeVertex.Opcode == imageEdgeVertex.Opcode)
             {
                 edgeMatchScore += EdgeScorePoints.TargetVertexCodeExactMatch;
             }
-            else if (CodeGroups.AreSameGroup(firstEdgeVertex.Opcode, secondEdgeVertex.Opcode))
+            else if (CodeGroups.AreSameGroup(sourceEdgeVertex.Opcode, imageEdgeVertex.Opcode))
             {
                 edgeMatchScore += EdgeScorePoints.TargetVertexCodeFamilyMatch;
             }
-            if (firstEdge.EdgeType != EdgeType.ProgramFlowAffecting)
+            if (sourceEdge.EdgeType != EdgeType.ProgramFlowAffecting)
             {
                 edgeMatchScore *= ImportantEdgeTypeMultiplier;
             }

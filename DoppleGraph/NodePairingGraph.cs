@@ -28,7 +28,10 @@ namespace DoppleGraph
             _pairings = pairings;
             ImageGraphNodes = pairings.Pairings.Keys.Select(x => new GoLabeledVertexWrapper(new GoTextNodeHoverable(), x)).ToList();
             InitializeComponent();
-            ScoreLbl.Text = ((double)pairings.TotalScore / (double) _sourceGraphSelfPairings.TotalScore).ToString();
+            ScoreLbl.Text = (pairings.TotalScore / _sourceGraphSelfPairings.TotalScore).ToString();
+            var pairingValues = pairings.Pairings.Values.SelectMany(x => x);
+            var selfPairingValues = _sourceGraphSelfPairings.Pairings.SelectMany(x => x.Value);
+            var moreThanSelf = pairingValues.Select(x => new { Regular =  x.Score, Self =  selfPairingValues.First(y => y.SourceGraphVertex== x.SourceGraphVertex).Score }).ToList();
         }
 
         private static int ColumnOffset = 150;
@@ -61,11 +64,11 @@ namespace DoppleGraph
                 imageNode.Node.Location = new PointF(column * ColumnOffset, row * RowOffset);
                 foreach(var sourceNodePairing in _pairings.Pairings[imageNode.LabledVertex])
                 {
-                    var sourceLabledVertex = new GoLabeledVertexWrapper(new GoTextNodeHoverable(), sourceNodePairing.PairedVertex);
+                    var sourceLabledVertex = new GoLabeledVertexWrapper(new GoTextNodeHoverable(), sourceNodePairing.ImageGraphVertex);
                     SetShape(frontLayer,sourceLabledVertex);
                     frontLayer.Add(sourceLabledVertex.Node);
                     sourceLabledVertex.Node.Location = new PointF((column + 1) * ColumnOffset, row * RowOffset);
-                    DrawPairingEdge(sourceLabledVertex.Node, imageNode.Node, sourceNodePairing.PairingScore, frontLayer);
+                    DrawPairingEdge(sourceLabledVertex.Node, imageNode.Node, sourceNodePairing.NormalizedScore, frontLayer);
                     row++;
                 }
                 row++;

@@ -31,6 +31,8 @@ namespace GraphSimilarityByMatching
             Parallel.For(1, 1, (i) =>
             {
                 NodePairings pairing = GetPairings(sourceGraphLabeled, imageGraphLabeled);
+                if (pairing.TotalScore >1)
+                { throw new Exception(""); }
                 lock(lockObject)
                 {
                     if (pairing.TotalScore > bestMatch.TotalScore)
@@ -44,12 +46,12 @@ namespace GraphSimilarityByMatching
 
         private static NodePairings GetPairings(List<LabeledVertex> sourceGraphLabeled, List<LabeledVertex> imageGraphLabeled)
         {
-            NodePairings nodePairings = new NodePairings(sourceGraphLabeled, imageGraphLabeled);
+            NodePairings nodePairings = new NodePairings(sourceGraph: sourceGraphLabeled, imageGraph: imageGraphLabeled);
 
             Random rnd = new Random();
             Dictionary<Code[], IEnumerable<LabeledVertex>> sourceGraphGrouped;
             Dictionary<Code[], IEnumerable<LabeledVertex>> imageGraphGrouped;
-            GetGrouped(sourceGraphLabeled, imageGraphLabeled, out sourceGraphGrouped, out imageGraphGrouped);
+            GetGrouped(sourceGraphLabeled: sourceGraphLabeled, imageGraphLabeled: imageGraphLabeled, sourceGraphGrouped: out sourceGraphGrouped, imageGraphGrouped: out imageGraphGrouped);
 
 
             //Parallel.ForEach(sourceGraphGrouped.Keys, (codeGroup) =>
@@ -58,7 +60,7 @@ namespace GraphSimilarityByMatching
                 //not gonna lock for now
                 foreach (var sourceGraphVertex in sourceGraphGrouped[codeGroup])
                 {
-                    Tuple<LabeledVertex, int> winningPair;
+                    VertexMatch winningPair;
                     if (!imageGraphGrouped.ContainsKey(codeGroup))
                     {
                         winningPair = null;   
@@ -67,21 +69,21 @@ namespace GraphSimilarityByMatching
                     
                     else
                     {
-                        var vertexPossiblePairings = new ConcurrentBag<Tuple<LabeledVertex, int>>();
+                        var vertexPossiblePairings = new ConcurrentBag<VertexMatch>();
                         foreach (var imageGraphCandidate in imageGraphGrouped[codeGroup].OrderBy(x => rnd.Next()).ToList())
                         {
-                            vertexPossiblePairings.Add(new Tuple<LabeledVertex, int>(imageGraphCandidate, VertexScorer.GetScore(sourceGraphVertex, imageGraphCandidate, nodePairings)));
+                            vertexPossiblePairings.Add(new VertexMatch() { SourceGraphVertex = sourceGraphVertex, ImageGraphVertex = imageGraphCandidate, Score = VertexScorer.GetScore(sourceGraphVertex, imageGraphCandidate, nodePairings) });
                         }
-                        winningPair = vertexPossiblePairings.Where(x => x.Item2 > 0).OrderByDescending(x => x.Item2).ThenBy(x => rnd.Next()).FirstOrDefault();
+                        winningPair = vertexPossiblePairings.Where(x => x.Score > 0).OrderByDescending(x => x.Score).ThenBy(x => rnd.Next()).FirstOrDefault();
                     }
                     //});
                     if (winningPair != null)
                     {
-                        int winningPairScore = winningPair.Item2;
                         lock (nodePairings.Pairings)
                         {
-                            nodePairings.Pairings[winningPair.Item1].Add(new SingleNodePairing(sourceGraphVertex, winningPairScore/VertexScorer.GetSelfScore(sourceGraphVertex)));
-                            nodePairings.TotalScore += winningPairScore;
+                            winningPair.NormalizedScore = winningPair.Score / VertexScorer.GetSelfScore(winningPair.SourceGraphVertex); 
+                            nodePairings.Pairings[winningPair.ImageGraphVertex].Add(winningPair);
+                            nodePairings.TotalScore += winningPair.Score;
                         }
                     }
                 }
@@ -178,11 +180,11 @@ namespace GraphSimilarityByMatching
 
         public static NodePairings GetGraphSelfScore(List<LabeledVertex> labeledGraph)
         {
-            NodePairings nodePairings = new NodePairings(labeledGraph, labeledGraph);
+            NodePairings nodePairings = new NodePairings(imageGraph: labeledGraph, sourceGraph: labeledGraph);
             foreach (var node in labeledGraph)
             {
                 double score = VertexScorer.GetSelfScore(node);              
-                nodePairings.Pairings[node].Add(new SingleNodePairing(node, score));
+                nodePairings.Pairings[node].Add(new VertexMatch() { SourceGraphVertex = node, ImageGraphVertex = node, Score = score, NormalizedScore = 1 });
                 nodePairings.TotalScore += score;
             }
             return nodePairings;

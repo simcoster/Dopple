@@ -10,11 +10,11 @@ namespace GraphSimilarityByMatching
         {
             ImageGraph = imageGraph;
             SourceGraph = sourceGraph;
-            SourceGraph.ForEach(x => Pairings.Add(x, new ConcurrentBag<SingleNodePairing>()));
+            ImageGraph.ForEach(x => Pairings.Add(x, new ConcurrentBag<VertexMatch>()));
         }
         public List<LabeledVertex> ImageGraph { get; set; }
         public List<LabeledVertex> SourceGraph { get; set; }
-        public Dictionary<LabeledVertex, ConcurrentBag<SingleNodePairing>> Pairings { get; set; } = new Dictionary<LabeledVertex, ConcurrentBag<SingleNodePairing>>();
+        public Dictionary<LabeledVertex, ConcurrentBag<VertexMatch>> Pairings { get; set; } = new Dictionary<LabeledVertex, ConcurrentBag<VertexMatch>>();
         public double TotalScore { get; set; } = 0;
     }
 }

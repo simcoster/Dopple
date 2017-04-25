@@ -38,15 +38,15 @@ namespace TestedFunctions
             }
             return sum;
         }
-        public static int TestSumForLoop(List<Helper> nums)
-        {
-            int sum = 0;
-            for (int i=0; i< nums.Count; i++)
-            {
-                sum += nums[i].Number;
-            }
-            return sum;
-        }
+        //public static int TestSumForLoop(List<Helper> nums)
+        //{
+        //    int sum = 0;
+        //    for (int i=0; i< nums.Count; i++)
+        //    {
+        //        sum += nums[i].Number;
+        //    }
+        //    return sum;
+        //}
         //public static int SumMe(int[] nums)
         //{
         //    return nums.Sum(x => x * 6);
