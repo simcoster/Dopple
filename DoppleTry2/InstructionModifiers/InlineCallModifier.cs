@@ -29,6 +29,7 @@ namespace Dopple.InstructionModifiers
         //problem, need to mark the originals if the son is discovered to be reucrisve
         public void InlineCallNodes(List<InstructionNode> instructionNodes)
         {
+            return;
             List<InstructionNode> originalNodes = new List<InstructionNode>(instructionNodes);
             instructionNodes.ForEach(x => x.InliningProperties.CallSequence.Add(new MethodAndNode() { Method = instructionNodes[0].Method, MethodsNodes = originalNodes }));
             var callNodes = instructionNodes.Where(x => x is InlineableCallNode).Cast<InlineableCallNode>().Where(x => !x.CallWasInlined).ToArray();

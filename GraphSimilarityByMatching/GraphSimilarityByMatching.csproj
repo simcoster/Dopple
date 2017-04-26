@@ -59,7 +59,6 @@
     <Compile Include="EdgeMatch.cs" />
     <Compile Include="EdgeScorePoints.cs" />
     <Compile Include="Match.cs" />
-    <Compile Include="MatchWeights.cs" />
     <Compile Include="SmallBigLinkEdge.cs" />
     <Compile Include="EdgeIndexInfo.cs" />
     <Compile Include="EdgeScorer.cs" />

@@ -11,7 +11,7 @@ namespace GraphSimilarityByMatching
     public static class VertexScorer
     {
         private const int ImportantCodeMultiplier = 50;
-        private const int RetBackTreeMultiplier = 50;
+        private const int RetBackTreeMultiplier = 1;
 
 
         private static readonly List<Code> ImportantCodes = CodeGroups.LdElemCodes.Concat(CodeGroups.StElemCodes).Concat(CodeGroups.ArithmeticCodes).Concat(new[] { Code.Ret }).ToList();
