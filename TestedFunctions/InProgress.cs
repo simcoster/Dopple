@@ -25,29 +25,28 @@ namespace TestedFunctions
         //{
         //    return nums.Select(x => x++).ToList();
         //}
-        //public static int testLinq2(List<Helper> nums)
-        //{
-        //    return nums.Sum(x => x.Number);
-        //}
-        //public static int TestSumForeachLoop(List<Helper> nums)
-        //{
-        //    int sum = 0;
-        //    foreach (var num in nums)
-        //    {
-        //        sum += num.Number;
-        //    }
-        //    return sum;
-        //}
-
-
-        public static int TestMinusForLoop(Helper[] nums)
+        public static int testLinq2(List<Helper> nums)
         {
-            return nums[1].Number + nums[2].Number;
+            return nums.Sum(x => x.Number);
+        }
+        public static int TestSumForeachLoop(List<Helper> nums)
+        {
+            int sum = 0;
+            foreach (var num in nums)
+            {
+                sum += num.Number;
+            }
+            return sum;
         }
 
         public static int TestSumForLoop(Helper[] nums)
         {
-            return nums[3].Number + nums[4].Number;
+            int sum = 0;
+            for (int i =0;  i< nums.Length; i++)
+            {
+                sum += nums[i].Number;
+            }
+            return sum;
         }
 
         //public static int SumMe(int[] nums)

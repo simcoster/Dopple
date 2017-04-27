@@ -51,14 +51,14 @@ namespace GraphSimilarityByMatching
                 }
                 var relevantImageVertexEdges = unmachedImageVertexEdges.Where(predicate);
                 relevantImageVertexEdges.ForEach(imageVertexEdge => pairingScores.Add(new EdgeMatch() { ImageGraphEdge = imageVertexEdge, SourceVertexEdge = sourceVertexEdge, Score = GetEdgeMatchScore(sourceVertexEdge, imageVertexEdge, sharedSourceOrDest, pairings, indexImportance) }));
-                var winningMatchGroup = pairingScores.Where(x => x.Score > 0).GroupBy(x => x.Score).OrderBy(x => rnd.Next()).FirstOrDefault();
+                var winningMatchGroup = pairingScores.Where(x => x.Score > 0).GroupBy(x => x.Score).OrderByDescending(x => x.Key).FirstOrDefault();
                 if (winningMatchGroup == null || !winningMatchGroup.Any())
                 {
                     edgePairings.Add(new EdgeMatch() { SourceVertexEdge = sourceVertexEdge, ImageGraphEdge = null, Score = 0 });
                 }
                 else
                 {
-                    var winningMatch = winningMatchGroup.First();
+                    var winningMatch = winningMatchGroup.OrderBy(x => rnd.Next()).First();
                     unmachedImageVertexEdges.Remove(winningMatch.ImageGraphEdge);
                     winningMatch.Score = GetEdgeMatchScore(sourceVertexEdge, winningMatch.ImageGraphEdge, sharedSourceOrDest, pairings, indexImportance, false);
                     edgePairings.Add(winningMatch);

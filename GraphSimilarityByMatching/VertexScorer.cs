@@ -10,8 +10,8 @@ namespace GraphSimilarityByMatching
 {
     public static class VertexScorer
     {
-        private const int ImportantCodeMultiplier = 50;
-        private const int RetBackTreeMultiplier = 1;
+        private const int ImportantCodeMultiplier = 1;
+        private const int RetBackTreeMultiplier = 50;
 
 
         private static readonly List<Code> ImportantCodes = CodeGroups.LdElemCodes.Concat(CodeGroups.StElemCodes).Concat(CodeGroups.ArithmeticCodes).Concat(new[] { Code.Ret }).ToList();
@@ -56,7 +56,8 @@ namespace GraphSimilarityByMatching
         {
             int selfScore = VertexScorePoints.ExactMatch;
             object lockObject = new object();
-            Parallel.ForEach(labeledVertex.BackEdges, (edge) =>
+            //Parallel.ForEach(labeledVertex.BackEdges, (edge) =>
+            foreach(var edge in labeledVertex.BackEdges)
             {
 
                 int score = EdgeScorer.GetEdgeMatchScore(edge, edge, SharedSourceOrDest.Dest, null, IndexImportance.Important, false);
@@ -64,15 +65,16 @@ namespace GraphSimilarityByMatching
                 {
                     selfScore += score;
                 }
-            });
-            Parallel.ForEach(labeledVertex.ForwardEdges, (edge) =>
+            }
+            //Parallel.ForEach(labeledVertex.ForwardEdges, (edge) =>
+            foreach (var edge in labeledVertex.ForwardEdges)
             {
                 int score = EdgeScorer.GetEdgeMatchScore(edge, edge, SharedSourceOrDest.Source, null, IndexImportance.Important, false);
                 lock (lockObject)
                 {
                     selfScore += score;
                 }
-            });
+            }
             if (ImportantCodes.Contains(labeledVertex.Opcode))
             {
                 selfScore *= ImportantCodeMultiplier;
