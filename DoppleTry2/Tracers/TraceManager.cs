@@ -18,9 +18,6 @@ namespace Dopple.BackTracers
         public TraceManager()
         {
             _InFuncDataTransferBackTracers = new BackTracer[] { _LdArgBacktracer, _LdLocBackTracer, _RetBackTracer };
-
-            _OutFuncDataTransferBackTracers = new BackTracer[]{ _LdStaticFieldBackTracer, _LdStaticFieldBackTracer 
-                            ,_LoadMemoryByOperandBackTracer ,_TypedReferenceBackTracer,_LdElemBacktracer, _LdFldBacktracer};
         }
         private readonly Verifier[] verifiers;
 
@@ -39,12 +36,8 @@ namespace Dopple.BackTracers
         BackTracer[] _InFuncDataTransferBackTracers;
       
 
-        private readonly LdStaticFieldBackTracer _LdStaticFieldBackTracer = new LdStaticFieldBackTracer();
-        private readonly LindBacktracer _LoadMemoryByOperandBackTracer = new LindBacktracer();
         private readonly TypedReferenceBackTracer _TypedReferenceBackTracer = new TypedReferenceBackTracer();
         private readonly ConditionionalsTracer _Conditionalstracer = new ConditionionalsTracer();
-        private readonly LdElemBacktracer _LdElemBacktracer = new LdElemBacktracer();
-        private readonly LdFldBacktracer _LdFldBacktracer = new LdFldBacktracer();
 
         public static int CountVisitedNodes = 0;
 
@@ -97,7 +90,7 @@ namespace Dopple.BackTracers
         private BackTracer[] _OutFuncDataTransferBackTracers;
 
         private List<InstructionNode> GlobalVisited = new List<InstructionNode>();
-        private void TraceOutsideFunctionBoundsRec(InstructionNode currentNode,  Dictionary<InstructionNode,int> visitCount, Dictionary<InstructionNode, MergeNodeTraceData> mergingNodesData, InstructionNode lastNode = null, StateProviderCollection stateProviders = null)
+        private void TraceOutsideFunctionBoundsRec(InstructionNode currentNode, Dictionary<InstructionNode, int> visitCount, Dictionary<InstructionNode, MergeNodeTraceData> mergingNodesData, InstructionNode lastNode = null, StateProviderCollection stateProviders = null)
         {
             if (lastNode == null)
             {
@@ -108,7 +101,7 @@ namespace Dopple.BackTracers
             while (true)
             {
                 GlobalVisited.Add(currentNode);
-                bool reachedMergeNodeNotLast;          
+                bool reachedMergeNodeNotLast;
                 ActOnCurrentNode(currentNode, mergingNodesData, lastNode, ref stateProviders, out reachedMergeNodeNotLast);
                 if (reachedMergeNodeNotLast)
                 {
@@ -123,36 +116,16 @@ namespace Dopple.BackTracers
                 if (currentNode.ProgramFlowForwardRoutes.Count == 1)
                 {
                     currentNode = currentNode.ProgramFlowForwardRoutes[0];
+                    continue;
+                }
+                var createdLoopNode = GetCreatedLoopNode(currentNode);
+                if (createdLoopNode != null && visitCount[createdLoopNode] < 2)
+                {
+                    currentNode = createdLoopNode;
                 }
                 else
                 {
-                    // a loop
-                    var loopBranch = currentNode.ProgramFlowForwardRoutes.Where(x => x.BranchProperties.FirstInLoop).ToList();
-                    //if (loopBranch.Count == 0 && currentNode.ProgramFlowForwardRoutes.Any(x => x.BranchProperties.Branches.First().BranchType == BranchPropertiesNS.BranchType.Loop))
-                    //{
-
-                    //}
-                    if (loopBranch.Count > 1)
-                    {
-                        throw new Exception("Can't deal with 2 loops from the same place (too many combinations)");
-                    }
-                    if (loopBranch.Any())
-                    {
-                        if (visitCount[loopBranch.First()] <2)
-                        {
-                            currentNode = loopBranch.First();
-                            continue;
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        //A split
-                        break;
-                    }
+                    break;
                 }
             }
             if (currentNode.ProgramFlowForwardRoutes.Count == 0)
@@ -162,11 +135,21 @@ namespace Dopple.BackTracers
             if (!(currentNode is ConditionalJumpNode))
             {
                 throw new Exception("split without a conditional");
-            }
-            foreach (var node in currentNode.ProgramFlowForwardRoutes.Except(currentNode.ProgramFlowForwardRoutes.Where(x => x.BranchProperties.FirstInLoop)).ToList())
+            }           
+            foreach (var node in currentNode.ProgramFlowForwardRoutes.Except(new[] { GetCreatedLoopNode(currentNode) }).ToList())
             {
                 TraceOutsideFunctionBoundsRec(node, visitCount, mergingNodesData, currentNode, stateProviders.Clone());
             }
+        }
+
+        private static InstructionNode GetCreatedLoopNode(InstructionNode currentNode)
+        {
+            var loopNodes = currentNode.ProgramFlowForwardRoutes.Where(x => x.BranchProperties.FirstInLoop != null).ToList();
+            if (loopNodes.Any())
+            {
+                return loopNodes.OrderByDescending(x => x.BranchProperties.FirstInLoop.BackTurnNode.Instruction.Offset).First();
+            }
+            return null;
         }
 
         internal void TraceConditionals(List<InstructionNode> instructionNodes)

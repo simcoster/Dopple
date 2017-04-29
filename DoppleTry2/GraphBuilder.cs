@@ -96,13 +96,13 @@ namespace Dopple
                 runCounter++;
             }
             //RecursionFix();
-            RemoveHelperCodes();
+            //RemoveHelperCodes();
             //RemoveAndStitchDynamicDataConnections();
 
-            _backTraceManager.ForwardDynamicData(InstructionNodes);
-            MergeSimilarInstructions();
-            MergeEquivilentPairs();
-            AddZeroNode();
+            //_backTraceManager.ForwardDynamicData(InstructionNodes);
+            //MergeSimilarInstructions();
+            //MergeEquivilentPairs();
+            //AddZeroNode();
             BranchProperties.BaseBranch.RemoveAllTwoWay();
             //Verify();
             return InstructionNodes;
@@ -219,10 +219,6 @@ namespace Dopple
             foreach (var firstNode in InstructionNodes.Where(x => x.DataFlowBackRelated.Count == 0))
             {
                 firstNode.DataFlowBackRelated.AddTwoWay(nodeZero, -1);
-            }
-            foreach (var uninitilizedLoadNode in InstructionNodes.Where(x => x is IDynamicDataLoadNode && !((IDynamicDataLoadNode)x).AllPathsHaveAStoreNode))
-            {
-                uninitilizedLoadNode.DataFlowBackRelated.AddTwoWay(nodeZero, -1);
             }
             var firstOrderLdArgs = GetFirstOrderLdArgs();
             foreach (var firstOrderLdArg in firstOrderLdArgs)

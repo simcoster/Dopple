@@ -100,10 +100,7 @@
     <Compile Include="Tracers\StateProviders\StElemStateProvider.cs" />
     <Compile Include="Tracers\StateProviders\StoreFieldStateProvider.cs" />
     <Compile Include="Tracers\StateProviders\StoreDynamicDataStateProvider.cs" />
-    <Compile Include="Tracers\DynaymicLdArgBacktracer.cs" />
     <Compile Include="Tracers\ForwardTracers\ConditionionalsTracer.cs" />
-    <Compile Include="Tracers\LegacyDataLoadBacktracers\DynamicDataBacktracer.cs" />
-    <Compile Include="Tracers\LegacyDataLoadBacktracers\LdFldBacktracer.cs" />
     <Compile Include="Tracers\RecursiveBacktracer.cs" />
     <Compile Include="Tracers\RetBackTracer.cs" />
     <Compile Include="Tracers\SingleUnitBacktracers\SingleArithmeticWithConstantBacktracer.cs" />
@@ -144,12 +141,9 @@
     <Compile Include="InstructionNodeMembers\ArgList.cs" />
     <Compile Include="BackSearcher.cs" />
     <Compile Include="Tracers\BackTracer.cs" />
-    <Compile Include="Tracers\LegacyDataLoadBacktracers\LdElemBacktracer.cs" />
     <Compile Include="Tracers\Helpers\SingleIndexBackSearcher.cs" />
     <Compile Include="GraphBuilder.cs" />
     <Compile Include="Tracers\LdArgBacktracer.cs" />
-    <Compile Include="Tracers\LegacyDataLoadBacktracers\LdStaticFieldBackTracer.cs" />
-    <Compile Include="Tracers\LegacyDataLoadBacktracers\LoadMemoryByOperandBackTracer.cs" />
     <Compile Include="Tracers\SingleIndexBackTracer.cs" />
     <Compile Include="Tracers\LdLocBackTracer.cs" />
     <Compile Include="Tracers\TypedReferenceBackTracer.cs" />
@@ -198,7 +192,9 @@
       <Name>Utility</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Tracers\LegacyDataLoadBacktracers\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

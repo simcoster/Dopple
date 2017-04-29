@@ -102,14 +102,23 @@ namespace Dopple.BackTracers
             }
         }
      
-        private void MoveForwardAndMarkBranch(InstructionNode originNode,InstructionNode currentNode, BranchID currentBranch, HashSet<InstructionNode> visited = null)
+        private void MoveForwardAndMarkBranch(InstructionNode originNode,InstructionNode currentNode, BranchID currentBranch, InstructionNode lastNode = null, HashSet<InstructionNode> visited = null)
         {
             if (visited ==null)
             {
                 visited = new HashSet<InstructionNode>() { originNode };
+                lastNode = currentNode ;
             }
-            while(true)
+            while (true)
             {
+                if (currentNode.Instruction.Offset < lastNode.Instruction.Offset)
+                {
+                    if (currentBranch.BackTurnNode != null)
+                    {
+                        throw new Exception("should only happen once");
+                    }
+                    currentBranch.BackTurnNode = currentNode;
+                }
                 if (currentNode == originNode)
                 {
                     currentNode.BranchProperties.Branches.AddDistinct(currentBranch);
@@ -117,7 +126,11 @@ namespace Dopple.BackTracers
                     if (currentBranch.BranchType  != BranchType.SplitMerge)
                     {
                         currentBranch.BranchType = BranchType.Loop;
-                        currentBranch.BranchNodes[0].BranchProperties.FirstInLoop = true;
+                        currentBranch.BranchNodes[0].BranchProperties.FirstInLoop = currentBranch;
+                        if (currentBranch.BackTurnNode == null)
+                        {
+                            throw new Exception("Loop should contain back turn");
+                        }
                     }
                     return;
                 }
@@ -126,7 +139,7 @@ namespace Dopple.BackTracers
                     return;
                 }
                 visited.Add(currentNode);
-                if (currentBranch.MergingNode == null)
+                if (currentBranch.MergingNode == null && currentNode.Instruction.Offset > currentBranch.OriginatingNode.Instruction.Offset)
                 {
                     List<BranchID> otherBranches = currentNode.BranchProperties.Branches.Where(x => x.OriginatingNode == originNode && x != currentBranch && x.MergingNode == null).ToList();
                     if (otherBranches.Count > 0)
@@ -134,9 +147,10 @@ namespace Dopple.BackTracers
                         int i = 1;
                         foreach (var mergedBranch in otherBranches.Concat(new[] { currentBranch }).ToList())
                         {
+                            //not sure about this fix
                             if (mergedBranch.BranchNodes.Any())
                             {
-                                mergedBranch.BranchNodes[0].BranchProperties.FirstInLoop = false;
+                                mergedBranch.BranchNodes[0].BranchProperties.FirstInLoop = null;
                             }
                             mergedBranch.BranchType = BranchType.SplitMerge;
                             MarkMergeNode(currentNode, mergedBranch);
@@ -156,11 +170,12 @@ namespace Dopple.BackTracers
                 {
                     break;
                 }
+                lastNode = currentNode;
                 currentNode = currentNode.ProgramFlowForwardRoutes[0];
             }
             foreach (var forwardNode in currentNode.ProgramFlowForwardRoutes)
             {
-                MoveForwardAndMarkBranch(originNode, forwardNode, currentBranch, visited);
+                MoveForwardAndMarkBranch(originNode, forwardNode, currentBranch,currentNode, visited);
             }
         }
 
