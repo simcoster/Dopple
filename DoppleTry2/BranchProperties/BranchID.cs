@@ -56,7 +56,6 @@ namespace Dopple.BranchPropertiesNS
         public int PairedBranchesIndex { get; set; }
         public List<InstructionNode> BranchNodes { get { return _BranchNodes; } } 
         public InstructionNode MergingNode { get; set; }
-        public InstructionNode BackTurnNode { get; internal set; }
     }
 
     public class BaseBranch : BranchID

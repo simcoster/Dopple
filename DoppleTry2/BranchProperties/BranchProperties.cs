@@ -16,9 +16,9 @@ namespace Dopple.BranchPropertiesNS
         public BranchList Branches { get; private set; } = new BranchList() ;
         public MergingNodeProperties MergingNodeProperties { get; private set; }
         //public bool FirstInLoop { get; internal set; }
-        private BranchID firstInLoop = null;
+        private bool firstInLoop = false;
 
-        public BranchID FirstInLoop
+        public bool FirstInLoop
         {
             get { return firstInLoop; }
             set { firstInLoop = value; }

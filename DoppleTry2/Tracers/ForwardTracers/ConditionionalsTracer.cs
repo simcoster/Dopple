@@ -34,6 +34,19 @@ namespace Dopple.BackTracers
                 }
                 branchesSameOrigins.Add(splitNode.CreatedBranches);
             }
+            //For nested loops
+            foreach (ConditionalJumpNode splitNode in splitNodes.Where(x => x.CreatedBranches.Count(y => y.BranchType == BranchType.Loop)>1))
+            {
+                foreach (var loopBranch in splitNode.CreatedBranches.Where(x => x.BranchType == BranchType.Loop))
+                {
+                    if (loopBranch.BranchNodes.Any(x => splitNode.BranchProperties.Branches.Any(y => y.OriginatingNode == x)))
+                    {
+                        loopBranch.BranchType = BranchType.Exit;
+                        loopBranch.BranchNodes[0].BranchProperties.FirstInLoop = false;
+                    }
+                }
+            }
+
             var nodesToRemoveFromBranches = new Dictionary<BranchID, ConcurrentBag<InstructionNode>>();
             foreach(var branch in AllBrances.Values)
             {
@@ -50,7 +63,6 @@ namespace Dopple.BackTracers
                         foreach (var branchSameOriginOfNode in branchesSameOriginOfNode)
                         {
                             nodesToRemoveFromBranches[branchSameOriginOfNode].Add(node);
-                            //nodeBranchToRemove.BranchNodes.Remove(node);
                             node.BranchProperties.Branches.Remove(branchSameOriginOfNode);
                         }
                     }
@@ -111,14 +123,6 @@ namespace Dopple.BackTracers
             }
             while (true)
             {
-                if (currentNode.Instruction.Offset < lastNode.Instruction.Offset)
-                {
-                    if (currentBranch.BackTurnNode != null)
-                    {
-                        throw new Exception("should only happen once");
-                    }
-                    currentBranch.BackTurnNode = currentNode;
-                }
                 if (currentNode == originNode)
                 {
                     currentNode.BranchProperties.Branches.AddDistinct(currentBranch);
@@ -126,11 +130,8 @@ namespace Dopple.BackTracers
                     if (currentBranch.BranchType  != BranchType.SplitMerge)
                     {
                         currentBranch.BranchType = BranchType.Loop;
-                        currentBranch.BranchNodes[0].BranchProperties.FirstInLoop = currentBranch;
-                        if (currentBranch.BackTurnNode == null)
-                        {
-                            throw new Exception("Loop should contain back turn");
-                        }
+                        currentBranch.BranchNodes[0].BranchProperties.FirstInLoop = true;
+                 
                     }
                     return;
                 }
@@ -150,7 +151,7 @@ namespace Dopple.BackTracers
                             //not sure about this fix
                             if (mergedBranch.BranchNodes.Any())
                             {
-                                mergedBranch.BranchNodes[0].BranchProperties.FirstInLoop = null;
+                                mergedBranch.BranchNodes[0].BranchProperties.FirstInLoop = false;
                             }
                             mergedBranch.BranchType = BranchType.SplitMerge;
                             MarkMergeNode(currentNode, mergedBranch);

@@ -108,7 +108,7 @@ namespace Dopple.BackTracers
                     return;
                 }
                 visitCount[currentNode]++;
-                if (visitCount[currentNode] > 3 && !currentNode.BranchProperties.MergingNodeProperties.IsMergingNode)
+                if (visitCount[currentNode] > 3 && currentNode.ProgramFlowBackRoutes.Count == 1)
                 {
                     return;
                 }
@@ -118,14 +118,22 @@ namespace Dopple.BackTracers
                     currentNode = currentNode.ProgramFlowForwardRoutes[0];
                     continue;
                 }
-                var createdLoopNode = GetCreatedLoopNode(currentNode);
-                if (createdLoopNode != null && visitCount[createdLoopNode] < 2)
-                {
-                    currentNode = createdLoopNode;
-                }
                 else
                 {
-                    break;
+                    var firstInLoopNodes = currentNode.ProgramFlowForwardRoutes.Where(x => x.BranchProperties.FirstInLoop).ToList();
+                    if (firstInLoopNodes.Count >1)
+                    {
+                        throw new Exception("Can't have 2 first loop nodes");
+                    }
+                    else if (firstInLoopNodes.Count ==1 && visitCount[firstInLoopNodes[0]] < 2)
+                    {
+                        currentNode = firstInLoopNodes[0];
+                        continue;
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
             }
             if (currentNode.ProgramFlowForwardRoutes.Count == 0)
@@ -136,22 +144,13 @@ namespace Dopple.BackTracers
             {
                 throw new Exception("split without a conditional");
             }           
-            foreach (var node in currentNode.ProgramFlowForwardRoutes.Except(new[] { GetCreatedLoopNode(currentNode) }).ToList())
+            foreach (var node in currentNode.ProgramFlowForwardRoutes.Where(x => !x.BranchProperties.FirstInLoop).ToList())
             {
                 TraceOutsideFunctionBoundsRec(node, visitCount, mergingNodesData, currentNode, stateProviders.Clone());
             }
         }
 
-        private static InstructionNode GetCreatedLoopNode(InstructionNode currentNode)
-        {
-            var loopNodes = currentNode.ProgramFlowForwardRoutes.Where(x => x.BranchProperties.FirstInLoop != null).ToList();
-            if (loopNodes.Any())
-            {
-                return loopNodes.OrderByDescending(x => x.BranchProperties.FirstInLoop.BackTurnNode.Instruction.Offset).First();
-            }
-            return null;
-        }
-
+  
         internal void TraceConditionals(List<InstructionNode> instructionNodes)
         {
             _Conditionalstracer.TraceConditionals(instructionNodes);
