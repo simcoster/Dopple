@@ -92,7 +92,6 @@ namespace Dopple.BackTracers
         private List<InstructionNode> GlobalVisited = new List<InstructionNode>();
         private void TraceOutsideFunctionBoundsRec(InstructionNode currentNode, Dictionary<InstructionNode, int> visitCount, Dictionary<InstructionNode, MergeNodeTraceData> mergingNodesData, InstructionNode lastNode = null, StateProviderCollection stateProviders = null)
         {
-            return;
             if (lastNode == null)
             {
                 lastNode = currentNode;
@@ -101,6 +100,7 @@ namespace Dopple.BackTracers
             }
             while (true)
             {
+                Console.WriteLine("state providers contains stelem? " + stateProviders._StateProviders.Any(x => x is StElemStateProvider));
                 GlobalVisited.Add(currentNode);
                 bool reachedMergeNodeNotLast;
                 ActOnCurrentNode(currentNode, mergingNodesData, lastNode, ref stateProviders, out reachedMergeNodeNotLast);
@@ -129,15 +129,16 @@ namespace Dopple.BackTracers
                     }
                     else if (firstInLoopNodes.Count ==1 )
                     {
-                        if (visitCount[firstInLoopNodes[0]] < 2)
+                        var loopNode = firstInLoopNodes[0];
+                        if (visitCount[loopNode] < loopNode.BranchProperties.Branches.Count(x => x.BranchType == BranchType.Loop)*2)
                         {
-                            Console.WriteLine("looping at " + firstInLoopNodes.First().InstructionIndex);
-                            currentNode = firstInLoopNodes[0];
+                            Console.WriteLine("looping at " + loopNode.InstructionIndex);
+                            currentNode = loopNode;
                             continue;
                         }
                         else
                         {
-                            Console.WriteLine("looped more than twice at " + firstInLoopNodes.First().InstructionIndex);
+                            Console.WriteLine("looped more than twice at " + loopNode.InstructionIndex);
                             break;
                         }
                     }
