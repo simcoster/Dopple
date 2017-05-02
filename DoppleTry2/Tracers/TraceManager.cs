@@ -100,6 +100,7 @@ namespace Dopple.BackTracers
             }
             while (true)
             {
+                Console.WriteLine("now at " + currentNode.InstructionIndex + currentNode.Instruction);
                 Console.WriteLine("state providers contains stelem? " + stateProviders._StateProviders.Any(x => x is StElemStateProvider));
                 GlobalVisited.Add(currentNode);
                 bool reachedMergeNodeNotLast;

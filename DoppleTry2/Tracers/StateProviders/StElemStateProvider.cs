@@ -30,11 +30,24 @@ namespace Dopple.Tracers.StateProviders
                 return false;
             }
             var loadArrayArgs = loadNode.DataFlowBackRelated.Where(x => x.ArgIndex == 0).SelectMany(x => x.Argument.GetDataOriginNodes()).ToArray();
-            if (!loadArrayArgs.Intersect(ObjectNodes).Any())
+            if (!HaveEquivilentObjectNode(loadArrayArgs,ObjectNodes))
             {
                 return false;
             }
             return true;
+        }
+
+        private bool HaveEquivilentObjectNode(IEnumerable<InstructionNode> loadArrayArgs, IEnumerable<InstructionNode> objectNodes)
+        {
+            if (loadArrayArgs.Intersect(objectNodes).Count() >1)
+            {
+                return true;
+            }
+            if (loadArrayArgs.Where(x => x is LdArgInstructionNode).Cast<LdArgInstructionNode>().Any(x => objectNodes.Any(y => y is LdArgInstructionNode && x.ArgIndex == ((LdArgInstructionNode)y).ArgIndex && y.Method == x.Method)))
+            {
+                return true;
+            }
+            return false;
         }
 
         public static bool HaveEquivilentIndexNode(InstructionNode indexNodeToMatch, IEnumerable<InstructionNode> indexArgs)
