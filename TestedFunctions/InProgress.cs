@@ -19,6 +19,10 @@ namespace TestedFunctions
                 {
                     if (array[j] < nextMin)
                     {
+                        for (int k =0; k<7; k++)
+                        {
+                            nextMinIndex = k;
+                        }
                         nextMin = array[j];
                     }
                 }

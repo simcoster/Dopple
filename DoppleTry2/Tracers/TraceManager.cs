@@ -92,6 +92,7 @@ namespace Dopple.BackTracers
         private List<InstructionNode> GlobalVisited = new List<InstructionNode>();
         private void TraceOutsideFunctionBoundsRec(InstructionNode currentNode, Dictionary<InstructionNode, int> visitCount, Dictionary<InstructionNode, MergeNodeTraceData> mergingNodesData, InstructionNode lastNode = null, StateProviderCollection stateProviders = null)
         {
+            return;
             if (lastNode == null)
             {
                 lastNode = currentNode;
@@ -110,7 +111,8 @@ namespace Dopple.BackTracers
                 visitCount[currentNode]++;
                 if (visitCount[currentNode] > 3 && currentNode.ProgramFlowBackRoutes.Count == 1)
                 {
-                    return;
+
+                    //return;
                 }
                 lastNode = currentNode;
                 if (currentNode.ProgramFlowForwardRoutes.Count == 1)
@@ -125,10 +127,19 @@ namespace Dopple.BackTracers
                     {
                         throw new Exception("Can't have 2 first loop nodes");
                     }
-                    else if (firstInLoopNodes.Count ==1 && visitCount[firstInLoopNodes[0]] < 2)
+                    else if (firstInLoopNodes.Count ==1 )
                     {
-                        currentNode = firstInLoopNodes[0];
-                        continue;
+                        if (visitCount[firstInLoopNodes[0]] < 2)
+                        {
+                            Console.WriteLine("looping at " + firstInLoopNodes.First().InstructionIndex);
+                            currentNode = firstInLoopNodes[0];
+                            continue;
+                        }
+                        else
+                        {
+                            Console.WriteLine("looped more than twice at " + firstInLoopNodes.First().InstructionIndex);
+                            break;
+                        }
                     }
                     else
                     {
