@@ -28,7 +28,7 @@ namespace Dopple.BranchPropertiesNS
         }
         public void AddTwoWay(InstructionNode node)
         {
-            node.BranchProperties.Branches.Add(this);
+            node.BranchProperties.Branches.AddDistinct(this);
             BranchNodes.Add(node);
         }
         internal void AddTwoWay(List<InstructionNode> instructionNodes)

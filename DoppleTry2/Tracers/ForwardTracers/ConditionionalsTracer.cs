@@ -17,9 +17,10 @@ namespace Dopple.BackTracers
         {
             MoveForwardAndMarkBranches(instructionNodes[0]);
             RemoveMutlipleBranchesSameOrigin(instructionNodes);
-            if (instructionNodes.Any(x => x.BranchProperties.MergingNodeProperties.MergedBranches.Any(y => y.BranchType != BranchType.SplitMerge)))
+            var mergeNonMerged = instructionNodes.Where(x => x.BranchProperties.MergingNodeProperties.MergedBranches.Any(y => y.BranchType != BranchType.SplitMerge));
+            if (mergeNonMerged.Any())
             {
-                throw new Exception("Should merge only split merge branches");
+                //throw new Exception("Should merge only split merge branches");
             }
             MergeReturnNodes(instructionNodes);
         }
@@ -43,13 +44,14 @@ namespace Dopple.BackTracers
                     }
                 }
             }
-            Parallel.ForEach((instructionNodes.Where(x => x.BranchProperties.MergingNodeProperties.IsMergingNode)), mergingNode =>
+            foreach (var mergingNode in instructionNodes.Where(x => x.BranchProperties.MergingNodeProperties.IsMergingNode))
             {
                 foreach (var mergedBranch in mergingNode.BranchProperties.MergingNodeProperties.MergedBranches)
                 {
                     mergedBranch.AddTwoWay(mergingNode);
+                    mergedBranch.BranchType = BranchType.SplitMerge;
                 }
-            });
+            }
         }
 
         private void MergeReturnNodes(List<InstructionNode> instructionNodes)
@@ -77,11 +79,11 @@ namespace Dopple.BackTracers
             }
         }
      
-        private void MoveForwardAndMarkBranches(InstructionNode currentNode, List<BranchID> currentBranches = null, HashSet<InstructionNode> visited = null)
+        private void MoveForwardAndMarkBranches(InstructionNode currentNode, List<BranchID> currentBranches = null, List<InstructionNode> visited = null)
         {
             if (visited ==null)
             {
-                visited = new HashSet<InstructionNode>();
+                visited = new List<InstructionNode>();
                 currentBranches = new List<BranchID>();
             }
             while (true)
@@ -97,15 +99,21 @@ namespace Dopple.BackTracers
                     loopBranches.First().BranchNodes[0].BranchProperties.FirstInLoop = true;
                     return;
                 }
-                if (visited.Contains(currentNode))
+                if (visited.Count(x => x ==currentNode) > 2 || ((currentNode is ConditionalJumpNode) && visited.Contains(currentNode)))
                 {
                     throw new Exception("we shouldn't get to a visited node without passing an originating split node");
                 }
                 visited.Add(currentNode);
-                currentNode.BranchProperties.Branches.AddRangeDistinct(currentBranches);
-                var mergedBranches =  currentNode.BranchProperties.Branches.Concat(currentBranches).GroupBy(x => x.OriginatingNode).Where(x => x.Count() > 1);
-                foreach(var mergedBranch in mergedBranches.SelectMany(x => x).Where(x => x.MergingNode == null))
+                currentBranches.ForEach(x => x.AddTwoWay(currentNode));
+                var mergedBranches =  currentNode.BranchProperties.Branches.GroupBy(x => x.OriginatingNode).Where(x => x.Count() > 1);
+                var mergedBranchesFlattened = mergedBranches.SelectMany(x => x).ToList();
+                foreach(var mergedBranch in mergedBranchesFlattened)
                 {
+                    if (mergedBranch.MergingNode != null)
+                    {
+                        continue;
+                    }
+                    Console.WriteLine("node {0} is merge of branch {1} that originates in {2}", currentNode.InstructionIndex + "  " +currentNode.Instruction.ToString(), mergedBranch.Index, mergedBranch.OriginatingNode.InstructionIndex);
                     MarkMergeNode(currentNode, mergedBranch);
                     mergedBranch.PairedBranchesIndex = currentNode.BranchProperties.MergingNodeProperties.MergedBranches.IndexOf(mergedBranch);
                 }
@@ -122,8 +130,9 @@ namespace Dopple.BackTracers
             foreach (var forwardNode in currentNode.ProgramFlowForwardRoutes)
             {
                 var newBranch = CreateNewBranch((ConditionalJumpNode)currentNode);
-                currentBranches.Add(newBranch);
-                MoveForwardAndMarkBranches(forwardNode, new List<BranchID>(currentBranches));
+                var currentBranchesClone = new List<BranchID>(currentBranches);
+                currentBranchesClone.Add(newBranch);
+                MoveForwardAndMarkBranches(forwardNode, currentBranchesClone, new List<InstructionNode>(visited));
             }
         }
 
