@@ -113,7 +113,7 @@ namespace Dopple.BackTracers
                     {
                         continue;
                     }
-                    Console.WriteLine("node {0} is merge of branch {1} that originates in {2}", currentNode.InstructionIndex + "  " +currentNode.Instruction.ToString(), mergedBranch.Index, mergedBranch.OriginatingNode.InstructionIndex);
+                    //Console.WriteLine("node {0} is merge of branch {1} that originates in {2}", currentNode.InstructionIndex + "  " +currentNode.Instruction.ToString(), mergedBranch.Index, mergedBranch.OriginatingNode.InstructionIndex);
                     MarkMergeNode(currentNode, mergedBranch);
                     mergedBranch.PairedBranchesIndex = currentNode.BranchProperties.MergingNodeProperties.MergedBranches.IndexOf(mergedBranch);
                 }

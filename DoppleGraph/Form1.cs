@@ -39,6 +39,7 @@ namespace DoppleGraph
                 newForm.Show();
             }
 
+            return;
             var csv = new StringBuilder();
             csv.Append(',');
             for (int i = 0; i < Graphs.Count ; i++)
@@ -79,21 +80,10 @@ namespace DoppleGraph
                 var newFormmm = new NodePairingGraph(pairing1);
                 newFormmm.Show();
             }
-
+            double Score1 = pairing1.TotalScore;
+            double Score2 = pairing2.TotalScore;
+            Console.WriteLine("{0} = {1} {2}", Graph1[0].Method.Name, Graph2[0].Method.Name, (Score1 + Score2) / 2);
             return 0;
-            //double Score1 = pairing1.TotalScore;
-            //double Score2 = pairing2.TotalScore;
-            //Console.WriteLine("{0} = {1} {2}", Graph1[0].Method.Name, Graph2[0].Method.Name, (Score1 + Score2) / 2);
-            //double selfScoreSum = GraphSimilarityCalc.GetSelfScore(pairing1.SecondGraph).TotalScore + GraphSimilarityCalc.GetSelfScore(pairing2.SecondGraph).TotalScore;
-            //double normalizedScore =  Math.Round((Score1 +Score2) / selfScoreSum, 2);
-            //if (normalizedScore < 0)
-            //{
-            //    return 0;
-            //}
-            //else
-            //{
-            //    return normalizedScore;
-            //}
         }
     }
 }

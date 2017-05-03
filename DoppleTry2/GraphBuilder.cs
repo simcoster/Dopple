@@ -90,6 +90,7 @@ namespace Dopple
                 bool shouldRunDynamicTrace;
                 //MergeSingleOperationNodes();
                 ResolveVirtualMethods(out shouldRerun, out shouldRunDynamicTrace);
+              //  shouldRerun = false;
              
                 //SetInstructionIndexes();
                 isFirstRun = false;

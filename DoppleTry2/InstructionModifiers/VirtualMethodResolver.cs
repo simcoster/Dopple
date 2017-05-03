@@ -75,7 +75,9 @@ namespace Dopple
                         bool typeFound = TryGetObjectType(dataOriginNode, out objectTypeReference);
                         if (!typeFound)
                         {
-                            throw new Exception("Couldn't detect type of node" + dataOriginNode.Instruction);
+                            Console.WriteLine("couldnt detect type of node " + dataOriginNode.Instruction +" offset:" + dataOriginNode.Instruction.Offset);
+                            continue;
+                            //throw new Exception("Couldn't detect type of node" + dataOriginNode.Instruction);
                         }
                         TypeDefinition objectTypeDefinition = null;
                         if (objectTypeReference.IsArray)

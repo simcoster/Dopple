@@ -100,8 +100,6 @@ namespace Dopple.BackTracers
             }
             while (true)
             {
-                Console.WriteLine("now at " + currentNode.InstructionIndex + currentNode.Instruction);
-                Console.WriteLine("state providers contains stelem? " + stateProviders._StateProviders.Any(x => x is StElemStateProvider));
                 GlobalVisited.Add(currentNode);
                 bool reachedMergeNodeNotLast;
                 ActOnCurrentNode(currentNode, mergingNodesData, lastNode, ref stateProviders, out reachedMergeNodeNotLast);
@@ -110,10 +108,9 @@ namespace Dopple.BackTracers
                     return;
                 }
                 visitCount[currentNode]++;
-                if (visitCount[currentNode] > 3 && currentNode.ProgramFlowBackRoutes.Count == 1)
+                if (!(currentNode is ConditionalJumpNode)  &&visitCount[currentNode] > currentNode.BranchProperties.Branches.Count(x => x.BranchType == BranchType.Loop)*2+1 && currentNode.ProgramFlowBackRoutes.Count == 1)
                 {
-
-                    //return;
+                    return;
                 }
                 lastNode = currentNode;
                 if (currentNode.ProgramFlowForwardRoutes.Count == 1)
@@ -130,16 +127,18 @@ namespace Dopple.BackTracers
                     }
                     else if (firstInLoopNodes.Count ==1 )
                     {
+                        need to implement an algorithm where outer loop causes mini loop to reset
+                        do outer once, then inner twice, then outer again, then inner twice again
                         var loopNode = firstInLoopNodes[0];
                         if (visitCount[loopNode] < loopNode.BranchProperties.Branches.Count(x => x.BranchType == BranchType.Loop)*2)
                         {
-                            Console.WriteLine("looping at " + loopNode.InstructionIndex);
+                            //Console.WriteLine("looping at " + loopNode.InstructionIndex);
                             currentNode = loopNode;
                             continue;
                         }
                         else
                         {
-                            Console.WriteLine("looped more than twice at " + loopNode.InstructionIndex);
+                            //Console.WriteLine("looped more than twice at " + loopNode.InstructionIndex);
                             break;
                         }
                     }

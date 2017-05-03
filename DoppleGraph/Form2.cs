@@ -469,7 +469,7 @@ namespace DoppleGraph
                     return Color.Yellow;
 
                 default:
-                    throw new Exception("no one here");
+                    return Color.Lavender;
             }
         }
 
@@ -518,10 +518,10 @@ namespace DoppleGraph
         {
             foreach (var node in colNodes)
             {
-                //var nodesToUpdate = node.InstructionNode.DataFlowForwardRelated
-                var nodesToUpdate = node.InstructionNode.ProgramFlowForwardRoutes
-               //.Select(x => GetNodeWrapper(x.Argument))
-               .Select(x => GetNodeWrapper(x))
+                var nodesToUpdate = node.InstructionNode.DataFlowForwardRelated
+                //var nodesToUpdate = node.InstructionNode.ProgramFlowForwardRoutes
+               .Select(x => GetNodeWrapper(x.Argument))
+               //.Select(x => GetNodeWrapper(x))
                //TODO remove, this hides a problem
                .Where(x => x.LongestPath.Count == 0 || !x.LongestPath.Intersect(node.LongestPath).SequenceEqual(x.LongestPath))
                .Where(x => x.LongestPath.Count < node.LongestPath.Count + 1)
