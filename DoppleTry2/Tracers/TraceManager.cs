@@ -127,10 +127,8 @@ namespace Dopple.BackTracers
                     }
                     else if (firstInLoopNodes.Count ==1 )
                     {
-                        need to implement an algorithm where outer loop causes mini loop to reset
-                        do outer once, then inner twice, then outer again, then inner twice again
                         var loopNode = firstInLoopNodes[0];
-                        if (visitCount[loopNode] < loopNode.BranchProperties.Branches.Count(x => x.BranchType == BranchType.Loop)*2)
+                        if (visitCount[loopNode] < 2)
                         {
                             //Console.WriteLine("looping at " + loopNode.InstructionIndex);
                             currentNode = loopNode;
@@ -139,6 +137,7 @@ namespace Dopple.BackTracers
                         else
                         {
                             //Console.WriteLine("looped more than twice at " + loopNode.InstructionIndex);
+                            visitCount[loopNode] = 0;
                             break;
                         }
                     }

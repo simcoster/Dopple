@@ -97,12 +97,12 @@ namespace Dopple
                 runCounter++;
             }
             //RecursionFix();
-            //RemoveHelperCodes();
+            RemoveHelperCodes();
             //RemoveAndStitchDynamicDataConnections();
 
             //_backTraceManager.ForwardDynamicData(InstructionNodes);
-            //MergeSimilarInstructions();
-            //MergeEquivilentPairs();
+            MergeSimilarInstructions();
+            MergeEquivilentPairs();
             //AddZeroNode();
             BranchProperties.BaseBranch.RemoveAllTwoWay();
             //Verify();
@@ -208,6 +208,7 @@ namespace Dopple
             RemoveAndStitchNodes(InstructionNodes.Where(x => new[] { Code.Br, Code.Br_S }.Contains(x.Instruction.OpCode.Code)));
             RemoveAndStitchNodes(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Nop));
             RemoveAndStitchNodes(InstructionNodes.Where(x => x.Instruction.OpCode.Code == Code.Dup));
+            RemoveAndStitchNodes(InstructionNodes.Where(x => CodeGroups.ConvCodes.Contains(x.Instruction.OpCode.Code)));
             RemoveAndStitchNodes(InstructionNodes.Where(x => x.InliningProperties.Inlined && x is LdArgInstructionNode && x.DataFlowBackRelated.Count > 0 && !x.DataFlowBackRelated.SelfFeeding));
             RemoveAndStitchNodes(InstructionNodes.Where(x => x is RetInstructionNode && x.InliningProperties.Inlined && !x.DataFlowBackRelated.SelfFeeding));
         }

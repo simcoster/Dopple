@@ -10,6 +10,11 @@ namespace Dopple
     public static class CodeGroups
     {
         public static OpCode[] AllOpcodes = typeof(OpCodes).GetFields().Select(x => x.GetValue(null)).Cast<OpCode>().ToArray();
+        public static Code[] ConvCodes = {Code.Conv_I, Code.Conv_I1, Code.Conv_I2 , Code.Conv_I4 , Code.Conv_I8, Code.Conv_Ovf_I, Code.Conv_Ovf_I1,
+                                              Code.Conv_Ovf_I1_Un, Code.Conv_Ovf_I2, Code.Conv_Ovf_I2_Un, Code.Conv_Ovf_I4 , Code.Conv_Ovf_I4_Un, Code.Conv_Ovf_I8,
+                                              Code.Conv_Ovf_I8_Un, Code.Conv_Ovf_I_Un, Code.Conv_Ovf_U, Code.Conv_Ovf_U1, Code.Conv_Ovf_U1_Un, Code.Conv_Ovf_U2,
+                                               Code.Conv_Ovf_U2_Un, Code.Conv_Ovf_U4, Code.Conv_Ovf_U4_Un, Code.Conv_Ovf_U8, Code.Conv_Ovf_U8_Un, Code.Conv_Ovf_U_Un,
+                                              Code.Conv_R4, Code.Conv_R8, Code.Conv_R_Un, Code.Conv_U, Code.Conv_U1, Code.Conv_U2, Code.Conv_U4, Code.Conv_U8};
         public static Code[] CallCodes     = { Code.Call, Code.Calli};
         public static Code[] LdArgCodes    = { Code.Ldarg, Code.Ldarg_0, Code.Ldarg_1, Code.Ldarg_2, Code.Ldarg_3, Code.Ldarg_S};
         public static Code[] StArgCodes   =  { Code.Starg, Code.Starg_S};
