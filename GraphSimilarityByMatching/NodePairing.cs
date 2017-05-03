@@ -16,5 +16,7 @@ namespace GraphSimilarityByMatching
         public List<LabeledVertex> SourceGraph { get; set; }
         public Dictionary<LabeledVertex, ConcurrentBag<VertexMatch>> Pairings { get; set; } = new Dictionary<LabeledVertex, ConcurrentBag<VertexMatch>>();
         public double TotalScore { get; set; } = 0;
+        public NodePairings SourceSelfScore { get; internal set; }
+        public NodePairings ImageSelfScore { get; internal set; }
     }
 }

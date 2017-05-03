@@ -41,6 +41,8 @@ namespace GraphSimilarityByMatching
                     }
                 }
             });
+            bestMatch.SourceSelfScore = GetGraphSelfScore(sourceGraphLabeled);
+            bestMatch.ImageSelfScore = GetGraphSelfScore(imageGraphLabeled);
             return bestMatch ;
         }
 

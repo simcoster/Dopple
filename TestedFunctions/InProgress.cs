@@ -9,28 +9,28 @@ namespace TestedFunctions
 {
     public class InProgress
     {
-        public static void insertionSort(int[] array)
-        {
-            for (int i = 0; i < array.Length - 1; i++)
-            {
-                int nextMin = int.MaxValue;
-                int nextMinIndex = -1;
-                for (int j = i; j < array.Length; j++)
-                {
-                    if (array[j] < nextMin)
-                    {
-                        nextMin = array[j];
-                        nextMinIndex = j;
-                    }
-                }
-                if (nextMin < array[i])
-                {
-                    int temp = array[i];
-                    array[i] = array[nextMinIndex];
-                    array[nextMinIndex] = temp;
-                }
-            }
-        }
+        //public static void insertionSort(int[] array)
+        //{
+        //    for (int i = 0; i < array.Length - 1; i++)
+        //    {
+        //        int nextMin = int.MaxValue;
+        //        int nextMinIndex = -1;
+        //        for (int j = i; j < array.Length; j++)
+        //        {
+        //            if (array[j] < nextMin)
+        //            {
+        //                nextMin = array[j];
+        //                nextMinIndex = j;
+        //            }
+        //        }
+        //        if (nextMin < array[i])
+        //        {
+        //            int temp = array[i];
+        //            array[i] = array[nextMinIndex];
+        //            array[nextMinIndex] = temp;
+        //        }
+        //    }
+        //}
 
         //public static void insertionSortWithHelpers(int[] array)
         //{
@@ -127,20 +127,23 @@ namespace TestedFunctions
         //    return sum;
         //}
 
-        //public static int TestSumForLoop(Helper[] nums)
-        //{
-        //    int sum = 0;
-        //    for (int i = 0; i < nums.Length; i++)
-        //    {
-        //        sum += nums[i].Number;
-        //    }
-        //    return sum;
-        //}
+        public static int TestSumForLoop(int[] nums)
+        {
+            int sum = 0;
+            for (int i = 0; i < nums.Length; i++)
+            {
+                if (nums[i] > 7)
+                {
+                    sum += nums[i];
+                }
+            }
+            return sum;
+        }
 
-        //public static int SumMe(IEnumerable<Helper> nums)
-        //{
-        //    return nums.Sum(x => x.Number);
-        //}
+        public static int SumMe(int[] nums)
+        {
+            return nums.Where(x => x >7).Sum();
+        }
 
         //public static int DynamicGames(int index)
         //{
