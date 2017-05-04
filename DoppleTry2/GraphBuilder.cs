@@ -97,12 +97,12 @@ namespace Dopple
                 runCounter++;
             }
             //RecursionFix();
-            RemoveHelperCodes();
+            //RemoveHelperCodes();
             //RemoveAndStitchDynamicDataConnections();
 
             //_backTraceManager.ForwardDynamicData(InstructionNodes);
-            MergeSimilarInstructions();
-            MergeEquivilentPairs();
+            //MergeSimilarInstructions();
+            //MergeEquivilentPairs();
             //AddZeroNode();
             BranchProperties.BaseBranch.RemoveAllTwoWay();
             //Verify();
