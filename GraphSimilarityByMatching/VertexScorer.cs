@@ -10,15 +10,15 @@ namespace GraphSimilarityByMatching
 {
     public static class VertexScorer
     {
-        private const int ImportantCodeMultiplier = 1;
-        private const int RetBackTreeMultiplier = 1;
+        private const int ImportantCodeMultiplier = 5;
+        private const int RetBackTreeMultiplier = 5;
 
 
-        private static readonly List<Code> ImportantCodes = CodeGroups.LdElemCodes.Concat(CodeGroups.StElemCodes).Concat(CodeGroups.ArithmeticCodes).Concat(new[] { Code.Ret }).ToList();
+        private static readonly Code[] ImportantCodes = new Code[] { }.Concat(CodeGroups.StoreFieldCodes).Concat(CodeGroups.StElemCodes).Concat(CodeGroups.ArithmeticCodes).Concat(new[] { Code.Ret }).ToArray();
 
-        public static int GetScore(LabeledVertex sourceGraphVertex, LabeledVertex imageGraphVertex, NodePairings pairings)
+        public static double GetScore(LabeledVertex sourceGraphVertex, LabeledVertex imageGraphVertex, NodePairings pairings)
         {
-            int score = 0;
+            double score = 0;
             if (sourceGraphVertex.Opcode == imageGraphVertex.Opcode)
             {
                 score += VertexScorePoints.CodeMatch;
@@ -38,17 +38,19 @@ namespace GraphSimilarityByMatching
             {
                 if (pairings.Pairings[imageGraphVertex].Count > 0)
                 {
-                    score -= VertexScorePoints.SingleToMultipleVertexMatchPenalty;
+                    //score -= VertexScorePoints.SingleToMultipleVertexMatchPenalty;
+                    score *= 0.9;
                 }
             }
             if (ImportantCodes.Contains(sourceGraphVertex.Opcode))
             {
                 score *= ImportantCodeMultiplier;
             }
-            if (sourceGraphVertex.IsInReturnBackTree)
-            {
-                score *= RetBackTreeMultiplier;
-            }
+            //if (sourceGraphVertex.IsInReturnBackTree)
+            //{
+            //    score *= RetBackTreeMultiplier;
+            //}
+            var scoreToDouble = score / GetSelfScore(sourceGraphVertex); 
             return score;
         }
 
@@ -78,10 +80,6 @@ namespace GraphSimilarityByMatching
             if (ImportantCodes.Contains(labeledVertex.Opcode))
             {
                 selfScore *= ImportantCodeMultiplier;
-            }
-            if (labeledVertex.IsInReturnBackTree)
-            {
-                selfScore *= RetBackTreeMultiplier;
             }
             return selfScore;
         }

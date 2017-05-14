@@ -52,23 +52,24 @@ namespace DoppleGraph
             var frontLayer = myView.Document.Layers.CreateNewLayerAfter(myView.Document.LinksLayer);
             int column = 0;
             int row = 0;
-            foreach (var imageNode in ImageGraphNodes)
+            foreach (var imageNodeLabled in _pairings.Pairings.Keys.OrderByDescending(x => _pairings.Pairings[x].Count))
             {
                 if (row >100)
                 {
                     row = 0;
                     column +=2;
                 }
-                SetShape(frontLayer, imageNode);
-                frontLayer.Add(imageNode.Node);
-                imageNode.Node.Location = new PointF(column * ColumnOffset, row * RowOffset);
-                foreach(var sourceNodePairing in _pairings.Pairings[imageNode.LabledVertex])
+                var imageNodeWrapper = ImageGraphNodes.First(x => x.LabledVertex == imageNodeLabled);
+                SetShape(frontLayer, imageNodeWrapper);
+                frontLayer.Add(imageNodeWrapper.Node);
+                imageNodeWrapper.Node.Location = new PointF(column * ColumnOffset, row * RowOffset);
+                foreach(var sourceNodePairing in _pairings.Pairings[imageNodeWrapper.LabledVertex])
                 {
                     var sourceLabledVertex = new GoLabeledVertexWrapper(new GoTextNodeHoverable(), sourceNodePairing.SourceGraphVertex);
                     SetShape(frontLayer,sourceLabledVertex);
                     frontLayer.Add(sourceLabledVertex.Node);
                     sourceLabledVertex.Node.Location = new PointF((column + 1) * ColumnOffset, row * RowOffset);
-                    DrawPairingEdge(sourceLabledVertex.Node, imageNode.Node, sourceNodePairing.NormalizedScore, frontLayer);
+                    DrawPairingEdge(sourceLabledVertex.Node, imageNodeWrapper.Node, sourceNodePairing.NormalizedScore, frontLayer);
                     row++;
                 }
                 row++;

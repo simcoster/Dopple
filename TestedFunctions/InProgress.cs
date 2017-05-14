@@ -9,28 +9,28 @@ namespace TestedFunctions
 {
     public class InProgress
     {
-        public static void insertionSort(int[] array)
-        {
-            for (int i = 0; i < array.Length - 1; i++)
-            {
-                int nextMin = int.MaxValue;
-                int nextMinIndex = -1;
-                for (int j = i; j < array.Length; j++)
-                {
-                    if (array[j] < nextMin)
-                    {
-                        nextMin = array[j];
-                        nextMinIndex = j;
-                    }
-                }
-                if (nextMin < array[i])
-                {
-                    int temp = array[i];
-                    array[i] = array[nextMinIndex];
-                    array[nextMinIndex] = temp;
-                }
-            }
-        }
+        //public static void insertionSort(int[] array)
+        //{
+        //    for (int i = 0; i < array.Length - 1; i++)
+        //    {
+        //        int nextMin = int.MaxValue;
+        //        int nextMinIndex = -1;
+        //        for (int j = i; j < array.Length; j++)
+        //        {
+        //            if (array[j] < nextMin)
+        //            {
+        //                nextMin = array[j];
+        //                nextMinIndex = j;
+        //            }
+        //        }
+        //        if (nextMin < array[i])
+        //        {
+        //            int temp = array[i];
+        //            array[i] = array[nextMinIndex];
+        //            array[nextMinIndex] = temp;
+        //        }
+        //    }
+        //}
 
         //public static void insertionSortWithHelpers(int[] array)
         //{
@@ -109,7 +109,7 @@ namespace TestedFunctions
         //    answer = a + b;
         //}
 
-        //public static int SumThroughLinq(int[] nums)
+        //public static int SumIntsLinq(int[] nums)
         //{
         //    return nums.Sum();
         //}
@@ -117,7 +117,7 @@ namespace TestedFunctions
         //{
         //    return nums.Sum(x => x.Number);
         //}
-        //public static int TestSumForeachLoop(List<Helper> nums)
+        //public static int TestSumObjectMemeberForeachLoop(List<Helper> nums)
         //{
         //    int sum = 0;
         //    foreach (var num in nums)
@@ -127,20 +127,20 @@ namespace TestedFunctions
         //    return sum;
         //}
 
-        //public static int TestSumForLoop(Helper[] nums)
-        //{
-        //    int sum = 0;
-        //    for (int i = 0; i < nums.Length; i++)
-        //    {
-        //        if (nums[i].Number > 7)
-        //        {
-        //            sum += nums[i].Number;
-        //        }
-        //    }
-        //    return sum;
-        //}
+        public static int TestSumBiggerThan7ForLoop(int[] nums)
+        {
+            int sum = 0;
+            for (int i = 0; i < nums.Length; i++)
+            {
+                if (nums[i] > 7)
+                {
+                    sum += nums[i];
+                }
+            }
+            return sum;
+        }
 
-        public static int SumMe(int[] nums)
+        public static int SumIntsWhereBiggerThan7Linq(int[] nums)
         {
             return nums.Where(x => x > 7).Sum();
         }
@@ -158,78 +158,79 @@ namespace TestedFunctions
         //    return a;
         //}
 
-        //public static void QuickSortMiddle(int[] arr)
-        //{
-        //    QuicksortMiddleRec(arr, 0, arr.Length);
-        //}
-
-        //public static void QuicksortMiddleRec(int[] elements, int left, int right)
-        //{
-        //    int i = left, j = right;
-        //    int pivot = elements[(left + right) / 2];
-
-        //    while (i <= j)
+        //    public static void QuickSortMiddle(int[] arr)
         //    {
-        //        while (elements[i] < pivot)
-        //        {
-        //            i++;
-        //        }
-
-        //        while (elements[j] > pivot)
-        //        {
-        //            j--;
-        //        }
-
-        //        if (i <= j)
-        //        {
-        //            //Swap
-        //            int tmp = elements[i];
-        //            elements[i] = elements[j];
-        //            elements[j] = tmp;
-
-        //            i++;
-        //            j--;
-        //        }
+        //        QuicksortMiddleRec(arr, 0, arr.Length);
         //    }
 
-        //    //Recursive calls
-        //    if (left < j)
+        //    public static void QuicksortMiddleRec(int[] elements, int left, int right)
         //    {
-        //        QuicksortMiddleRec(elements, left, j);
-        //    }
+        //        int i = left, j = right;
+        //        int pivot = elements[(left + right) / 2];
 
-        //    if (i < right)
-        //    {
-        //        QuicksortMiddleRec(elements, i, right);
-        //    }
-        //}
-
-
-
-        //static void BubbleSort(int[] number)
-        //{
-        //    bool flag = true;
-        //    int temp;
-        //    int numLength = number.Length;
-        //    //sorting an array
-        //    for (int i = 1; (i <= (numLength - 1)) && flag; i++)
-        //    {
-        //        flag = false;
-        //        for (int j = 0; j < (numLength - 1); j++)
+        //        while (i <= j)
         //        {
-        //            if (number[j + 1] > number[j])
+        //            while (elements[i] < pivot)
         //            {
-        //                temp = number[j];
-        //                number[j] = number[j + 1];
-        //                number[j + 1] = temp;
-        //                flag = true;
+        //                i++;
+        //            }
+
+        //            while (elements[j] > pivot)
+        //            {
+        //                j--;
+        //            }
+
+        //            if (i <= j)
+        //            {
+        //                //Swap
+        //                int tmp = elements[i];
+        //                elements[i] = elements[j];
+        //                elements[j] = tmp;
+
+        //                i++;
+        //                j--;
+        //            }
+        //        }
+
+        //        //Recursive calls
+        //        if (left < j)
+        //        {
+        //            QuicksortMiddleRec(elements, left, j);
+        //        }
+
+        //        if (i < right)
+        //        {
+        //            QuicksortMiddleRec(elements, i, right);
+        //        }
+        //    }
+
+
+
+        //    static void BubbleSort(int[] number)
+        //    {
+        //        bool flag = true;
+        //        int temp;
+        //        int numLength = number.Length;
+        //        //sorting an array
+        //        for (int i = 1; (i <= (numLength - 1)) && flag; i++)
+        //        {
+        //            flag = false;
+        //            for (int j = 0; j < (numLength - 1); j++)
+        //            {
+        //                if (number[j + 1] > number[j])
+        //                {
+        //                    temp = number[j];
+        //                    number[j] = number[j + 1];
+        //                    number[j + 1] = temp;
+        //                    flag = true;
+        //                }
         //            }
         //        }
         //    }
         //}
     }
 
-    public class Helper
+        public class Helper
     {
         public int Number;
         public Helper anotherHelper;

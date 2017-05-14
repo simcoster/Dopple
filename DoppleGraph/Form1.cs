@@ -40,49 +40,34 @@ namespace DoppleGraph
             }
 
             var csv = new StringBuilder();
-            csv.Append(',');
-            for (int i = 0; i < Graphs.Count ; i++)
-            {
-                csv.Append(Graphs[i][0].Method.Name);
-                csv.Append(',');
-            }
-            csv.AppendLine();
             for (int i =0; i<Graphs.Count; i++)
             {
-                for (int j=-1; j < Graphs.Count; j++)
+                for (int j = i+1; j < Graphs.Count; j++)
                 {
-                    if (j==-1)
-                    {
-                        csv.Append(Graphs[i][0].Method.Name);
-                    }
-                    else if (i!=j)
-                    //else if (true)
-                    {
-                        csv.Append(NewMethod(Graphs[i], Graphs[j]));
-                    }
-                    csv.Append(",");
+                    csv.Append(GetContainedScore(Graphs[i], Graphs[j]));
                 }
                 csv.AppendLine();
             }
-            File.WriteAllText("C:\\temp\\comparisons.csv", csv.ToString());
+            File.WriteAllText("C:\\temp\\comparisons.txt", csv.ToString());
         }
 
-        private static double NewMethod(List<InstructionNode> Graph1, List<InstructionNode> Graph2)
+        private static string GetContainedScore(List<InstructionNode> Graph1, List<InstructionNode> Graph2)
         {
             NodePairings pairing1 = GraphSimilarityCalc.GetDistance(Graph1, Graph2);
             NodePairings pairing2 = GraphSimilarityCalc.GetDistance(Graph2, Graph1);
-            //if (Graph1 != Graph2)
-            if (true)
-            {
-                var newFormm = new NodePairingGraph(pairing2);
-                newFormm.Show();
-                var newFormmm = new NodePairingGraph(pairing1);
-                newFormmm.Show();
-            }
-            double Score1 = pairing1.TotalScore;
-            double Score2 = pairing2.TotalScore;
-            Console.WriteLine("{0} = {1} {2}", Graph1[0].Method.Name, Graph2[0].Method.Name, (Score1+ Score2)/ (pairing1.SourceSelfScore.TotalScore + pairing1.ImageSelfScore.TotalScore));
-            return 0;
+          
+            double Graph1ContainedIn2Score = pairing1.TotalScore / pairing1.SourceSelfScore.TotalScore;
+            double Graph2ContainedIn1Score = pairing2.TotalScore / pairing2.SourceSelfScore.TotalScore;
+            double totalScoreAverage = (Graph1ContainedIn2Score + Graph2ContainedIn1Score) / (pairing1.SourceSelfScore.TotalScore + pairing1.ImageSelfScore.TotalScore);
+            var newFormm = new NodePairingGraph(pairing2);
+            newFormm.Show();
+            var newFormmm = new NodePairingGraph(pairing1);
+            newFormmm.Show();
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine(string.Format("{0} --> {1} = {2}", pairing1.SourceGraph.First().Method.Name, pairing1.ImageGraph.First().Method.Name, Graph1ContainedIn2Score));
+            sb.AppendLine(string.Format("{0} --> {1} = {2}", pairing2.SourceGraph.First().Method.Name, pairing2.ImageGraph.First().Method.Name, Graph2ContainedIn1Score));
+            sb.AppendLine(string.Format("{0} <-> {1} = {2}", pairing1.SourceGraph.First().Method.Name, pairing1.ImageGraph.First().Method.Name, totalScoreAverage));
+            return sb.ToString();
         }
     }
 }

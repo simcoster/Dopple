@@ -96,13 +96,13 @@ namespace Dopple
                 isFirstRun = false;
                 runCounter++;
             }
-            //RecursionFix();
-            //RemoveHelperCodes();
+            RecursionFix();
+            RemoveHelperCodes();
             //RemoveAndStitchDynamicDataConnections();
 
-            //_backTraceManager.ForwardDynamicData(InstructionNodes);
-            //MergeSimilarInstructions();
-            //MergeEquivilentPairs();
+            _backTraceManager.ForwardDynamicData(InstructionNodes);
+            MergeSimilarInstructions();
+            MergeEquivilentPairs();
             //AddZeroNode();
             BranchProperties.BaseBranch.RemoveAllTwoWay();
             //Verify();

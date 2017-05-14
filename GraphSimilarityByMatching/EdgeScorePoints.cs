@@ -10,7 +10,7 @@ namespace GraphSimilarityByMatching
     {
         public const int IndexMatch = 1;
         public const int TargetVertexCodeFamilyMatch = VertexScorePoints.CodeFamilyMatch;
-        public const int TargetVertexCodeExactMatch = VertexScorePoints.ExactMatch;
+        public const int TargetVertexCodeExactMatch = VertexScorePoints.CodeMatch;
         public const int TargetVertexArePaired =1;
         public const int ExactMatch = IndexMatch  + TargetVertexCodeExactMatch;
     }

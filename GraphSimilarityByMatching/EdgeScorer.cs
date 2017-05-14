@@ -38,7 +38,7 @@ namespace GraphSimilarityByMatching
                 }
                 else
                 {
-                    indexImportance = opCodeInfo.GetIndexImportance(vertexToMatch.Opcode);
+                    indexImportance = opCodeInfo.GetIndexImportance(sourceVertexEdge.DestinationVertex.Opcode);
                 }
                 Func<LabeledEdge, bool> predicate;
                 if (indexImportance == IndexImportance.Critical)
@@ -61,6 +61,7 @@ namespace GraphSimilarityByMatching
                     var winningMatch = winningMatchGroup.OrderBy(x => rnd.Next()).First();
                     unmachedImageVertexEdges.Remove(winningMatch.ImageGraphEdge);
                     winningMatch.Score = GetEdgeMatchScore(sourceVertexEdge, winningMatch.ImageGraphEdge, sharedSourceOrDest, pairings, indexImportance, false);
+                    var scoreRelatedToMax = (double)winningMatch.Score / GetEdgeMatchScore(sourceVertexEdge, sourceVertexEdge, sharedSourceOrDest, pairings, IndexImportance.Important, false);
                     edgePairings.Add(winningMatch);
                     totalScore += winningMatch.Score;
                 }
