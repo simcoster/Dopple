@@ -11,7 +11,6 @@ namespace TestedFunctions
     {
         public static void insertionSort(int[] array)
         {
-            int b =0;
             for (int i = 0; i < array.Length - 1; i++)
             {
                 int nextMin = int.MaxValue;
@@ -34,49 +33,49 @@ namespace TestedFunctions
             return;
         }
 
-        //public static void insertionSortWithHelpers(int[] array)
-        //{
-        //    for (int i = 0; i < array.Length - 1; i++)
-        //    {
-        //        int nextMin = int.MaxValue;
-        //        int nextMinIndex = -1;
-        //        for (int j = i; j < array.Length; j++)
-        //        {
-        //            if (array[j] < nextMin)
-        //            {
-        //                nextMin = array[j];
-        //                nextMinIndex = j;
-        //            }
-        //        }
-        //        if (nextMin < array[i])
-        //        {
-        //            swapTwo(array, i, nextMinIndex);
-        //        }
-        //    }
-        //}
+        public static void insertionSortWithHelpers(int[] array)
+        {
+            for (int i = 0; i < array.Length - 1; i++)
+            {
+                int nextMin = int.MaxValue;
+                int nextMinIndex = -1;
+                for (int j = i; j < array.Length; j++)
+                {
+                    if (array[j] < nextMin)
+                    {
+                        nextMin = array[j];
+                        nextMinIndex = j;
+                    }
+                }
+                if (nextMin < array[i])
+                {
+                    swapTwo(array, i, nextMinIndex);
+                }
+            }
+        }
 
-        //public static void swapTwo(int[] array, int i, int j)
-        //{
-        //    int temp = array[i];
-        //    array[i] = array[j];
-        //    array[j] = temp;
-        //}
+        public static void swapTwo(int[] array, int i, int j)
+        {
+            int temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+        }
 
-        //public static void findMinAndIndex(int[] array, int startIndex, out int minValue, out int minIndex)
-        //{
-        //    int currentMin = int.MaxValue;
-        //    int currentMinIndex = -1;
-        //    for (int i = startIndex; i < array.Length; i++)
-        //    {
-        //        if (array[i] < currentMin)
-        //        {
-        //            currentMin = array[i];
-        //            currentMinIndex = i;
-        //        }
-        //    }
-        //    minValue = currentMin;
-        //    minIndex = currentMinIndex;
-        //}
+        public static void findMinAndIndex(int[] array, int startIndex, out int minValue, out int minIndex)
+        {
+            int currentMin = int.MaxValue;
+            int currentMinIndex = -1;
+            for (int i = startIndex; i < array.Length; i++)
+            {
+                if (array[i] < currentMin)
+                {
+                    currentMin = array[i];
+                    currentMinIndex = i;
+                }
+            }
+            minValue = currentMin;
+            minIndex = currentMinIndex;
+        }
 
         public int[] SelectionSort(int[] arr)
         {
@@ -160,79 +159,79 @@ namespace TestedFunctions
         //    return a;
         //}
 
-        //    public static void QuickSortMiddle(int[] arr)
-        //    {
-        //        QuicksortMiddleRec(arr, 0, arr.Length);
-        //    }
+        public static void QuickSortMiddle(int[] arr)
+        {
+            QuicksortMiddleRec(arr, 0, arr.Length);
+        }
 
-        //    public static void QuicksortMiddleRec(int[] elements, int left, int right)
-        //    {
-        //        int i = left, j = right;
-        //        int pivot = elements[(left + right) / 2];
+        public static void QuicksortMiddleRec(int[] elements, int left, int right)
+        {
+            int i = left, j = right;
+            int pivot = elements[(left + right) / 2];
 
-        //        while (i <= j)
-        //        {
-        //            while (elements[i] < pivot)
-        //            {
-        //                i++;
-        //            }
+            while (i <= j)
+            {
+                while (elements[i] < pivot)
+                {
+                    i++;
+                }
 
-        //            while (elements[j] > pivot)
-        //            {
-        //                j--;
-        //            }
+                while (elements[j] > pivot)
+                {
+                    j--;
+                }
 
-        //            if (i <= j)
-        //            {
-        //                //Swap
-        //                int tmp = elements[i];
-        //                elements[i] = elements[j];
-        //                elements[j] = tmp;
+                if (i <= j)
+                {
+                    //Swap
+                    int tmp = elements[i];
+                    elements[i] = elements[j];
+                    elements[j] = tmp;
 
-        //                i++;
-        //                j--;
-        //            }
-        //        }
+                    i++;
+                    j--;
+                }
+            }
 
-        //        //Recursive calls
-        //        if (left < j)
-        //        {
-        //            QuicksortMiddleRec(elements, left, j);
-        //        }
+            //Recursive calls
+            if (left < j)
+            {
+                QuicksortMiddleRec(elements, left, j);
+            }
 
-        //        if (i < right)
-        //        {
-        //            QuicksortMiddleRec(elements, i, right);
-        //        }
-        //    }
+            if (i < right)
+            {
+                QuicksortMiddleRec(elements, i, right);
+            }
+        }
 
 
 
-        //    static void BubbleSort(int[] number)
-        //    {
-        //        bool flag = true;
-        //        int temp;
-        //        int numLength = number.Length;
-        //        //sorting an array
-        //        for (int i = 1; (i <= (numLength - 1)) && flag; i++)
-        //        {
-        //            flag = false;
-        //            for (int j = 0; j < (numLength - 1); j++)
-        //            {
-        //                if (number[j + 1] > number[j])
-        //                {
-        //                    temp = number[j];
-        //                    number[j] = number[j + 1];
-        //                    number[j + 1] = temp;
-        //                    flag = true;
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
+        static void BubbleSort(int[] number)
+        {
+            bool flag = true;
+            int temp;
+            int numLength = number.Length;
+            //sorting an array
+            for (int i = 1; (i <= (numLength - 1)) && flag; i++)
+            {
+                flag = false;
+                for (int j = 0; j < (numLength - 1); j++)
+                {
+                    if (number[j + 1] > number[j])
+                    {
+                        temp = number[j];
+                        number[j] = number[j + 1];
+                        number[j + 1] = temp;
+                        flag = true;
+                    }
+                }
+            }
+        }
     }
 
-        public class Helper
+
+    public class Helper
     {
         public int Number;
         public Helper anotherHelper;

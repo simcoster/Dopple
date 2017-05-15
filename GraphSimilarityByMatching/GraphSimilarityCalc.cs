@@ -18,9 +18,11 @@ namespace GraphSimilarityByMatching
         {
             List<LabeledVertex> sourceGraphLabeled = GetLabeled(sourceGraph);
             List<LabeledVertex> imageGraphLabeled = GetLabeled(imageGraph);
-            var retNodes = sourceGraph.Where(x => x.Instruction.OpCode.Code == Code.Ret);
-            var backRetTree = retNodes.SelectMany(x => BackSearcher.GetBackDataTree(x)).Distinct().Concat(retNodes).Select(x => x.InstructionIndex).ToList();
-            foreach(var backRetNode in sourceGraphLabeled.Where(x => backRetTree.Contains(x.Index)))
+            var retNodes = sourceGraph.Where(x => VertexScorer.OutDataCodes.Contains(x.Instruction.OpCode.Code));
+            var backRetTree = retNodes.SelectMany(x => BackSearcher.GetBackDataTree(x)).Distinct().Concat(retNodes).ToList();
+            backRetTree.AddRange(backRetTree.ToList().SelectMany(x => x.BranchProperties.Branches.Select(y => y.OriginatingNode)));
+            var backRetTreeIndexes = backRetTree.Select(x => x.InstructionIndex).ToList();
+            foreach(var backRetNode in sourceGraphLabeled.Where(x => backRetTreeIndexes.Contains(x.Index)))
             {
                 backRetNode.IsInReturnBackTree = true;
             }
@@ -53,7 +55,6 @@ namespace GraphSimilarityByMatching
             Dictionary<Code[], IEnumerable<LabeledVertex>> sourceGraphGrouped;
             Dictionary<Code[], IEnumerable<LabeledVertex>> imageGraphGrouped;
             GetGrouped(sourceGraphLabeled: sourceGraphLabeled, imageGraphLabeled: imageGraphLabeled, sourceGraphGrouped: out sourceGraphGrouped, imageGraphGrouped: out imageGraphGrouped);
-            var outDatBackTree = sourceGraphGrouped.Where(x => x BackSearcher.GetBackDataTree()
 
             //Parallel.ForEach(sourceGraphGrouped.Keys, (codeGroup) =>
             foreach (var codeGroup in sourceGraphGrouped.Keys)
