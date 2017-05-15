@@ -14,7 +14,6 @@ namespace GraphSimilarityByMatching
     {
         private static readonly CodeInfo opCodeInfo = new CodeInfo();
 
-
         public static NodePairings GetDistance(List<InstructionNode> sourceGraph, List<InstructionNode> imageGraph)
         {
             List<LabeledVertex> sourceGraphLabeled = GetLabeled(sourceGraph);
@@ -54,7 +53,7 @@ namespace GraphSimilarityByMatching
             Dictionary<Code[], IEnumerable<LabeledVertex>> sourceGraphGrouped;
             Dictionary<Code[], IEnumerable<LabeledVertex>> imageGraphGrouped;
             GetGrouped(sourceGraphLabeled: sourceGraphLabeled, imageGraphLabeled: imageGraphLabeled, sourceGraphGrouped: out sourceGraphGrouped, imageGraphGrouped: out imageGraphGrouped);
-
+            var outDatBackTree = sourceGraphGrouped.Where(x => x BackSearcher.GetBackDataTree()
 
             //Parallel.ForEach(sourceGraphGrouped.Keys, (codeGroup) =>
             foreach (var codeGroup in sourceGraphGrouped.Keys)

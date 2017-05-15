@@ -112,6 +112,10 @@ namespace GraphSimilarityByMatching
             {
                 edgeMatchScore *= ImportantEdgeTypeMultiplier;
             }
+            if (sourceEdge.SourceVertex.IsInReturnBackTree && sourceEdge.DestinationVertex.IsInReturnBackTree)
+            {
+                edgeMatchScore *= ImportantEdgeTypeMultiplier;
+            }
             return edgeMatchScore;
         }
     }

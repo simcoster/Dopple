@@ -10,11 +10,10 @@ namespace GraphSimilarityByMatching
 {
     public static class VertexScorer
     {
-        private const int ImportantCodeMultiplier = 5;
-        private const int RetBackTreeMultiplier = 5;
+        private const int ImportantCodeMultiplier = 10;
 
 
-        private static readonly Code[] ImportantCodes = new Code[] { }.Concat(CodeGroups.StoreFieldCodes).Concat(CodeGroups.StElemCodes).Concat(CodeGroups.ArithmeticCodes).Concat(new[] { Code.Ret }).ToArray();
+        public static readonly Code[] OutDataCodes = new Code[] { }.Concat(CodeGroups.StoreFieldCodes).Concat(CodeGroups.StElemCodes).Concat(new[] { Code.Ret }).ToArray();
 
         public static double GetScore(LabeledVertex sourceGraphVertex, LabeledVertex imageGraphVertex, NodePairings pairings)
         {
@@ -42,13 +41,13 @@ namespace GraphSimilarityByMatching
                     score *= 0.9;
                 }
             }
-            if (ImportantCodes.Contains(sourceGraphVertex.Opcode))
+            if (OutDataCodes.Contains(sourceGraphVertex.Opcode))
             {
                 score *= ImportantCodeMultiplier;
             }
             //if (sourceGraphVertex.IsInReturnBackTree)
             //{
-            //    score *= RetBackTreeMultiplier;
+            //    score *= ImportantCodeMultiplier;
             //}
             var scoreToDouble = score / GetSelfScore(sourceGraphVertex); 
             return score;
@@ -77,7 +76,7 @@ namespace GraphSimilarityByMatching
                     selfScore += score;
                 }
             }
-            if (ImportantCodes.Contains(labeledVertex.Opcode))
+            if (OutDataCodes.Contains(labeledVertex.Opcode))
             {
                 selfScore *= ImportantCodeMultiplier;
             }

@@ -58,15 +58,15 @@ namespace DoppleGraph
           
             double Graph1ContainedIn2Score = pairing1.TotalScore / pairing1.SourceSelfScore.TotalScore;
             double Graph2ContainedIn1Score = pairing2.TotalScore / pairing2.SourceSelfScore.TotalScore;
-            double totalScoreAverage = (Graph1ContainedIn2Score + Graph2ContainedIn1Score) / (pairing1.SourceSelfScore.TotalScore + pairing1.ImageSelfScore.TotalScore);
+            double totalScoreAverage = (pairing1.TotalScore + pairing2.TotalScore) / (pairing1.SourceSelfScore.TotalScore + pairing1.ImageSelfScore.TotalScore);
             var newFormm = new NodePairingGraph(pairing2);
             newFormm.Show();
             var newFormmm = new NodePairingGraph(pairing1);
             newFormmm.Show();
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine(string.Format("{0} --> {1} = {2}", pairing1.SourceGraph.First().Method.Name, pairing1.ImageGraph.First().Method.Name, Graph1ContainedIn2Score));
-            sb.AppendLine(string.Format("{0} --> {1} = {2}", pairing2.SourceGraph.First().Method.Name, pairing2.ImageGraph.First().Method.Name, Graph2ContainedIn1Score));
-            sb.AppendLine(string.Format("{0} <-> {1} = {2}", pairing1.SourceGraph.First().Method.Name, pairing1.ImageGraph.First().Method.Name, totalScoreAverage));
+            sb.AppendLine(string.Format("{0} --> {1} = {2}", pairing1.SourceGraph.First().Method.Name, pairing1.ImageGraph.First().Method.Name, Math.Round(Graph1ContainedIn2Score, 4)));
+            sb.AppendLine(string.Format("{0} --> {1} = {2}", pairing2.SourceGraph.First().Method.Name, pairing2.ImageGraph.First().Method.Name, Math.Round(Graph2ContainedIn1Score,4)));
+            sb.AppendLine(string.Format("{0} <-> {1} = {2}", pairing1.SourceGraph.First().Method.Name, pairing1.ImageGraph.First().Method.Name, Math.Round(totalScoreAverage,4)));
             return sb.ToString();
         }
     }
