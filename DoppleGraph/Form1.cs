@@ -15,7 +15,7 @@ namespace DoppleGraph
 {
     public partial class Form1 : Form
     {
-     
+
         public Form1()
         {
             InitializeComponent();
@@ -39,35 +39,61 @@ namespace DoppleGraph
                 newForm.Show();
             }
 
-            var csv = new StringBuilder();
-            for (int i =0; i<Graphs.Count; i++)
-            {
-                for (int j = i+1; j < Graphs.Count; j++)
-                {
-                    csv.Append(GetContainedScore(Graphs[i], Graphs[j]));
-                }
-                csv.AppendLine();
-            }
-            File.WriteAllText("C:\\temp\\comparisons.txt", csv.ToString());
+            WriteTalbe(Graphs, "oneway.csv", false);
+            WriteTalbe(Graphs, "twoway.csv", true);
         }
 
-        private static string GetContainedScore(List<InstructionNode> Graph1, List<InstructionNode> Graph2)
+        private static void WriteTalbe(List<List<InstructionNode>> Graphs, string fileName, bool twoWayMark)
+        {
+            DataTable dt = new DataTable();
+            dt.Columns.Add("Name");
+            foreach (var graph in Graphs)
+            {
+                dt.Columns.Add(graph.First().Method.Name);
+            }
+            for (int i = 0; i < Graphs.Count; i++)
+            {
+                var row = dt.NewRow();
+                row["name"] = Graphs[i].First().Method.Name;
+                for (int j = 0; j < Graphs.Count; j++)
+                {
+                    row[Graphs[j].First().Method.Name] = Math.Round(GetContainedScore(Graphs[i], Graphs[j], twoWayMark), 4);
+                }
+                dt.Rows.Add(row);
+            }
+            StringBuilder sb = new StringBuilder();
+
+            IEnumerable<string> columnNames = dt.Columns.Cast<DataColumn>().
+                                              Select(column => column.ColumnName);
+            sb.AppendLine(string.Join(",", columnNames));
+
+            foreach (DataRow row in dt.Rows)
+            {
+                IEnumerable<string> fields = row.ItemArray.Select(field => field.ToString());
+                sb.AppendLine(string.Join(",", fields));
+            }
+
+            File.WriteAllText("c:\\temp\\" + fileName, sb.ToString());
+        }
+
+        private static double GetContainedScore(List<InstructionNode> Graph1, List<InstructionNode> Graph2, bool twoWayScore)
         {
             NodePairings pairing1 = GraphSimilarityCalc.GetDistance(Graph1, Graph2);
-            NodePairings pairing2 = GraphSimilarityCalc.GetDistance(Graph2, Graph1);
-          
+
             double Graph1ContainedIn2Score = pairing1.TotalScore / pairing1.SourceSelfScore.TotalScore;
-            double Graph2ContainedIn1Score = pairing2.TotalScore / pairing2.SourceSelfScore.TotalScore;
-            double totalScoreAverage = (pairing1.TotalScore + pairing2.TotalScore) / (pairing1.SourceSelfScore.TotalScore + pairing1.ImageSelfScore.TotalScore);
-            var newFormm = new NodePairingGraph(pairing2);
-            newFormm.Show();
-            var newFormmm = new NodePairingGraph(pairing1);
-            newFormmm.Show();
-            StringBuilder sb = new StringBuilder();
-            sb.AppendLine(string.Format("{0} --> {1} = {2}", pairing1.SourceGraph.First().Method.Name, pairing1.ImageGraph.First().Method.Name, Math.Round(Graph1ContainedIn2Score, 4)));
-            sb.AppendLine(string.Format("{0} --> {1} = {2}", pairing2.SourceGraph.First().Method.Name, pairing2.ImageGraph.First().Method.Name, Math.Round(Graph2ContainedIn1Score,4)));
-            sb.AppendLine(string.Format("{0} <-> {1} = {2}", pairing1.SourceGraph.First().Method.Name, pairing1.ImageGraph.First().Method.Name, Math.Round(totalScoreAverage,4)));
-            return sb.ToString();
+            //var newFormmm = new NodePairingGraph(pairing1);
+            //newFormmm.Show();
+
+            if (twoWayScore)
+            {
+                NodePairings pairing2 = GraphSimilarityCalc.GetDistance(Graph2, Graph1);
+                double totalScoreAverage = (pairing1.TotalScore + pairing2.TotalScore) / (pairing1.SourceSelfScore.TotalScore + pairing1.ImageSelfScore.TotalScore);
+                return totalScoreAverage;
+            }
+            else
+            {
+                return Graph1ContainedIn2Score;
+            }
         }
     }
 }

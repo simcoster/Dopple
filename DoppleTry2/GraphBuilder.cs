@@ -90,7 +90,7 @@ namespace Dopple
                 bool shouldRunDynamicTrace;
                 //MergeSingleOperationNodes();
                 ResolveVirtualMethods(out shouldRerun, out shouldRunDynamicTrace);
-              //  shouldRerun = false;
+                //shouldRerun = false;
              
                 //SetInstructionIndexes();
                 isFirstRun = false;
@@ -103,7 +103,6 @@ namespace Dopple
             _backTraceManager.ForwardDynamicData(InstructionNodes);
             MergeSimilarInstructions();
             MergeEquivilentPairs();
-            //AddZeroNode();
             BranchProperties.BaseBranch.RemoveAllTwoWay();
             //Verify();
             return InstructionNodes;
@@ -404,7 +403,6 @@ namespace Dopple
                 {
                     _backTraceManager.TraceDynamicData(InstructionNodes);
                 }
-                RemoveHelperCodes();
                 //MergeSingleOperationNodes();
                 MergeSimilarInstructions();
                 RecursionFix();
@@ -412,7 +410,7 @@ namespace Dopple
                 SetInstructionIndexes();
                 isFirstRun = false;
             }
-            RemoveHelperCodes();
+            //RemoveHelperCodes();
             AddZeroNode();
             Verify();
 

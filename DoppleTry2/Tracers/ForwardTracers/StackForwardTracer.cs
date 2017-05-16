@@ -32,8 +32,6 @@ namespace Dopple.BackTracers
             }
             while (true)
             {
-                //lock (currentNode)
-                //{
                     if (!currentNode.StackBacktraceDone)
                     {
                         currentNode.DataFlowBackRelated.ResetIndex();
@@ -49,7 +47,6 @@ namespace Dopple.BackTracers
                         {
                             stackedNodes.Push(currentNode);
                         }
-                    //}
                 }
 
                 int forwardRouteCount = currentNode.ProgramFlowForwardRoutes.Count;
