@@ -27,21 +27,14 @@ namespace Dopple
         private CallInliner _inlineCallModifier;
         ConditionionalsTracer _ConditionionalsTracer = new ConditionionalsTracer();
         Verifier[] verifiers;
-
-        public GraphBuilder(FunctionFlowGraph functionFlowGraph)
+        public GraphBuilder(MethodDefinition method)
         {
-            List<Instruction> instructions = functionFlowGraph.Method.Body.Instructions.ToList();
-            if (instructions.Any(x => x.OpCode.Code == Code.Ldsfld))
-            {
-                //instructions = functionFlowGraph.TypeInitializer.Body.Instructions.Where(x => x.OpCode.Code != Code.Ret).Concat(instructions).ToList();
-            }
             InstructionNodes =
-                instructions.SelectMany(x => _InstructionNodeFactory.GetInstructionNodes(x, functionFlowGraph.Method)).ToList();
+              method.Body.Instructions.SelectMany(x => _InstructionNodeFactory.GetInstructionNodes(x, method)).ToList();
             foreach (var inst in InstructionNodes)
             {
                 inst.InstructionIndex = InstructionNodes.IndexOf(inst);
             }
-            metDef = functionFlowGraph.Method;
             InitInliner();
         }
         private void InitInliner()

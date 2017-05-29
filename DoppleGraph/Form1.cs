@@ -81,8 +81,6 @@ namespace DoppleGraph
             NodePairings pairing1 = GraphSimilarityCalc.GetDistance(Graph1, Graph2);
 
             double Graph1ContainedIn2Score = pairing1.TotalScore / pairing1.SourceSelfScore.TotalScore;
-            //var newFormmm = new NodePairingGraph(pairing1);
-            //newFormmm.Show();
 
             if (twoWayScore)
             {
