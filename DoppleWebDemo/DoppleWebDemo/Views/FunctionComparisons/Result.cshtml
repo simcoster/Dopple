@@ -1,0 +1,31 @@
+﻿@model DoppleWebDemo.Models.FunctionComparison
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Flowchart</title>
+    <meta name="description" content="Interactive flowchart diagram implemented by GoJS in JavaScript for HTML." />
+    <!-- Copyright 1998-2017 by Northwoods Software Corporation. -->
+    <meta charset="UTF-8">
+
+    <script id="code">
+        @{
+            var serilizer = new System.Web.Script.Serialization.JavaScriptSerializer();
+        }
+        var nodeDataArray = @Html.Raw(serilizer.Serialize(@Model.NodesAndEdges.Nodes));
+        var linkDataArray = @Html.Raw(serilizer.Serialize(@Model.NodesAndEdges.Edges));
+    </script>
+    @Scripts.Render("~/Scripts/go-1.7.11-debug.js")
+    @Scripts.Render("~/Scripts/initGraph.js")
+</head>
+<body onload="init()">
+   
+
+    <div id="sample">
+        <!-- The DIV for the Diagram needs an explicit size or else we won't see anything.
+             This also adds a border to help see the edges of the viewport. -->
+        <div id="myDiagramDiv" style="border: solid 1px black; width:400px; height:400px"></div>
+    </div>
+</body>
+</html>

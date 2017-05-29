@@ -73,7 +73,7 @@
     <Compile Include="VertexScorer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DoppleTry2\GraphBuilder.csproj">
+    <ProjectReference Include="..\GraphBuilder\GraphBuilder.csproj">
       <Project>{77C5971E-3C37-4932-911D-9C6050E67FFA}</Project>
       <Name>GraphBuilder</Name>
     </ProjectReference>
