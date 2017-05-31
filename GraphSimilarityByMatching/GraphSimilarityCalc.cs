@@ -163,7 +163,7 @@ namespace GraphSimilarityByMatching
                 vertex.BackEdges.Add(new LabeledEdge()
                 {
                     EdgeType = EdgeType.ProgramFlowAffecting,
-                    Index = (int) branch.PairedBranchesIndex,
+                    Index = (int) branch.MergeNodeBranchIndex,
                     SourceVertex = labeledVertexes[branch.OriginatingNode.InstructionIndex],
                     DestinationVertex = vertex
                 });

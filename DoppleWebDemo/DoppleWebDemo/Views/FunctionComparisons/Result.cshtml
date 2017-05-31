@@ -13,19 +13,28 @@
         @{
             var serilizer = new System.Web.Script.Serialization.JavaScriptSerializer();
         }
-        var nodeDataArray = @Html.Raw(serilizer.Serialize(@Model.NodesAndEdges.Nodes));
-        var linkDataArray = @Html.Raw(serilizer.Serialize(@Model.NodesAndEdges.Edges));
+        var nodeDataArray1 = @Html.Raw(serilizer.Serialize(@Model.FirstFuncNodesAndEdges.Nodes));
+        var edgeDataArray1 = @Html.Raw(serilizer.Serialize(@Model.FirstFuncNodesAndEdges.Edges));
+        var nodeDataArray2 = @Html.Raw(serilizer.Serialize(@Model.SecondFuncNodesAndEdges.Nodes));
+        var edgeDataArray2 = @Html.Raw(serilizer.Serialize(@Model.SecondFuncNodesAndEdges.Edges));
     </script>
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Styles.Render("~/Content/css")
     @Scripts.Render("~/Scripts/go-1.7.11-debug.js")
     @Scripts.Render("~/Scripts/initGraph.js")
 </head>
 <body onload="init()">
-   
-
-    <div id="sample">
-        <!-- The DIV for the Diagram needs an explicit size or else we won't see anything.
-             This also adds a border to help see the edges of the viewport. -->
-        <div id="myDiagramDiv" style="border: solid 1px black; width:400px; height:400px"></div>
-    </div>
+    <table width="100%">
+        <tr>
+                <!-- The DIV for the Diagram needs an explicit size or else we won't see anything.
+                     This also adds a border to help see the edges of the viewport. -->
+            <td>
+                <div id="myDiagramDiv1" style="border: solid 1px black; height:500px; margin: 1%"></div>
+            </td><td>
+                <div id="myDiagramDiv2" style="border: solid 1px black; height:500px; margin: 1%"></div>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>

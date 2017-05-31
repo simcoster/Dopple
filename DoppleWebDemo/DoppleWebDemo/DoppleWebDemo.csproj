@@ -202,6 +202,7 @@
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\go-1.7.11-debug.js" />
     <Content Include="Scripts\go-1.7.11.js" />
+    <Content Include="Scripts\initGraph - Copy.js" />
     <Content Include="Scripts\initGraph.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -237,6 +238,7 @@
     <Content Include="Views\FunctionComparisons\Edit.cshtml" />
     <Content Include="Views\FunctionComparisons\Index.cshtml" />
     <Content Include="Views\FunctionComparisons\Result.cshtml" />
+    <Content Include="Views\FunctionComparisons\Experiment.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

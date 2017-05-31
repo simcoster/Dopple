@@ -22,7 +22,7 @@ namespace Dopple.InstructionNodes
             foreach(var branch in CreatedBranches)
             {
                 otherAsConditional.CreatedBranches.Add(branch);
-                branch.OriginatingNode = nodeToMergeInto;
+                branch.OriginatingNode = otherAsConditional;
             }
         }
 

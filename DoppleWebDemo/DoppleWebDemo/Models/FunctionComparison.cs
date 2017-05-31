@@ -19,7 +19,10 @@ namespace DoppleWebDemo.Models
         public double? ScoreSecondContainedInFirst { get; set; }
         public double? ScoreTwoWay { get; set; }
         [NotMapped]
-        public NodesAndEdges NodesAndEdges { get; set; }
+        public NodesAndEdges FirstFuncNodesAndEdges { get; set; }
+        [NotMapped]
+        public NodesAndEdges SecondFuncNodesAndEdges { get; set; }
+
 
         public FunctionComparison()
         {

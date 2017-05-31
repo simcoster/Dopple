@@ -1,22 +1,17 @@
 ﻿function init() {
-    initASingleGraph("myDiagramDiv1", nodeDataArray1, edgeDataArray1);
-    initASingleGraph("myDiagramDiv2", nodeDataArray2, edgeDataArray2);
-
-}
-
-function initASingleGraph(divName, nodeDataArray, edgeDataArray) {
+    if (window.goSamples) goSamples();  // init for these samples -- you don't need to call this
     var $ = go.GraphObject.make;  // for conciseness in defining templates
     myDiagram =
-    $(go.Diagram, divName,  // create a Diagram for the DIV HTML element
-      {
-          // position the graph in the middle of the diagram
-          initialContentAlignment: go.Spot.Center,
-          // enable undo & redo
-          "undoManager.isEnabled": true,
-          allowLink: false,
-          initialAutoScale: go.Diagram.Uniform,
-          layout: $(go.LayeredDigraphLayout)
-      });
+      $(go.Diagram, "myDiagramDiv1",  // create a Diagram for the DIV HTML element
+        {
+            // position the graph in the middle of the diagram
+            initialContentAlignment: go.Spot.Center,
+            // enable undo & redo
+            "undoManager.isEnabled": true,
+            allowLink : false,
+            initialAutoScale: go.Diagram.Uniform,
+            layout: $(go.LayeredDigraphLayout)
+        });
     // Define the appearance and behavior for Nodes:
     // First, define the shared context menu for all Nodes, Links, and Groups.
     // To simplify this code we define a function for creating a context menu button:
@@ -91,11 +86,14 @@ function initASingleGraph(divName, nodeDataArray, edgeDataArray) {
         return "Link:\nfrom " + d.from + " to " + d.to;
     }
 
-    function getDashedArray(d) {
-        if (d.type == 1) {
+    function getDashedArray(d)
+    {
+        if (d.type == 1)
+        {
             return [5, 15];
         }
-        else {
+        else
+        {
             return [];
         }
     }
@@ -103,7 +101,7 @@ function initASingleGraph(divName, nodeDataArray, edgeDataArray) {
     // The link shape and arrowhead have their stroke brush data bound to the "color" property
     myDiagram.linkTemplate =
       $(go.Link,
-        { toShortLength: 3, relinkableFrom: false, relinkableTo: false },  // allow the user to relink existing links
+        { toShortLength: 3, relinkableFrom: false, relinkableTo: false},  // allow the user to relink existing links
         $(go.Shape,
           {
               strokeWidth: 4,
@@ -124,7 +122,7 @@ function initASingleGraph(divName, nodeDataArray, edgeDataArray) {
             contextMenu: partContextMenu
         }
       );
-
+ 
     // Define the behavior for the Diagram background:
     function diagramInfo(model) {  // Tooltip info for the diagram's model
         return "Model:\n" + model.nodeDataArray.length + " nodes, " + model.linkDataArray.length + " links";
@@ -146,5 +144,5 @@ function initASingleGraph(divName, nodeDataArray, edgeDataArray) {
                      function (e, obj) { e.diagram.commandHandler.redo(); },
                      function (o) { return o.diagram.commandHandler.canRedo(); })
       );
-    myDiagram.model = new go.GraphLinksModel(nodeDataArray, edgeDataArray);
+    myDiagram.model = new go.GraphLinksModel(nodeDataArray1, linkDataArray1);
 }

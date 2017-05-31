@@ -49,13 +49,14 @@ namespace DoppleWebDemo.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "Index,FirstFunctionCode,SecondFunctionCode")] FunctionComparison functionComparison)
         {
+            //return View("Result");
+
             if (ModelState.IsValid)
             {
                 var blah = db.FunctionComparisons.Add(functionComparison);
                 var id = db.SaveChanges();
-                var nodesAndEdges = GraphCreator.CompileCode("b");
-           
-                functionComparison.NodesAndEdges = nodesAndEdges;
+                functionComparison.FirstFuncNodesAndEdges = GraphCreator.CompileCode(functionComparison.FirstFunctionCode);
+                functionComparison.SecondFuncNodesAndEdges = GraphCreator.CompileCode(functionComparison.SecondFunctionCode);
                 return View("Result", functionComparison);
             }
 

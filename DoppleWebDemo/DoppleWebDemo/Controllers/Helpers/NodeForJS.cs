@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Mono.Cecil;
 
 namespace DoppleWebDemo.Controllers.Helpers
 {
@@ -10,5 +11,6 @@ namespace DoppleWebDemo.Controllers.Helpers
         public int key { get; set; }
         public string text { get; set; }
         public string color { get; set; }
+        public string method { get; internal set; }
     }
 }

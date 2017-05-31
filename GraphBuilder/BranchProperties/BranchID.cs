@@ -11,7 +11,7 @@ namespace Dopple.BranchPropertiesNS
         private static int GlobalIndex = 0;
         private List<InstructionNode> _BranchNodes = new List<InstructionNode>();
 
-        public BranchID(InstructionNode originatingNode)
+        public BranchID(ConditionalJumpNode originatingNode)
         {
             lock(_LockGlobalIndex)
             {
@@ -19,6 +19,7 @@ namespace Dopple.BranchPropertiesNS
                 GlobalIndex++;
             }
             OriginatingNode = originatingNode;
+            OriginatingNodeIndex = OriginatingNode!=null? OriginatingNode.CreatedBranches.Count : -1;
             //TODO not got design, parent should not be aware of sons
             if (!(this is BaseBranch))
             {
@@ -52,10 +53,11 @@ namespace Dopple.BranchPropertiesNS
         }
         public int Index { get; protected set; }
         public virtual BranchType BranchType { get; set; }
-        public InstructionNode OriginatingNode { get; set; }
-        public int PairedBranchesIndex { get; set; }
+        public ConditionalJumpNode OriginatingNode { get; set; }
+        public int MergeNodeBranchIndex { get; set; }
         public List<InstructionNode> BranchNodes { get { return _BranchNodes; } } 
         public InstructionNode MergingNode { get; set; }
+        public int OriginatingNodeIndex { get; private set; }
     }
 
     public class BaseBranch : BranchID

@@ -10,6 +10,7 @@ namespace DoppleWebDemo.Controllers.Helpers
 {
     class CodeColorHanlder
     {
+        private const int minColorValue = 90;
         static Code[] LdcCodes = { Code.Ldc_I4_0, Code.Ldc_I4_1, Code.Ldc_I4_2, Code.Ldc_I4_3, Code.Ldc_I4_4, Code.Ldc_I4_5,
                             Code.Ldc_I4_6, Code.Ldc_I4_7, Code.Ldc_I4_8, Code.Ldc_I4_S, Code.Ldc_I4, Code.Ldc_R4,
                             Code.Ldc_R8, Code.Ldc_I8, Code.Ldc_I4_M1 };
@@ -54,33 +55,33 @@ namespace DoppleWebDemo.Controllers.Helpers
 
         public CodeColorHanlder()
         {
-            int Rvalue = 50;
-            int Gvalue = 50;
-            int Bvalue = 50;
+            int Rvalue = minColorValue;
+            int Gvalue = minColorValue;
+            int Bvalue = minColorValue;
 
             int BigIncrement = 30;
             int SmallIncrement = 2;
 
-            var deltCodes = GetType()
+            List<Code[]> codeGroups = GetType()
                 .GetFields(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)
-                .Select(x => x.GetValue(null))
-                .Cast<Code[]>();
+                .Select(x => x.GetValue(null)).Where(x => x is Code[])
+                .Cast<Code[]>().ToList();
 
-            foreach (var codeGroup in deltCodes)
+            foreach (var codeGroup in codeGroups)
             {
-                GetColor(ref Rvalue, ref Gvalue, ref Bvalue, BigIncrement);
+                IncrementValues(ref Rvalue, ref Gvalue, ref Bvalue, BigIncrement, minColorValue);
                 foreach (var code in codeGroup)
                 {
                     CodeColors.Add(code, Color.FromArgb(Rvalue, Gvalue, Bvalue));
-                    GetColor(ref Rvalue, ref Gvalue, ref Bvalue, SmallIncrement);
+                    IncrementValues(ref Rvalue, ref Gvalue, ref Bvalue, SmallIncrement, minColorValue);
                 }
             }
 
-            var undeltCodes = CodeGroups.AllOpcodes.Select(x => x.Code).Except(deltCodes.SelectMany(x => x));
+            var ungroupedCodes = CodeGroups.AllOpcodes.Select(x => x.Code).Except(codeGroups.SelectMany(x => x));
 
-            foreach (var loneCode in undeltCodes)
+            foreach (var loneCode in ungroupedCodes)
             {
-                GetColor(ref Rvalue, ref Gvalue, ref Bvalue, BigIncrement);
+                IncrementValues(ref Rvalue, ref Gvalue, ref Bvalue, BigIncrement, minColorValue);
                 CodeColors.Add(loneCode, Color.FromArgb(Rvalue, Gvalue, Bvalue));
             }
         }
@@ -114,32 +115,32 @@ namespace DoppleWebDemo.Controllers.Helpers
                 switch (index)
                 {
                     case 0:
-                        return Color.LightPink;
+                        return Color.Pink;
                     case 1:
-                        return Color.LightYellow;
+                        return Color.Yellow;
                     case 2:
-                        return Color.LightSeaGreen;
+                        return Color.SeaGreen;
                     case 3:
                         return Color.LightBlue;
                     default:
-                        return Color.LightGray;
+                        return Color.MediumPurple;
                 }
             }
             throw new Exception("invalid edge type");
         }
 
-        private void GetColor(ref int RValue, ref int GValue, ref int BValue, int increment)
+        private void IncrementValues(ref int RValue, ref int GValue, ref int BValue, int increment, int baseValue)
         {
             int maxValue = 255;
 
             RValue += increment;
             if (RValue > maxValue)
             {
-                RValue -= maxValue;
+                RValue = baseValue;
                 GValue += increment;
                 if (GValue > maxValue)
                 {
-                    GValue -= maxValue;
+                    GValue = baseValue;
                     BValue += increment;
                 }
             }

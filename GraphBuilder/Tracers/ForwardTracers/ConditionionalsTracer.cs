@@ -20,7 +20,7 @@ namespace Dopple.BackTracers
             var mergeNonMerged = instructionNodes.Where(x => x.BranchProperties.MergingNodeProperties.MergedBranches.Any(y => y.BranchType != BranchType.SplitMerge));
             if (mergeNonMerged.Any())
             {
-                //throw new Exception("Should merge only split merge branches");
+                throw new Exception("Should merge only split merge branches");
             }
             MergeReturnNodes(instructionNodes);
         }
@@ -115,7 +115,7 @@ namespace Dopple.BackTracers
                     }
                     //Console.WriteLine("node {0} is merge of branch {1} that originates in {2}", currentNode.InstructionIndex + "  " +currentNode.Instruction.ToString(), mergedBranch.Index, mergedBranch.OriginatingNode.InstructionIndex);
                     MarkMergeNode(currentNode, mergedBranch);
-                    mergedBranch.PairedBranchesIndex = currentNode.BranchProperties.MergingNodeProperties.MergedBranches.IndexOf(mergedBranch);
+                    mergedBranch.MergeNodeBranchIndex = currentNode.BranchProperties.MergingNodeProperties.MergedBranches.IndexOf(mergedBranch);
                 }
                 if (currentNode.ProgramFlowForwardRoutes.Count == 0)
                 {
