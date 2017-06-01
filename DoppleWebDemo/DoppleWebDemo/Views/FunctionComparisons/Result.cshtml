@@ -13,10 +13,10 @@
         @{
             var serilizer = new System.Web.Script.Serialization.JavaScriptSerializer();
         }
-        var nodeDataArray1 = @Html.Raw(serilizer.Serialize(@Model.FirstFuncNodesAndEdges.Nodes));
-        var edgeDataArray1 = @Html.Raw(serilizer.Serialize(@Model.FirstFuncNodesAndEdges.Edges));
-        var nodeDataArray2 = @Html.Raw(serilizer.Serialize(@Model.SecondFuncNodesAndEdges.Nodes));
-        var edgeDataArray2 = @Html.Raw(serilizer.Serialize(@Model.SecondFuncNodesAndEdges.Edges));
+        var nodeDataArray1 = @Html.Raw(serilizer.Serialize(@Model.FirstFuncNodesAndEdges.NodesJS));
+        var edgeDataArray1 = @Html.Raw(serilizer.Serialize(@Model.FirstFuncNodesAndEdges.EdgesJS));
+        var nodeDataArray2 = @Html.Raw(serilizer.Serialize(@Model.SecondFuncNodesAndEdges.NodesJS));
+        var edgeDataArray2 = @Html.Raw(serilizer.Serialize(@Model.SecondFuncNodesAndEdges.EdgesJS));
     </script>
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
@@ -27,11 +27,37 @@
 <body onload="init()">
     <table width="100%">
         <tr>
+            <td>
+                Similarity Score:
+                </td>
+            <td> 
+                @Model.ScoreTwoWay
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Score of @Model.FirstFuncNodesAndEdges.Method.Name contained in @Model.SecondFuncNodesAndEdges.Method.Name
+            </td>
+            <td>
+                @Model.ScoreFirstContainedInSecond
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Score of @Model.FirstFuncNodesAndEdges.Method.Name contained in @Model.SecondFuncNodesAndEdges.Method.Name
+            </td>
+            <td>
+                @Model.ScoreFirstContainedInSecond
+            </td>
+        </tr>
+        <tr>
                 <!-- The DIV for the Diagram needs an explicit size or else we won't see anything.
                      This also adds a border to help see the edges of the viewport. -->
             <td>
+                @Model.FirstFuncNodesAndEdges.Method.Name
                 <div id="myDiagramDiv1" style="border: solid 1px black; height:500px; margin: 1%"></div>
             </td><td>
+                @Model.SecondFuncNodesAndEdges.Method.Name
                 <div id="myDiagramDiv2" style="border: solid 1px black; height:500px; margin: 1%"></div>
             </td>
         </tr>

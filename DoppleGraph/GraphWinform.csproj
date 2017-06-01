@@ -133,10 +133,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DoppleTry2\GraphBuilder.csproj">
-      <Project>{77c5971e-3c37-4932-911d-9c6050e67ffa}</Project>
-      <Name>GraphBuilder</Name>
-    </ProjectReference>
     <ProjectReference Include="..\GraphSimilarityByMatching\GraphSimilarityByMatching.csproj">
       <Project>{ce4aa61a-cfe3-4c9b-8671-58c058c8e40c}</Project>
       <Name>GraphSimilarityByMatching</Name>

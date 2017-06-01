@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Mvc;
 using DoppleWebDemo.Models;
 using DoppleWebDemo.Controllers.Helpers;
+using GraphSimilarityByMatching;
 
 namespace DoppleWebDemo.Controllers
 {
@@ -54,9 +55,10 @@ namespace DoppleWebDemo.Controllers
             if (ModelState.IsValid)
             {
                 var blah = db.FunctionComparisons.Add(functionComparison);
+                functionComparison.CalculateScores();
                 var id = db.SaveChanges();
-                functionComparison.FirstFuncNodesAndEdges = GraphCreator.CompileCode(functionComparison.FirstFunctionCode);
-                functionComparison.SecondFuncNodesAndEdges = GraphCreator.CompileCode(functionComparison.SecondFunctionCode);
+
+           
                 return View("Result", functionComparison);
             }
 

@@ -50,14 +50,17 @@ namespace DoppleWebDemo.Controllers.Helpers
             var graphBuilder = new GraphBuilder(loadedType.Methods.First());
             graphBuilder.Run();
 
-            return GetNodesAndEdges(graphBuilder.InstructionNodes);
+            var nodesAndEdgesForJS =  GetNodesAndEdges(graphBuilder.InstructionNodes);
+            nodesAndEdgesForJS.Method = graphBuilder.InstructionNodes[0].Method;
+            nodesAndEdgesForJS.Nodes = graphBuilder.InstructionNodes;
+            return nodesAndEdgesForJS;
         }
 
         private static NodesAndEdges GetNodesAndEdges(List<InstructionNode> instructionNodes)
         {
             List<NodeForJS> nodes = GetNodes(instructionNodes);
             List<EdgeForJS> edges = GetEdges(instructionNodes);
-            return new NodesAndEdges() { Nodes = nodes, Edges = edges };
+            return new NodesAndEdges() { NodesJS = nodes, EdgesJS = edges };
         }
 
         private static List<NodeForJS> GetNodes(List<InstructionNode> instructionNodes)

@@ -202,7 +202,6 @@
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\go-1.7.11-debug.js" />
     <Content Include="Scripts\go-1.7.11.js" />
-    <Content Include="Scripts\initGraph - Copy.js" />
     <Content Include="Scripts\initGraph.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />

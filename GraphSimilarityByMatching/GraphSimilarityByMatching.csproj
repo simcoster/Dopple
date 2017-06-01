@@ -73,13 +73,13 @@
     <Compile Include="VertexScorer.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\GraphBuilder\GraphBuilder.csproj">
       <Project>{77C5971E-3C37-4932-911D-9C6050E67FFA}</Project>
       <Name>GraphBuilder</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
