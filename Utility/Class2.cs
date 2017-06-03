@@ -10,6 +10,44 @@ namespace Utility
 {
     public class Class2
     {
+        public IEnumerable<int> ArikStuff()
+        {
+            int i = 0;
+            while (true)
+            {
+                yield return i;
+                i++;
+            }
+        }
+
+        public int ArikFunc(int a, int b)
+        {
+            while (a != 0)
+            {
+                if(a > b)
+                {
+                    a = a ^ b;
+                    b = a ^ b;
+                    a = a ^ b;
+                }
+                Math.DivRem(b, a, out b);
+            }
+            return b;
+        }
+        public int RecGcd(int a, int b)
+        {
+            if (a == b)
+                return b;
+            if (a > b)
+            {
+                a = a ^ b;
+                b = a ^ b;
+                a = a ^ b;
+            }
+            Math.DivRem(b, a, out b);
+            return RecGcd(a, b);
+        }
+
         public static int SumInSingleStep(int a, int b, int c)
         {
             return a + b + c;

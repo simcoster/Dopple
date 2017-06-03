@@ -93,10 +93,19 @@ function initASingleGraph(divName, nodeDataArray, edgeDataArray) {
 
     function getDashedArray(d) {
         if (d.type == 1) {
-            return [5, 15];
+            return [10,5];
         }
         else {
             return [];
+        }
+    }
+
+    function isAffectingLayout(d) {
+        if (d.type == 1) {
+            return false;
+        }
+        else {
+            return true;
         }
     }
 
@@ -112,7 +121,8 @@ function initASingleGraph(divName, nodeDataArray, edgeDataArray) {
           new go.Binding("strokeDashArray", "", getDashedArray)),
         $(go.Shape,
           { toArrow: "Standard", stroke: null },
-          new go.Binding("fill", "color")),
+          new go.Binding("fill", "color"),
+          new go.Binding("isLayoutPositioned", "" , isAffectingLayout)),
         { // this tooltip Adornment is shared by all links
             toolTip:
               $(go.Adornment, "Auto",

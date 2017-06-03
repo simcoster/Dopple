@@ -14,9 +14,9 @@
             var serilizer = new System.Web.Script.Serialization.JavaScriptSerializer();
         }
         var nodeDataArray1 = @Html.Raw(serilizer.Serialize(@Model.FirstFuncNodesAndEdges.NodesJS));
-        var edgeDataArray1 = @Html.Raw(serilizer.Serialize(@Model.FirstFuncNodesAndEdges.EdgesJS));
+        var edgeDataArray1 = @Html.Raw(serilizer.Serialize(@Model.FirstFuncNodesAndEdges.DataEdgesJS));
         var nodeDataArray2 = @Html.Raw(serilizer.Serialize(@Model.SecondFuncNodesAndEdges.NodesJS));
-        var edgeDataArray2 = @Html.Raw(serilizer.Serialize(@Model.SecondFuncNodesAndEdges.EdgesJS));
+        var edgeDataArray2 = @Html.Raw(serilizer.Serialize(@Model.SecondFuncNodesAndEdges.DataEdgesJS));
     </script>
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
@@ -25,39 +25,50 @@
     @Scripts.Render("~/Scripts/initGraph.js")
 </head>
 <body onload="init()">
-    <table width="100%">
+    <div align="center">
+    <table style="font-size:x-large; font-weight:bold; margin-top:50px">
         <tr>
-            <td>
-                Similarity Score:
-                </td>
-            <td> 
+            <th width="70%" nowrap="nowrap">
+                    Similarity Score
+                </th>
+            <th width="30%" nowrap="nowrap" style="text-align:right"> 
                 @Model.ScoreTwoWay
+            </th>
+        </tr>
+        @{string message = "";
+            double? score = 0.0;
+            if (Model.ScoreFirstContainedInSecond > Model.ScoreSecondContainedInFirst)
+            {
+                message = "Score of " + Model.FirstFuncNodesAndEdges.Method.Name + " contained in " + Model.SecondFuncNodesAndEdges.Method.Name;
+                score = Model.ScoreFirstContainedInSecond;
+            }
+            else
+            {
+                message = "Score of " + Model.SecondFuncNodesAndEdges.Method.Name + " contained in " + Model.FirstFuncNodesAndEdges.Method.Name;
+                score = Model.ScoreSecondContainedInFirst;
+            }
+        }
+        <tr>
+            <td>
+              @message * 
+            </td>
+            <td style="text-align:right">
+                @score
             </td>
         </tr>
         <tr>
-            <td>
-                Score of @Model.FirstFuncNodesAndEdges.Method.Name contained in @Model.SecondFuncNodesAndEdges.Method.Name
-            </td>
-            <td>
-                @Model.ScoreFirstContainedInSecond
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Score of @Model.FirstFuncNodesAndEdges.Method.Name contained in @Model.SecondFuncNodesAndEdges.Method.Name
-            </td>
-            <td>
-                @Model.ScoreFirstContainedInSecond
-            </td>
-        </tr>
+    </table>
+    </div>
+    <table width="100%" style="margin-top:50px">
         <tr>
                 <!-- The DIV for the Diagram needs an explicit size or else we won't see anything.
                      This also adds a border to help see the edges of the viewport. -->
-            <td>
-                @Model.FirstFuncNodesAndEdges.Method.Name
+            <td width="50%" align="center">
+                <h2>@Model.FirstFuncNodesAndEdges.Method.Name</h2>
                 <div id="myDiagramDiv1" style="border: solid 1px black; height:500px; margin: 1%"></div>
-            </td><td>
-                @Model.SecondFuncNodesAndEdges.Method.Name
+            </td>
+            <td width="50%"  align="center">
+                <h2>@Model.SecondFuncNodesAndEdges.Method.Name</h2>
                 <div id="myDiagramDiv2" style="border: solid 1px black; height:500px; margin: 1%"></div>
             </td>
         </tr>

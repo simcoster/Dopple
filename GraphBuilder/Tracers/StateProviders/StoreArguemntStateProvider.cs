@@ -13,7 +13,14 @@ namespace Dopple.Tracers.StateProviders
         FunctionArgNodeBase ArgumentNode;
         public StoreArgumentStateProvider(InstructionNode storeNode) : base(storeNode)
         {
-            ArgumentNode = (FunctionArgNodeBase) storeNode;
+            try
+            {
+                ArgumentNode = (FunctionArgNodeBase) storeNode;
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
 
         Code[] LoadLocationCodes = CodeGroups.LdArgCodes.Concat(new[] { Code.Ldarga, Code.Ldarga_S }).ToArray();

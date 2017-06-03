@@ -23,18 +23,9 @@ namespace DoppleWebDemo.Controllers
         }
 
         // GET: FunctionComparisons/Details/5
-        public ActionResult Details(int? id)
+        public ActionResult Intro()
         {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            FunctionComparison functionComparison = db.FunctionComparisons.Find(id);
-            if (functionComparison == null)
-            {
-                return HttpNotFound();
-            }
-            return View(functionComparison);
+            return View();
         }
 
         // GET: FunctionComparisons/Create

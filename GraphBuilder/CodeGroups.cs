@@ -17,6 +17,7 @@ namespace Dopple
                                               Code.Conv_R4, Code.Conv_R8, Code.Conv_R_Un, Code.Conv_U, Code.Conv_U1, Code.Conv_U2, Code.Conv_U4, Code.Conv_U8};
         public static Code[] CallCodes     = { Code.Call, Code.Calli};
         public static Code[] LdArgCodes    = { Code.Ldarg, Code.Ldarg_0, Code.Ldarg_1, Code.Ldarg_2, Code.Ldarg_3, Code.Ldarg_S};
+        public static Code[] LdArgAddressCodes = { Code.Ldarga, Code.Ldarga_S };
         public static Code[] StArgCodes   =  { Code.Starg, Code.Starg_S};
         public static Code[] LdElemCodes  =  { Code.Ldelem_Any, Code.Ldelem_I, Code.Ldelem_I1, Code.Ldelem_I2, Code.Ldelem_I4, Code.Ldelem_I8,
                                                Code.Ldelem_R4, Code.Ldelem_R8, Code.Ldelem_Ref, Code.Ldelem_U1 , Code.Ldelem_U2, Code.Ldelem_U4};

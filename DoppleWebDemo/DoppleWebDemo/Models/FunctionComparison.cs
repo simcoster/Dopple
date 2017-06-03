@@ -44,11 +44,11 @@ namespace DoppleWebDemo.Models
             PairingFirstToSecond = GraphSimilarityCalc.GetDistance(FirstFuncNodesAndEdges.Nodes, SecondFuncNodesAndEdges.Nodes);
             PairingSecondToFirst = GraphSimilarityCalc.GetDistance(SecondFuncNodesAndEdges.Nodes, FirstFuncNodesAndEdges.Nodes);
 
-            ScoreFirstContainedInSecond = PairingFirstToSecond.TotalScore / PairingFirstToSecond.SourceSelfPairings.TotalScore;
-            ScoreFirstContainedInSecond = PairingSecondToFirst.TotalScore / PairingSecondToFirst.SourceSelfPairings.TotalScore;
+            ScoreFirstContainedInSecond = Math.Round(PairingFirstToSecond.TotalScore / PairingFirstToSecond.SourceSelfPairings.TotalScore, 2);
+            ScoreSecondContainedInFirst = Math.Round(PairingSecondToFirst.TotalScore / PairingSecondToFirst.SourceSelfPairings.TotalScore, 2);
 
             ScoreTwoWay = (PairingFirstToSecond.TotalScore + PairingSecondToFirst.TotalScore) / (PairingSecondToFirst.SourceSelfPairings.TotalScore + PairingFirstToSecond.SourceSelfPairings.TotalScore);
-
+            ScoreTwoWay = Math.Round(ScoreTwoWay.Value, 2);
         }
     }
     public class FunctionComparisonDBContext : DbContext

@@ -12,5 +12,6 @@ namespace DoppleWebDemo.Controllers.Helpers
         public int to { get; set; }
         public string color { get; set; }
         public EdgeType type { get; internal set; }
+        public bool isLayoutPositioned { get; internal set; }
     }
 }

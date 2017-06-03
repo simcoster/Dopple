@@ -80,12 +80,12 @@ namespace DoppleGraph
         {
             NodePairings pairing1 = GraphSimilarityCalc.GetDistance(Graph1, Graph2);
 
-            double Graph1ContainedIn2Score = pairing1.TotalScore / pairing1.SourceSelfScore.TotalScore;
+            double Graph1ContainedIn2Score = pairing1.TotalScore / pairing1.SourceSelfPairings.TotalScore;
 
             if (twoWayScore)
             {
                 NodePairings pairing2 = GraphSimilarityCalc.GetDistance(Graph2, Graph1);
-                double totalScoreAverage = (pairing1.TotalScore + pairing2.TotalScore) / (pairing1.SourceSelfScore.TotalScore + pairing1.ImageSelfScore.TotalScore);
+                double totalScoreAverage = (pairing1.TotalScore + pairing2.TotalScore) / (pairing1.SourceSelfPairings.TotalScore + pairing1.ImageSelfPairings.TotalScore);
                 return totalScoreAverage;
             }
             else

@@ -22,6 +22,18 @@ namespace Utility
             a = helper.Number;
             return a;
         }
+
+        public static int Bigger(int a, int b)
+        {
+            if (a > b)
+            {
+                return a;
+            }
+            else
+            {
+                return b;
+            }
+        }
     }
 
     public class Helper

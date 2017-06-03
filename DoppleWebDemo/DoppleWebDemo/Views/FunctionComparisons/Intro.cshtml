@@ -1,0 +1,38 @@
+﻿@{
+    ViewBag.Title = "Intro";
+    //Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Intro</h2>
+
+<p>Hi!</p>
+
+<p>
+    This is a personal project which I've worked on for about 10 months.
+    It is a program which attempts to estimate how similar two c# functions are, in terms of their functionality.
+</p>
+<p>
+    It produces 2 scores:
+    a score between 0 and 1, where a higher score means they are more closely related
+    </p>
+<p>
+    A function compared to itself should always get a score of 1 (in practice the algorithm is greedy so this is not guaranteed).
+</p>
+<p>
+    The second score represents how well one function contains some of the functionality of the other, i.e. how well one function can use the other and still preform the same actions.  .
+</p>
+<br />
+<p>
+    I'd be happy if you could help me test it out!
+    Please go to the comparison page, and insert two c# functions and see if the produced scores match your intuition!
+<p>
+    Bellow the scores are graph representations of the two functions.
+    I compute these using the compiled (cil) code, and then use them to the compute the similarity scores.
+    Explore them if you like.
+</p>
+<p>
+    I would greatly appreciate ANY feedback.
+</p>
+<p>
+    Thanks!
+</p>

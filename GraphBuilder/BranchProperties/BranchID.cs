@@ -41,8 +41,8 @@ namespace Dopple.BranchPropertiesNS
         }
         public void RemoveTwoWay(InstructionNode node)
         {
-            node.BranchProperties.Branches.Remove(this);
-            BranchNodes.Remove(node);
+                node.BranchProperties.Branches.Remove(this);
+                BranchNodes.Remove(node);
         }
         internal void RemoveAllTwoWay()
         {

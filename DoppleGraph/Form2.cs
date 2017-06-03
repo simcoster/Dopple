@@ -381,7 +381,7 @@ namespace DoppleGraph
                 {
                     try
                     {
-                        Color linkColor = GetPredefinedFlowAffectLinkColor((int) branch.PairedBranchesIndex);
+                        Color linkColor = GetPredefinedFlowAffectLinkColor((int) branch.OriginatingNodeIndex);
                         GoLink edge = DrawEdge(nodeWrapper, myView,branch.OriginatingNode, flowAffectingLinksLayer, new Pen(linkColor));
                         edge.ToolTipText = branch.Index.ToString() + " " + edge.PenColor.R;
                     }

@@ -233,7 +233,7 @@
     <Content Include="Views\FuncComaprison\Index.cshtml" />
     <Content Include="Views\FuncComaprison\Welcome.cshtml" />
     <Content Include="Views\FunctionComparisons\Create.cshtml" />
-    <Content Include="Views\FunctionComparisons\Details.cshtml" />
+    <Content Include="Views\FunctionComparisons\Intro.cshtml" />
     <Content Include="Views\FunctionComparisons\Edit.cshtml" />
     <Content Include="Views\FunctionComparisons\Index.cshtml" />
     <Content Include="Views\FunctionComparisons\Result.cshtml" />

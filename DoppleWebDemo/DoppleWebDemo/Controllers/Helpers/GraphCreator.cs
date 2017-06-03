@@ -15,6 +15,18 @@ namespace DoppleWebDemo.Controllers.Helpers
 {
     public static class GraphCreator
     {
+        private const string CodePadding = @"using System;
+                                            using System.Collections.Generic;
+                                            using System.Linq;
+
+                                            namespace TestedFunctions
+                                            {
+                                                class TestedFunction
+                                                {
+                                                    FunctionPlaceholder
+                                                }
+                                            }
+                                            ";
         private static CodeColorHanlder CodeColorHandler = new CodeColorHanlder();
         public static NodesAndEdges CompileCode(string source)
         {
@@ -31,6 +43,11 @@ namespace DoppleWebDemo.Controllers.Helpers
                 GenerateExecutable = false
             };
 
+            string firstLine = source.Substring(0, source.IndexOf('\n'));
+            if (firstLine.Contains('(') && firstLine.Contains(')'))
+            {
+                source = CodePadding.Replace("FunctionPlaceholder", source);
+            }
             CompilerResults results = provider.CompileAssemblyFromSource(compilerParams, source);
 
             if (results.Errors.Count != 0)
@@ -60,7 +77,7 @@ namespace DoppleWebDemo.Controllers.Helpers
         {
             List<NodeForJS> nodes = GetNodes(instructionNodes);
             List<EdgeForJS> edges = GetEdges(instructionNodes);
-            return new NodesAndEdges() { NodesJS = nodes, EdgesJS = edges };
+            return new NodesAndEdges() { NodesJS = nodes, DataEdgesJS = edges };
         }
 
         private static List<NodeForJS> GetNodes(List<InstructionNode> instructionNodes)
@@ -78,14 +95,16 @@ namespace DoppleWebDemo.Controllers.Helpers
             { from = y.Argument.InstructionIndex,
                 to = x.InstructionIndex,
                 color = ColorTranslator.ToHtml(CodeColorHandler.GetEdgeColor(y.ArgIndex, GraphSimilarityByMatching.EdgeType.DataFlow)),
-                type = GraphSimilarityByMatching.EdgeType.DataFlow
+                type = GraphSimilarityByMatching.EdgeType.DataFlow,
+                isLayoutPositioned = true
             }));
             var flowEdges = instructionNodes.SelectMany(x => x.BranchProperties.Branches.Select(y => new EdgeForJS()
             {
                 from = y.OriginatingNode.InstructionIndex,
                 to = x.InstructionIndex,
                 color = ColorTranslator.ToHtml(CodeColorHandler.GetEdgeColor(y.OriginatingNodeIndex, GraphSimilarityByMatching.EdgeType.ProgramFlowAffecting)),
-                type = GraphSimilarityByMatching.EdgeType.ProgramFlowAffecting
+                type = GraphSimilarityByMatching.EdgeType.ProgramFlowAffecting,
+                isLayoutPositioned = false
             }));
             return dataEdges.Concat(flowEdges).ToList();
 

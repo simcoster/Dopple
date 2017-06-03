@@ -78,6 +78,10 @@ namespace Dopple.InstructionNodes
             {
                 return new[] { new LdArgInstructionNode(instruction, method) };
             }
+            else if (CodeGroups.LdArgAddressCodes.Contains(nodeCode))
+            {
+                return new[] { new LoadArgAddressInstructionNode(instruction, method) };
+            }
             else if (CodeGroups.StArgCodes.Contains(nodeCode))
             {
                 return new[] { new StoreArgumentNode(instruction, method) };

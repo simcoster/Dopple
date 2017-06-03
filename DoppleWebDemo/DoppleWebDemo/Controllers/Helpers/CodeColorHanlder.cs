@@ -117,13 +117,13 @@ namespace DoppleWebDemo.Controllers.Helpers
                     case 0:
                         return Color.Pink;
                     case 1:
-                        return Color.Yellow;
+                        return Color.Purple;
                     case 2:
                         return Color.SeaGreen;
                     case 3:
                         return Color.LightBlue;
                     default:
-                        return Color.MediumPurple;
+                        return Color.Gray;
                 }
             }
             throw new Exception("invalid edge type");
