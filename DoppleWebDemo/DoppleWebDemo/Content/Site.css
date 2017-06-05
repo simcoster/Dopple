@@ -8,6 +8,11 @@ textarea {
     padding: 50px;
 }
 
-.form-group label{
-    font-size: 15px;
+.control-label{
+    font-size: large;
+}
+
+.function-textbox
+{
+    min-height: 500px;
 }

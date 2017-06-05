@@ -190,6 +190,8 @@
   <ItemGroup>
     <Content Include="App_Data\function_text_placeholder1.txt" />
     <Content Include="App_Data\function_text_placeholder2.txt" />
+    <Content Include="Content\Images\gmail.png" />
+    <Content Include="Content\Images\linkedin.jpg" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\Site.css" />

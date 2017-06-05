@@ -11,12 +11,15 @@
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
             <ul class="nav navbar-nav">
+                <div class="navbar-header">
+                    <a class="navbar-brand" style="color:darkorange">Dopple</a>
+                </div>
                 <li>@Html.ActionLink("Intro", "Intro", "FunctionComparisons")</li>
                 <li>@Html.ActionLink("Compare", "Compare", "FunctionComparisons")</li>
             </ul>
         </div>
     </div>
-    <div class="container-fluid body-content" style="width:95%">
+    <div class="container body-content" style="width:75%">
         @RenderBody()
         <hr />
     </div>

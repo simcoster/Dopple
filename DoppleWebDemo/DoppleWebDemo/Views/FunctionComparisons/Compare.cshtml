@@ -4,29 +4,26 @@
         ViewBag.Title = "Function Compare";
     }
 
-    <h2 class="col-md-offset-5" style="margin-bottom:5%">Compare</h2>
-
-
     @using (Html.BeginForm())
     {
         @Html.AntiForgeryToken()
 
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        <div class="row text-center">
+        <div class="row text-center" style="margin-top:70px">
             <div class="form-group col-sm-6">
                 @Html.LabelFor(model => model.FirstFunctionCode, "First Function Code", htmlAttributes: new { @class = "control-label" })
-                @Html.EditorFor(model => model.FirstFunctionCode, new { htmlAttributes = new { @class = "form-control", placeholder = ViewBag.FunctionPlaceHolder1 } })
+                @Html.EditorFor(model => model.FirstFunctionCode, new { htmlAttributes = new { @class = "form-control function-textbox", placeholder = ViewBag.FunctionPlaceHolder1 } })
                 @Html.ValidationMessageFor(model => model.FirstFunctionCode, "", new { @class = "text-danger" })
             </div>
 
             <div class="form-group col-sm-6">
                 @Html.LabelFor(model => model.SecondFunctionCode, "Second Function Code", htmlAttributes: new { @class = "control-label" })
-                @Html.EditorFor(model => model.SecondFunctionCode, new { htmlAttributes = new { @class = "form-control ", placeholder = ViewBag.FunctionPlaceHolder2 } })
+                @Html.EditorFor(model => model.SecondFunctionCode, new { htmlAttributes = new { @class = "form-control function-textbox", placeholder = ViewBag.FunctionPlaceHolder2 } })
                 @Html.ValidationMessageFor(model => model.SecondFunctionCode, "", new { @class = "text-danger" })
             </div>
         </div>
         <div class="row">
-            <div class="form-group col-md-4 col-md-offset-5">
+            <div align="center">
                 <input type="submit" value="Compare!" class="btn btn-default" style="width : 300px" />
             </div>
         </div>

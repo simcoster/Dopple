@@ -98,14 +98,15 @@ namespace DoppleWebDemo.Controllers.Helpers
                 type = GraphSimilarityByMatching.EdgeType.DataFlow,
                 isLayoutPositioned = true
             }));
-            var flowEdges = instructionNodes.SelectMany(x => x.BranchProperties.Branches.Select(y => new EdgeForJS()
-            {
-                from = y.OriginatingNode.InstructionIndex,
-                to = x.InstructionIndex,
-                color = ColorTranslator.ToHtml(CodeColorHandler.GetEdgeColor(y.OriginatingNodeIndex, GraphSimilarityByMatching.EdgeType.ProgramFlowAffecting)),
-                type = GraphSimilarityByMatching.EdgeType.ProgramFlowAffecting,
-                isLayoutPositioned = false
-            }));
+            //var flowEdges = instructionNodes.SelectMany(x => x.BranchProperties.Branches.Select(y => new EdgeForJS()
+            //{
+            //    from = y.OriginatingNode.InstructionIndex,
+            //    to = x.InstructionIndex,
+            //    color = ColorTranslator.ToHtml(CodeColorHandler.GetEdgeColor(y.OriginatingNodeIndex, GraphSimilarityByMatching.EdgeType.ProgramFlowAffecting)),
+            //    type = GraphSimilarityByMatching.EdgeType.ProgramFlowAffecting,
+            //    isLayoutPositioned = false
+            //}));
+            var flowEdges = new List<EdgeForJS>();
             return dataEdges.Concat(flowEdges).ToList();
 
         }
