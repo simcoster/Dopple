@@ -1,18 +1,10 @@
 ﻿@model DoppleWebDemo.Models.FunctionComparison
-
-<html>
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    @Styles.Render("~/Content/css")
-    @Scripts.Render("~/bundles/modernizr")
-</head>
-<body>
     @{
+        Layout = "~/Views/Shared/_Layout.cshtml";
         ViewBag.Title = "Function Compare";
     }
 
-    <h2 class="col-md-offset-5">Function Compare</h2>
+    <h2 class="col-md-offset-5" style="margin-bottom:5%">Compare</h2>
 
 
     @using (Html.BeginForm())
@@ -20,16 +12,16 @@
         @Html.AntiForgeryToken()
 
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        <div class="row">
+        <div class="row text-center">
             <div class="form-group col-sm-6">
-                @Html.LabelFor(model => model.FirstFunctionCode, "First Function Code", htmlAttributes: new { @class = "control -label" })
-                @Html.EditorFor(model => model.FirstFunctionCode, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.LabelFor(model => model.FirstFunctionCode, "First Function Code", htmlAttributes: new { @class = "control-label" })
+                @Html.EditorFor(model => model.FirstFunctionCode, new { htmlAttributes = new { @class = "form-control", placeholder = ViewBag.FunctionPlaceHolder1 } })
                 @Html.ValidationMessageFor(model => model.FirstFunctionCode, "", new { @class = "text-danger" })
             </div>
 
             <div class="form-group col-sm-6">
                 @Html.LabelFor(model => model.SecondFunctionCode, "Second Function Code", htmlAttributes: new { @class = "control-label" })
-                @Html.EditorFor(model => model.SecondFunctionCode, new { htmlAttributes = new { @class = "form-control " } })
+                @Html.EditorFor(model => model.SecondFunctionCode, new { htmlAttributes = new { @class = "form-control ", placeholder = ViewBag.FunctionPlaceHolder2 } })
                 @Html.ValidationMessageFor(model => model.SecondFunctionCode, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -40,11 +32,9 @@
         </div>
     }
 
-    @section Scripts {
+@section Scripts {
         @Scripts.Render("~/bundles/jqueryval")
         @Scripts.Render("~/bundles/jquery")
         @Scripts.Render("~/bundles/bootstrap")
-        @RenderSection("scripts", required: false)
-    }
-</body>
-</html>
+}
+

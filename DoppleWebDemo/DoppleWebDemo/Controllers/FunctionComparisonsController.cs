@@ -29,8 +29,11 @@ namespace DoppleWebDemo.Controllers
         }
 
         // GET: FunctionComparisons/Create
-        public ActionResult Create()
+        public ActionResult Compare()
         {
+            ViewBag.FunctionPlaceHolder1 = System.IO.File.ReadAllText(Server.MapPath(@"~/App_Data/function_text_placeholder1.txt"));
+            ViewBag.FunctionPlaceHolder2 = System.IO.File.ReadAllText(Server.MapPath(@"~/App_Data/function_text_placeholder2.txt"));
+
             return View();
         }
 
@@ -48,7 +51,6 @@ namespace DoppleWebDemo.Controllers
                 var blah = db.FunctionComparisons.Add(functionComparison);
                 functionComparison.CalculateScores();
                 var id = db.SaveChanges();
-
            
                 return View("Result", functionComparison);
             }

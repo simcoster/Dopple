@@ -188,6 +188,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Data\function_text_placeholder1.txt" />
+    <Content Include="App_Data\function_text_placeholder2.txt" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\Site.css" />
@@ -226,22 +228,19 @@
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
-    <Content Include="Views\Shared\_Layout2.cshtml" />
+    <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Home\About.cshtml" />
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
-    <Content Include="Views\FuncComaprison\Index.cshtml" />
-    <Content Include="Views\FuncComaprison\Welcome.cshtml" />
-    <Content Include="Views\FunctionComparisons\Create.cshtml" />
+    <Content Include="Views\FunctionComparisons\Compare.cshtml" />
     <Content Include="Views\FunctionComparisons\Intro.cshtml" />
     <Content Include="Views\FunctionComparisons\Edit.cshtml" />
     <Content Include="Views\FunctionComparisons\Index.cshtml" />
     <Content Include="Views\FunctionComparisons\Result.cshtml" />
     <Content Include="Views\FunctionComparisons\Experiment.cshtml" />
+    <Content Include="Views\FunctionComparisons\HowToUse.cshtml" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="App_Data\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
