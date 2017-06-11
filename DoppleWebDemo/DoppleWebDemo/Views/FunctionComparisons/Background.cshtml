@@ -1,0 +1,30 @@
+﻿@{
+    ViewBag.Title = "Background";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script>
+    appInsights.trackEvent("Added Item to Shopping Cart");
+</script>
+<div>
+    <h3 class="text-general">
+        I noticed while I was working in my previous positions that on some occasions, one developer would work on some functionallity, not knowing that another developer has already written similar code.
+        <br />
+        I wondered whether this could be avoided programmatically.
+        <br /><br />
+        I assumed that 2 pieces of code that do similar things probably also have similar "mini patterns".
+        <br />
+        For instance a sorting algorithm will probably compare 2 cells in an array, and write their contents to other cells based on that comparison.
+        <br /><br />
+        To detect these patterns, I first recursively inline any called functions, if any calls exist.
+        <br />
+        I then construct a data flow graph for each of the functions.
+        <br />
+        This graph is comprised of the compiled op codes (cil codes) as the nodes, and edges represent which node hands data to which.
+        <br />
+        For example a function that sums 2 arguments a,b will have a graph containing an Add node, connected to 2 nodes - Ldarg.0 and Ldarg.1
+        <br /><br />
+        After constructing the graphs for each of the functions I compare them by matching each node of the first graph to those of the second, then doing the same process for the second.
+        <br />
+        I score each of those matches and add them up, then divide the total by the sum of the match scores of each graph to itself.
+    </h3>
+</div>

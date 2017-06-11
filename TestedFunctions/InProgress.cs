@@ -109,10 +109,10 @@ namespace TestedFunctions
         //    answer = a + b;
         //}
 
-        //public static int SumIntsLinq(int[] nums)
-        //{
-        //    return nums.Sum();
-        //}
+        public static int SumIntsLinq(int[] nums)
+        {
+            return nums.Sum();
+        }
         //public static int testLinq2(List<Helper> nums)
         //{
         //    return nums.Sum(x => x.Number);
@@ -406,7 +406,25 @@ namespace TestedFunctions
             }
         }
     }
+    class InProgress
+    {
+        public static int temp(int a, int b)
+        {
+            return add_incremental(a, b);
+        }
 
+        public static int add_incremental(int one, int two)
+        {
+            int multiplier = 1;
+            if (two < 0)
+                multiplier = -1;
+            for (int i = 0; i < two; i++)
+            {
+                one = one + 1 * multiplier;
+            }
+            return one;
+        }
+    }
 
     public class Helper
     {
@@ -415,7 +433,6 @@ namespace TestedFunctions
         public Helper()
         {
             Number = 4;
-            //Text2 = "Blaaa";
         }
         //neeed to add a real exmaple
         //object with object field in it and with 2 inheriting implementing 2 a virtual method

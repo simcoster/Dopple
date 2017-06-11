@@ -36,13 +36,14 @@ namespace DoppleWebDemo.Controllers.Helpers
                 };
             CSharpCodeProvider provider = new CSharpCodeProvider(providerOptions);
 
-            var tempFile = Path.GetTempPath() + Guid.NewGuid().ToString() + ".dll";
+            //var tempFile = Path.GetTempPath() + Guid.NewGuid().ToString() + ".dll";
+            var tempFile = Path.GetTempPath() + "Functions" + ".dll";
             CompilerParameters compilerParams = new CompilerParameters(new[] { "mscorlib.dll", "System.Core.dll", "System.dll" }, tempFile)
             {
                 GenerateInMemory = false,
                 GenerateExecutable = false
             };
-
+            source = source.Trim();
             string firstLine = source.Substring(0, source.IndexOf('\n'));
             if (firstLine.Contains('(') && firstLine.Contains(')'))
             {
@@ -50,8 +51,8 @@ namespace DoppleWebDemo.Controllers.Helpers
             }
             CompilerResults results = provider.CompileAssemblyFromSource(compilerParams, source);
 
-            if (results.Errors.Count != 0)
-                throw new Exception("Mission failed!");
+            //if (results.Errors.Count != 0)
+            //    throw new Exception("Mission failed!");
 
             AssemblyDefinition loadedAssembly = AssemblyDefinition.ReadAssembly(tempFile);
             if (loadedAssembly.MainModule.Types.Count(x => x.HasMethods) != 1)
@@ -70,6 +71,7 @@ namespace DoppleWebDemo.Controllers.Helpers
             var nodesAndEdgesForJS =  GetNodesAndEdges(graphBuilder.InstructionNodes);
             nodesAndEdgesForJS.Method = graphBuilder.InstructionNodes[0].Method;
             nodesAndEdgesForJS.Nodes = graphBuilder.InstructionNodes;
+            File.Delete(tempFile);
             return nodesAndEdgesForJS;
         }
 

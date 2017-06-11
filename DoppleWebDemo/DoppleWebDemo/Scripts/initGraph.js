@@ -4,6 +4,7 @@
 
 }
 
+
 function initASingleGraph(divName, nodeDataArray, edgeDataArray) {
     var $ = go.GraphObject.make;  // for conciseness in defining templates
     myDiagram =

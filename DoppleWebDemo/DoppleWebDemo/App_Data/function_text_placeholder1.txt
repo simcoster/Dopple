@@ -1,7 +1,4 @@
-﻿ please enter a C# function here
- e.g,
- 
- public static void insertionSort(int[] array)
+﻿ public static void insertionSort(int[] array)
         {
             for (int i = 0; i < array.Length - 1; i++)
             {

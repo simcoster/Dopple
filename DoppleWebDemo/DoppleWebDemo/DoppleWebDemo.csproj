@@ -180,10 +180,14 @@
     <Compile Include="Controllers\Helpers\GraphCreator.cs" />
     <Compile Include="Controllers\Helpers\NodeForJS.cs" />
     <Compile Include="Controllers\Helpers\NodesAndEdges.cs" />
-    <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201706071838216_InitialCreate.cs" />
+    <Compile Include="Migrations\201706071838216_InitialCreate.Designer.cs">
+      <DependentUpon>201706071838216_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\FunctionComparison.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -203,6 +207,7 @@
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Properties\PublishProfiles\Dopple - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\go-1.7.11-debug.js" />
     <Content Include="Scripts\go-1.7.11.js" />
@@ -236,13 +241,15 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\FunctionComparisons\Compare.cshtml" />
     <Content Include="Views\FunctionComparisons\Intro.cshtml" />
-    <Content Include="Views\FunctionComparisons\Edit.cshtml" />
-    <Content Include="Views\FunctionComparisons\Index.cshtml" />
     <Content Include="Views\FunctionComparisons\Result.cshtml" />
-    <Content Include="Views\FunctionComparisons\Experiment.cshtml" />
     <Content Include="Views\FunctionComparisons\HowToUse.cshtml" />
+    <Content Include="Views\FunctionComparisons\Background.cshtml" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201706071838216_InitialCreate.resx">
+      <DependentUpon>201706071838216_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />

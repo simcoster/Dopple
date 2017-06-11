@@ -1,7 +1,4 @@
-﻿ please enter a C# function here
- e.g,
- 
- public int[] SelectionSort(int[] arr)
+﻿ public int[] SelectionSort(int[] arr)
         {
             int _min = 0;
             for (int i = 0; i < arr.Length; i++)

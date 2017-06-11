@@ -9,6 +9,7 @@ using System.Web.Mvc;
 using DoppleWebDemo.Models;
 using DoppleWebDemo.Controllers.Helpers;
 using GraphSimilarityByMatching;
+using System.Diagnostics;
 
 namespace DoppleWebDemo.Controllers
 {
@@ -28,33 +29,38 @@ namespace DoppleWebDemo.Controllers
             return View();
         }
 
+        public ActionResult Background()
+        {
+            return View();
+        }
+
         // GET: FunctionComparisons/Create
         public ActionResult Compare()
         {
-            ViewBag.FunctionPlaceHolder1 = System.IO.File.ReadAllText(Server.MapPath(@"~/App_Data/function_text_placeholder1.txt"));
-            ViewBag.FunctionPlaceHolder2 = System.IO.File.ReadAllText(Server.MapPath(@"~/App_Data/function_text_placeholder2.txt"));
+            FunctionComparison comparison = new FunctionComparison();
+            comparison.FirstFunctionCode = System.IO.File.ReadAllText(Server.MapPath(@"~/App_Data/function_text_placeholder1.txt"));
+            comparison.SecondFunctionCode =System.IO.File.ReadAllText(Server.MapPath(@"~/App_Data/function_text_placeholder2.txt"));
 
-            return View();
+            return View(comparison);
         }
 
         // POST: FunctionComparisons/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [ValidateInput(false)]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Index,FirstFunctionCode,SecondFunctionCode")] FunctionComparison functionComparison)
+        public ActionResult Compare([Bind(Include = "Index,FirstFunctionCode,SecondFunctionCode")] FunctionComparison functionComparison)
         {
             //return View("Result");
-
             if (ModelState.IsValid)
             {
                 var blah = db.FunctionComparisons.Add(functionComparison);
                 functionComparison.CalculateScores();
                 var id = db.SaveChanges();
-           
+
                 return View("Result", functionComparison);
             }
-
             return View(functionComparison);
         }
 
