@@ -29,25 +29,18 @@ namespace DoppleWebDemo.Controllers
             return View();
         }
 
-        public ActionResult Background()
-        {
-            return View();
-        }
-
         // GET: FunctionComparisons/Create
         public ActionResult Compare()
         {
-            FunctionComparison comparison = new FunctionComparison();
-            comparison.FirstFunctionCode = System.IO.File.ReadAllText(Server.MapPath(@"~/App_Data/function_text_placeholder1.txt"));
-            comparison.SecondFunctionCode =System.IO.File.ReadAllText(Server.MapPath(@"~/App_Data/function_text_placeholder2.txt"));
+            ViewBag.FunctionPlaceHolder1 = System.IO.File.ReadAllText(Server.MapPath(@"~/App_Data/function_text_placeholder1.txt"));
+            ViewBag.FunctionPlaceHolder2 = System.IO.File.ReadAllText(Server.MapPath(@"~/App_Data/function_text_placeholder2.txt"));
 
-            return View(comparison);
+            return View();
         }
 
         // POST: FunctionComparisons/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [ValidateInput(false)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Compare([Bind(Include = "Index,FirstFunctionCode,SecondFunctionCode")] FunctionComparison functionComparison)
@@ -55,12 +48,20 @@ namespace DoppleWebDemo.Controllers
             //return View("Result");
             if (ModelState.IsValid)
             {
-                var blah = db.FunctionComparisons.Add(functionComparison);
-                functionComparison.CalculateScores();
-                var id = db.SaveChanges();
-
+                try
+                {
+                    var blah = db.FunctionComparisons.Add(functionComparison);
+                    functionComparison.CalculateScores();
+                    var id = db.SaveChanges();
+                }
+               catch(Exception ex)
+                {
+                    Trace.TraceError(ex.Message);
+                }
+           
                 return View("Result", functionComparison);
             }
+
             return View(functionComparison);
         }
 

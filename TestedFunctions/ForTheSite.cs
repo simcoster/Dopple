@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TestedFunctions
+﻿namespace TestedFunctions
 {
     class ForTheSite
     {
-        public static void insertionSort(int[] array)
+        public static void insertionSortWithHelpers(int[] array)
         {
             for (int i = 0; i < array.Length - 1; i++)
             {
@@ -24,12 +18,32 @@ namespace TestedFunctions
                 }
                 if (nextMin < array[i])
                 {
-                    int temp = array[i];
-                    array[i] = array[nextMinIndex];
-                    array[nextMinIndex] = temp;
+                    swapTwo(array, i, nextMinIndex);
                 }
             }
-            return;
+        }
+
+        public static void swapTwo(int[] array, int i, int j)
+        {
+            int temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+        }
+
+        public static void findMinAndIndex(int[] array, int startIndex, out int minValue, out int minIndex)
+        {
+            int currentMin = int.MaxValue;
+            int currentMinIndex = -1;
+            for (int i = startIndex; i < array.Length; i++)
+            {
+                if (array[i] < currentMin)
+                {
+                    currentMin = array[i];
+                    currentMinIndex = i;
+                }
+            }
+            minValue = currentMin;
+            minIndex = currentMinIndex;
         }
     }
 }

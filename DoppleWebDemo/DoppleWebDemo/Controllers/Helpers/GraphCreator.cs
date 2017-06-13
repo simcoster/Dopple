@@ -60,11 +60,6 @@ namespace DoppleWebDemo.Controllers.Helpers
                 throw new Exception("only one class allowed");
             }
             TypeDefinition loadedType = loadedAssembly.MainModule.Types.First(x => x.HasMethods);
-            if (loadedType.Methods.Count > 3)
-            {
-                throw new Exception("only one user method allowed");
-            }
-
             var graphBuilder = new GraphBuilder(loadedType.Methods.First());
             graphBuilder.Run();
 
