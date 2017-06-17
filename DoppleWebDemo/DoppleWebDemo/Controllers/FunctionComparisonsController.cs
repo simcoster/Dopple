@@ -29,6 +29,11 @@ namespace DoppleWebDemo.Controllers
             return View();
         }
 
+        public ActionResult Background()
+        {
+            return View();
+        }
+
         // GET: FunctionComparisons/Create
         public ActionResult Compare()
         {
