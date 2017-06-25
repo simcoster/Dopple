@@ -14,6 +14,11 @@ namespace DoppleWebDemo
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
             routes.MapRoute(
+               name: "Blank",
+               url: "",
+               defaults: new { controller = "FunctionComparisons", action = "Intro", id = UrlParameter.Optional }
+           );
+            routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
                 defaults: new { controller = "FunctionComparisons", action = "Intro", id = UrlParameter.Optional }

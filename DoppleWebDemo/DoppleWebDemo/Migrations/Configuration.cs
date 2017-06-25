@@ -9,7 +9,7 @@ namespace DoppleWebDemo.Migrations
     {
         public Configuration()
         {
-            AutomaticMigrationsEnabled = false;
+            AutomaticMigrationsEnabled = true;
         }
 
         protected override void Seed(DoppleWebDemo.Models.FunctionComparisonDBContext context)

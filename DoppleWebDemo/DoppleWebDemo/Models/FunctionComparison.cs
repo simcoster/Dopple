@@ -59,5 +59,7 @@ namespace DoppleWebDemo.Models
             base.OnModelCreating(modelBuilder);
         }
         public DbSet<FunctionComparison> FunctionComparisons { get; set; }
+
+        public System.Data.Entity.DbSet<DoppleWebDemo.Models.Feedback> Feedbacks { get; set; }
     }
 }

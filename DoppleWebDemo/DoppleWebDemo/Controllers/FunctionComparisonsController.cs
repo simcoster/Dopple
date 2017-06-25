@@ -131,6 +131,14 @@ namespace DoppleWebDemo.Controllers
             return View(functionComparison);
         }
 
+
+        // GET: FunctionComparisons/Edit/5
+        public ActionResult Feedback()
+        {
+            return View();
+        }
+
+
         // POST: FunctionComparisons/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
