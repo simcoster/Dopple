@@ -1,13 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29009.5
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utility", "Utility\Utility.csproj", "{95E968C9-C211-483D-9619-DBF408CE9BCC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphWinform", "DoppleGraph\GraphWinform.csproj", "{B9888195-F233-4969-BBBC-3A9F7769C0C7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphSimilarity", "GraphSimilarity\GraphSimilarity.csproj", "{BCA16D37-4D5B-43D3-AF84-2FEB636580BB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{77C5971E-3C37-4932-911D-9C6050E67FFA} = {77C5971E-3C37-4932-911D-9C6050E67FFA}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphSimilarityByMatching", "GraphSimilarityByMatching\GraphSimilarityByMatching.csproj", "{CE4AA61A-CFE3-4C9B-8671-58C058C8E40C}"
 EndProject
@@ -17,10 +20,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestedFunctions", "TestedFu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphBuilder", "GraphBuilder\GraphBuilder.csproj", "{77C5971E-3C37-4932-911D-9C6050E67FFA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DoppleWebDemo", "DoppleWebDemo\DoppleWebDemo\DoppleWebDemo.csproj", "{3EE9F57F-F992-43F1-921A-E624B74C70F0}"
+EndProject
 Global
-	GlobalSection(Performance) = preSolution
-		HasPerformanceSessions = true
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Mixed|Any CPU = Mixed|Any CPU
@@ -69,8 +71,20 @@ Global
 		{77C5971E-3C37-4932-911D-9C6050E67FFA}.Mixed|Any CPU.Build.0 = Mixed|Any CPU
 		{77C5971E-3C37-4932-911D-9C6050E67FFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{77C5971E-3C37-4932-911D-9C6050E67FFA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3EE9F57F-F992-43F1-921A-E624B74C70F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3EE9F57F-F992-43F1-921A-E624B74C70F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3EE9F57F-F992-43F1-921A-E624B74C70F0}.Mixed|Any CPU.ActiveCfg = Release|Any CPU
+		{3EE9F57F-F992-43F1-921A-E624B74C70F0}.Mixed|Any CPU.Build.0 = Release|Any CPU
+		{3EE9F57F-F992-43F1-921A-E624B74C70F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3EE9F57F-F992-43F1-921A-E624B74C70F0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FE60E208-55D1-4CCA-ABB9-122050BB4497}
+	EndGlobalSection
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal

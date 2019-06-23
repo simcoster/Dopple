@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29009.5
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DoppleWebDemo", "DoppleWebDemo\DoppleWebDemo.csproj", "{3EE9F57F-F992-43F1-921A-E624B74C70F0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphBuilder", "..\GraphBuilder\GraphBuilder.csproj", "{77C5971E-3C37-4932-911D-9C6050E67FFA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphSimilarityByMatching", "..\GraphSimilarityByMatching\GraphSimilarityByMatching.csproj", "{CE4AA61A-CFE3-4C9B-8671-58C058C8E40C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utility", "..\Utility\Utility.csproj", "{95E968C9-C211-483D-9619-DBF408CE9BCC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,8 +36,17 @@ Global
 		{CE4AA61A-CFE3-4C9B-8671-58C058C8E40C}.Mixed|Any CPU.Build.0 = Release|Any CPU
 		{CE4AA61A-CFE3-4C9B-8671-58C058C8E40C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CE4AA61A-CFE3-4C9B-8671-58C058C8E40C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95E968C9-C211-483D-9619-DBF408CE9BCC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95E968C9-C211-483D-9619-DBF408CE9BCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95E968C9-C211-483D-9619-DBF408CE9BCC}.Mixed|Any CPU.ActiveCfg = Mixed|Any CPU
+		{95E968C9-C211-483D-9619-DBF408CE9BCC}.Mixed|Any CPU.Build.0 = Mixed|Any CPU
+		{95E968C9-C211-483D-9619-DBF408CE9BCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95E968C9-C211-483D-9619-DBF408CE9BCC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4BB50D6E-ADF7-46E4-860B-B5A0AE737A36}
 	EndGlobalSection
 EndGlobal

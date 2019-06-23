@@ -406,25 +406,6 @@ namespace TestedFunctions
             }
         }
     }
-    class InProgress
-    {
-        public static int temp(int a, int b)
-        {
-            return add_incremental(a, b);
-        }
-
-        public static int add_incremental(int one, int two)
-        {
-            int multiplier = 1;
-            if (two < 0)
-                multiplier = -1;
-            for (int i = 0; i < two; i++)
-            {
-                one = one + 1 * multiplier;
-            }
-            return one;
-        }
-    }
 
     public class Helper
     {
